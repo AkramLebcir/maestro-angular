@@ -43,6 +43,7 @@ export interface CreateLabDto {
   isAvailable?: boolean;
 }
 
+
 @Component({
   selector: 'app-classes',
   templateUrl: './classes.component.html',
@@ -231,9 +232,11 @@ export class ClassesComponent implements OnInit {
     };
 
     this.apiService.post<Lab>('/labs', submitData).subscribe({
-      next: () => {
+      next: (newLab) => {
         this.loadLabs();
         this.closeLabModal();
+        // Automatically select the newly created lab
+        this.formData.labId = newLab.id;
         alert('تم إضافة المخبر بنجاح');
       },
       error: (error) => {
