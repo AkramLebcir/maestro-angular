@@ -18,6 +18,30 @@ export class Student {
   @Column({ nullable: true })
   studentNumber: string;
 
+  @Column({ nullable: true })
+  idNumber: string;
+
+  @Column({ type: 'date', nullable: true })
+  dateOfBirth: Date;
+
+  @Column({ nullable: true })
+  placeOfBirth: string;
+
+  @Column({ type: 'enum', enum: ['male', 'female'], nullable: true })
+  gender: 'male' | 'female';
+
+  @Column({ type: 'boolean', default: false, nullable: true })
+  isRepeater: boolean;
+
+  @Column({ nullable: true })
+  studentId: string;
+
+  @Column({ type: 'text', nullable: true })
+  photo: string;
+
+  @Column({ type: 'text', nullable: true })
+  generalNotes: string;
+
   @ManyToOne(() => Class, (classEntity) => classEntity.students, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'classId' })
   class: Class;
