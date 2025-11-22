@@ -4,6 +4,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from './database/database.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { ClassesModule } from './classes/classes.module';
+import { LabsModule } from './labs/labs.module';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { AppService } from './app.service';
       envFilePath: '.env',
     }),
     DatabaseModule,
+    ClassesModule,
+    LabsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

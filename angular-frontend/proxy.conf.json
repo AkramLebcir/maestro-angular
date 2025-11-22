@@ -4,9 +4,7 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
-    "pathRewrite": {
-      "^/api": ""
-    }
+    "timeout": 60000
   }
 }
 

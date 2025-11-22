@@ -40,6 +40,13 @@ export class ApiService {
   }
 
   /**
+   * Generic PATCH request
+   */
+  patch<T>(endpoint: string, body: any): Observable<T> {
+    return this.http.patch<T>(`${this.apiUrl}${endpoint}`, body);
+  }
+
+  /**
    * Generic DELETE request
    */
   delete<T>(endpoint: string): Observable<T> {
