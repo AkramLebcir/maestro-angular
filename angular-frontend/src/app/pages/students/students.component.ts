@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import * as XLSX from 'xlsx';
 
 export interface Student {
   id: number;
@@ -78,6 +79,16 @@ export class StudentsComponent implements OnInit {
   // File upload
   selectedFile: File | null = null;
   photoPreview: string | null = null;
+  
+  // Excel import
+  isImporting: boolean = false;
+  importProgress: { total: number; success: number; failed: number; errors: string[] } = {
+    total: 0,
+    success: 0,
+    failed: 0,
+    errors: []
+  };
+  showImportModal: boolean = false;
 
   constructor(private apiService: ApiService) {}
 
@@ -380,26 +391,218 @@ export class StudentsComponent implements OnInit {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Note: xlsx library needs to be installed: npm install xlsx
-    // For now, we'll show an alert
-    alert('ميزة استيراد Excel تتطلب تثبيت مكتبة xlsx. سيتم إضافتها قريباً.');
+    const reader = new FileReader();
+    reader.onload = (e: any) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const firstSheetName = workbook.SheetNames[0];
+        const firstSheet = workbook.Sheets[firstSheetName];
+        const jsonData: any[] = XLSX.utils.sheet_to_json(firstSheet, { raw: false });
+        
+        if (jsonData.length === 0) {
+          alert('الملف فارغ أو لا يحتوي على بيانات');
+          return;
+        }
+
+        this.processExcelData(jsonData);
+      } catch (error) {
+        console.error('Error reading Excel file:', error);
+        alert('حدث خطأ أثناء قراءة ملف Excel. يرجى التحقق من صحة الملف.');
+      }
+    };
+    reader.readAsArrayBuffer(file);
     
-    // TODO: Implement Excel import when xlsx is installed
-    // import * as XLSX from 'xlsx';
-    // const reader = new FileReader();
-    // reader.onload = (e: any) => {
-    //   const data = new Uint8Array(e.target.result);
-    //   const workbook = XLSX.read(data, { type: 'array' });
-    //   const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-    //   const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-    //   // Process and import students
-    // };
-    // reader.readAsArrayBuffer(file);
+    // Reset file input
+    event.target.value = '';
+  }
+
+  processExcelData(jsonData: any[]): void {
+    this.isImporting = true;
+    this.showImportModal = true;
+    this.importProgress = {
+      total: jsonData.length,
+      success: 0,
+      failed: 0,
+      errors: []
+    };
+
+    // Column mapping - supports multiple possible column names
+    const columnMap: { [key: string]: string[] } = {
+      idNumber: ['رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية'],
+      lastName: ['اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name'],
+      firstName: ['الاسم', 'firstName', 'first_name', 'الاسم الأول'],
+      dateOfBirth: ['تاريخ الميلاد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'birth_date'],
+      placeOfBirth: ['مكان الميلاد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'birth_place'],
+      gender: ['الجنس', 'gender', 'sex', 'النوع'],
+      isRepeater: ['معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater', 'هل التلميذ معيد'],
+      studentId: ['رقم التلميذ', 'studentId', 'student_id', 'رقم_التلميذ'],
+      email: ['البريد الإلكتروني', 'email', 'e-mail', 'البريد'],
+      studentNumber: ['رقم الطالب', 'studentNumber', 'student_number', 'رقم_الطالب'],
+      className: ['القسم', 'class', 'className', 'class_name', 'department', 'القسم/الفصل'],
+      generalNotes: ['ملاحظات', 'ملاحظات عامة', 'generalNotes', 'general_notes', 'notes', 'ملاحظات_عامة']
+    };
+
+    let processed = 0;
+    const processNext = () => {
+      if (processed >= jsonData.length) {
+        this.isImporting = false;
+        return;
+      }
+
+      const row = jsonData[processed];
+      const studentData = this.mapRowToStudent(row, columnMap);
+      
+      if (!studentData.lastName || !studentData.firstName) {
+        this.importProgress.failed++;
+        this.importProgress.errors.push(`الصف ${processed + 2}: الاسم واللقب مطلوبان`);
+        processed++;
+        setTimeout(processNext, 50);
+        return;
+      }
+
+      this.apiService.post<Student>('/students', studentData).subscribe({
+        next: () => {
+          this.importProgress.success++;
+          processed++;
+          setTimeout(processNext, 50);
+        },
+        error: (error) => {
+          this.importProgress.failed++;
+          const errorMsg = error?.error?.message || 'خطأ غير معروف';
+          this.importProgress.errors.push(`الصف ${processed + 2}: ${errorMsg}`);
+          processed++;
+          setTimeout(processNext, 50);
+        }
+      });
+    };
+
+    processNext();
+  }
+
+  mapRowToStudent(row: any, columnMap: { [key: string]: string[] }): CreateStudentDto {
+    const findColumnValue = (keys: string[]): any => {
+      for (const key of keys) {
+        if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
+          return row[key];
+        }
+      }
+      return undefined;
+    };
+
+    const studentData: CreateStudentDto = {
+      idNumber: findColumnValue(columnMap['idNumber']),
+      lastName: findColumnValue(columnMap['lastName']) || '',
+      firstName: findColumnValue(columnMap['firstName']) || '',
+      dateOfBirth: this.parseDate(findColumnValue(columnMap['dateOfBirth'])),
+      placeOfBirth: findColumnValue(columnMap['placeOfBirth']),
+      gender: this.parseGender(findColumnValue(columnMap['gender'])),
+      isRepeater: this.parseBoolean(findColumnValue(columnMap['isRepeater'])),
+      studentId: findColumnValue(columnMap['studentId']),
+      email: findColumnValue(columnMap['email']),
+      studentNumber: findColumnValue(columnMap['studentNumber']),
+      generalNotes: findColumnValue(columnMap['generalNotes'])
+    };
+
+    // Try to find class by name
+    const className = findColumnValue(columnMap['className']);
+    if (className) {
+      const foundClass = this.classes.find(c => 
+        c.name.toLowerCase().trim() === className.toString().toLowerCase().trim()
+      );
+      if (foundClass) {
+        studentData.classId = foundClass.id;
+      }
+    }
+
+    return studentData;
+  }
+
+  parseDate(dateValue: any): string | undefined {
+    if (!dateValue) return undefined;
+    
+    // If it's already a date string in ISO format
+    if (typeof dateValue === 'string' && dateValue.includes('T')) {
+      return dateValue.split('T')[0];
+    }
+    
+    // If it's an Excel serial date number
+    if (typeof dateValue === 'number') {
+      const excelEpoch = new Date(1899, 11, 30);
+      const date = new Date(excelEpoch.getTime() + dateValue * 86400000);
+      return date.toISOString().split('T')[0];
+    }
+    
+    // Try to parse as date string
+    if (typeof dateValue === 'string') {
+      const date = new Date(dateValue);
+      if (!isNaN(date.getTime())) {
+        return date.toISOString().split('T')[0];
+      }
+    }
+    
+    return undefined;
+  }
+
+  parseGender(genderValue: any): 'male' | 'female' | undefined {
+    if (!genderValue) return undefined;
+    
+    const genderStr = genderValue.toString().toLowerCase().trim();
+    if (genderStr === 'ذكر' || genderStr === 'male' || genderStr === 'm' || genderStr === '1') {
+      return 'male';
+    }
+    if (genderStr === 'أنثى' || genderStr === 'female' || genderStr === 'f' || genderStr === '2') {
+      return 'female';
+    }
+    return undefined;
+  }
+
+  parseBoolean(boolValue: any): boolean {
+    if (boolValue === undefined || boolValue === null || boolValue === '') return false;
+    
+    const boolStr = boolValue.toString().toLowerCase().trim();
+    if (boolStr === 'نعم' || boolStr === 'yes' || boolStr === 'true' || boolStr === '1' || boolStr === 'معيد') {
+      return true;
+    }
+    return false;
+  }
+
+  closeImportModal(): void {
+    this.showImportModal = false;
+    if (!this.isImporting) {
+      this.loadStudents();
+      this.importProgress = { total: 0, success: 0, failed: 0, errors: [] };
+    }
   }
 
   exportToExcel(): void {
-    // TODO: Implement Excel export when xlsx is installed
-    alert('ميزة تصدير Excel تتطلب تثبيت مكتبة xlsx. سيتم إضافتها قريباً.');
+    try {
+      const dataToExport = this.filteredStudents.map(student => ({
+        'رقم الهوية / الكود': student.idNumber || '',
+        'اللقب': student.lastName,
+        'الاسم': student.firstName,
+        'تاريخ الميلاد': student.dateOfBirth ? this.formatDate(student.dateOfBirth) : '',
+        'مكان الميلاد': student.placeOfBirth || '',
+        'الجنس': this.getGenderLabel(student.gender),
+        'معيد': student.isRepeater ? 'نعم' : 'لا',
+        'رقم التلميذ': student.studentId || '',
+        'القسم': this.getClassName(student.classId),
+        'البريد الإلكتروني': student.email || '',
+        'رقم الطالب': student.studentNumber || '',
+        'ملاحظات عامة': student.generalNotes || ''
+      }));
+
+      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'التلاميذ');
+      
+      // Generate file name with current date
+      const fileName = `التلاميذ_${new Date().toISOString().split('T')[0]}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      alert('حدث خطأ أثناء تصدير البيانات إلى Excel');
+    }
   }
 }
 

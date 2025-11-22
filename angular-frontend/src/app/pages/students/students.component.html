@@ -11,6 +11,14 @@
           <input type="file" accept=".xlsx,.xls" (change)="onExcelFileSelected($event)" class="hidden">
         </label>
         <button 
+          (click)="exportToExcel()"
+          class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>تصدير إلى Excel</span>
+        </button>
+        <button 
           (click)="openAddModal()"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -354,6 +362,82 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Excel Import Progress Modal -->
+<div 
+  *ngIf="showImportModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  (click)="!isImporting && closeImportModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">استيراد من Excel</h3>
+      <button 
+        *ngIf="!isImporting"
+        (click)="closeImportModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <!-- Progress Bar -->
+      <div *ngIf="isImporting">
+        <div class="flex justify-between text-sm text-gray-600 mb-2">
+          <span>جاري الاستيراد...</span>
+          <span>{{ importProgress.success + importProgress.failed }} / {{ importProgress.total }}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2.5">
+          <div 
+            class="bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+            [style.width.%]="((importProgress.success + importProgress.failed) / importProgress.total) * 100">
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Summary -->
+      <div *ngIf="!isImporting" class="space-y-2">
+        <div class="flex items-center gap-2 text-green-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          <span class="font-semibold">نجح: {{ importProgress.success }}</span>
+        </div>
+        <div class="flex items-center gap-2 text-red-600">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          <span class="font-semibold">فشل: {{ importProgress.failed }}</span>
+        </div>
+        <div class="text-gray-600">
+          <span class="font-semibold">المجموع: {{ importProgress.total }}</span>
+        </div>
+      </div>
+
+      <!-- Error Details -->
+      <div *ngIf="importProgress.errors.length > 0" class="mt-4">
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">تفاصيل الأخطاء:</h4>
+        <div class="max-h-48 overflow-y-auto bg-gray-50 rounded p-3 space-y-1">
+          <div *ngFor="let error of importProgress.errors" class="text-sm text-red-600">
+            • {{ error }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <div *ngIf="!isImporting" class="flex justify-end pt-4">
+        <button 
+          (click)="closeImportModal()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          إغلاق
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
