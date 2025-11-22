@@ -27,14 +27,15 @@ export class StudentsService {
       }
     }
 
-    // Convert dateOfBirth string to Date if provided
-    const studentData: any = { ...createStudentDto };
-    if (createStudentDto.dateOfBirth) {
-      studentData.dateOfBirth = new Date(createStudentDto.dateOfBirth);
-    }
+    // Convert dateOfBirth string to Date if provided, and prepare data for entity
+    const { dateOfBirth, ...restDto } = createStudentDto;
+    const studentData: Partial<Student> = {
+      ...restDto,
+      ...(dateOfBirth && { dateOfBirth: new Date(dateOfBirth) }),
+    };
 
     const student = this.studentRepository.create(studentData);
-    const savedStudent = await this.studentRepository.save(student);
+    const savedStudent = await this.studentRepository.save(student) as Student;
     return this.findOne(savedStudent.id);
   }
 
