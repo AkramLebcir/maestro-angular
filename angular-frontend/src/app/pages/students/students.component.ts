@@ -396,16 +396,65 @@ export class StudentsComponent implements OnInit {
       try {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
-        const firstSheetName = workbook.SheetNames[0];
-        const firstSheet = workbook.Sheets[firstSheetName];
-        const jsonData: any[] = XLSX.utils.sheet_to_json(firstSheet, { raw: false });
         
-        if (jsonData.length === 0) {
-          alert('الملف فارغ أو لا يحتوي على بيانات');
+        // Process all sheets - each sheet represents a class
+        const allStudentsData: Array<{ students: any[], className: string, startRow: number }> = [];
+        let totalStudents = 0;
+
+        for (const sheetName of workbook.SheetNames) {
+          const sheet = workbook.Sheets[sheetName];
+          
+          // Read raw sheet data to search for headers
+          const rawData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+          
+          if (rawData.length === 0) continue;
+
+          // Find header row by searching for key columns
+          const headerRowIndex = this.findHeaderRow(rawData);
+          
+          if (headerRowIndex === -1) {
+            console.warn(`Sheet "${sheetName}": لم يتم العثور على رؤوس الأعمدة`);
+            continue;
+          }
+
+          // Extract headers and data
+          const headers = rawData[headerRowIndex];
+          const dataRows = rawData.slice(headerRowIndex + 1).filter(row => 
+            row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+          );
+
+          if (dataRows.length === 0) {
+            console.warn(`Sheet "${sheetName}": لم يتم العثور على بيانات`);
+            continue;
+          }
+
+          // Convert to object array with proper column mapping
+          const jsonData = dataRows.map(row => {
+            const obj: any = {};
+            headers.forEach((header, index) => {
+              if (header && header !== '') {
+                obj[header] = row[index] || '';
+              }
+            });
+            return obj;
+          });
+
+          allStudentsData.push({
+            students: jsonData,
+            className: sheetName.trim(),
+            startRow: headerRowIndex + 2
+          });
+          
+          totalStudents += jsonData.length;
+        }
+
+        if (allStudentsData.length === 0) {
+          alert('لم يتم العثور على بيانات صحيحة في أي ورقة عمل');
           return;
         }
 
-        this.processExcelData(jsonData);
+        // Process all sheets with their class names
+        this.processExcelDataWithClasses(allStudentsData, totalStudents);
       } catch (error) {
         console.error('Error reading Excel file:', error);
         alert('حدث خطأ أثناء قراءة ملف Excel. يرجى التحقق من صحة الملف.');
@@ -417,11 +466,59 @@ export class StudentsComponent implements OnInit {
     event.target.value = '';
   }
 
-  processExcelData(jsonData: any[]): void {
+  findHeaderRow(rawData: any[][]): number {
+    // Column names to search for (in Arabic and English)
+    const keyColumns = [
+      // First name variations
+      'الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'name',
+      // Last name variations
+      'اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'last name', 'surname',
+      // Date of birth variations
+      'تاريخ الميلاد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'birth_date', 'date of birth', 'dob',
+      // ID number variations
+      'رقم الهوية', 'رقم الهوية / الكود', 'رقم التعريف', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف', 'id number', 'id', 'identification number',
+      // Place of birth variations
+      'مكان الميلاد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'birth_place', 'place of birth',
+      // Gender variations
+      'الجنس', 'gender', 'sex', 'sexe', 'النوع', 'الجنس/النوع',
+      // Repeater variations
+      'معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater'
+    ];
+
+    // Search through all rows
+    for (let i = 0; i < rawData.length; i++) {
+      const row = rawData[i];
+      if (!row || row.length === 0) continue;
+
+      // Convert row to lowercase strings for comparison
+      const rowLower = row.map(cell => {
+        if (cell === null || cell === undefined) return '';
+        return String(cell).toLowerCase().trim();
+      });
+
+      // Check if this row contains key column names
+      let foundCount = 0;
+      for (const keyColumn of keyColumns) {
+        const keyLower = keyColumn.toLowerCase().trim();
+        if (rowLower.some(cell => cell === keyLower || cell.includes(keyLower))) {
+          foundCount++;
+        }
+      }
+
+      // If we found at least 2 key columns, this is likely the header row
+      if (foundCount >= 2) {
+        return i;
+      }
+    }
+
+    return -1; // Header row not found
+  }
+
+  processExcelDataWithClasses(sheetsData: Array<{ students: any[], className: string, startRow: number }>, totalStudents: number): void {
     this.isImporting = true;
     this.showImportModal = true;
     this.importProgress = {
-      total: jsonData.length,
+      total: totalStudents,
       success: 0,
       failed: 0,
       errors: []
@@ -429,13 +526,13 @@ export class StudentsComponent implements OnInit {
 
     // Column mapping - supports multiple possible column names
     const columnMap: { [key: string]: string[] } = {
-      idNumber: ['رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية'],
+      idNumber: ['رقم الهوية', 'رقم الهوية / الكود', 'رقم التعريف', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف'],
       lastName: ['اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name'],
       firstName: ['الاسم', 'firstName', 'first_name', 'الاسم الأول'],
       dateOfBirth: ['تاريخ الميلاد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'birth_date'],
-      placeOfBirth: ['مكان الميلاد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'birth_place'],
-      gender: ['الجنس', 'gender', 'sex', 'النوع'],
-      isRepeater: ['معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater', 'هل التلميذ معيد'],
+      placeOfBirth: ['مكان الميلاد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'birth_place', 'مكان الميلاد', 'lieu de naissance', 'place'],
+      gender: ['الجنس', 'gender', 'sex', 'sexe', 'النوع', 'الجنس/النوع', 'sex/gender'],
+      isRepeater: ['معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater', 'هل التلميذ معيد', 'معيد؟', 'مكرر؟'],
       studentId: ['رقم التلميذ', 'studentId', 'student_id', 'رقم_التلميذ'],
       email: ['البريد الإلكتروني', 'email', 'e-mail', 'البريد'],
       studentNumber: ['رقم الطالب', 'studentNumber', 'student_number', 'رقم_الطالب'],
@@ -443,20 +540,97 @@ export class StudentsComponent implements OnInit {
       generalNotes: ['ملاحظات', 'ملاحظات عامة', 'generalNotes', 'general_notes', 'notes', 'ملاحظات_عامة']
     };
 
-    let processed = 0;
+    let currentSheetIndex = 0;
+    let currentStudentIndex = 0;
+    let classCache: { [className: string]: number } = {}; // Cache class names to IDs
+
+    // First, ensure all classes exist
+    const ensureClassesExist = (callback: () => void) => {
+      const classNames = sheetsData.map(s => s.className);
+      const uniqueClassNames = [...new Set(classNames)];
+      let classesProcessed = 0;
+
+      if (uniqueClassNames.length === 0) {
+        callback();
+        return;
+      }
+
+      uniqueClassNames.forEach(className => {
+        // Check if class already exists
+        const existingClass = this.classes.find(c => 
+          c.name.toLowerCase().trim() === className.toLowerCase().trim()
+        );
+
+        if (existingClass) {
+          classCache[className] = existingClass.id;
+          classesProcessed++;
+          if (classesProcessed === uniqueClassNames.length) {
+            callback();
+          }
+        } else {
+          // Try to create class - for now, we'll use a default level
+          // In a real scenario, you might want to prompt the user or use a default
+          const newClassData: any = {
+            name: className,
+            level: '1st_year_middle', // Default level - you might want to make this configurable
+            subject: 'Computer Science', // Default subject
+            weeklySessions: 0
+          };
+
+          this.apiService.post<any>('/classes', newClassData).subscribe({
+            next: (newClass) => {
+              classCache[className] = newClass.id;
+              this.classes.push(newClass); // Add to local cache
+              classesProcessed++;
+              if (classesProcessed === uniqueClassNames.length) {
+                callback();
+              }
+            },
+            error: (error) => {
+              console.error(`Error creating class "${className}":`, error);
+              // Continue anyway - students will be imported without class assignment
+              classesProcessed++;
+              if (classesProcessed === uniqueClassNames.length) {
+                callback();
+              }
+            }
+          });
+        }
+      });
+    };
+
     const processNext = () => {
-      if (processed >= jsonData.length) {
+      // Check if we've processed all sheets
+      if (currentSheetIndex >= sheetsData.length) {
         this.isImporting = false;
         return;
       }
 
-      const row = jsonData[processed];
+      const currentSheet = sheetsData[currentSheetIndex];
+      
+      // Check if we've processed all students in current sheet
+      if (currentStudentIndex >= currentSheet.students.length) {
+        currentSheetIndex++;
+        currentStudentIndex = 0;
+        setTimeout(processNext, 50);
+        return;
+      }
+
+      const row = currentSheet.students[currentStudentIndex];
       const studentData = this.mapRowToStudent(row, columnMap);
+      
+      // Assign class from sheet name
+      const classId = classCache[currentSheet.className];
+      if (classId) {
+        studentData.classId = classId;
+      }
+
+      const currentRowNumber = currentSheet.startRow + currentStudentIndex;
       
       if (!studentData.lastName || !studentData.firstName) {
         this.importProgress.failed++;
-        this.importProgress.errors.push(`الصف ${processed + 2}: الاسم واللقب مطلوبان`);
-        processed++;
+        this.importProgress.errors.push(`ورقة "${currentSheet.className}" - الصف ${currentRowNumber}: الاسم واللقب مطلوبان`);
+        currentStudentIndex++;
         setTimeout(processNext, 50);
         return;
       }
@@ -464,27 +638,43 @@ export class StudentsComponent implements OnInit {
       this.apiService.post<Student>('/students', studentData).subscribe({
         next: () => {
           this.importProgress.success++;
-          processed++;
+          currentStudentIndex++;
           setTimeout(processNext, 50);
         },
         error: (error) => {
           this.importProgress.failed++;
           const errorMsg = error?.error?.message || 'خطأ غير معروف';
-          this.importProgress.errors.push(`الصف ${processed + 2}: ${errorMsg}`);
-          processed++;
+          this.importProgress.errors.push(`ورقة "${currentSheet.className}" - الصف ${currentRowNumber}: ${errorMsg}`);
+          currentStudentIndex++;
           setTimeout(processNext, 50);
         }
       });
     };
 
-    processNext();
+    // Start by ensuring all classes exist, then process students
+    ensureClassesExist(() => {
+      processNext();
+    });
+  }
+
+  processExcelData(jsonData: any[], startRowNumber: number = 2): void {
+    // Legacy method - kept for backward compatibility
+    // This method is now replaced by processExcelDataWithClasses
+    this.processExcelDataWithClasses([{ students: jsonData, className: '', startRow: startRowNumber }], jsonData.length);
   }
 
   mapRowToStudent(row: any, columnMap: { [key: string]: string[] }): CreateStudentDto {
     const findColumnValue = (keys: string[]): any => {
       for (const key of keys) {
+        // Check exact match first
         if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
           return row[key];
+        }
+        // Also check case-insensitive match
+        const rowKeys = Object.keys(row);
+        const matchedKey = rowKeys.find(rk => rk.toLowerCase().trim() === key.toLowerCase().trim());
+        if (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null && row[matchedKey] !== '') {
+          return row[matchedKey];
         }
       }
       return undefined;
@@ -495,7 +685,7 @@ export class StudentsComponent implements OnInit {
       lastName: findColumnValue(columnMap['lastName']) || '',
       firstName: findColumnValue(columnMap['firstName']) || '',
       dateOfBirth: this.parseDate(findColumnValue(columnMap['dateOfBirth'])),
-      placeOfBirth: findColumnValue(columnMap['placeOfBirth']),
+      placeOfBirth: findColumnValue(columnMap['placeOfBirth']) || undefined,
       gender: this.parseGender(findColumnValue(columnMap['gender'])),
       isRepeater: this.parseBoolean(findColumnValue(columnMap['isRepeater'])),
       studentId: findColumnValue(columnMap['studentId']),
@@ -545,15 +735,22 @@ export class StudentsComponent implements OnInit {
   }
 
   parseGender(genderValue: any): 'male' | 'female' | undefined {
-    if (!genderValue) return undefined;
+    if (genderValue === null || genderValue === undefined || genderValue === '') return undefined;
     
     const genderStr = genderValue.toString().toLowerCase().trim();
-    if (genderStr === 'ذكر' || genderStr === 'male' || genderStr === 'm' || genderStr === '1') {
+    
+    // Male variations
+    if (genderStr === 'ذكر' || genderStr === 'male' || genderStr === 'm' || genderStr === '1' || 
+        genderStr === 'homme' || genderStr === 'h' || genderStr === 'masculin' || genderStr === 'ذكر') {
       return 'male';
     }
-    if (genderStr === 'أنثى' || genderStr === 'female' || genderStr === 'f' || genderStr === '2') {
+    
+    // Female variations
+    if (genderStr === 'أنثى' || genderStr === 'female' || genderStr === 'f' || genderStr === '2' || 
+        genderStr === 'femme' || genderStr === 'féminin' || genderStr === 'feminin' || genderStr === 'أنثى') {
       return 'female';
     }
+    
     return undefined;
   }
 
@@ -561,9 +758,21 @@ export class StudentsComponent implements OnInit {
     if (boolValue === undefined || boolValue === null || boolValue === '') return false;
     
     const boolStr = boolValue.toString().toLowerCase().trim();
-    if (boolStr === 'نعم' || boolStr === 'yes' || boolStr === 'true' || boolStr === '1' || boolStr === 'معيد') {
+    
+    // True variations
+    if (boolStr === 'نعم' || boolStr === 'yes' || boolStr === 'true' || boolStr === '1' || 
+        boolStr === 'معيد' || boolStr === 'مكرر' || boolStr === 'oui' || boolStr === 'vrai' ||
+        boolStr === 'y' || boolStr === '✓' || boolStr === '✔' || boolStr === 'true') {
       return true;
     }
+    
+    // False variations
+    if (boolStr === 'لا' || boolStr === 'no' || boolStr === 'false' || boolStr === '0' || 
+        boolStr === 'non' || boolStr === 'faux' || boolStr === 'n' || boolStr === '✗' || 
+        boolStr === '✘' || boolStr === 'false') {
+      return false;
+    }
+    
     return false;
   }
 
