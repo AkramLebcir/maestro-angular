@@ -2,12 +2,13 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { ClassesComponent } from './pages/classes/classes.component';
 import { LabsComponent } from './pages/labs/labs.component';
+import { StudentsComponent } from './pages/students/students.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/classes', pathMatch: 'full' },
   { path: 'classes', component: ClassesComponent },
   { path: 'dashboard', component: ClassesComponent }, // Placeholder
-  { path: 'students', component: ClassesComponent }, // Placeholder
+  { path: 'students', component: StudentsComponent },
   { path: 'labs', component: LabsComponent },
   { path: 'grades', component: ClassesComponent }, // Placeholder
   { path: 'timetable', component: ClassesComponent }, // Placeholder
