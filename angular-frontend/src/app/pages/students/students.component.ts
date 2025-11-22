@@ -62,6 +62,7 @@ export class StudentsComponent implements OnInit {
   searchTerm: string = '';
   selectedClassFilter: number | null = null;
   selectedGenderFilter: 'male' | 'female' | null = null;
+  selectedRepeaterFilter: boolean | null = null;
   
   // Sort
   sortField: string = '';
@@ -236,14 +237,27 @@ export class StudentsComponent implements OnInit {
     // Search filter
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase();
-      filtered = filtered.filter(student => 
-        student.firstName?.toLowerCase().includes(term) ||
-        student.lastName?.toLowerCase().includes(term) ||
-        student.dateOfBirth?.toString().includes(term) ||
-        student.placeOfBirth?.toLowerCase().includes(term) ||
-        student.idNumber?.toLowerCase().includes(term) ||
-        student.studentId?.toLowerCase().includes(term)
-      );
+      filtered = filtered.filter(student => {
+        const firstName = student.firstName?.toLowerCase() || '';
+        const lastName = student.lastName?.toLowerCase() || '';
+        const dateOfBirth = student.dateOfBirth ? this.formatDate(student.dateOfBirth).toLowerCase() : '';
+        const placeOfBirth = student.placeOfBirth?.toLowerCase() || '';
+        const idNumber = student.idNumber?.toLowerCase() || '';
+        const studentId = student.studentId?.toLowerCase() || '';
+        const gender = this.getGenderLabel(student.gender).toLowerCase();
+        const isRepeater = student.isRepeater ? 'نعم' : 'لا';
+        const className = this.getClassName(student.classId).toLowerCase();
+        
+        return firstName.includes(term) ||
+               lastName.includes(term) ||
+               dateOfBirth.includes(term) ||
+               placeOfBirth.includes(term) ||
+               idNumber.includes(term) ||
+               studentId.includes(term) ||
+               gender.includes(term) ||
+               isRepeater.includes(term) ||
+               className.includes(term);
+      });
     }
 
     // Class filter
@@ -256,11 +270,45 @@ export class StudentsComponent implements OnInit {
       filtered = filtered.filter(student => student.gender === this.selectedGenderFilter);
     }
 
+    // Teaching Assistant (isRepeater) filter
+    if (this.selectedRepeaterFilter !== null) {
+      filtered = filtered.filter(student => (student.isRepeater || false) === this.selectedRepeaterFilter);
+    }
+
     // Sort
     if (this.sortField) {
       filtered.sort((a, b) => {
-        let aVal: any = (a as any)[this.sortField];
-        let bVal: any = (b as any)[this.sortField];
+        let aVal: any;
+        let bVal: any;
+        
+        // Handle special cases for sorting
+        if (this.sortField === 'classId') {
+          // Sort by class name
+          aVal = this.getClassName(a.classId);
+          bVal = this.getClassName(b.classId);
+        } else if (this.sortField === 'gender') {
+          // Sort by gender label
+          aVal = this.getGenderLabel(a.gender);
+          bVal = this.getGenderLabel(b.gender);
+        } else if (this.sortField === 'dateOfBirth') {
+          // Sort by date
+          aVal = a.dateOfBirth ? (typeof a.dateOfBirth === 'string' ? new Date(a.dateOfBirth) : a.dateOfBirth) : null;
+          bVal = b.dateOfBirth ? (typeof b.dateOfBirth === 'string' ? new Date(b.dateOfBirth) : b.dateOfBirth) : null;
+          
+          if (aVal === null && bVal === null) return 0;
+          if (aVal === null) return this.sortDirection === 'asc' ? 1 : -1;
+          if (bVal === null) return this.sortDirection === 'asc' ? -1 : 1;
+          
+          const aTime = aVal.getTime();
+          const bTime = bVal.getTime();
+          
+          if (aTime < bTime) return this.sortDirection === 'asc' ? -1 : 1;
+          if (aTime > bTime) return this.sortDirection === 'asc' ? 1 : -1;
+          return 0;
+        } else {
+          aVal = (a as any)[this.sortField];
+          bVal = (b as any)[this.sortField];
+        }
         
         if (aVal === null || aVal === undefined) aVal = '';
         if (bVal === null || bVal === undefined) bVal = '';
@@ -288,6 +336,10 @@ export class StudentsComponent implements OnInit {
   }
 
   onGenderFilterChange(): void {
+    this.applyFilters();
+  }
+
+  onRepeaterFilterChange(): void {
     this.applyFilters();
   }
 
