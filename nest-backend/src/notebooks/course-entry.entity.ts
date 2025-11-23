@@ -1,5 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Notebook } from './notebook.entity';
+import { Topic } from '../topics/topic.entity';
 
 @Entity('course_entries')
 export class CourseEntry {
@@ -27,6 +28,13 @@ export class CourseEntry {
 
   @Column()
   notebookId: number;
+
+  @ManyToOne(() => Topic, { nullable: true, onDelete: 'SET NULL' })
+  @JoinColumn({ name: 'topicId' })
+  topic?: Topic;
+
+  @Column({ nullable: true })
+  topicId?: number;
 
   @Column({ nullable: true })
   order?: number;

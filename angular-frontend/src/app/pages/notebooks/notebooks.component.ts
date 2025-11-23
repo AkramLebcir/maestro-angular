@@ -68,6 +68,7 @@ export interface Notebook {
   class?: {
     id: number;
     name: string;
+    subject: string;
   };
   courseEntries?: CourseEntry[];
   createdAt: Date;
@@ -104,6 +105,12 @@ export class NotebooksComponent implements OnInit {
   editingCourse: CourseEntry | null = null;
   currentNotebookForCourse: Notebook | null = null;
   topics: Topic[] = [];
+  showNewTopicForm = false;
+  newTopicData: { title: string; subtitle: string; description: string } = {
+    title: '',
+    subtitle: '',
+    description: ''
+  };
   
   // Search and filter
   searchTerm: string = '';
@@ -159,12 +166,38 @@ export class NotebooksComponent implements OnInit {
       next: (data) => {
         const notebook = this.notebooks.find(n => n.id === notebookId);
         if (notebook) {
+          // Load topic information for each course entry
+          data.forEach(entry => {
+            if (entry.topicId && !entry.topic) {
+              // Find topic from loaded topics
+              const topic = this.topics.find(t => t.id === entry.topicId);
+              if (topic) {
+                entry.topic = {
+                  id: topic.id,
+                  title: topic.title,
+                  subtitle: topic.subtitle,
+                  description: topic.description,
+                  elements: topic.elements || [],
+                  createdAt: topic.createdAt,
+                  updatedAt: topic.updatedAt
+                };
+              } else {
+                // If topic not in loaded list, try to load it
+                this.loadTopicForCourseEntry(entry);
+              }
+            }
+          });
+          
           notebook.courseEntries = data.sort((a, b) => {
             // Sort by date, then by start time
             const dateCompare = a.date.localeCompare(b.date);
             if (dateCompare !== 0) return dateCompare;
             return a.startTime.localeCompare(b.startTime);
           });
+          // Update selectedNotebookForReport if it's the same notebook
+          if (this.selectedNotebookForReport && this.selectedNotebookForReport.id === notebookId) {
+            this.selectedNotebookForReport.courseEntries = notebook.courseEntries;
+          }
         }
       },
       error: (error) => {
@@ -172,7 +205,44 @@ export class NotebooksComponent implements OnInit {
         const notebook = this.notebooks.find(n => n.id === notebookId);
         if (notebook) {
           notebook.courseEntries = [];
+          // Update selectedNotebookForReport if it's the same notebook
+          if (this.selectedNotebookForReport && this.selectedNotebookForReport.id === notebookId) {
+            this.selectedNotebookForReport.courseEntries = [];
+          }
         }
+      }
+    });
+  }
+
+  loadTopicForCourseEntry(entry: CourseEntry): void {
+    if (!entry.topicId) return;
+    
+    this.apiService.get<Topic>(`/topics/${entry.topicId}`).subscribe({
+      next: (topic) => {
+        // Load elements for the topic
+        this.apiService.get<TopicElement[]>(`/topics/${entry.topicId}/elements`).subscribe({
+          next: (elements) => {
+            entry.topic = {
+              ...topic,
+              elements: elements.sort((a, b) => (a.order || 0) - (b.order || 0))
+            };
+            // Update the topics list if not already there
+            const existingTopic = this.topics.find(t => t.id === topic.id);
+            if (!existingTopic) {
+              this.topics.push({
+                ...topic,
+                elements: elements.sort((a, b) => (a.order || 0) - (b.order || 0))
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error loading topic elements:', error);
+            entry.topic = { ...topic, elements: [] };
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading topic:', error);
       }
     });
   }
@@ -364,6 +434,8 @@ export class NotebooksComponent implements OnInit {
       notebookId: notebook.id,
       topicId: undefined
     };
+    this.showNewTopicForm = false;
+    this.newTopicData = { title: '', subtitle: '', description: '' };
     this.showCourseModal = true;
   }
 
@@ -509,6 +581,10 @@ export class NotebooksComponent implements OnInit {
   openReportModal(notebook: Notebook): void {
     this.selectedNotebookForReport = notebook;
     this.showReportModal = true;
+    // Ensure course entries are loaded for the report
+    if (!notebook.courseEntries || notebook.courseEntries.length === 0) {
+      this.loadCourseEntries(notebook.id);
+    }
   }
 
   closeReportModal(): void {
@@ -562,6 +638,18 @@ export class NotebooksComponent implements OnInit {
     return topic?.subtitle || '';
   }
 
+  getTopicDescription(topicId?: number): string {
+    if (!topicId) return '';
+    const topic = this.topics.find(t => t.id === topicId);
+    return topic?.description || '';
+  }
+
+  formatTextWithLineBreaks(text: string | undefined): string {
+    if (!text) return '';
+    // Preserve line breaks by converting \n to <br> or using CSS
+    return text;
+  }
+
   getTopicElements(topicId?: number): TopicElement[] {
     if (!topicId) return [];
     const topic = this.topics.find(t => t.id === topicId);
@@ -569,8 +657,79 @@ export class NotebooksComponent implements OnInit {
   }
 
   onTopicChange(): void {
-    // When topic is selected, user can still edit the description manually
-    // The topic elements are shown as a preview but description remains editable
+    // When topic is selected, auto-fill description with topic's description
+    if (this.courseFormData.topicId) {
+      this.showNewTopicForm = false;
+      const selectedTopic = this.topics.find(t => t.id === this.courseFormData.topicId);
+      if (selectedTopic) {
+        // Auto-fill description with topic's description if it exists
+        if (selectedTopic.description) {
+          this.courseFormData.description = selectedTopic.description;
+        } else {
+          // If no description, use title and subtitle
+          let desc = selectedTopic.title;
+          if (selectedTopic.subtitle) {
+            desc += ' - ' + selectedTopic.subtitle;
+          }
+          this.courseFormData.description = desc;
+        }
+      }
+    } else {
+      // Clear description when no topic is selected
+      this.courseFormData.description = '';
+    }
+  }
+
+  toggleNewTopicForm(): void {
+    this.showNewTopicForm = !this.showNewTopicForm;
+    if (this.showNewTopicForm) {
+      this.courseFormData.topicId = undefined;
+      this.newTopicData = { title: '', subtitle: '', description: '' };
+    }
+  }
+
+  createTopicAndSelect(): void {
+    if (!this.newTopicData.title.trim()) {
+      alert('يرجى إدخال عنوان الموضوع');
+      return;
+    }
+
+    const submitData: any = {
+      title: this.newTopicData.title.trim(),
+      subtitle: this.newTopicData.subtitle?.trim() || undefined,
+      description: this.newTopicData.description?.trim() || undefined
+    };
+
+    this.apiService.post<Topic>('/topics', submitData).subscribe({
+      next: (newTopic) => {
+        // Reload topics to include the new one
+        this.loadTopics();
+        // Select the newly created topic
+        this.courseFormData.topicId = newTopic.id;
+        this.showNewTopicForm = false;
+        // Optionally auto-fill description with topic title/subtitle
+        if (!this.courseFormData.description) {
+          let desc = newTopic.title;
+          if (newTopic.subtitle) {
+            desc += ' - ' + newTopic.subtitle;
+          }
+          if (newTopic.description) {
+            desc += '\n' + newTopic.description;
+          }
+          this.courseFormData.description = desc;
+        }
+      },
+      error: (error) => {
+        console.error('Error creating topic:', error);
+        const errorMessage = error?.error?.message || 
+                           (error?.error?.error && Array.isArray(error.error.error) 
+                             ? error.error.error.join(', ') 
+                             : error.error?.error) ||
+                           error?.message || 
+                           'حدث خطأ أثناء إضافة الموضوع';
+        alert(errorMessage);
+      }
+    });
   }
 
   async exportReportToPDF(notebook: Notebook): Promise<void> {

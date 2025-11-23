@@ -7,6 +7,7 @@ export class NotebookResponseDto {
   class?: {
     id: number;
     name: string;
+    subject: string;
   };
   createdAt: Date;
   updatedAt: Date;

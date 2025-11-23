@@ -24,6 +24,11 @@ export class CreateCourseEntryDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
+  topicId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
   order?: number;
 }
 

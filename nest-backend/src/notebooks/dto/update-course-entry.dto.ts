@@ -30,6 +30,11 @@ export class UpdateCourseEntryDto {
   @IsOptional()
   @Type(() => Number)
   @IsInt()
+  topicId?: number;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
   order?: number;
 }
 

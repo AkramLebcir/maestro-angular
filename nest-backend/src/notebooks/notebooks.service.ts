@@ -102,6 +102,7 @@ export class NotebooksService {
         ? {
             id: notebook.class.id,
             name: notebook.class.name,
+            subject: notebook.class.subject,
           }
         : undefined,
       createdAt: notebook.createdAt,
@@ -129,7 +130,12 @@ export class NotebooksService {
       notebookId,
     });
     const savedCourseEntry = await this.courseEntryRepository.save(courseEntry);
-    return this.mapCourseEntryToResponseDto(savedCourseEntry);
+    // Reload with relations
+    const reloadedEntry = await this.courseEntryRepository.findOne({
+      where: { id: savedCourseEntry.id },
+      relations: ['topic', 'topic.elements'],
+    });
+    return this.mapCourseEntryToResponseDto(reloadedEntry || savedCourseEntry);
   }
 
   async findAllCourseEntries(notebookId: number): Promise<CourseEntryResponseDto[]> {
@@ -141,6 +147,7 @@ export class NotebooksService {
 
     const courseEntries = await this.courseEntryRepository.find({
       where: { notebookId },
+      relations: ['topic', 'topic.elements'],
       order: {
         date: 'ASC',
         startTime: 'ASC',
@@ -153,6 +160,7 @@ export class NotebooksService {
   async findOneCourseEntry(notebookId: number, courseEntryId: number): Promise<CourseEntryResponseDto> {
     const courseEntry = await this.courseEntryRepository.findOne({
       where: { id: courseEntryId, notebookId },
+      relations: ['topic', 'topic.elements'],
     });
 
     if (!courseEntry) {
@@ -198,7 +206,12 @@ export class NotebooksService {
 
     Object.assign(courseEntry, updateCourseEntryDto);
     const savedCourseEntry = await this.courseEntryRepository.save(courseEntry);
-    return this.mapCourseEntryToResponseDto(savedCourseEntry);
+    // Reload with relations
+    const reloadedEntry = await this.courseEntryRepository.findOne({
+      where: { id: savedCourseEntry.id },
+      relations: ['topic', 'topic.elements'],
+    });
+    return this.mapCourseEntryToResponseDto(reloadedEntry || savedCourseEntry);
   }
 
   async removeCourseEntry(notebookId: number, courseEntryId: number): Promise<void> {
@@ -222,6 +235,24 @@ export class NotebooksService {
       startTime: courseEntry.startTime,
       endTime: courseEntry.endTime,
       notebookId: courseEntry.notebookId,
+      topicId: courseEntry.topicId,
+      topic: courseEntry.topic
+        ? {
+            id: courseEntry.topic.id,
+            title: courseEntry.topic.title,
+            subtitle: courseEntry.topic.subtitle,
+            description: courseEntry.topic.description,
+            elements: courseEntry.topic.elements
+              ? courseEntry.topic.elements
+                  .sort((a, b) => (a.order || 0) - (b.order || 0))
+                  .map((el) => ({
+                    id: el.id,
+                    content: el.content,
+                    order: el.order || 0,
+                  }))
+              : [],
+          }
+        : undefined,
       order: courseEntry.order,
       createdAt: courseEntry.createdAt,
       updatedAt: courseEntry.updatedAt,
