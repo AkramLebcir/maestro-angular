@@ -1,0 +1,353 @@
+<div class="flex-1 p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">إدارة الدفاتر</h1>
+      <div class="flex gap-3">
+        <button 
+          (click)="openAddModal()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>إضافة دفتر جديد</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search and Filter Section -->
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">البحث</label>
+        <input 
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="ابحث بالعنوان، الوصف، المحتوى...">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب القسم</label>
+        <select 
+          [(ngModel)]="selectedClassFilter"
+          (change)="onClassFilterChange()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option [ngValue]="null">جميع الأقسام</option>
+          <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
+        </select>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة الدفاتر ({{ filteredNotebooks.length }})</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div 
+        *ngFor="let notebook of filteredNotebooks" 
+        class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition">
+        <div class="flex justify-between items-start mb-2">
+          <h3 class="text-lg font-semibold text-gray-800 cursor-pointer" (click)="openEditModal(notebook)">{{ notebook.title }}</h3>
+          <button 
+            (click)="deleteNotebook(notebook.id); $event.stopPropagation()"
+            class="text-red-600 hover:text-red-800 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        <p class="text-sm text-gray-600 mb-2 cursor-pointer" (click)="openEditModal(notebook)">{{ truncateText(notebook.description) }}</p>
+        <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+          <span *ngIf="notebook.classId">القسم: {{ getClassName(notebook.classId) }}</span>
+          <span *ngIf="!notebook.classId">عام</span>
+          <span *ngIf="notebook.courseEntries">• {{ notebook.courseEntries.length }} حصة</span>
+        </div>
+        <div class="flex gap-2 mt-3">
+          <button 
+            (click)="openAddCourseModal(notebook); $event.stopPropagation()"
+            class="flex-1 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+            إضافة حصة
+          </button>
+          <button 
+            (click)="openReportModal(notebook); $event.stopPropagation()"
+            class="flex-1 bg-purple-600 text-white px-3 py-1 rounded text-sm hover:bg-purple-700 transition">
+            عرض التقرير
+          </button>
+        </div>
+        <div class="text-xs text-gray-400 mt-2">
+          {{ formatDate(notebook.updatedAt) }}
+        </div>
+      </div>
+      <div *ngIf="filteredNotebooks.length === 0" class="col-span-full text-center text-gray-500 py-8">
+        لا توجد دفاتر
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Notebook Modal -->
+<div 
+  *ngIf="showModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        {{ editingNotebook ? 'تعديل الدفتر' : 'إضافة دفتر جديد' }}
+      </h3>
+      <button 
+        (click)="closeModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #notebookForm="ngForm" (ngSubmit)="saveNotebook()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">العنوان *</label>
+        <input 
+          type="text"
+          [(ngModel)]="formData.title"
+          name="title"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل عنوان الدفتر">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <textarea 
+          [(ngModel)]="formData.description"
+          name="description"
+          rows="2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل وصف الدفتر"></textarea>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">القسم</label>
+        <select 
+          [(ngModel)]="formData.classId"
+          name="classId"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          <option [ngValue]="undefined">عام (لجميع الأقسام)</option>
+          <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">المحتوى</label>
+        <textarea 
+          [(ngModel)]="formData.content"
+          name="content"
+          rows="10"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+          placeholder="أدخل محتوى الدفتر..."></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!notebookForm.valid"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+          {{ editingNotebook ? 'تحديث' : 'إضافة' }}
+        </button>
+        <button 
+          type="button"
+          (click)="closeModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Course Entry Modal -->
+<div 
+  *ngIf="showCourseModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeCourseModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        {{ editingCourse ? 'تعديل الحصة' : 'إضافة حصة جديدة' }}
+        <span *ngIf="currentNotebookForCourse" class="text-sm font-normal text-gray-600">
+          - {{ currentNotebookForCourse.title }}
+        </span>
+      </h3>
+      <button 
+        (click)="closeCourseModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #courseForm="ngForm" (ngSubmit)="saveCourse()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">العنوان *</label>
+          <input 
+            type="text"
+            [(ngModel)]="courseFormData.title"
+            name="title"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="أدخل عنوان الحصة">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ *</label>
+          <input 
+            type="date"
+            [(ngModel)]="courseFormData.date"
+            name="date"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">وقت البداية *</label>
+          <input 
+            type="time"
+            [(ngModel)]="courseFormData.startTime"
+            name="startTime"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">وقت النهاية *</label>
+          <input 
+            type="time"
+            [(ngModel)]="courseFormData.endTime"
+            name="endTime"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف / الموضوع *</label>
+        <textarea 
+          [(ngModel)]="courseFormData.description"
+          name="description"
+          required
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل وصف الحصة أو الموضوع المطلوب إنجازه..."></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!courseForm.valid"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+          {{ editingCourse ? 'تحديث' : 'إضافة' }}
+        </button>
+        <button 
+          type="button"
+          (click)="closeCourseModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Report Modal -->
+<div 
+  *ngIf="showReportModal && selectedNotebookForReport"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeReportModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        تقرير: {{ selectedNotebookForReport.title }}
+      </h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="exportReportToPDF(selectedNotebookForReport)"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition text-sm">
+          تصدير PDF
+        </button>
+        <button 
+          (click)="closeReportModal()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse" id="report-table">
+        <thead>
+          <tr class="bg-blue-600 text-white">
+            <th class="border border-blue-700 p-3 text-right font-semibold">التاريخ</th>
+            <th class="border border-blue-700 p-3 text-right font-semibold">التوقيت</th>
+            <th class="border border-blue-700 p-3 text-right font-semibold">الموضوع أو العمل المطلوب إنجازه</th>
+            <th class="border border-blue-700 p-3 text-right font-semibold">الإمضاء</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let course of getCourseEntriesForReport(selectedNotebookForReport)" class="border-b border-gray-200 hover:bg-gray-50">
+            <td class="border border-gray-300 p-3 text-gray-800">
+              {{ formatDateForReport(course.date) }}
+            </td>
+            <td class="border border-gray-300 p-3 text-gray-800">
+              {{ formatTimeRange(course.startTime, course.endTime) }}
+            </td>
+            <td class="border border-gray-300 p-3 text-gray-800">
+              <div class="font-semibold mb-1">{{ course.title }}</div>
+              <div class="text-sm text-gray-600">{{ course.description }}</div>
+              <div class="flex gap-2 mt-2">
+                <button 
+                  (click)="openEditCourseModal(course, selectedNotebookForReport)"
+                  class="text-blue-600 hover:text-blue-800 text-xs">
+                  تعديل
+                </button>
+                <button 
+                  (click)="deleteCourse(selectedNotebookForReport.id, course.id)"
+                  class="text-red-600 hover:text-red-800 text-xs">
+                  حذف
+                </button>
+              </div>
+            </td>
+            <td class="border border-gray-300 p-3 text-gray-400">
+              <!-- Signature space -->
+            </td>
+          </tr>
+          <tr *ngIf="getCourseEntriesForReport(selectedNotebookForReport).length === 0">
+            <td colspan="4" class="border border-gray-300 p-8 text-center text-gray-500">
+              لا توجد حصص مسجلة
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="mt-4 flex justify-end gap-2">
+      <button 
+        (click)="openAddCourseModal(selectedNotebookForReport)"
+        class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+        إضافة حصة جديدة
+      </button>
+      <button 
+        (click)="closeReportModal()"
+        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+        إغلاق
+      </button>
+    </div>
+  </div>
+</div>
+

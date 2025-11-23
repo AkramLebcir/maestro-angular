@@ -10,6 +10,7 @@ import { ClassesComponent } from './pages/classes/classes.component';
 import { LabsComponent } from './pages/labs/labs.component';
 import { StudentsComponent } from './pages/students/students.component';
 import { TimetableComponent } from './pages/timetable/timetable.component';
+import { NotebooksComponent } from './pages/notebooks/notebooks.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { TimetableComponent } from './pages/timetable/timetable.component';
     ClassesComponent,
     LabsComponent,
     StudentsComponent,
-    TimetableComponent
+    TimetableComponent,
+    NotebooksComponent
   ],
   imports: [
     BrowserModule,

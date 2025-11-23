@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export interface TimetableEntry {
   id: number;
@@ -94,8 +95,9 @@ export class TimetableComponent implements OnInit {
   dragOverTime: string | null = null;
 
   constructor(private apiService: ApiService) {
-    // Generate time slots from 8:00 to 17:00 (5:00 PM) - 1 hour intervals
-    for (let hour = 8; hour <= 17; hour++) {
+    // Generate time slots from 8:00 to 16:00 (4:00 PM) - 1 hour intervals
+    // Removed 17:00-18:00 (5 PM to 6 PM) slot to fit on one page
+    for (let hour = 8; hour <= 16; hour++) {
       const currentTime = `${hour.toString().padStart(2, '0')}:00`;
       const nextHour = hour + 1;
       const nextTime = `${nextHour.toString().padStart(2, '0')}:00`;
@@ -489,64 +491,107 @@ export class TimetableComponent implements OnInit {
   }
 
   // PDF Export
-  exportToPDF(): void {
+  async exportToPDF(): Promise<void> {
     try {
-      // Create PDF document
-      const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation
+      // Ensure we're in weekly view for the table export
+      const originalViewMode = this.viewMode;
+      if (this.viewMode !== 'weekly') {
+        this.viewMode = 'weekly';
+        // Wait for view to update
+        await new Promise(resolve => setTimeout(resolve, 100));
+      }
+
+      // Get the table element
+      const tableElement = document.querySelector('.overflow-x-auto table');
+      if (!tableElement) {
+        alert('لا يمكن العثور على الجدول. يرجى التأكد من أنك في عرض الأسبوع.');
+        return;
+      }
+
+      // Create a container for the export
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.width = '1100px'; // Slightly reduced width for better fit
+      exportContainer.style.backgroundColor = 'white';
+      exportContainer.style.padding = '15px';
+      document.body.appendChild(exportContainer);
+
+      // Clone the table and add title
+      const title = document.createElement('h1');
+      title.textContent = 'جدول الأوقات';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '20px'; // Reduced font size
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '15px';
+      title.style.color = '#1f2937';
+      exportContainer.appendChild(title);
+
+      const clonedTable = tableElement.cloneNode(true) as HTMLElement;
+      clonedTable.style.width = '100%';
+      clonedTable.style.borderCollapse = 'collapse';
       
-      // Set Arabic font support (requires additional setup)
-      doc.setFontSize(16);
-      doc.text('جدول الأوقات', 140, 15, { align: 'center' });
-      
-      // Add weekly timetable
-      let yPos = 30;
-      const cellWidth = 40;
-      const cellHeight = 8;
-      const startX = 20;
-      
-      // Headers
-      doc.setFontSize(10);
-      doc.text('الوقت', startX, yPos);
-      let xPos = startX + 20;
-      this.workingDays.forEach(day => {
-        doc.text(day.short, xPos, yPos);
-        xPos += cellWidth;
-      });
-      yPos += cellHeight;
-      
-      // Time slots and entries
-      this.timeSlots.forEach(timeSlot => {
-        doc.text(timeSlot, startX, yPos);
-        xPos = startX + 20;
-        
-        this.workingDays.forEach(day => {
-          const entries = this.getEntriesForDay(day.value).filter(e => 
-            this.shouldDisplayEntryInSlot(e, timeSlot)
-          );
-          
-          if (entries.length > 0) {
-            const entry = entries[0];
-            doc.setFontSize(8);
-            doc.text(entry.subject.substring(0, 10), xPos, yPos);
-            doc.text(entry.startTime, xPos, yPos + 3);
-          }
-          
-          xPos += cellWidth;
-        });
-        
-        yPos += cellHeight;
-        if (yPos > 180) {
-          doc.addPage();
-          yPos = 20;
-        }
+      // Reduce font sizes in cloned table to fit on one page
+      const allCells = clonedTable.querySelectorAll('td, th');
+      allCells.forEach((cell: Element) => {
+        const htmlCell = cell as HTMLElement;
+        const currentFontSize = window.getComputedStyle(htmlCell).fontSize;
+        const fontSizeNum = parseFloat(currentFontSize);
+        htmlCell.style.fontSize = `${Math.max(10, fontSizeNum * 0.85)}px`; // Reduce by 15%
+        htmlCell.style.padding = '4px'; // Reduce padding
       });
       
+      exportContainer.appendChild(clonedTable);
+
+      // Use html2canvas to capture the table with proper Arabic rendering
+      const canvas = await html2canvas(exportContainer, {
+        scale: 1.5, // Reduced scale for better fit
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Restore original view mode
+      this.viewMode = originalViewMode;
+
+      // Calculate PDF dimensions (landscape A4)
+      const imgWidth = 297; // A4 width in mm (landscape)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('l', 'mm', 'a4');
+
+      // Calculate scale to fit on one page
+      const pageHeight = 210; // A4 height in mm (landscape)
+      const pageWidth = 297; // A4 width in mm (landscape)
+      
+      // If content is taller than one page, scale it down
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+      
+      if (imgHeight > pageHeight) {
+        // Scale down to fit height
+        const scale = pageHeight / imgHeight;
+        finalHeight = pageHeight;
+        finalWidth = imgWidth * scale;
+      }
+      
+      // Center the content if it's smaller than the page
+      const xOffset = (pageWidth - finalWidth) / 2;
+      const yOffset = (pageHeight - finalHeight) / 2;
+
+      // Add to PDF (single page)
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+
       // Save PDF
       const fileName = `timetable_${new Date().toISOString().split('T')[0]}.pdf`;
-      doc.save(fileName);
+      pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت مكتبة jsPDF.');
+      alert('حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت المكتبات المطلوبة.');
     }
   }
 

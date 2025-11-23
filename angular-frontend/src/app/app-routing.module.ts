@@ -4,6 +4,7 @@ import { ClassesComponent } from './pages/classes/classes.component';
 import { LabsComponent } from './pages/labs/labs.component';
 import { StudentsComponent } from './pages/students/students.component';
 import { TimetableComponent } from './pages/timetable/timetable.component';
+import { NotebooksComponent } from './pages/notebooks/notebooks.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/classes', pathMatch: 'full' },
@@ -13,6 +14,7 @@ const routes: Routes = [
   { path: 'labs', component: LabsComponent },
   { path: 'grades', component: ClassesComponent }, // Placeholder
   { path: 'timetable', component: TimetableComponent },
+  { path: 'notebooks', component: NotebooksComponent },
   { path: 'reports', component: ClassesComponent }, // Placeholder
   { path: 'settings', component: ClassesComponent } // Placeholder
 ];
