@@ -1,0 +1,229 @@
+<div class="flex-1 p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">إدارة المواضيع</h1>
+      <div class="flex gap-3">
+        <button 
+          (click)="openAddModal()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>إضافة موضوع جديد</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="mb-6">
+        <label class="block text-sm font-medium text-gray-700 mb-1">البحث</label>
+      <input 
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchChange()"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        placeholder="ابحث بالعنوان، العنوان الفرعي أو الوصف...">
+    </div>
+
+    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة المواضيع ({{ filteredTopics.length }})</h2>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div 
+        *ngFor="let topic of filteredTopics" 
+        class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition">
+        <div class="flex justify-between items-start mb-2">
+          <div class="flex-1">
+            <h3 class="text-lg font-semibold text-gray-800">{{ topic.title }}</h3>
+            <p *ngIf="topic.subtitle" class="text-sm font-medium text-gray-700 mt-1">{{ topic.subtitle }}</p>
+          </div>
+          <button 
+            (click)="deleteTopic(topic.id)"
+            class="text-red-600 hover:text-red-800 p-1">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+        <p *ngIf="topic.description" class="text-sm text-gray-600 mb-2">{{ topic.description }}</p>
+        <div class="text-xs text-gray-500 mb-3">
+          {{ topic.elements?.length || 0 }} عنصر
+        </div>
+        <div class="flex gap-2">
+          <button 
+            (click)="openEditModal(topic)"
+            class="flex-1 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">
+            تعديل
+          </button>
+          <button 
+            (click)="openAddTopicElementModal(topic)"
+            class="flex-1 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+            إضافة عنصر
+          </button>
+        </div>
+      </div>
+      <div *ngIf="filteredTopics.length === 0" class="col-span-full text-center text-gray-500 py-8">
+        لا توجد مواضيع
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Topic Modal -->
+<div 
+  *ngIf="showModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        {{ editingTopic ? 'تعديل الموضوع' : 'إضافة موضوع جديد' }}
+      </h3>
+      <button 
+        (click)="closeModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #topicForm="ngForm" (ngSubmit)="saveTopic()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">عنوان الموضوع *</label>
+        <input 
+          type="text"
+          [(ngModel)]="topicFormData.title"
+          name="title"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل عنوان الموضوع">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">العنوان الفرعي</label>
+        <input 
+          type="text"
+          [(ngModel)]="topicFormData.subtitle"
+          name="subtitle"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل العنوان الفرعي">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <textarea 
+          [(ngModel)]="topicFormData.description"
+          name="description"
+          rows="2"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل وصف الموضوع"></textarea>
+      </div>
+
+      <div *ngIf="editingTopic" class="mt-4">
+        <div class="flex justify-between items-center mb-2">
+          <h4 class="font-semibold text-gray-700">عناصر الموضوع</h4>
+          <button 
+            type="button"
+            (click)="openAddTopicElementModal(editingTopic)"
+            class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
+            إضافة عنصر
+          </button>
+        </div>
+        <div class="space-y-2 max-h-60 overflow-y-auto">
+          <div *ngFor="let element of editingTopic.elements" class="flex items-center justify-between p-2 bg-gray-50 rounded border">
+            <span class="text-sm text-gray-800">{{ element.content }}</span>
+            <div class="flex gap-2">
+              <button 
+                type="button"
+                (click)="openEditTopicElementModal(element, editingTopic)"
+                class="text-blue-600 hover:text-blue-800 text-xs">
+                تعديل
+              </button>
+              <button 
+                type="button"
+                (click)="deleteTopicElement(editingTopic.id, element.id)"
+                class="text-red-600 hover:text-red-800 text-xs">
+                حذف
+              </button>
+            </div>
+          </div>
+          <div *ngIf="!editingTopic.elements || editingTopic.elements.length === 0" class="text-center text-gray-400 text-sm py-4">
+            لا توجد عناصر
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!topicForm.valid"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+          {{ editingTopic ? 'تحديث' : 'إضافة' }}
+        </button>
+        <button 
+          type="button"
+          (click)="closeModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Topic Element Modal -->
+<div 
+  *ngIf="showTopicElementModal && currentTopicForElement"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeTopicElementModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        {{ editingTopicElement ? 'تعديل العنصر' : 'إضافة عنصر جديد' }}
+        <span class="text-sm font-normal text-gray-600">
+          - {{ currentTopicForElement.title }}
+        </span>
+      </h3>
+      <button 
+        (click)="closeTopicElementModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #elementForm="ngForm" (ngSubmit)="saveTopicElement()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">محتوى العنصر *</label>
+        <textarea 
+          [(ngModel)]="topicElementFormData.content"
+          name="content"
+          required
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل محتوى العنصر..."></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!elementForm.valid"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+          {{ editingTopicElement ? 'تحديث' : 'إضافة' }}
+        </button>
+        <button 
+          type="button"
+          (click)="closeTopicElementModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

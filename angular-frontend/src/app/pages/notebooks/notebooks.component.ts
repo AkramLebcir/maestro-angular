@@ -3,6 +3,36 @@ import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
+export interface TopicElement {
+  id: number;
+  content: string;
+  order: number;
+  topicId: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Topic {
+  id: number;
+  title: string;
+  subtitle?: string;
+  description?: string;
+  elements: TopicElement[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface CreateTopicDto {
+  title: string;
+  description?: string;
+}
+
+export interface CreateTopicElementDto {
+  content: string;
+  topicId: number;
+  order?: number;
+}
+
 export interface CourseEntry {
   id: number;
   title: string;
@@ -11,6 +41,8 @@ export interface CourseEntry {
   startTime: string; // Format: HH:mm
   endTime: string; // Format: HH:mm
   notebookId: number;
+  topicId?: number;
+  topic?: Topic;
   order?: number;
   createdAt: Date;
   updatedAt: Date;
@@ -23,6 +55,7 @@ export interface CreateCourseEntryDto {
   startTime: string;
   endTime: string;
   notebookId: number;
+  topicId?: number;
   order?: number;
 }
 
@@ -70,6 +103,7 @@ export class NotebooksComponent implements OnInit {
   showCourseModal = false;
   editingCourse: CourseEntry | null = null;
   currentNotebookForCourse: Notebook | null = null;
+  topics: Topic[] = [];
   
   // Search and filter
   searchTerm: string = '';
@@ -92,11 +126,13 @@ export class NotebooksComponent implements OnInit {
     notebookId: 0
   };
 
+
   constructor(private apiService: ApiService) {}
 
   ngOnInit(): void {
     this.loadNotebooks();
     this.loadClasses();
+    this.loadTopics();
   }
 
   loadNotebooks(): void {
@@ -149,6 +185,40 @@ export class NotebooksComponent implements OnInit {
       error: (error) => {
         console.error('Error loading classes:', error);
         this.classes = [];
+      }
+    });
+  }
+
+  loadTopics(): void {
+    this.apiService.get<Topic[]>('/topics').subscribe({
+      next: (data) => {
+        // Load elements for each topic
+        this.topics = data;
+        this.topics.forEach(topic => {
+          this.loadTopicElements(topic.id);
+        });
+      },
+      error: (error) => {
+        console.error('Error loading topics:', error);
+        this.topics = [];
+      }
+    });
+  }
+
+  loadTopicElements(topicId: number): void {
+    this.apiService.get<TopicElement[]>(`/topics/${topicId}/elements`).subscribe({
+      next: (data) => {
+        const topic = this.topics.find(t => t.id === topicId);
+        if (topic) {
+          topic.elements = data.sort((a, b) => (a.order || 0) - (b.order || 0));
+        }
+      },
+      error: (error) => {
+        console.error('Error loading topic elements:', error);
+        const topic = this.topics.find(t => t.id === topicId);
+        if (topic) {
+          topic.elements = [];
+        }
       }
     });
   }
@@ -291,7 +361,8 @@ export class NotebooksComponent implements OnInit {
       date: new Date().toISOString().split('T')[0],
       startTime: '08:00',
       endTime: '09:00',
-      notebookId: notebook.id
+      notebookId: notebook.id,
+      topicId: undefined
     };
     this.showCourseModal = true;
   }
@@ -305,7 +376,8 @@ export class NotebooksComponent implements OnInit {
       date: course.date,
       startTime: course.startTime,
       endTime: course.endTime,
-      notebookId: course.notebookId
+      notebookId: course.notebookId,
+      topicId: course.topicId
     };
     this.showCourseModal = true;
   }
@@ -366,7 +438,8 @@ export class NotebooksComponent implements OnInit {
       date: this.courseFormData.date,
       startTime: normalizedStartTime,
       endTime: normalizedEndTime,
-      notebookId: this.courseFormData.notebookId
+      notebookId: this.courseFormData.notebookId,
+      topicId: this.courseFormData.topicId || undefined
     };
 
     if (this.editingCourse) {
@@ -475,6 +548,29 @@ export class NotebooksComponent implements OnInit {
     const hours = parseInt(parts[0] || '0', 10);
     const minutes = parseInt(parts[1] || '0', 10);
     return hours * 60 + minutes;
+  }
+
+  getTopicTitle(topicId?: number): string {
+    if (!topicId) return '';
+    const topic = this.topics.find(t => t.id === topicId);
+    return topic ? topic.title : '';
+  }
+
+  getTopicSubtitle(topicId?: number): string {
+    if (!topicId) return '';
+    const topic = this.topics.find(t => t.id === topicId);
+    return topic?.subtitle || '';
+  }
+
+  getTopicElements(topicId?: number): TopicElement[] {
+    if (!topicId) return [];
+    const topic = this.topics.find(t => t.id === topicId);
+    return topic ? topic.elements : [];
+  }
+
+  onTopicChange(): void {
+    // When topic is selected, user can still edit the description manually
+    // The topic elements are shown as a preview but description remains editable
   }
 
   async exportReportToPDF(notebook: Notebook): Promise<void> {
