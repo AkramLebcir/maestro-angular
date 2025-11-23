@@ -14,6 +14,7 @@ import { TopicsComponent } from './pages/topics/topics.component';
 import { NotebooksComponent } from './pages/notebooks/notebooks.component';
 import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
+import { GradebookComponent } from './pages/gradebook/gradebook.component';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,8 @@ import { AttendanceComponent } from './pages/attendance/attendance.component';
     TopicsComponent,
     NotebooksComponent,
     AttendanceComponent,
-    BehaviorComponent
+    BehaviorComponent,
+    GradebookComponent
   ],
   imports: [
     BrowserModule,

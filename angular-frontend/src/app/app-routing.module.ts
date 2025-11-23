@@ -8,6 +8,7 @@ import { TopicsComponent } from './pages/topics/topics.component';
 import { NotebooksComponent } from './pages/notebooks/notebooks.component';
 import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
+import { GradebookComponent } from './pages/gradebook/gradebook.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/classes', pathMatch: 'full' },
@@ -21,6 +22,7 @@ const routes: Routes = [
   { path: 'notebooks', component: NotebooksComponent },
   { path: 'attendance', component: AttendanceComponent },
   { path: 'behavior', component: BehaviorComponent },
+  { path: 'gradebook', component: GradebookComponent },
   { path: 'reports', component: ClassesComponent }, // Placeholder
   { path: 'settings', component: ClassesComponent } // Placeholder
 ];

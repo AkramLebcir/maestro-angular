@@ -12,6 +12,7 @@ import { NotebooksModule } from './notebooks/notebooks.module';
 import { TopicsModule } from './topics/topics.module';
 import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
 import { AttendanceModule } from './attendance/attendance.module';
+import { GradesModule } from './grades/grades.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { AttendanceModule } from './attendance/attendance.module';
     TopicsModule,
     BehaviorEventsModule,
     AttendanceModule,
+    GradesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

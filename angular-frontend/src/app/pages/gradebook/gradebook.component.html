@@ -1,0 +1,620 @@
+<div class="flex-1 p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">سجل الدرجات</h1>
+      <div class="flex gap-3">
+        <button 
+          (click)="viewMode = 'reports'; openReportModal()"
+          class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>التقارير</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Class and Date Selection -->
+    <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">القسم</label>
+        <select 
+          [(ngModel)]="selectedClass"
+          (change)="onClassChange()"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <option [ngValue]="null">اختر القسم</option>
+          <option *ngFor="let classItem of classes" [ngValue]="classItem">{{ classItem.name }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ</label>
+        <input 
+          type="date"
+          [value]="formatDateForAPI(selectedDate)"
+          (change)="onDateChange($event)"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+    </div>
+
+    <!-- View Mode Tabs -->
+    <div class="flex gap-2 mb-4 border-b border-gray-200">
+      <button 
+        (click)="viewMode = 'entry'"
+        [class]="viewMode === 'entry' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="px-4 py-2 font-semibold">
+        إدخال الدرجات
+      </button>
+      <button 
+        (click)="viewMode = 'grades'"
+        [class]="viewMode === 'grades' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="px-4 py-2 font-semibold">
+        عرض الدرجات
+      </button>
+    </div>
+
+    <!-- Grade Entry View -->
+    <div *ngIf="viewMode === 'entry' && selectedClass">
+      <div class="mb-4 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">
+          إدخال درجات
+        </h2>
+        <div class="flex gap-2">
+          <button 
+            (click)="exportToExcel()"
+            class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+            تصدير إلى Excel
+          </button>
+          <button 
+            (click)="openImportModal()"
+            class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+            استيراد من Excel
+          </button>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 text-sm">
+          <thead>
+            <tr class="bg-blue-600 text-white">
+              <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الاسم</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">اللقب</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">السلوك (5)</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التقييم المستمر</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التعبير الشفهي/العمل العملي</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الفرض</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الاختبار</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الترتيب</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              *ngFor="let student of students; let i = index" 
+              class="border-b border-gray-200 hover:bg-gray-50"
+              [class.bg-red-50]="(student.averages?.termAverage || 0) < 10">
+              <td class="border border-gray-300 p-2 text-gray-800 text-center">{{ i + 1 }}</td>
+              <td class="border border-gray-300 p-2 text-gray-800">
+                {{ student.firstName }}
+              </td>
+              <td class="border border-gray-300 p-2 text-gray-800">
+                {{ student.lastName }}
+              </td>
+              <!-- تصحيح الدفتر -->
+              <td class="border border-gray-300 p-2">
+                <input 
+                  type="number"
+                  [value]="getGradeForStudent(student.id, getAssessmentIdByType('notebook_correction'))?.score || ''"
+                  (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
+                  (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
+                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  min="0"
+                  [max]="getAssessmentMaxScore('notebook_correction')"
+                  step="0.5"
+                  placeholder="0">
+              </td>
+              <!-- الواجب -->
+              <td class="border border-gray-300 p-2">
+                <input 
+                  type="number"
+                  [value]="getGradeForStudent(student.id, getAssessmentIdByType('duty'))?.score || ''"
+                  (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
+                  (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
+                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  min="0"
+                  [max]="getAssessmentMaxScore('duty')"
+                  step="0.5"
+                  placeholder="0">
+              </td>
+              <!-- الحضور (تلقائي من إدارة الحضور) -->
+              <td class="border border-gray-300 p-2 text-center font-semibold bg-gray-50">
+                {{ (student.calculatedGrades?.attendance || 0).toFixed(2) }}
+              </td>
+              <!-- السلوك (تلقائي من إدارة السلوك) -->
+              <td class="border border-gray-300 p-2 text-center font-semibold bg-gray-50">
+                {{ (student.calculatedGrades?.behavior || 0).toFixed(2) }}
+              </td>
+              <!-- التقييم المستمر (محسوب تلقائياً) -->
+              <td class="border border-gray-300 p-2 text-center font-semibold">
+                {{ (student.calculatedGrades?.continuousAssessment || 0).toFixed(2) }}
+              </td>
+               <!-- التعبير الشفهي/العمل العملي (عمود واحد) -->
+               <td class="border border-gray-300 p-2">
+                 <input 
+                   type="number"
+                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('oral_expression'))?.score || ''"
+                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('oral_expression'))"
+                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('oral_expression'))"
+                   class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                   min="0"
+                   [max]="getAssessmentMaxScore('oral_expression')"
+                   step="0.5"
+                   placeholder="0"
+                   title="التعبير الشفهي/العمل العملي">
+               </td>
+              <!-- الفرض -->
+              <td class="border border-gray-300 p-2">
+                <input 
+                  type="number"
+                  [value]="getGradeForStudent(student.id, getAssessmentIdByType('assignment'))?.score || ''"
+                  (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('assignment'))"
+                  (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('assignment'))"
+                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  min="0"
+                  [max]="getAssessmentMaxScore('assignment')"
+                  step="0.5"
+                  placeholder="0">
+              </td>
+              <!-- الاختبار -->
+              <td class="border border-gray-300 p-2">
+                <input 
+                  type="number"
+                  [value]="getGradeForStudent(student.id, getAssessmentIdByType('test'))?.score || ''"
+                  (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('test'))"
+                  (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('test'))"
+                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  min="0"
+                  [max]="getAssessmentMaxScore('test')"
+                  step="0.5"
+                  placeholder="0">
+              </td>
+              <!-- المعدل -->
+              <td class="border border-gray-300 p-2 text-center font-semibold"
+                  [class.text-red-600]="(student.averages?.termAverage || 0) < 10"
+                  [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
+                {{ (student.averages?.termAverage || 0).toFixed(2) }}
+              </td>
+              <!-- الترتيب -->
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.ranking || '-' }}
+              </td>
+            </tr>
+            <tr *ngIf="students.length === 0">
+              <td colspan="13" class="border border-gray-300 p-8 text-center text-gray-500">
+                لا يوجد تلاميذ في هذا القسم
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-100 font-semibold">
+              <td colspan="11" class="border border-gray-300 p-2 text-right">معدل القسم:</td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ calculateClassAverage().toFixed(2) }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+            <tr class="bg-blue-50">
+              <td colspan="11" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10:</td>
+              <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
+                {{ getStudentsAbove10() }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+            <tr class="bg-red-50">
+              <td colspan="11" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10:</td>
+              <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
+                {{ getStudentsBelow10() }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <!-- Grades View -->
+    <div *ngIf="viewMode === 'grades' && selectedClass">
+      <div class="mb-4">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">نتائج الفصل</h2>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 text-sm">
+          <thead>
+            <tr class="bg-blue-600 text-white">
+              <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الاسم</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">اللقب</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">السلوك (5)</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التقييم المستمر</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التعبير الشفهي/العمل العملي</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الفرض</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الاختبار</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الترتيب</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr 
+              *ngFor="let student of students; let i = index" 
+              class="border-b border-gray-200 hover:bg-gray-50"
+              [class.bg-red-50]="(student.averages?.termAverage || 0) < 10">
+              <td class="border border-gray-300 p-2 text-gray-800 text-center">{{ i + 1 }}</td>
+              <td class="border border-gray-300 p-2 text-gray-800">
+                {{ student.firstName }}
+              </td>
+              <td class="border border-gray-300 p-2 text-gray-800">
+                {{ student.lastName }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.duty?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.attendance?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.behavior?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.continuousAssessment?.toFixed(2) || '-' }}
+              </td>
+                <td class="border border-gray-300 p-2 text-center">
+                 {{ student.calculatedGrades?.oralExpression?.toFixed(2) || '-' }}
+               </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.assignment?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.calculatedGrades?.test?.toFixed(2) || '-' }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center font-semibold"
+                  [class.text-red-600]="(student.averages?.termAverage || 0) < 10"
+                  [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
+                {{ (student.averages?.termAverage || 0).toFixed(2) }}
+              </td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ student.ranking || '-' }}
+              </td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr class="bg-gray-100 font-semibold">
+              <td colspan="10" class="border border-gray-300 p-2 text-right">معدل القسم:</td>
+              <td class="border border-gray-300 p-2 text-center">
+                {{ calculateClassAverage().toFixed(2) }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+            <tr class="bg-blue-50">
+              <td colspan="10" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10:</td>
+              <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
+                {{ getStudentsAbove10() }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+            <tr class="bg-red-50">
+              <td colspan="10" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10:</td>
+              <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
+                {{ getStudentsBelow10() }}
+              </td>
+              <td class="border border-gray-300 p-2"></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="!selectedClass" class="text-center text-gray-500 py-12">
+      يرجى اختيار قسم لعرض الدرجات
+    </div>
+  </div>
+</div>
+
+<!-- Grade Entry Modal -->
+<div 
+  *ngIf="showGradeModal && selectedAssessment"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  (click)="closeGradeModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        إدخال درجة: {{ selectedAssessment.nameAr }}
+      </h3>
+      <button 
+        (click)="closeGradeModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #gradeForm="ngForm" (ngSubmit)="saveGrade()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الدرجة *</label>
+        <input 
+          type="number"
+          [(ngModel)]="formData.score"
+          name="score"
+          required
+          min="0"
+          [max]="formData.maxScore"
+          step="0.5"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">من</label>
+        <input 
+          type="number"
+          [(ngModel)]="formData.maxScore"
+          name="maxScore"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+        <textarea 
+          [(ngModel)]="formData.notes"
+          name="notes"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+          placeholder="أدخل ملاحظات..."></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!gradeForm.valid"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400">
+          حفظ
+        </button>
+        <button 
+          type="button"
+          (click)="closeGradeModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Excel Import Modal -->
+<div 
+  *ngIf="showImportModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  (click)="closeImportModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">استيراد من Excel</h3>
+      <button 
+        (click)="closeImportModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <p class="text-sm text-gray-600">
+        يرجى اختيار ملف Excel يحتوي على أعمدة: اسم التلميذ والدرجة
+      </p>
+      <input 
+        type="file"
+        accept=".xlsx,.xls"
+        (change)="onExcelFileSelected($event)"
+        class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+    </div>
+  </div>
+</div>
+
+<!-- Reports Modal -->
+<div 
+  *ngIf="showReportModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeReportModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">تقارير الدرجات</h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="exportReportToPDF()"
+          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
+          تصدير PDF
+        </button>
+        <button 
+          (click)="closeReportModal()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Grade Statistics Table -->
+    <div class="mb-6">
+      <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع الدرجات حسب النطاقات</h4>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300">
+          <thead>
+            <tr class="bg-blue-600 text-white">
+              <th class="border border-blue-700 p-3 text-right font-semibold">النطاق</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold">العدد</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold">النسبة المئوية</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">أقل من 4</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().lessThan4 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().lessThan4 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">4 - 6</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between4and6 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between4and6 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">6 - 8</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between6and8 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between6and8 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">8 - 10</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between8and10 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between8and10 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">10 - 12</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between10and12 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between10and12 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">12 - 14</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between12and14 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between12and14 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">14 - 16</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between14and16 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().between14and16 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+            <tr class="border-b border-gray-200">
+              <td class="border border-gray-300 p-3 text-gray-800">أكبر من 16</td>
+              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().greaterThan16 }}</td>
+              <td class="border border-gray-300 p-3 text-center">
+                {{ (getGradeStatistics().greaterThan16 / getGradeStatistics().total * 100).toFixed(1) }}%
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Gender Distribution -->
+    <div class="mb-6">
+      <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع الدرجات حسب الجنس</h4>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <h5 class="font-semibold text-gray-700 mb-2">الذكور</h5>
+          <div class="text-sm text-gray-600">
+            <div>معدل ≥ 10: {{ getGenderDistribution().male.total - (getGenderDistribution().male.lessThan4 + getGenderDistribution().male.between4and6 + getGenderDistribution().male.between6and8 + getGenderDistribution().male.between8and10) }}</div>
+            <div>معدل < 10: {{ getGenderDistribution().male.lessThan4 + getGenderDistribution().male.between4and6 + getGenderDistribution().male.between6and8 + getGenderDistribution().male.between8and10 }}</div>
+          </div>
+        </div>
+        <div>
+          <h5 class="font-semibold text-gray-700 mb-2">الإناث</h5>
+          <div class="text-sm text-gray-600">
+            <div>معدل ≥ 10: {{ getGenderDistribution().female.total - (getGenderDistribution().female.lessThan4 + getGenderDistribution().female.between4and6 + getGenderDistribution().female.between6and8 + getGenderDistribution().female.between8and10) }}</div>
+            <div>معدل < 10: {{ getGenderDistribution().female.lessThan4 + getGenderDistribution().female.between4and6 + getGenderDistribution().female.between6and8 + getGenderDistribution().female.between8and10 }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grade Range Distribution -->
+    <div class="mb-6">
+      <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع التلاميذ حسب الفئات</h4>
+      <div class="grid grid-cols-5 gap-4">
+        <div class="text-center p-4 bg-green-100 rounded-lg">
+          <div class="font-bold text-green-800 text-lg">{{ getGradeRangeDistribution().congratulations }}</div>
+          <div class="text-sm text-green-700">تهنئة (>16)</div>
+        </div>
+        <div class="text-center p-4 bg-blue-100 rounded-lg">
+          <div class="font-bold text-blue-800 text-lg">{{ getGradeRangeDistribution().encouragement }}</div>
+          <div class="text-sm text-blue-700">تشجيع (14-16)</div>
+        </div>
+        <div class="text-center p-4 bg-purple-100 rounded-lg">
+          <div class="font-bold text-purple-800 text-lg">{{ getGradeRangeDistribution().honorRoll }}</div>
+          <div class="text-sm text-purple-700">قائمة الشرف (12-14)</div>
+        </div>
+        <div class="text-center p-4 bg-gray-100 rounded-lg">
+          <div class="font-bold text-gray-800 text-lg">{{ getGradeRangeDistribution().none }}</div>
+          <div class="text-sm text-gray-700">عادي (10-12)</div>
+        </div>
+        <div class="text-center p-4 bg-red-100 rounded-lg">
+          <div class="font-bold text-red-800 text-lg">{{ getGradeRangeDistribution().remarks }}</div>
+          <div class="text-sm text-red-700">ملاحظات (<10)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Highest and Lowest Grades -->
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+        <h5 class="font-semibold text-green-800 mb-2">أعلى درجة</h5>
+        <div *ngIf="getHighestGrade()" class="text-sm">
+          <div class="font-bold">{{ getHighestGrade()!.student.lastName }} {{ getHighestGrade()!.student.firstName }}</div>
+          <div class="text-green-600 text-lg font-bold">{{ getHighestGrade()!.grade.toFixed(2) }}</div>
+        </div>
+      </div>
+      <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <h5 class="font-semibold text-red-800 mb-2">أقل درجة</h5>
+        <div *ngIf="getLowestGrade()" class="text-sm">
+          <div class="font-bold">{{ getLowestGrade()!.student.lastName }} {{ getLowestGrade()!.student.firstName }}</div>
+          <div class="text-red-600 text-lg font-bold">{{ getLowestGrade()!.grade.toFixed(2) }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="grid grid-cols-3 gap-4">
+      <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+        <div class="text-2xl font-bold text-blue-700">{{ calculateClassAverage().toFixed(2) }}</div>
+        <div class="text-sm text-blue-600">معدل القسم</div>
+      </div>
+      <div class="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+        <div class="text-2xl font-bold text-green-700">{{ getStudentsAbove10() }}</div>
+        <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
+      </div>
+      <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+        <div class="text-2xl font-bold text-red-700">{{ getStudentsBelow10() }}</div>
+        <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
+      </div>
+    </div>
+  </div>
+</div>
+
