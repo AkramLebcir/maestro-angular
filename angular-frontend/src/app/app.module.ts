@@ -9,6 +9,7 @@ import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { ClassesComponent } from './pages/classes/classes.component';
 import { LabsComponent } from './pages/labs/labs.component';
 import { StudentsComponent } from './pages/students/students.component';
+import { TimetableComponent } from './pages/timetable/timetable.component';
 
 @NgModule({
   declarations: [
@@ -17,7 +18,8 @@ import { StudentsComponent } from './pages/students/students.component';
     SidebarComponent,
     ClassesComponent,
     LabsComponent,
-    StudentsComponent
+    StudentsComponent,
+    TimetableComponent
   ],
   imports: [
     BrowserModule,

@@ -7,6 +7,7 @@ import { AppService } from './app.service';
 import { ClassesModule } from './classes/classes.module';
 import { LabsModule } from './labs/labs.module';
 import { StudentsModule } from './students/students.module';
+import { TimetableModule } from './timetable/timetable.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { StudentsModule } from './students/students.module';
     ClassesModule,
     LabsModule,
     StudentsModule,
+    TimetableModule,
   ],
   controllers: [AppController],
   providers: [AppService],
