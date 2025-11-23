@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { jsPDF } from 'jspdf';
 
 export interface TimetableEntry {
   id: number;
@@ -490,68 +491,62 @@ export class TimetableComponent implements OnInit {
   // PDF Export
   exportToPDF(): void {
     try {
-      // Dynamic import for jsPDF
-      import('jspdf').then((jsPDFModule: any) => {
-        const { jsPDF } = jsPDFModule;
-        const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation
+      // Create PDF document
+      const doc = new jsPDF('l', 'mm', 'a4'); // landscape orientation
+      
+      // Set Arabic font support (requires additional setup)
+      doc.setFontSize(16);
+      doc.text('جدول الأوقات', 140, 15, { align: 'center' });
+      
+      // Add weekly timetable
+      let yPos = 30;
+      const cellWidth = 40;
+      const cellHeight = 8;
+      const startX = 20;
+      
+      // Headers
+      doc.setFontSize(10);
+      doc.text('الوقت', startX, yPos);
+      let xPos = startX + 20;
+      this.workingDays.forEach(day => {
+        doc.text(day.short, xPos, yPos);
+        xPos += cellWidth;
+      });
+      yPos += cellHeight;
+      
+      // Time slots and entries
+      this.timeSlots.forEach(timeSlot => {
+        doc.text(timeSlot, startX, yPos);
+        xPos = startX + 20;
         
-        // Set Arabic font support (requires additional setup)
-        doc.setFontSize(16);
-        doc.text('جدول الأوقات', 140, 15, { align: 'center' });
-        
-        // Add weekly timetable
-        let yPos = 30;
-        const cellWidth = 40;
-        const cellHeight = 8;
-        const startX = 20;
-        
-        // Headers
-        doc.setFontSize(10);
-        doc.text('الوقت', startX, yPos);
-        let xPos = startX + 20;
         this.workingDays.forEach(day => {
-          doc.text(day.short, xPos, yPos);
+          const entries = this.getEntriesForDay(day.value).filter(e => 
+            this.shouldDisplayEntryInSlot(e, timeSlot)
+          );
+          
+          if (entries.length > 0) {
+            const entry = entries[0];
+            doc.setFontSize(8);
+            doc.text(entry.subject.substring(0, 10), xPos, yPos);
+            doc.text(entry.startTime, xPos, yPos + 3);
+          }
+          
           xPos += cellWidth;
         });
+        
         yPos += cellHeight;
-        
-        // Time slots and entries
-        this.timeSlots.forEach(timeSlot => {
-          doc.text(timeSlot, startX, yPos);
-          xPos = startX + 20;
-          
-          this.workingDays.forEach(day => {
-            const entries = this.getEntriesForDay(day.value).filter(e => 
-              this.shouldDisplayEntryInSlot(e, timeSlot)
-            );
-            
-            if (entries.length > 0) {
-              const entry = entries[0];
-              doc.setFontSize(8);
-              doc.text(entry.subject.substring(0, 10), xPos, yPos);
-              doc.text(entry.startTime, xPos, yPos + 3);
-            }
-            
-            xPos += cellWidth;
-          });
-          
-          yPos += cellHeight;
-          if (yPos > 180) {
-            doc.addPage();
-            yPos = 20;
-          }
-        });
-        
-        // Save PDF
-        const fileName = `timetable_${new Date().toISOString().split('T')[0]}.pdf`;
-        doc.save(fileName);
-      }).catch((error) => {
-        console.error('Error loading jsPDF:', error);
-        alert('حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت مكتبة jsPDF.');
+        if (yPos > 180) {
+          doc.addPage();
+          yPos = 20;
+        }
       });
+      
+      // Save PDF
+      const fileName = `timetable_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF');
+      alert('حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت مكتبة jsPDF.');
     }
   }
 
