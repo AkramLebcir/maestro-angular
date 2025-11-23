@@ -13,6 +13,7 @@ export class StudentResponseDto {
   photo?: string;
   generalNotes?: string;
   classId?: number;
+  group?: 1 | 2 | null;
   class?: {
     id: number;
     name: string;

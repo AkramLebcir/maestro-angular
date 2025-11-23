@@ -15,6 +15,7 @@ export interface Student {
   photo?: string;
   generalNotes?: string;
   classId?: number;
+  group?: 1 | 2 | null;
   class?: {
     id: number;
     name: string;
@@ -37,6 +38,7 @@ export interface CreateStudentDto {
   photo?: string;
   generalNotes?: string;
   classId?: number;
+  group?: 1 | 2 | null;
   email?: string;
   studentNumber?: string;
 }
@@ -64,6 +66,7 @@ export class StudentsComponent implements OnInit {
   selectedClassFilter: number | null = null;
   selectedGenderFilter: 'male' | 'female' | null = null;
   selectedRepeaterFilter: boolean | null = null;
+  selectedGroupFilter: 1 | 2 | null = null;
   
   // Sort
   sortField: string = '';
@@ -129,7 +132,8 @@ export class StudentsComponent implements OnInit {
     this.formData = {
       lastName: '',
       firstName: '',
-      isRepeater: false
+      isRepeater: false,
+      group: null
     };
     this.photoPreview = null;
     this.selectedFile = null;
@@ -150,6 +154,7 @@ export class StudentsComponent implements OnInit {
       photo: student.photo,
       generalNotes: student.generalNotes,
       classId: student.classId,
+      group: student.group || null,
       email: student.email,
       studentNumber: student.studentNumber
     };
@@ -191,6 +196,7 @@ export class StudentsComponent implements OnInit {
       photo: this.formData.photo || undefined,
       generalNotes: this.formData.generalNotes || undefined,
       classId: this.formData.classId || undefined,
+      group: this.formData.group || undefined,
       email: this.formData.email || undefined,
       studentNumber: this.formData.studentNumber || undefined
     };
@@ -286,6 +292,11 @@ export class StudentsComponent implements OnInit {
       filtered = filtered.filter(student => (student.isRepeater || false) === this.selectedRepeaterFilter);
     }
 
+    // Group filter
+    if (this.selectedGroupFilter !== null) {
+      filtered = filtered.filter(student => student.group === this.selectedGroupFilter);
+    }
+
     // Sort
     if (this.sortField) {
       filtered.sort((a, b) => {
@@ -301,6 +312,10 @@ export class StudentsComponent implements OnInit {
           // Sort by gender label
           aVal = this.getGenderLabel(a.gender);
           bVal = this.getGenderLabel(b.gender);
+        } else if (this.sortField === 'group') {
+          // Sort by group label
+          aVal = this.getGroupLabel(a.group);
+          bVal = this.getGroupLabel(b.group);
         } else if (this.sortField === 'dateOfBirth') {
           // Sort by date
           aVal = a.dateOfBirth ? (typeof a.dateOfBirth === 'string' ? new Date(a.dateOfBirth) : a.dateOfBirth) : null;
@@ -354,6 +369,10 @@ export class StudentsComponent implements OnInit {
     this.applyFilters();
   }
 
+  onGroupFilterChange(): void {
+    this.applyFilters();
+  }
+
   sort(field: string): void {
     if (this.sortField === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -378,6 +397,11 @@ export class StudentsComponent implements OnInit {
   getGenderLabel(gender?: string): string {
     if (!gender) return '-';
     return gender === 'male' ? 'ذكر' : 'أنثى';
+  }
+
+  getGroupLabel(group?: 1 | 2 | null): string {
+    if (!group) return '-';
+    return group === 1 ? 'المجموعة 1' : 'المجموعة 2';
   }
 
   formatDate(date: Date | string | undefined): string {

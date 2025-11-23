@@ -1,6 +1,26 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 
+export interface Student {
+  id: number;
+  idNumber?: string;
+  lastName: string;
+  firstName: string;
+  dateOfBirth?: Date | string;
+  placeOfBirth?: string;
+  gender?: 'male' | 'female';
+  isRepeater?: boolean;
+  studentId?: string;
+  photo?: string;
+  generalNotes?: string;
+  classId?: number;
+  group?: 1 | 2 | null;
+  email?: string;
+  studentNumber?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 export interface Class {
   id: number;
   level: string;
@@ -43,6 +63,26 @@ export interface CreateLabDto {
   isAvailable?: boolean;
 }
 
+export interface Student {
+  id: number;
+  idNumber?: string;
+  lastName: string;
+  firstName: string;
+  dateOfBirth?: Date | string;
+  placeOfBirth?: string;
+  gender?: 'male' | 'female';
+  isRepeater?: boolean;
+  studentId?: string;
+  photo?: string;
+  generalNotes?: string;
+  classId?: number;
+  group?: 1 | 2 | null;
+  email?: string;
+  studentNumber?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 
 @Component({
   selector: 'app-classes',
@@ -54,7 +94,11 @@ export class ClassesComponent implements OnInit {
   labs: Lab[] = [];
   showModal = false;
   showLabModal = false;
+  showGroupModal = false;
   editingClass: Class | null = null;
+  currentClassForGroups: Class | null = null;
+  classStudents: Student[] = [];
+  selectedStudents: Set<number> = new Set();
   formData: CreateClassDto = {
     level: '',
     name: '',
@@ -250,6 +294,189 @@ export class ClassesComponent implements OnInit {
         alert(errorMessage);
       }
     });
+  }
+
+  // Group Management
+  openGroupModal(classItem: Class): void {
+    this.currentClassForGroups = classItem;
+    this.selectedStudents.clear();
+    this.loadClassStudents(classItem.id);
+    this.showGroupModal = true;
+  }
+
+  closeGroupModal(): void {
+    this.showGroupModal = false;
+    this.currentClassForGroups = null;
+    this.classStudents = [];
+    this.selectedStudents.clear();
+  }
+
+  loadClassStudents(classId: number): void {
+    this.apiService.get<Student[]>('/students').subscribe({
+      next: (allStudents) => {
+        // Filter students by class
+        this.classStudents = allStudents.filter(s => s.classId === classId);
+        // Sort by name for better display
+        this.classStudents.sort((a, b) => {
+          const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+          const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      },
+      error: (error) => {
+        console.error('Error loading students:', error);
+        this.classStudents = [];
+      }
+    });
+  }
+
+  // Automatic Division
+  divideByFirstName(): void {
+    const sorted = [...this.classStudents].sort((a, b) => 
+      (a.firstName || '').toLowerCase().localeCompare((b.firstName || '').toLowerCase())
+    );
+    this.assignGroupsByHalf(sorted);
+  }
+
+  divideByLastName(): void {
+    const sorted = [...this.classStudents].sort((a, b) => 
+      (a.lastName || '').toLowerCase().localeCompare((b.lastName || '').toLowerCase())
+    );
+    this.assignGroupsByHalf(sorted);
+  }
+
+  divideByGender(): void {
+    const males = this.classStudents.filter(s => s.gender === 'male');
+    const females = this.classStudents.filter(s => s.gender === 'female');
+    const unknown = this.classStudents.filter(s => !s.gender);
+    
+    // Sort each group alphabetically by last name
+    males.sort((a, b) => (a.lastName || '').toLowerCase().localeCompare((b.lastName || '').toLowerCase()));
+    females.sort((a, b) => (a.lastName || '').toLowerCase().localeCompare((b.lastName || '').toLowerCase()));
+    unknown.sort((a, b) => (a.lastName || '').toLowerCase().localeCompare((b.lastName || '').toLowerCase()));
+    
+    // Combine: first half of males, first half of females, then second halves
+    const allStudents: Student[] = [];
+    const maleMid = Math.ceil(males.length / 2);
+    const femaleMid = Math.ceil(females.length / 2);
+    const unknownMid = Math.ceil(unknown.length / 2);
+    
+    // First halves → Group 1
+    allStudents.push(...males.slice(0, maleMid));
+    allStudents.push(...females.slice(0, femaleMid));
+    allStudents.push(...unknown.slice(0, unknownMid));
+    
+    // Second halves → Group 2
+    allStudents.push(...males.slice(maleMid));
+    allStudents.push(...females.slice(femaleMid));
+    allStudents.push(...unknown.slice(unknownMid));
+    
+    // Assign groups
+    const totalFirstHalf = maleMid + femaleMid + unknownMid;
+    allStudents.forEach((student, index) => {
+      student.group = (index < totalFirstHalf) ? 1 : 2;
+    });
+    
+    this.saveGroupAssignments();
+  }
+
+  assignGroupsByHalf(students: Student[]): void {
+    const midPoint = Math.ceil(students.length / 2);
+    students.forEach((student, index) => {
+      student.group = (index < midPoint) ? 1 : 2;
+    });
+    this.saveGroupAssignments();
+  }
+
+  // Manual Assignment
+  toggleStudentSelection(studentId: number): void {
+    if (this.selectedStudents.has(studentId)) {
+      this.selectedStudents.delete(studentId);
+    } else {
+      this.selectedStudents.add(studentId);
+    }
+  }
+
+  assignSelectedToGroup(group: 1 | 2): void {
+    if (this.selectedStudents.size === 0) {
+      alert('يرجى اختيار تلاميذ أولاً');
+      return;
+    }
+
+    this.selectedStudents.forEach(studentId => {
+      const student = this.classStudents.find(s => s.id === studentId);
+      if (student) {
+        student.group = group;
+      }
+    });
+
+    this.selectedStudents.clear();
+    this.saveGroupAssignments();
+  }
+
+  removeFromGroup(studentId: number): void {
+    const student = this.classStudents.find(s => s.id === studentId);
+    if (student) {
+      student.group = null;
+      this.saveGroupAssignments();
+    }
+  }
+
+  saveGroupAssignments(): void {
+    const updates = this.classStudents.map(student => ({
+      id: student.id,
+      group: student.group
+    }));
+
+    let completed = 0;
+    let errors = 0;
+
+    if (updates.length === 0) {
+      return;
+    }
+
+    updates.forEach(update => {
+      const student = this.classStudents.find(s => s.id === update.id);
+      if (!student) return;
+
+      const updateData: any = { group: update.group };
+      
+      this.apiService.patch<Student>(`/students/${update.id}`, updateData).subscribe({
+        next: () => {
+          completed++;
+          if (completed + errors === updates.length) {
+            if (errors === 0) {
+              alert('تم حفظ تقسيم المجموعات بنجاح');
+            } else {
+              alert(`تم حفظ ${completed} تلميذ، فشل ${errors}`);
+            }
+          }
+        },
+        error: (error) => {
+          console.error(`Error updating student ${update.id}:`, error);
+          errors++;
+          if (completed + errors === updates.length) {
+            alert(`تم حفظ ${completed} تلميذ، فشل ${errors}`);
+          }
+        }
+      });
+    });
+  }
+
+  getGroup1Students(): Student[] {
+    return this.classStudents.filter(s => s.group === 1);
+  }
+
+  getGroup2Students(): Student[] {
+    return this.classStudents.filter(s => s.group === 2);
+  }
+
+  getUngroupedStudents(): Student[] {
+    return this.classStudents.filter(s => !s.group || s.group === null);
+  }
+
+  isStudentSelected(studentId: number): boolean {
+    return this.selectedStudents.has(studentId);
   }
 }
 

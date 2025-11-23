@@ -49,6 +49,9 @@ export class Student {
   @Column({ nullable: true })
   classId: number;
 
+  @Column({ type: 'int', nullable: true })
+  group: 1 | 2 | null;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

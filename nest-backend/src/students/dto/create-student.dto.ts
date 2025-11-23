@@ -1,4 +1,4 @@
-import { IsString, IsOptional, IsEmail, IsInt, IsBoolean, IsEnum, IsDateString } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsInt, IsBoolean, IsEnum, IsDateString, IsIn, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class CreateStudentDto {
@@ -53,5 +53,12 @@ export class CreateStudentDto {
   @IsOptional()
   @IsString()
   generalNotes?: string;
+
+  @IsOptional()
+  @ValidateIf((o) => o.group !== null && o.group !== undefined)
+  @Type(() => Number)
+  @IsInt()
+  @IsIn([1, 2], { message: 'Group must be either 1 or 2' })
+  group?: 1 | 2 | null;
 }
 

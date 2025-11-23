@@ -131,6 +131,11 @@ export class StudentsService {
     if (updateStudentDto.classId !== undefined) {
       fieldsToUpdate.classId = updateStudentDto.classId || null;
     }
+    
+    // Group field - update if provided (1, 2, or null)
+    if (updateStudentDto.group !== undefined) {
+      fieldsToUpdate.group = updateStudentDto.group ?? null;
+    }
 
     Object.assign(student, fieldsToUpdate);
     await this.studentRepository.save(student);
@@ -163,6 +168,7 @@ export class StudentsService {
       photo: student.photo,
       generalNotes: student.generalNotes,
       classId: student.classId,
+      group: student.group,
       class: student.class
         ? {
             id: student.class.id,
