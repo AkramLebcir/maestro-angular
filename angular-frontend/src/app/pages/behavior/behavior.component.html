@@ -1,0 +1,388 @@
+<div class="flex-1 p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">إدارة السلوك</h1>
+      <div class="flex gap-3">
+        <button 
+          (click)="openClassReport()"
+          class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>تقرير القسم</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Class Selection -->
+    <div class="mb-6">
+      <label class="block text-sm font-medium text-gray-700 mb-2">اختر القسم</label>
+      <select 
+        [(ngModel)]="selectedClass"
+        (change)="onClassChange()"
+        class="w-full md:w-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        <option [ngValue]="null">اختر القسم</option>
+        <option *ngFor="let classItem of classes" [ngValue]="classItem">{{ classItem.name }}</option>
+      </select>
+    </div>
+
+    <!-- Students Grid -->
+    <div *ngIf="selectedClass && filteredStudents.length > 0" class="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <div 
+        *ngFor="let student of filteredStudents" 
+        class="relative bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition cursor-pointer"
+        (click)="openBehaviorModal(student)">
+        <!-- Student Photo -->
+        <div class="relative mb-2">
+          <!-- Student Photo (if available) -->
+          <img 
+            *ngIf="hasPhoto(student)"
+            [src]="getStudentPhoto(student)"
+            [alt]="student.firstName + ' ' + student.lastName"
+            class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-gray-200">
+          
+          <!-- Default Icon (if no photo) -->
+          <div 
+            *ngIf="!hasPhoto(student)"
+            class="w-20 h-20 rounded-full mx-auto border-2 border-gray-200 flex items-center justify-center text-4xl bg-gray-100"
+            [class.bg-blue-50]="student.gender === 'male'"
+            [class.bg-pink-50]="student.gender === 'female'">
+            {{ getDefaultIcon(student) }}
+          </div>
+          
+          <!-- Positive Behavior Badge -->
+          <div 
+            *ngIf="student.behaviorCounts && student.behaviorCounts.positive > 0"
+            class="absolute top-0 right-0 bg-green-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            {{ student.behaviorCounts.positive }}
+          </div>
+          
+          <!-- Negative Behavior Badge -->
+          <div 
+            *ngIf="student.behaviorCounts && student.behaviorCounts.negative > 0"
+            class="absolute top-0 left-0 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold">
+            {{ student.behaviorCounts.negative }}
+          </div>
+        </div>
+        
+        <!-- Student Name -->
+        <div class="text-center">
+          <div class="text-sm font-semibold text-gray-800">{{ student.firstName }}</div>
+          <div class="text-xs text-gray-600">{{ student.lastName }}</div>
+        </div>
+
+        <!-- View Report Button -->
+        <button 
+          (click)="openStudentReport(student); $event.stopPropagation()"
+          class="mt-2 w-full bg-blue-600 text-white px-2 py-1 rounded text-xs hover:bg-blue-700 transition">
+          عرض التقرير
+        </button>
+
+        <!-- Warning Indicator -->
+        <div 
+          *ngIf="student.behaviorCounts && student.behaviorCounts.negative >= warningThreshold"
+          class="absolute top-2 right-2 bg-red-600 text-white rounded-full w-4 h-4 flex items-center justify-center">
+          <span class="text-xs">⚠</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="selectedClass && filteredStudents.length === 0" class="text-center text-gray-500 py-12">
+      لا يوجد تلاميذ في هذا القسم
+    </div>
+
+    <div *ngIf="!selectedClass" class="text-center text-gray-500 py-12">
+      يرجى اختيار قسم لعرض التلاميذ
+    </div>
+  </div>
+</div>
+
+<!-- Behavior Recording Modal -->
+<div 
+  *ngIf="showBehaviorModal && selectedStudent"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeBehaviorModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">
+        تسجيل سلوك - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+      </h3>
+      <button 
+        (click)="closeBehaviorModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form #behaviorForm="ngForm" (ngSubmit)="saveBehaviorEvent()" class="space-y-4">
+      <!-- Date -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ *</label>
+        <input 
+          type="date"
+          [(ngModel)]="formData.date"
+          name="date"
+          required
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      </div>
+
+      <!-- Behavior Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">اختر نوع السلوك *</label>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Negative Behaviors (Left) -->
+          <div>
+            <h4 class="text-sm font-semibold text-red-700 mb-2">السلوك السلبي</h4>
+            <div class="space-y-2">
+              <button 
+                *ngFor="let behavior of negativeBehaviors"
+                type="button"
+                (click)="selectBehavior(behavior)"
+                [class]="formData.behaviorId === behavior.id 
+                  ? 'bg-red-600 text-white border-2 border-red-700' 
+                  : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'"
+                class="w-full p-3 rounded-lg text-right flex items-center gap-2 transition">
+                <span class="text-xl">{{ behavior.icon }}</span>
+                <span class="flex-1">{{ behavior.nameAr }}</span>
+                <span *ngIf="formData.behaviorId === behavior.id" class="text-white">✓</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Positive Behaviors (Right) -->
+          <div>
+            <h4 class="text-sm font-semibold text-green-700 mb-2">السلوك الإيجابي</h4>
+            <div class="space-y-2">
+              <button 
+                *ngFor="let behavior of positiveBehaviors"
+                type="button"
+                (click)="selectBehavior(behavior)"
+                [class]="formData.behaviorId === behavior.id 
+                  ? 'bg-green-600 text-white border-2 border-green-700' 
+                  : 'bg-green-50 text-green-700 border border-green-200 hover:bg-green-100'"
+                class="w-full p-3 rounded-lg text-right flex items-center gap-2 transition">
+                <span class="text-xl">{{ behavior.icon }}</span>
+                <span class="flex-1">{{ behavior.nameAr }}</span>
+                <span *ngIf="formData.behaviorId === behavior.id" class="text-white">✓</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف (اختياري)</label>
+        <textarea 
+          [(ngModel)]="formData.description"
+          name="description"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="أدخل وصف إضافي للسلوك..."></textarea>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button 
+          type="submit"
+          [disabled]="!behaviorForm.valid || !formData.behaviorId"
+          class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+          حفظ
+        </button>
+        <button 
+          type="button"
+          (click)="closeBehaviorModal()"
+          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Student Report Modal -->
+<div 
+  *ngIf="showStudentReportModal && selectedReportStudent && reportData"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] overflow-y-auto p-4"
+  (click)="closeStudentReportModal()">
+  <div 
+    #studentReportContent
+    class="bg-white rounded-lg shadow-xl w-full max-w-4xl my-4 max-h-[90vh] flex flex-col"
+    (click)="$event.stopPropagation()">
+    <!-- Header (Fixed) -->
+    <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 flex-shrink-0">
+      <h3 class="text-xl font-bold text-gray-800">
+        تقرير السلوك - {{ reportData.studentName }}
+      </h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="exportStudentReportToPDF(selectedReportStudent)"
+          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
+          تصدير PDF
+        </button>
+        <button 
+          (click)="closeStudentReportModal()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto p-6 pt-4">
+      <!-- Summary -->
+      <div class="grid grid-cols-3 gap-4 mb-6">
+        <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-green-700">{{ reportData.positiveCount }}</div>
+          <div class="text-sm text-green-600">سلوك إيجابي</div>
+        </div>
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-red-700">{{ reportData.negativeCount }}</div>
+          <div class="text-sm text-red-600">سلوك سلبي</div>
+        </div>
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-blue-700">{{ reportData.totalEvents }}</div>
+          <div class="text-sm text-blue-600">إجمالي السجلات</div>
+        </div>
+      </div>
+
+      <!-- Warning -->
+      <div *ngIf="reportData.negativeCount >= warningThreshold" class="mb-4 p-4 bg-red-100 border border-red-300 rounded-lg">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">⚠️</span>
+          <div>
+            <div class="font-semibold text-red-800">تحذير: تجاوز الحد المسموح</div>
+            <div class="text-sm text-red-700">
+              عدد السلوكيات السلبية ({{ reportData.negativeCount }}) تجاوز الحد المسموح ({{ warningThreshold }})
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Events List -->
+      <div class="space-y-2">
+      <div 
+        *ngFor="let event of reportData.events" 
+        class="border border-gray-200 rounded-lg p-3 hover:bg-gray-50">
+        <div class="flex justify-between items-start">
+          <div class="flex-1">
+            <div class="flex items-center gap-2 mb-1">
+              <span 
+                [class]="getBehaviorType(event.behaviorId) === 'positive' ? 'text-green-600' : 'text-red-600'"
+                class="font-semibold">
+                {{ getBehaviorName(event.behaviorId) }}
+              </span>
+              <span 
+                [class]="getBehaviorType(event.behaviorId) === 'positive' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                class="px-2 py-0.5 rounded text-xs">
+                {{ getBehaviorType(event.behaviorId) === 'positive' ? 'إيجابي' : 'سلبي' }}
+              </span>
+            </div>
+            <div class="text-sm text-gray-600 mb-1">{{ formatDateTime(event.date) }}</div>
+            <div *ngIf="event.description" class="text-sm text-gray-500">{{ event.description }}</div>
+          </div>
+          <button 
+            (click)="deleteBehaviorEvent(event.id)"
+            class="text-red-600 hover:text-red-800 text-sm">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div *ngIf="reportData.events.length === 0" class="text-center text-gray-400 py-8">
+        لا توجد سجلات سلوك
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Class Report Modal -->
+<div 
+  *ngIf="showReportModal && selectedClass"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4"
+  (click)="closeClassReportModal()">
+  <div 
+    #classReportContent
+    class="bg-white rounded-lg shadow-xl w-full max-w-6xl my-4 max-h-[90vh] flex flex-col"
+    (click)="$event.stopPropagation()">
+    <!-- Header (Fixed) -->
+    <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 flex-shrink-0">
+      <h3 class="text-xl font-bold text-gray-800">
+        تقرير السلوك - {{ selectedClass.name }}
+      </h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="exportClassReportToPDF()"
+          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
+          تصدير PDF
+        </button>
+        <button 
+          (click)="closeClassReportModal()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto overflow-x-auto p-6 pt-4">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-100 border-b-2 border-gray-300">
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم التلميذ</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">السلوك الإيجابي</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">السلوك السلبي</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجمالي</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr 
+            *ngFor="let report of getClassReportData()" 
+            class="border-b border-gray-200 hover:bg-gray-50"
+            [class.bg-red-50]="report.negativeCount >= warningThreshold">
+            <td class="py-3 px-4 text-gray-800">{{ report.studentName }}</td>
+            <td class="py-3 px-4 text-green-600 font-semibold">{{ report.positiveCount }}</td>
+            <td class="py-3 px-4 text-red-600 font-semibold">{{ report.negativeCount }}</td>
+            <td class="py-3 px-4 text-gray-800">{{ report.totalEvents }}</td>
+            <td class="py-3 px-4">
+              <span 
+                *ngIf="report.negativeCount >= warningThreshold"
+                class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm font-semibold">
+                ⚠️ تحذير
+              </span>
+              <span 
+                *ngIf="report.negativeCount < warningThreshold"
+                class="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
+                طبيعي
+              </span>
+            </td>
+            <td class="py-3 px-4">
+              <button 
+                *ngIf="getStudentById(report.studentId)"
+                (click)="openStudentReport(getStudentById(report.studentId)!)"
+                class="text-blue-600 hover:text-blue-800 text-sm">
+                عرض التفاصيل
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="getClassReportData().length === 0">
+            <td colspan="6" class="py-8 text-center text-gray-500">لا توجد بيانات</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+

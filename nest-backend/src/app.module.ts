@@ -10,6 +10,8 @@ import { StudentsModule } from './students/students.module';
 import { TimetableModule } from './timetable/timetable.module';
 import { NotebooksModule } from './notebooks/notebooks.module';
 import { TopicsModule } from './topics/topics.module';
+import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
+import { AttendanceModule } from './attendance/attendance.module';
 
 @Module({
   imports: [
@@ -24,6 +26,8 @@ import { TopicsModule } from './topics/topics.module';
     TimetableModule,
     NotebooksModule,
     TopicsModule,
+    BehaviorEventsModule,
+    AttendanceModule,
   ],
   controllers: [AppController],
   providers: [AppService],

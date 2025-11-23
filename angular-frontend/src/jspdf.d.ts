@@ -23,9 +23,23 @@ declare module 'jspdf' {
     constructor(orientation?: 'p' | 'portrait' | 'l' | 'landscape', unit?: string, format?: string | number[]);
     
     setFontSize(size: number): jsPDF;
-    text(text: string, x: number, y: number, options?: TextOptions): jsPDF;
+    text(text: string | string[], x: number, y: number, options?: TextOptions): jsPDF;
     addPage(): jsPDF;
     save(filename: string): void;
+    setTextColor(r: number, g?: number, b?: number): jsPDF;
+    setFillColor(r: number, g?: number, b?: number): jsPDF;
+    setDrawColor(r: number, g?: number, b?: number): jsPDF;
+    rect(x: number, y: number, w: number, h: number, operation?: 'S' | 'F' | 'FD' | 'DF'): jsPDF;
+    line(x1: number, y1: number, x2: number, y2: number): jsPDF;
+    splitTextToSize(text: string, maxWidth: number, options?: any): string[];
+    getNumberOfPages(): number;
+    setPage(pageNumber: number): jsPDF;
+    internal: {
+      pageSize: {
+        getWidth(): number;
+        getHeight(): number;
+      };
+    };
   }
 
   export default jsPDF;

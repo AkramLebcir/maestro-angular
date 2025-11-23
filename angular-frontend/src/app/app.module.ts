@@ -12,6 +12,8 @@ import { StudentsComponent } from './pages/students/students.component';
 import { TimetableComponent } from './pages/timetable/timetable.component';
 import { TopicsComponent } from './pages/topics/topics.component';
 import { NotebooksComponent } from './pages/notebooks/notebooks.component';
+import { BehaviorComponent } from './pages/behavior/behavior.component';
+import { AttendanceComponent } from './pages/attendance/attendance.component';
 
 @NgModule({
   declarations: [
@@ -23,7 +25,9 @@ import { NotebooksComponent } from './pages/notebooks/notebooks.component';
     StudentsComponent,
     TimetableComponent,
     TopicsComponent,
-    NotebooksComponent
+    NotebooksComponent,
+    AttendanceComponent,
+    BehaviorComponent
   ],
   imports: [
     BrowserModule,
