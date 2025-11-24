@@ -3,6 +3,7 @@ import { ApiService } from '../../services/api.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 
 export type AssessmentType = 
   | 'notebook_correction'
@@ -153,7 +154,7 @@ export class GradebookComponent implements OnInit {
   showImportModal = false;
   
   // Sorting
-  sortBy: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking' | null = null;
+  sortBy: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'term1Average' | 'term2Average' | 'term3Average' | 'annualAverage' | 'ranking' | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
   
   // Grade form
@@ -182,7 +183,125 @@ export class GradebookComponent implements OnInit {
   ];
 
   // View mode
-  viewMode: 'entry' | 'grades' | 'reports' = 'entry';
+  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' = 'entry';
+
+  // Chart configurations
+  public chartOptions: ChartConfiguration['options'] = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: true,
+        position: 'top',
+        rtl: true
+      },
+      title: {
+        display: false
+      },
+      tooltip: {
+        rtl: true
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true
+      }
+    },
+    layout: {
+      padding: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10
+      }
+    }
+  };
+
+  // Grade Distribution Chart (Bar Chart)
+  public gradeDistributionChartType: ChartType = 'bar';
+  public gradeDistributionChartData: ChartData<'bar'> = {
+    labels: ['<4', '4-6', '6-8', '8-10', '10-12', '12-14', '14-16', '>16'],
+    datasets: [{
+      label: 'عدد التلاميذ',
+      data: [],
+      backgroundColor: 'rgba(59, 130, 246, 0.5)',
+      borderColor: 'rgba(59, 130, 246, 1)',
+      borderWidth: 1
+    }]
+  };
+
+  // Grade Range Distribution Chart (Pie Chart)
+  public gradeRangeChartType: ChartType = 'pie';
+  public gradeRangeChartData: ChartData<'pie'> = {
+    labels: ['تهنئة (>16)', 'تشجيع (14-16)', 'قائمة الشرف (12-14)', 'عادي (10-12)', 'ملاحظات (<10)'],
+    datasets: [{
+      data: [],
+      backgroundColor: [
+        'rgba(34, 197, 94, 0.7)',
+        'rgba(59, 130, 246, 0.7)',
+        'rgba(147, 51, 234, 0.7)',
+        'rgba(107, 114, 128, 0.7)',
+        'rgba(239, 68, 68, 0.7)'
+      ],
+      borderColor: [
+        'rgba(34, 197, 94, 1)',
+        'rgba(59, 130, 246, 1)',
+        'rgba(147, 51, 234, 1)',
+        'rgba(107, 114, 128, 1)',
+        'rgba(239, 68, 68, 1)'
+      ],
+      borderWidth: 1
+    }]
+  };
+
+  // Gender Comparison Chart (Bar Chart)
+  public genderChartType: ChartType = 'bar';
+  public genderChartData: ChartData<'bar'> = {
+    labels: ['معدل ≥ 10', 'معدل < 10'],
+    datasets: [
+      {
+        label: 'ذكور',
+        data: [],
+        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+        borderColor: 'rgba(59, 130, 246, 1)',
+        borderWidth: 1
+      },
+      {
+        label: 'إناث',
+        data: [],
+        backgroundColor: 'rgba(236, 72, 153, 0.7)',
+        borderColor: 'rgba(236, 72, 153, 1)',
+        borderWidth: 1
+      }
+    ]
+  };
+
+  // Term Comparison Chart (Line Chart)
+  public termComparisonChartType: ChartType = 'line';
+  public termComparisonChartData: ChartData<'line'> = {
+    labels: ['الفصل الأول', 'الفصل الثاني', 'الفصل الثالث'],
+    datasets: [{
+      label: 'معدل القسم',
+      data: [],
+      borderColor: 'rgba(59, 130, 246, 1)',
+      backgroundColor: 'rgba(59, 130, 246, 0.1)',
+      tension: 0.4,
+      fill: true
+    }]
+  };
+
+  // Assessment Performance Chart (Bar Chart)
+  public assessmentChartType: ChartType = 'bar';
+  public assessmentChartData: ChartData<'bar'> = {
+    labels: [],
+    datasets: [{
+      label: 'متوسط الدرجات',
+      data: [],
+      backgroundColor: 'rgba(16, 185, 129, 0.7)',
+      borderColor: 'rgba(16, 185, 129, 1)',
+      borderWidth: 1
+    }]
+  };
 
   constructor(
     private apiService: ApiService,
@@ -335,6 +454,15 @@ export class GradebookComponent implements OnInit {
       // إعادة تحميل الدرجات من الخادم (سيتم استدعاء calculateAllGrades من loadAttendanceForClass و loadBehaviorForClass)
       this.loadGradesForClass(this.selectedClass.id);
     }
+  }
+
+  onAnalysisTabClick(): void {
+    this.viewMode = 'analysis';
+    // Update charts when switching to analysis tab
+    setTimeout(() => {
+      this.updateAllCharts();
+      this.cdr.detectChanges();
+    }, 100);
   }
 
   onDateChange(event: Event): void {
@@ -608,8 +736,13 @@ export class GradebookComponent implements OnInit {
     });
     this.calculateRankings();
     
-    // If currently sorted by ranking, termAverage, or annualAverage, reapply the sort
-    if (this.sortBy === 'ranking' || this.sortBy === 'termAverage' || this.sortBy === 'annualAverage') {
+    // Update charts if in analysis mode
+    if (this.viewMode === 'analysis') {
+      this.updateAllCharts();
+    }
+    
+    // If currently sorted by ranking, termAverage, term1Average, term2Average, term3Average, or annualAverage, reapply the sort
+    if (this.sortBy === 'ranking' || this.sortBy === 'termAverage' || this.sortBy === 'term1Average' || this.sortBy === 'term2Average' || this.sortBy === 'term3Average' || this.sortBy === 'annualAverage') {
       // Save current sort state
       const currentSortBy = this.sortBy;
       const currentSortDirection = this.sortDirection;
@@ -981,8 +1114,10 @@ export class GradebookComponent implements OnInit {
   calculateClassAverage(): number {
     if (this.students.length === 0) return 0;
     
+    // Calculate average of annual averages, or term averages if annual is not available
     const sum = this.students.reduce((acc, s) => {
-      return acc + (s.averages?.termAverage || 0);
+      const avg = s.averages?.annualAverage || s.averages?.term1Average || s.averages?.term2Average || s.averages?.term3Average || 0;
+      return acc + avg;
     }, 0);
     
     return sum / this.students.length;
@@ -990,12 +1125,16 @@ export class GradebookComponent implements OnInit {
 
   calculateRankings(): void {
     // Create a copy of students with averages for sorting
+    // Use annual average for ranking, or term average if annual is not available
     const studentsWithAverages = this.students
-      .filter(s => s.averages?.termAverage !== undefined && (s.averages?.termAverage || 0) > 0)
+      .filter(s => {
+        const avg = s.averages?.annualAverage || s.averages?.term1Average || s.averages?.term2Average || s.averages?.term3Average || 0;
+        return avg > 0;
+      })
       .map(s => ({ ...s })) // Create a copy to avoid mutating
       .sort((a, b) => {
-        const avgA = a.averages?.termAverage || 0;
-        const avgB = b.averages?.termAverage || 0;
+        const avgA = a.averages?.annualAverage || a.averages?.term1Average || a.averages?.term2Average || a.averages?.term3Average || 0;
+        const avgB = b.averages?.annualAverage || b.averages?.term1Average || b.averages?.term2Average || b.averages?.term3Average || 0;
         // Sort descending (highest average first)
         return avgB - avgA;
       });
@@ -1010,13 +1149,14 @@ export class GradebookComponent implements OnInit {
     
     // Students without averages get no ranking
     this.students.forEach(student => {
-      if (!student.averages?.termAverage || student.averages.termAverage === 0) {
+      const avg = student.averages?.annualAverage || student.averages?.term1Average || student.averages?.term2Average || student.averages?.term3Average || 0;
+      if (avg === 0) {
         student.ranking = undefined;
       }
     });
   }
 
-  sortStudents(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking'): void {
+  sortStudents(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'term1Average' | 'term2Average' | 'term3Average' | 'annualAverage' | 'ranking'): void {
     // If clicking the same field, toggle direction; otherwise, set to ascending
     if (this.sortBy === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -1051,6 +1191,18 @@ export class GradebookComponent implements OnInit {
         case 'termAverage':
           valueA = a.averages?.termAverage || 0;
           valueB = b.averages?.termAverage || 0;
+          break;
+        case 'term1Average':
+          valueA = a.averages?.term1Average || 0;
+          valueB = b.averages?.term1Average || 0;
+          break;
+        case 'term2Average':
+          valueA = a.averages?.term2Average || 0;
+          valueB = b.averages?.term2Average || 0;
+          break;
+        case 'term3Average':
+          valueA = a.averages?.term3Average || 0;
+          valueB = b.averages?.term3Average || 0;
           break;
         case 'annualAverage':
           valueA = a.averages?.annualAverage || 0;
@@ -1090,7 +1242,7 @@ export class GradebookComponent implements OnInit {
     this.students = studentsCopy;
   }
 
-  getSortIcon(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking'): string {
+  getSortIcon(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'term1Average' | 'term2Average' | 'term3Average' | 'annualAverage' | 'ranking'): string {
     if (this.sortBy !== field) {
       return '↕️'; // Neutral icon when not sorted by this field
     }
@@ -1302,11 +1454,25 @@ export class GradebookComponent implements OnInit {
   }
 
   getStudentsAbove10(): number {
-    return this.students.filter(s => (s.averages?.termAverage || 0) >= 10).length;
+    // Count students with annual average >= 10, or any term average >= 10
+    return this.students.filter(s => {
+      const annualAvg = s.averages?.annualAverage || 0;
+      const term1Avg = s.averages?.term1Average || 0;
+      const term2Avg = s.averages?.term2Average || 0;
+      const term3Avg = s.averages?.term3Average || 0;
+      return annualAvg >= 10 || term1Avg >= 10 || term2Avg >= 10 || term3Avg >= 10;
+    }).length;
   }
 
   getStudentsBelow10(): number {
-    return this.students.filter(s => (s.averages?.termAverage || 0) < 10).length;
+    // Count students with all averages < 10
+    return this.students.filter(s => {
+      const annualAvg = s.averages?.annualAverage || 0;
+      const term1Avg = s.averages?.term1Average || 0;
+      const term2Avg = s.averages?.term2Average || 0;
+      const term3Avg = s.averages?.term3Average || 0;
+      return annualAvg < 10 && term1Avg < 10 && term2Avg < 10 && term3Avg < 10;
+    }).length;
   }
 
   getHighestGrade(): { student: Student; grade: number } | null {
@@ -1340,6 +1506,139 @@ export class GradebookComponent implements OnInit {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  // Chart data update methods
+  updateGradeDistributionChart(): void {
+    const stats = this.getGradeStatistics();
+    this.gradeDistributionChartData = {
+      ...this.gradeDistributionChartData,
+      datasets: [{
+        ...this.gradeDistributionChartData.datasets[0],
+        data: [
+          stats.lessThan4,
+          stats.between4and6,
+          stats.between6and8,
+          stats.between8and10,
+          stats.between10and12,
+          stats.between12and14,
+          stats.between14and16,
+          stats.greaterThan16
+        ]
+      }]
+    };
+  }
+
+  updateGradeRangeChart(): void {
+    const dist = this.getGradeRangeDistribution();
+    this.gradeRangeChartData = {
+      ...this.gradeRangeChartData,
+      datasets: [{
+        ...this.gradeRangeChartData.datasets[0],
+        data: [
+          dist.congratulations,
+          dist.encouragement,
+          dist.honorRoll,
+          dist.none,
+          dist.remarks
+        ]
+      }]
+    };
+  }
+
+  updateGenderChart(): void {
+    const genderDist = this.getGenderDistribution();
+    const maleAbove10 = genderDist.male.total - (genderDist.male.lessThan4 + genderDist.male.between4and6 + genderDist.male.between6and8 + genderDist.male.between8and10);
+    const maleBelow10 = genderDist.male.lessThan4 + genderDist.male.between4and6 + genderDist.male.between6and8 + genderDist.male.between8and10;
+    const femaleAbove10 = genderDist.female.total - (genderDist.female.lessThan4 + genderDist.female.between4and6 + genderDist.female.between6and8 + genderDist.female.between8and10);
+    const femaleBelow10 = genderDist.female.lessThan4 + genderDist.female.between4and6 + genderDist.female.between6and8 + genderDist.female.between8and10;
+
+    this.genderChartData = {
+      ...this.genderChartData,
+      datasets: [
+        {
+          ...this.genderChartData.datasets[0],
+          data: [maleAbove10, maleBelow10]
+        },
+        {
+          ...this.genderChartData.datasets[1],
+          data: [femaleAbove10, femaleBelow10]
+        }
+      ]
+    };
+  }
+
+  updateTermComparisonChart(): void {
+    const term1Avg = this.calculateTermClassAverage(1);
+    const term2Avg = this.calculateTermClassAverage(2);
+    const term3Avg = this.calculateTermClassAverage(3);
+
+    this.termComparisonChartData = {
+      ...this.termComparisonChartData,
+      datasets: [{
+        ...this.termComparisonChartData.datasets[0],
+        data: [term1Avg, term2Avg, term3Avg]
+      }]
+    };
+  }
+
+  updateAssessmentChart(): void {
+    const labels: string[] = [];
+    const data: number[] = [];
+
+    this.assessments.forEach(assessment => {
+      if (assessment.type !== 'continuous_assessment') {
+        labels.push(assessment.nameAr);
+        const avg = this.calculateAssessmentAverage(assessment.id);
+        data.push(avg);
+      }
+    });
+
+    this.assessmentChartData = {
+      ...this.assessmentChartData,
+      labels: labels,
+      datasets: [{
+        ...this.assessmentChartData.datasets[0],
+        data: data
+      }]
+    };
+  }
+
+  calculateTermClassAverage(term: number): number {
+    if (this.students.length === 0) return 0;
+    
+    const sum = this.students.reduce((acc, s) => {
+      let avg = 0;
+      if (term === 1) avg = s.averages?.term1Average || 0;
+      else if (term === 2) avg = s.averages?.term2Average || 0;
+      else if (term === 3) avg = s.averages?.term3Average || 0;
+      return acc + avg;
+    }, 0);
+    
+    return sum / this.students.length;
+  }
+
+  calculateAssessmentAverage(assessmentId: number): number {
+    if (this.students.length === 0) return 0;
+    
+    const assessment = this.assessments.find(a => a.id === assessmentId);
+    if (!assessment) return 0;
+
+    const key = this.getCalculatedGradeKey(assessment.type);
+    const sum = this.students.reduce((acc, s) => {
+      const grade = s.calculatedGrades?.[key as keyof typeof s.calculatedGrades] as number || 0;
+      return acc + grade;
+    }, 0);
+    
+    return sum / this.students.length;
+  }
+
+  updateAllCharts(): void {
+    this.updateGradeDistributionChart();
+    this.updateGradeRangeChart();
+    this.updateGenderChart();
+    this.updateTermComparisonChart();
+    this.updateAssessmentChart();
   }
 
   formatDate(date: Date | string): string {
@@ -1406,38 +1705,113 @@ export class GradebookComponent implements OnInit {
     }
 
     try {
-      const element = document.querySelector('.bg-white.rounded-lg.shadow-lg') as HTMLElement;
-      if (!element) {
-        alert('لم يتم العثور على المحتوى للتصدير');
+      // Find the reports modal content
+      const modalContent = document.querySelector('.bg-white.rounded-lg.shadow-xl') as HTMLElement;
+      if (!modalContent) {
+        alert('لم يتم العثور على محتوى التقارير للتصدير');
         return;
       }
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false
-      });
+      // Create a temporary container for export
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = modalContent.offsetWidth + 'px';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      // Clone the modal content
+      const clonedContent = modalContent.cloneNode(true) as HTMLElement;
       
-      const imgWidth = 210;
-      const pageHeight = 295;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
+      // Remove the header buttons (export and close buttons)
+      const headerButtons = clonedContent.querySelector('.flex.gap-2');
+      if (headerButtons) {
+        headerButtons.remove();
       }
 
-      const fileName = `سجل_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.pdf`;
+      // Style the cloned content
+      clonedContent.style.width = '100%';
+      clonedContent.style.backgroundColor = '#ffffff';
+      
+      // Add title
+      const title = document.createElement('h2');
+      title.textContent = 'تقارير الدرجات';
+      title.style.textAlign = 'right';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '20px';
+      title.style.color = '#111827';
+      
+      // Add class name and date
+      const info = document.createElement('div');
+      info.style.textAlign = 'right';
+      info.style.marginBottom = '20px';
+      info.style.fontSize = '14px';
+      info.style.color = '#6b7280';
+      
+      const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
+      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      info.innerHTML = `${classInfo}<br>${dateInfo}`;
+      
+      exportContainer.appendChild(title);
+      exportContainer.appendChild(info);
+      exportContainer.appendChild(clonedContent);
+      
+      document.body.appendChild(exportContainer);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 1.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Calculate PDF dimensions (portrait A4)
+      const imgWidth = 210; // A4 width in mm (portrait)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      // Calculate scale to fit on page(s)
+      const pageHeight = 297; // A4 height in mm (portrait)
+      const pageWidth = 210; // A4 width in mm (portrait)
+      const margin = 10; // Margin on all sides
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = pageWidth - (2 * margin);
+      
+      // Scale to fit width first
+      let finalWidth = Math.min(imgWidth, availableWidth);
+      let finalHeight = (canvas.height * finalWidth) / canvas.width;
+      
+      // If height exceeds available height, we'll split across pages (don't scale down)
+      // Position content from top
+      const xOffset = (pageWidth - finalWidth) / 2; // Center horizontally
+      const yOffset = margin; // Start from top with margin
+
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      // Add additional pages if content is taller than one page
+      let heightLeft = finalHeight - availableHeight;
+      let position = -availableHeight;
+
+      while (heightLeft > 0) {
+        position = position - availableHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, position, finalWidth, finalHeight);
+        heightLeft -= availableHeight;
+      }
+
+      const fileName = `تقارير_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting to PDF:', error);
