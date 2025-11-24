@@ -72,7 +72,10 @@ export class TopicsComponent implements OnInit {
     this.apiService.get<Topic[]>('/topics').subscribe({
       next: (data) => {
         // Load elements for each topic
-        this.topics = data;
+        this.topics = data.map(topic => ({
+          ...topic,
+          elements: topic.elements || []
+        }));
         this.topics.forEach(topic => {
           this.loadTopicElements(topic.id);
         });
@@ -116,7 +119,10 @@ export class TopicsComponent implements OnInit {
   }
 
   openEditModal(topic: Topic): void {
-    this.editingTopic = topic;
+    this.editingTopic = {
+      ...topic,
+      elements: topic.elements || []
+    };
     this.topicFormData = {
       title: topic.title,
       subtitle: topic.subtitle || '',

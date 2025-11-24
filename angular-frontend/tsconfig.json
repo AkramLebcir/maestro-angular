@@ -20,10 +20,14 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
     "lib": [
       "ES2022",
       "dom"
-    ]
+    ],
+    "paths": {
+      "tslib": ["node_modules/tslib"]
+    }
   },
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
