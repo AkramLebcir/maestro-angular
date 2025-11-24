@@ -343,12 +343,152 @@
       </table>
     </div>
 
-      <!-- Statistics Report -->
-      <div *ngIf="reportType === 'statistics'" class="space-y-4">
-        <div class="text-center text-gray-500 py-8">
-          إحصائيات الحضور حسب القسم واليوم والشهر قيد التطوير
-        </div>
-      </div>
+       <!-- Statistics Report -->
+       <div *ngIf="reportType === 'statistics'" class="space-y-6">
+         <!-- Statistics by Class -->
+         <div>
+           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب القسم</h4>
+           <div class="overflow-x-auto">
+             <table class="w-full border-collapse border border-gray-300">
+               <thead>
+                 <tr class="bg-blue-600 text-white">
+                   <th class="border border-blue-700 p-3 text-right font-semibold">القسم</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">حاضر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr 
+                   *ngFor="let classStat of getClassStatisticsArray()" 
+                   class="border-b border-gray-200 hover:bg-gray-50">
+                   <td class="border border-gray-300 p-3 text-gray-800">{{ classStat.className }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-green-600 font-semibold">{{ classStat.present }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-red-600 font-semibold">{{ classStat.absent }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-blue-600 font-semibold">{{ classStat.late }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-purple-600 font-semibold">{{ classStat.excused }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-orange-600 font-semibold">{{ classStat.leftEarly }}</td>
+                   <td class="border border-gray-300 p-3 text-center font-semibold">{{ classStat.total }}</td>
+                   <td class="border border-gray-300 p-3 text-center">
+                     <div class="flex items-center gap-2">
+                       <div class="flex-1 bg-gray-200 rounded-full h-2">
+                         <div 
+                           class="bg-green-600 h-2 rounded-full"
+                           [style.width.%]="(classStat.present / classStat.total * 100) || 0">
+                         </div>
+                       </div>
+                       <span class="text-sm font-semibold">{{ ((classStat.present / classStat.total) * 100 || 0).toFixed(1) }}%</span>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr *ngIf="getClassStatisticsArray().length === 0">
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                 </tr>
+               </tbody>
+             </table>
+           </div>
+         </div>
+
+         <!-- Statistics by Day -->
+         <div>
+           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب اليوم</h4>
+           <div class="overflow-x-auto">
+             <table class="w-full border-collapse border border-gray-300">
+               <thead>
+                 <tr class="bg-blue-600 text-white">
+                   <th class="border border-blue-700 p-3 text-right font-semibold">اليوم</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">حاضر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr 
+                   *ngFor="let dayStat of getDayStatisticsArray()" 
+                   class="border-b border-gray-200 hover:bg-gray-50">
+                   <td class="border border-gray-300 p-3 text-gray-800 font-semibold">{{ dayStat.day }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-green-600 font-semibold">{{ dayStat.present }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-red-600 font-semibold">{{ dayStat.absent }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-blue-600 font-semibold">{{ dayStat.late }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-purple-600 font-semibold">{{ dayStat.excused }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-orange-600 font-semibold">{{ dayStat.leftEarly }}</td>
+                   <td class="border border-gray-300 p-3 text-center font-semibold">{{ dayStat.total }}</td>
+                   <td class="border border-gray-300 p-3 text-center">
+                     <div class="flex items-center gap-2">
+                       <div class="flex-1 bg-gray-200 rounded-full h-2">
+                         <div 
+                           class="bg-green-600 h-2 rounded-full"
+                           [style.width.%]="(dayStat.present / dayStat.total * 100) || 0">
+                         </div>
+                       </div>
+                       <span class="text-sm font-semibold">{{ ((dayStat.present / dayStat.total) * 100 || 0).toFixed(1) }}%</span>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr *ngIf="getDayStatisticsArray().length === 0">
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                 </tr>
+               </tbody>
+             </table>
+           </div>
+         </div>
+
+         <!-- Statistics by Month -->
+         <div>
+           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب الشهر</h4>
+           <div class="overflow-x-auto">
+             <table class="w-full border-collapse border border-gray-300">
+               <thead>
+                 <tr class="bg-blue-600 text-white">
+                   <th class="border border-blue-700 p-3 text-right font-semibold">الشهر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">حاضر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                 </tr>
+               </thead>
+               <tbody>
+                 <tr 
+                   *ngFor="let monthStat of getMonthStatisticsArray()" 
+                   class="border-b border-gray-200 hover:bg-gray-50">
+                   <td class="border border-gray-300 p-3 text-gray-800 font-semibold">{{ monthStat.month }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-green-600 font-semibold">{{ monthStat.present }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-red-600 font-semibold">{{ monthStat.absent }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-blue-600 font-semibold">{{ monthStat.late }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-purple-600 font-semibold">{{ monthStat.excused }}</td>
+                   <td class="border border-gray-300 p-3 text-center text-orange-600 font-semibold">{{ monthStat.leftEarly }}</td>
+                   <td class="border border-gray-300 p-3 text-center font-semibold">{{ monthStat.total }}</td>
+                   <td class="border border-gray-300 p-3 text-center">
+                     <div class="flex items-center gap-2">
+                       <div class="flex-1 bg-gray-200 rounded-full h-2">
+                         <div 
+                           class="bg-green-600 h-2 rounded-full"
+                           [style.width.%]="(monthStat.present / monthStat.total * 100) || 0">
+                         </div>
+                       </div>
+                       <span class="text-sm font-semibold">{{ ((monthStat.present / monthStat.total) * 100 || 0).toFixed(1) }}%</span>
+                     </div>
+                   </td>
+                 </tr>
+                 <tr *ngIf="getMonthStatisticsArray().length === 0">
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                 </tr>
+               </tbody>
+             </table>
+           </div>
+         </div>
+       </div>
 
       <!-- Class Attendance Report -->
       <div *ngIf="reportType === 'class'" class="overflow-x-auto">

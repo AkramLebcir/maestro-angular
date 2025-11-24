@@ -167,8 +167,13 @@ export class AttendanceComponent implements OnInit {
     const dateStr = this.formatDateForAPI(this.selectedDate);
     this.apiService.get<AttendanceRecord[]>(`/attendance?classId=${this.selectedClass.id}&date=${dateStr}`).subscribe({
       next: (data) => {
-        this.attendanceRecords = data;
-        // Map attendance status to students
+        // Update records for current date only (remove old records for this date and class)
+        const existingRecords = this.attendanceRecords.filter(r => 
+          !(r.date === dateStr && r.classId === this.selectedClass!.id)
+        );
+        this.attendanceRecords = [...existingRecords, ...data];
+        
+        // Map attendance status to students for current date
         this.students.forEach(student => {
           const record = data.find(r => r.studentId === student.id);
           student.attendanceStatus = record ? record.status : 'unrecorded';
@@ -176,8 +181,7 @@ export class AttendanceComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading attendance:', error);
-        this.attendanceRecords = [];
-        // Set all students to unrecorded
+        // Set all students to unrecorded for current date
         this.students.forEach(student => {
           student.attendanceStatus = 'unrecorded';
         });
@@ -185,11 +189,28 @@ export class AttendanceComponent implements OnInit {
     });
   }
 
+  loadAllAttendanceRecords(): void {
+    // Load all attendance records for statistics
+    if (!this.selectedClass) return;
+    
+    this.apiService.get<AttendanceRecord[]>(`/attendance?classId=${this.selectedClass.id}`).subscribe({
+      next: (data) => {
+        this.attendanceRecords = data;
+      },
+      error: (error) => {
+        console.error('Error loading all attendance records:', error);
+        this.attendanceRecords = [];
+      }
+    });
+  }
+
   onClassChange(): void {
     if (this.selectedClass) {
       this.loadStudentsForClass(this.selectedClass.id);
+      this.loadAllAttendanceRecords();
     } else {
       this.students = [];
+      this.attendanceRecords = [];
     }
   }
 
@@ -405,6 +426,10 @@ export class AttendanceComponent implements OnInit {
   openReportModal(type: 'absences' | 'statistics' | 'class'): void {
     this.reportType = type;
     this.showReportModal = true;
+    // Load all attendance records for statistics
+    if (type === 'statistics') {
+      this.loadAllAttendanceRecords();
+    }
   }
 
   closeReportModal(): void {
@@ -442,14 +467,93 @@ export class AttendanceComponent implements OnInit {
     }).sort((a, b) => b.absentDays - a.absentDays);
   }
 
-  getAttendanceStatistics(): any {
-    // Statistics by class, day, and month
-    // This would need proper API implementation
-    return {
-      byClass: {},
-      byDay: {},
-      byMonth: {}
+  getAttendanceStatistics(): {
+    byClass: { [classId: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number; className: string } };
+    byDay: { [day: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number } };
+    byMonth: { [month: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number } };
+  } {
+    const stats = {
+      byClass: {} as { [classId: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number; className: string } },
+      byDay: {} as { [day: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number } },
+      byMonth: {} as { [month: string]: { present: number; absent: number; late: number; excused: number; leftEarly: number; total: number } }
     };
+
+    // Load all attendance records for statistics
+    // This would ideally come from API, but for now we'll use loaded records
+    const allRecords = this.attendanceRecords;
+
+    // Statistics by Class
+    allRecords.forEach(record => {
+      const classId = String(record.classId || 'unknown');
+      if (!stats.byClass[classId]) {
+        stats.byClass[classId] = {
+          present: 0,
+          absent: 0,
+          late: 0,
+          excused: 0,
+          leftEarly: 0,
+          total: 0,
+          className: record.class?.name || `القسم ${classId}`
+        };
+      }
+      
+      stats.byClass[classId].total++;
+      if (record.status === 'present') stats.byClass[classId].present++;
+      else if (record.status === 'absent') stats.byClass[classId].absent++;
+      else if (record.status === 'late') stats.byClass[classId].late++;
+      else if (record.status === 'excused') stats.byClass[classId].excused++;
+      else if (record.status === 'left_early') stats.byClass[classId].leftEarly++;
+    });
+
+    // Statistics by Day
+    allRecords.forEach(record => {
+      const date = typeof record.date === 'string' ? new Date(record.date) : record.date;
+      const dayKey = date.toLocaleDateString('ar-EG', { weekday: 'long' });
+      
+      if (!stats.byDay[dayKey]) {
+        stats.byDay[dayKey] = {
+          present: 0,
+          absent: 0,
+          late: 0,
+          excused: 0,
+          leftEarly: 0,
+          total: 0
+        };
+      }
+      
+      stats.byDay[dayKey].total++;
+      if (record.status === 'present') stats.byDay[dayKey].present++;
+      else if (record.status === 'absent') stats.byDay[dayKey].absent++;
+      else if (record.status === 'late') stats.byDay[dayKey].late++;
+      else if (record.status === 'excused') stats.byDay[dayKey].excused++;
+      else if (record.status === 'left_early') stats.byDay[dayKey].leftEarly++;
+    });
+
+    // Statistics by Month
+    allRecords.forEach(record => {
+      const date = typeof record.date === 'string' ? new Date(record.date) : record.date;
+      const monthKey = date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' });
+      
+      if (!stats.byMonth[monthKey]) {
+        stats.byMonth[monthKey] = {
+          present: 0,
+          absent: 0,
+          late: 0,
+          excused: 0,
+          leftEarly: 0,
+          total: 0
+        };
+      }
+      
+      stats.byMonth[monthKey].total++;
+      if (record.status === 'present') stats.byMonth[monthKey].present++;
+      else if (record.status === 'absent') stats.byMonth[monthKey].absent++;
+      else if (record.status === 'late') stats.byMonth[monthKey].late++;
+      else if (record.status === 'excused') stats.byMonth[monthKey].excused++;
+      else if (record.status === 'left_early') stats.byMonth[monthKey].leftEarly++;
+    });
+
+    return stats;
   }
 
   getClassAttendanceReport(): AttendanceRecord[] {
@@ -464,6 +568,59 @@ export class AttendanceComponent implements OnInit {
       r.date === dateStr
     );
     return record ? record.status : 'unrecorded';
+  }
+
+  getClassStatisticsArray(): Array<{ className: string; present: number; absent: number; late: number; excused: number; leftEarly: number; total: number }> {
+    const stats = this.getAttendanceStatistics();
+    return Object.keys(stats.byClass).map(classId => ({
+      className: stats.byClass[classId].className,
+      present: stats.byClass[classId].present,
+      absent: stats.byClass[classId].absent,
+      late: stats.byClass[classId].late,
+      excused: stats.byClass[classId].excused,
+      leftEarly: stats.byClass[classId].leftEarly,
+      total: stats.byClass[classId].total
+    }));
+  }
+
+  getDayStatisticsArray(): Array<{ day: string; present: number; absent: number; late: number; excused: number; leftEarly: number; total: number }> {
+    const stats = this.getAttendanceStatistics();
+    const dayOrder = ['السبت', 'الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'];
+    return Object.keys(stats.byDay)
+      .map(day => ({
+        day,
+        present: stats.byDay[day].present,
+        absent: stats.byDay[day].absent,
+        late: stats.byDay[day].late,
+        excused: stats.byDay[day].excused,
+        leftEarly: stats.byDay[day].leftEarly,
+        total: stats.byDay[day].total
+      }))
+      .sort((a, b) => {
+        const indexA = dayOrder.indexOf(a.day);
+        const indexB = dayOrder.indexOf(b.day);
+        return (indexA === -1 ? 999 : indexA) - (indexB === -1 ? 999 : indexB);
+      });
+  }
+
+  getMonthStatisticsArray(): Array<{ month: string; present: number; absent: number; late: number; excused: number; leftEarly: number; total: number }> {
+    const stats = this.getAttendanceStatistics();
+    return Object.keys(stats.byMonth)
+      .map(month => ({
+        month,
+        present: stats.byMonth[month].present,
+        absent: stats.byMonth[month].absent,
+        late: stats.byMonth[month].late,
+        excused: stats.byMonth[month].excused,
+        leftEarly: stats.byMonth[month].leftEarly,
+        total: stats.byMonth[month].total
+      }))
+      .sort((a, b) => {
+        // Sort by date (newest first)
+        const dateA = new Date(a.month);
+        const dateB = new Date(b.month);
+        return dateB.getTime() - dateA.getTime();
+      });
   }
 
   async exportReportToPDF(): Promise<void> {
