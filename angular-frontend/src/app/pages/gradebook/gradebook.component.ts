@@ -42,6 +42,7 @@ export interface Grade {
     id: number;
     name: string;
   };
+  term: number; // 1, 2, or 3
   score: number;
   maxScore: number;
   date: string; // Format: YYYY-MM-DD
@@ -54,6 +55,7 @@ export interface CreateGradeDto {
   studentId: number;
   assessmentId: number;
   classId: number;
+  term: number; // 1, 2, or 3
   score: number;
   maxScore: number;
   date: string;
@@ -84,7 +86,11 @@ export interface Student {
   };
   averages?: {
     testAverage?: number;
-    termAverage?: number;
+    termAverage?: number; // Average for current term
+    term1Average?: number; // Average for term 1
+    term2Average?: number; // Average for term 2
+    term3Average?: number; // Average for term 3
+    annualAverage?: number; // Annual average (average of 3 terms)
     classAverage?: number;
   };
   ranking?: number;
@@ -138,6 +144,7 @@ export class GradebookComponent implements OnInit {
   selectedClass: Class | null = null;
   selectedAssessment: Assessment | null = null;
   selectedDate: Date = new Date();
+  selectedTerm: number = 1; // 1, 2, or 3
   showGradeModal = false;
   showReportModal = false;
   showImportModal = false;
@@ -147,6 +154,7 @@ export class GradebookComponent implements OnInit {
     studentId: 0,
     assessmentId: 0,
     classId: 0,
+    term: 1,
     score: 0,
     maxScore: 20,
     date: new Date().toISOString().split('T')[0]
@@ -279,12 +287,24 @@ export class GradebookComponent implements OnInit {
     });
   }
 
+  isBehaviorPositive(behaviorId: number): boolean {
+    // السلوكيات الإيجابية: IDs 1-5
+    // السلوكيات السلبية: IDs 6-10
+    return behaviorId >= 1 && behaviorId <= 5;
+  }
+
   onClassChange(): void {
     if (this.selectedClass) {
       this.loadStudentsForClass(this.selectedClass.id);
     } else {
       this.students = [];
       this.grades = [];
+    }
+  }
+
+  onTermChange(): void {
+    if (this.selectedClass) {
+      this.loadGradesForClass(this.selectedClass.id);
     }
   }
 
@@ -300,13 +320,15 @@ export class GradebookComponent implements OnInit {
     const existingGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === assessment.id &&
-      g.classId === this.selectedClass!.id
+      g.classId === this.selectedClass!.id &&
+      g.term === this.selectedTerm
     );
 
     this.formData = {
       studentId: student.id,
       assessmentId: assessment.id,
       classId: this.selectedClass!.id,
+      term: this.selectedTerm,
       score: existingGrade ? existingGrade.score : 0,
       maxScore: assessment.maxScore,
       date: this.formatDateForAPI(this.selectedDate),
@@ -356,6 +378,7 @@ export class GradebookComponent implements OnInit {
       this.formData.assessmentId = assessmentId;
       this.formData.score = score;
       this.formData.classId = this.selectedClass!.id;
+      this.formData.term = this.selectedTerm;
       this.formData.maxScore = assessment.maxScore;
       this.formData.date = this.formatDateForAPI(this.selectedDate);
     }
@@ -421,7 +444,8 @@ export class GradebookComponent implements OnInit {
     return this.grades.find(g => 
       g.studentId === studentId && 
       g.assessmentId === assessmentId &&
-      g.classId === this.selectedClass?.id
+      g.classId === this.selectedClass?.id &&
+      g.term === this.selectedTerm
     );
   }
 
@@ -475,23 +499,34 @@ export class GradebookComponent implements OnInit {
       } else if (assessment.type === 'continuous_assessment') {
         // Calculated automatically from notebook + duty + attendance + behavior
         calculated[key] = this.calculateAutomaticGrade(student, assessment);
-      } else {
-        // Manual entry
-        const grade = this.grades.find(g => 
-          g.studentId === student.id && 
-          g.assessmentId === assessment.id &&
-          g.classId === this.selectedClass?.id
-        );
-        calculated[key] = grade ? grade.score : undefined;
-      }
+        } else {
+          // Manual entry
+          const grade = this.grades.find(g => 
+            g.studentId === student.id && 
+            g.assessmentId === assessment.id &&
+            g.classId === this.selectedClass?.id &&
+            g.term === this.selectedTerm
+          );
+          calculated[key] = grade ? grade.score : undefined;
+        }
     });
 
     student.calculatedGrades = calculated;
     
     // Calculate averages
+    // Calculate averages for current term and all terms
+    const term1Avg = this.calculateTermAverage(student, 1);
+    const term2Avg = this.calculateTermAverage(student, 2);
+    const term3Avg = this.calculateTermAverage(student, 3);
+    const annualAvg = this.calculateAnnualAverage(student);
+    
     student.averages = {
       testAverage: this.calculateTestAverage(student),
       termAverage: this.calculateTermAverage(student),
+      term1Average: term1Avg,
+      term2Average: term2Avg,
+      term3Average: term3Avg,
+      annualAverage: annualAvg,
       classAverage: this.calculateClassAverage()
     };
   }
@@ -513,39 +548,66 @@ export class GradebookComponent implements OnInit {
 
   calculateAttendanceGrade(student: Student): number {
     // Calculate from attendance records automatically
-    if (!this.selectedClass) return 0;
+    // نبدأ من 3 نقاط
+    // كل حضور أو معذور: +0.5
+    // كل غياب أو مغادرة مبكرة: -0.5
+    // كل متأخر: -0.25
+    if (!this.selectedClass) return 3; // Default starting value
     
     const studentRecords = this.attendanceRecords.filter(r => r.studentId === student.id && r.classId === this.selectedClass?.id);
-    if (studentRecords.length === 0) return 0;
+    if (studentRecords.length === 0) return 3; // Default starting value
     
+    // نبدأ من 3 نقاط
+    let score = 3;
+    
+    // كل حضور: +0.5
     const presentDays = studentRecords.filter(r => r.status === 'present').length;
-    const totalDays = studentRecords.length;
-    const attendanceRate = (presentDays / totalDays) * 100;
+    score += presentDays * 0.5;
     
-    // Convert to 5-point scale: 100% = 5, 0% = 0
-    return (attendanceRate / 100) * 5;
+    // كل معذور: +0.5
+    const excusedDays = studentRecords.filter(r => r.status === 'excused').length;
+    score += excusedDays * 0.5;
+    
+    // كل غياب: -0.5
+    const absentDays = studentRecords.filter(r => r.status === 'absent').length;
+    score -= absentDays * 0.5;
+    
+    // كل مغادرة مبكرة: -0.5
+    const leftEarlyDays = studentRecords.filter(r => r.status === 'left_early').length;
+    score -= leftEarlyDays * 0.5;
+    
+    // كل متأخر: -0.25
+    const lateDays = studentRecords.filter(r => r.status === 'late').length;
+    score -= lateDays * 0.25;
+    
+    // Clamp between 0 and 5
+    return Math.max(0, Math.min(5, score));
   }
 
   calculateBehaviorGrade(student: Student): number {
     // Calculate from behavior events automatically
-    if (!this.selectedClass) return 0;
+    // نبدأ من 3 نقاط، كل سلوك إيجابي +0.5، كل سلوك سلبي -0.5
+    if (!this.selectedClass) return 3; // Default starting value
     
     const studentEvents = this.behaviorEvents.filter(e => e.studentId === student.id && e.classId === this.selectedClass?.id);
-    if (studentEvents.length === 0) return 5; // Default to full score if no events
+    if (studentEvents.length === 0) return 3; // Default starting value
     
-    // This is a simplified calculation - you may need to adjust based on your behavior scoring system
-    // For now, we'll use a simple positive/negative count
-    // You might need to load behavior definitions to get proper scoring
-    const positiveCount = studentEvents.filter(e => {
-      // You'll need to check behavior type from behavior definitions
-      // For now, assuming a simple positive/negative system
-      return true; // Placeholder - adjust based on your behavior system
-    }).length;
+    // نبدأ من 3 نقاط
+    let score = 3;
     
-    // Simple scoring: start with 5, reduce based on negative events
-    // This is a placeholder - adjust based on your actual behavior scoring system
-    const score = Math.max(0, 5 - (studentEvents.length - positiveCount) * 0.5);
-    return Math.min(5, score);
+    // حساب النقاط بناءً على نوع السلوك
+    studentEvents.forEach(event => {
+      if (this.isBehaviorPositive(event.behaviorId)) {
+        // سلوك إيجابي: +0.5
+        score += 0.5;
+      } else {
+        // سلوك سلبي: -0.5
+        score -= 0.5;
+      }
+    });
+    
+    // Clamp between 0 and 5
+    return Math.max(0, Math.min(5, score));
   }
 
   calculateContinuousAssessment(student: Student): number {
@@ -557,12 +619,14 @@ export class GradebookComponent implements OnInit {
     const dutyGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'duty')?.id &&
-      g.classId === this.selectedClass?.id
+      g.classId === this.selectedClass?.id &&
+      g.term === this.selectedTerm
     );
     const notebookGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'notebook_correction')?.id &&
-      g.classId === this.selectedClass?.id
+      g.classId === this.selectedClass?.id &&
+      g.term === this.selectedTerm
     );
     
     const duty = dutyGrade?.score || 0;
@@ -587,7 +651,8 @@ export class GradebookComponent implements OnInit {
     const practicalWorkGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'practical_work')?.id &&
-      g.classId === this.selectedClass?.id
+      g.classId === this.selectedClass?.id &&
+      g.term === this.selectedTerm
     );
     
     return practicalWorkGrade?.score || 0;
@@ -595,10 +660,12 @@ export class GradebookComponent implements OnInit {
 
   // Note: practical_work is now combined with oral_expression in one column
 
-  calculateTestAverage(student: Student): number {
+  calculateTestAverage(student: Student, term?: number): number {
+    const termFilter = term || this.selectedTerm;
     const testGrades = this.grades.filter(g => 
       g.studentId === student.id && 
-      g.assessmentId === this.assessments.find(a => a.type === 'test')?.id
+      g.assessmentId === this.assessments.find(a => a.type === 'test')?.id &&
+      g.term === termFilter
     );
     
     if (testGrades.length === 0) return 0;
@@ -606,28 +673,74 @@ export class GradebookComponent implements OnInit {
     return sum / testGrades.length;
   }
 
-  calculateTermAverage(student: Student): number {
-    if (!student.calculatedGrades) return 0;
+  calculateTermAverage(student: Student, term?: number): number {
+    const termFilter = term || this.selectedTerm;
+    
+    // Calculate grades for the specific term
+    const behavior = this.calculateBehaviorGrade(student);
+    const attendance = this.calculateAttendanceGrade(student);
+    
+    const dutyGrade = this.grades.find(g => 
+      g.studentId === student.id && 
+      g.assessmentId === this.assessments.find(a => a.type === 'duty')?.id &&
+      g.classId === this.selectedClass?.id &&
+      g.term === termFilter
+    );
+    const notebookGrade = this.grades.find(g => 
+      g.studentId === student.id && 
+      g.assessmentId === this.assessments.find(a => a.type === 'notebook_correction')?.id &&
+      g.classId === this.selectedClass?.id &&
+      g.term === termFilter
+    );
+    
+    const duty = dutyGrade?.score || 0;
+    const notebook = notebookGrade?.score || 0;
+    const continuous = (notebook || 0) + (duty || 0) + (attendance || 0) + (behavior || 0);
+    const continuousAssessment = Math.min(Math.max(continuous, 0), 20);
+    
+    const oralExpressionGrade = this.grades.find(g => 
+      g.studentId === student.id && 
+      g.assessmentId === this.assessments.find(a => a.type === 'oral_expression')?.id &&
+      g.classId === this.selectedClass?.id &&
+      g.term === termFilter
+    );
+    const assignmentGrade = this.grades.find(g => 
+      g.studentId === student.id && 
+      g.assessmentId === this.assessments.find(a => a.type === 'assignment')?.id &&
+      g.classId === this.selectedClass?.id &&
+      g.term === termFilter
+    );
+    const testGrade = this.grades.find(g => 
+      g.studentId === student.id && 
+      g.assessmentId === this.assessments.find(a => a.type === 'test')?.id &&
+      g.classId === this.selectedClass?.id &&
+      g.term === termFilter
+    );
+    
+    const oralExpression = oralExpressionGrade?.score || 0;
+    const assignment = assignmentGrade?.score || 0;
+    const test = testGrade?.score || 0;
     
     // المعدل = ((التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) ÷ 3 + الاختبار × 2) ÷ 5
-    const continuousAssessment = student.calculatedGrades.continuousAssessment || 0;
-    
-    // التعبير الشفهي/العمل العملي (عمود واحد)
-    const oralExpression = student.calculatedGrades.oralExpression || 0;
-    
-    const assignment = student.calculatedGrades.assignment || 0;
-    const test = student.calculatedGrades.test || 0;
-    
-    // (التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) ÷ 3
     const part1 = (continuousAssessment + oralExpression + assignment) / 3;
-    
-    // الاختبار × 2
     const part2 = test * 2;
-    
-    // الكل ÷ 5
     const average = (part1 + part2) / 5;
     
     return average;
+  }
+
+  calculateAnnualAverage(student: Student): number {
+    // Calculate average for each term
+    const term1Avg = this.calculateTermAverage(student, 1);
+    const term2Avg = this.calculateTermAverage(student, 2);
+    const term3Avg = this.calculateTermAverage(student, 3);
+    
+    // Annual average = average of 3 terms
+    const terms = [term1Avg, term2Avg, term3Avg].filter(avg => avg > 0);
+    if (terms.length === 0) return 0;
+    
+    const sum = terms.reduce((acc, avg) => acc + avg, 0);
+    return sum / terms.length;
   }
 
   calculateClassAverage(): number {
@@ -732,6 +845,7 @@ export class GradebookComponent implements OnInit {
           studentId: student.id,
           assessmentId: this.selectedAssessment.id,
           classId: this.selectedClass.id,
+          term: this.selectedTerm,
           score: score,
           maxScore: this.selectedAssessment.maxScore,
           date: this.formatDateForAPI(this.selectedDate)
