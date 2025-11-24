@@ -13,10 +13,12 @@ export class GradeResponseDto {
     id: number;
     name: string;
   };
+  term?: number; // 1, 2, or 3
   score: number;
   maxScore: number;
   date: string;
   notes?: string;
+  mark?: string;
   createdAt: Date;
   updatedAt: Date;
 }

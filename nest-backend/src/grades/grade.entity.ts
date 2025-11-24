@@ -24,6 +24,9 @@ export class Grade {
   @Column()
   classId: number;
 
+  @Column({ type: 'int', nullable: true })
+  term: number; // 1, 2, or 3
+
   @Column({ type: 'decimal', precision: 5, scale: 2 })
   score: number;
 
@@ -35,6 +38,9 @@ export class Grade {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @Column({ type: 'text', nullable: true })
+  mark: string;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

@@ -15,6 +15,11 @@ export class CreateGradeDto {
   classId: number;
 
   @Type(() => Number)
+  @IsInt()
+  @IsOptional()
+  term?: number; // 1, 2, or 3
+
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   score: number;
@@ -30,5 +35,9 @@ export class CreateGradeDto {
   @IsOptional()
   @IsString()
   notes?: string;
+
+  @IsOptional()
+  @IsString()
+  mark?: string;
 }
 

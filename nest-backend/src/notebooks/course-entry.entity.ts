@@ -39,6 +39,12 @@ export class CourseEntry {
   @Column({ nullable: true })
   order?: number;
 
+  @Column({ type: 'text', nullable: true })
+  mark?: string;
+
+  @Column({ type: 'text', nullable: true })
+  note?: string;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 

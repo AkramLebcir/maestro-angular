@@ -44,6 +44,8 @@ export interface CourseEntry {
   topicId?: number;
   topic?: Topic;
   order?: number;
+  mark?: string;
+  note?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,6 +59,8 @@ export interface CreateCourseEntryDto {
   notebookId: number;
   topicId?: number;
   order?: number;
+  mark?: string;
+  note?: string;
 }
 
 export interface Notebook {
@@ -130,7 +134,9 @@ export class NotebooksComponent implements OnInit {
     date: new Date().toISOString().split('T')[0],
     startTime: '08:00',
     endTime: '09:00',
-    notebookId: 0
+    notebookId: 0,
+    mark: '',
+    note: ''
   };
 
 
@@ -432,7 +438,9 @@ export class NotebooksComponent implements OnInit {
       startTime: '08:00',
       endTime: '09:00',
       notebookId: notebook.id,
-      topicId: undefined
+      topicId: undefined,
+      mark: '',
+      note: ''
     };
     this.showNewTopicForm = false;
     this.newTopicData = { title: '', subtitle: '', description: '' };
@@ -449,7 +457,9 @@ export class NotebooksComponent implements OnInit {
       startTime: course.startTime,
       endTime: course.endTime,
       notebookId: course.notebookId,
-      topicId: course.topicId
+      topicId: course.topicId,
+      mark: course.mark || '',
+      note: course.note || ''
     };
     this.showCourseModal = true;
   }
@@ -511,7 +521,9 @@ export class NotebooksComponent implements OnInit {
       startTime: normalizedStartTime,
       endTime: normalizedEndTime,
       notebookId: this.courseFormData.notebookId,
-      topicId: this.courseFormData.topicId || undefined
+      topicId: this.courseFormData.topicId || undefined,
+      mark: this.courseFormData.mark || undefined,
+      note: this.courseFormData.note || undefined
     };
 
     if (this.editingCourse) {

@@ -21,6 +21,8 @@ export class CourseEntryResponseDto {
   topicId?: number;
   topic?: TopicResponseDto;
   order?: number;
+  mark?: string;
+  note?: string;
   createdAt: Date;
   updatedAt: Date;
 }

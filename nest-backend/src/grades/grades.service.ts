@@ -136,6 +136,14 @@ export class GradesService {
         ? updateGradeDto.notes.trim() 
         : null;
     }
+    if (updateGradeDto.mark !== undefined) {
+      fieldsToUpdate.mark = updateGradeDto.mark && typeof updateGradeDto.mark === 'string' && updateGradeDto.mark.trim() !== '' 
+        ? updateGradeDto.mark.trim() 
+        : null;
+    }
+    if (updateGradeDto.term !== undefined) {
+      fieldsToUpdate.term = updateGradeDto.term;
+    }
 
     Object.assign(grade, fieldsToUpdate);
     await this.gradeRepository.save(grade);
@@ -268,10 +276,12 @@ export class GradesService {
             name: grade.class.name,
           }
         : undefined,
+      term: grade.term,
       score: typeof grade.score === 'string' ? parseFloat(grade.score) : grade.score,
       maxScore: typeof grade.maxScore === 'string' ? parseFloat(grade.maxScore) : grade.maxScore,
       date: grade.date instanceof Date ? grade.date.toISOString().split('T')[0] : grade.date,
       notes: grade.notes,
+      mark: grade.mark,
       createdAt: grade.createdAt,
       updatedAt: grade.updatedAt,
     };

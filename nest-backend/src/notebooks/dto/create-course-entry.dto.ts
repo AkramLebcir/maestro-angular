@@ -30,5 +30,13 @@ export class CreateCourseEntryDto {
   @Type(() => Number)
   @IsInt()
   order?: number;
+
+  @IsOptional()
+  @IsString()
+  mark?: string;
+
+  @IsOptional()
+  @IsString()
+  note?: string;
 }
 

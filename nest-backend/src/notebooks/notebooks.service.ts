@@ -254,6 +254,8 @@ export class NotebooksService {
           }
         : undefined,
       order: courseEntry.order,
+      mark: courseEntry.mark,
+      note: courseEntry.note,
       createdAt: courseEntry.createdAt,
       updatedAt: courseEntry.updatedAt,
     };

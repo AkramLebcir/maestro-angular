@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
@@ -47,6 +47,7 @@ export interface Grade {
   maxScore: number;
   date: string; // Format: YYYY-MM-DD
   notes?: string;
+  mark?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -60,12 +61,14 @@ export interface CreateGradeDto {
   maxScore: number;
   date: string;
   notes?: string;
+  mark?: string;
 }
 
 export interface Student {
   id: number;
   firstName: string;
   lastName: string;
+  idNumber?: string; // رقم الهوية أو الكود
   gender?: 'male' | 'female';
   classId?: number;
   class?: {
@@ -149,6 +152,10 @@ export class GradebookComponent implements OnInit {
   showReportModal = false;
   showImportModal = false;
   
+  // Sorting
+  sortBy: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking' | null = null;
+  sortDirection: 'asc' | 'desc' = 'asc';
+  
   // Grade form
   formData: CreateGradeDto = {
     studentId: 0,
@@ -157,7 +164,9 @@ export class GradebookComponent implements OnInit {
     term: 1,
     score: 0,
     maxScore: 20,
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    notes: '',
+    mark: ''
   };
 
   // Assessment types
@@ -175,7 +184,10 @@ export class GradebookComponent implements OnInit {
   // View mode
   viewMode: 'entry' | 'grades' | 'reports' = 'entry';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {}
 
   ngOnInit(): void {
     this.loadClasses();
@@ -240,15 +252,19 @@ export class GradebookComponent implements OnInit {
   loadGradesForClass(classId: number): void {
     this.apiService.get<Grade[]>(`/grades?classId=${classId}`).subscribe({
       next: (data) => {
-        this.grades = data;
+        // Ensure all grades have term property set (default to selectedTerm if not set)
+        this.grades = data.map(grade => ({
+          ...grade,
+          term: grade.term || this.selectedTerm
+        }));
         // Initialize grades for each student
         this.students.forEach(student => {
-          student.grades = data.filter(g => g.studentId === student.id);
+          student.grades = this.grades.filter(g => g.studentId === student.id);
         });
         // Load attendance and behavior data
+        // سيتم استدعاء calculateAllGrades() من loadAttendanceForClass و loadBehaviorForClass
         this.loadAttendanceForClass(classId);
         this.loadBehaviorForClass(classId);
-        this.calculateAllGrades();
       },
       error: (error) => {
         console.error('Error loading grades:', error);
@@ -256,6 +272,7 @@ export class GradebookComponent implements OnInit {
         this.students.forEach(student => {
           student.grades = [];
         });
+        // إعادة حساب الدرجات حتى في حالة الخطأ
         this.calculateAllGrades();
       }
     });
@@ -265,11 +282,14 @@ export class GradebookComponent implements OnInit {
     this.apiService.get<any[]>(`/attendance?classId=${classId}`).subscribe({
       next: (data) => {
         this.attendanceRecords = data;
+        // إعادة حساب الدرجات بعد تحميل سجلات الحضور
         this.calculateAllGrades();
       },
       error: (error) => {
         console.error('Error loading attendance:', error);
         this.attendanceRecords = [];
+        // إعادة حساب الدرجات حتى في حالة الخطأ
+        this.calculateAllGrades();
       }
     });
   }
@@ -278,11 +298,14 @@ export class GradebookComponent implements OnInit {
     this.apiService.get<any[]>(`/behavior-events?classId=${classId}`).subscribe({
       next: (data) => {
         this.behaviorEvents = data;
+        // إعادة حساب الدرجات بعد تحميل أحداث السلوك
         this.calculateAllGrades();
       },
       error: (error) => {
         console.error('Error loading behavior:', error);
         this.behaviorEvents = [];
+        // إعادة حساب الدرجات حتى في حالة الخطأ
+        this.calculateAllGrades();
       }
     });
   }
@@ -304,6 +327,12 @@ export class GradebookComponent implements OnInit {
 
   onTermChange(): void {
     if (this.selectedClass) {
+      // إعادة حساب الدرجات للفصل الدراسي الجديد
+      // استخدام setTimeout لضمان تحديث this.selectedTerm قبل الحساب
+      setTimeout(() => {
+        this.calculateAllGrades();
+      }, 0);
+      // إعادة تحميل الدرجات من الخادم (سيتم استدعاء calculateAllGrades من loadAttendanceForClass و loadBehaviorForClass)
       this.loadGradesForClass(this.selectedClass.id);
     }
   }
@@ -332,7 +361,8 @@ export class GradebookComponent implements OnInit {
       score: existingGrade ? existingGrade.score : 0,
       maxScore: assessment.maxScore,
       date: this.formatDateForAPI(this.selectedDate),
-      notes: existingGrade?.notes
+      notes: existingGrade?.notes || '',
+      mark: existingGrade?.mark || ''
     };
     this.showGradeModal = true;
   }
@@ -353,10 +383,6 @@ export class GradebookComponent implements OnInit {
           this.selectedAssessment = assessment;
         }
         this.saveGrade(studentId, assessmentId, score);
-        // Recalculate grades after saving
-        setTimeout(() => {
-          this.calculateAllGrades();
-        }, 100);
       }
     } else if (input && input.value === '') {
       // If input is cleared, we might want to delete the grade or set it to 0
@@ -374,13 +400,30 @@ export class GradebookComponent implements OnInit {
         return;
       }
       
+      // Validate score against max allowed
+      const maxScore = this.getAssessmentMaxScore(assessment.type);
+      if (score > maxScore) {
+        alert(`الدرجة القصوى المسموحة هي ${maxScore} نقاط`);
+        return;
+      }
+      
+      // Find existing grade to preserve notes and mark
+      const existingGrade = this.grades.find(g => 
+        g.studentId === studentId && 
+        g.assessmentId === assessmentId &&
+        g.classId === this.selectedClass!.id
+      );
+      
       this.formData.studentId = studentId;
       this.formData.assessmentId = assessmentId;
-      this.formData.score = score;
+      this.formData.score = Math.min(score, maxScore); // Ensure score doesn't exceed max
       this.formData.classId = this.selectedClass!.id;
       this.formData.term = this.selectedTerm;
-      this.formData.maxScore = assessment.maxScore;
+      this.formData.maxScore = maxScore; // Use the validated max score
       this.formData.date = this.formatDateForAPI(this.selectedDate);
+      // Preserve existing notes and mark if they exist
+      this.formData.notes = existingGrade?.notes || '';
+      this.formData.mark = existingGrade?.mark || '';
     }
 
     // Validate required fields
@@ -397,16 +440,77 @@ export class GradebookComponent implements OnInit {
       return;
     }
 
-    const existingGrade = this.grades.find(g => 
+    // First try to find grade with matching term
+    let existingGrade = this.grades.find(g => 
       g.studentId === this.formData.studentId && 
       g.assessmentId === this.formData.assessmentId &&
-      g.classId === this.formData.classId
+      g.classId === this.formData.classId &&
+      g.term === this.formData.term
     );
+    
+    // If not found, try to find grade without term (for backward compatibility)
+    if (!existingGrade && this.formData.term) {
+      existingGrade = this.grades.find(g => 
+        g.studentId === this.formData.studentId && 
+        g.assessmentId === this.formData.assessmentId &&
+        g.classId === this.formData.classId &&
+        !g.term
+      );
+    }
+
+    // Create payload with term property
+    const submitData: any = {
+      studentId: this.formData.studentId,
+      assessmentId: this.formData.assessmentId,
+      classId: this.formData.classId,
+      term: this.formData.term,
+      score: this.formData.score,
+      maxScore: this.formData.maxScore,
+      date: this.formData.date,
+      notes: this.formData.notes || undefined,
+      mark: this.formData.mark || undefined
+    };
 
     if (existingGrade) {
-      this.apiService.patch<Grade>(`/grades/${existingGrade.id}`, this.formData).subscribe({
-        next: () => {
-          this.loadGradesForClass(this.formData.classId);
+      const existingGradeId = existingGrade.id;
+      this.apiService.patch<Grade>(`/grades/${existingGradeId}`, submitData).subscribe({
+        next: (updatedGrade) => {
+          // Update local grade immediately for instant calculation
+          const gradeIndex = this.grades.findIndex(g => g.id === existingGradeId);
+          // Ensure term is set correctly
+          const gradeWithTerm = { 
+            ...updatedGrade, 
+            term: updatedGrade.term !== undefined && updatedGrade.term !== null 
+              ? updatedGrade.term 
+              : this.selectedTerm 
+          };
+          if (gradeIndex !== -1) {
+            // Replace the grade in the array to trigger change detection
+            this.grades = [
+              ...this.grades.slice(0, gradeIndex),
+              gradeWithTerm,
+              ...this.grades.slice(gradeIndex + 1)
+            ];
+          } else {
+            this.grades = [...this.grades, gradeWithTerm];
+          }
+          // Update student's grades array
+          const student = this.students.find(s => s.id === this.formData.studentId);
+          if (student) {
+            if (!student.grades) {
+              student.grades = [];
+            }
+            const studentGradeIndex = student.grades.findIndex(g => g.id === existingGradeId);
+            if (studentGradeIndex !== -1) {
+              student.grades[studentGradeIndex] = gradeWithTerm;
+            } else {
+              student.grades.push(gradeWithTerm);
+            }
+          }
+          // Recalculate all grades immediately
+          this.calculateAllGrades();
+          // Force change detection to update the view
+          this.cdr.detectChanges();
           if (!studentId) this.closeGradeModal();
         },
         error: (error) => {
@@ -421,9 +525,30 @@ export class GradebookComponent implements OnInit {
         }
       });
     } else {
-      this.apiService.post<Grade>('/grades', this.formData).subscribe({
-        next: () => {
-          this.loadGradesForClass(this.formData.classId);
+      this.apiService.post<Grade>('/grades', submitData).subscribe({
+        next: (newGrade) => {
+          // Add to local grades immediately for instant calculation
+          // Ensure term is set correctly
+          const gradeWithTerm = { 
+            ...newGrade, 
+            term: newGrade.term !== undefined && newGrade.term !== null 
+              ? newGrade.term 
+              : this.selectedTerm 
+          };
+          // Create new array to trigger change detection
+          this.grades = [...this.grades, gradeWithTerm];
+          // Update student's grades array
+          const student = this.students.find(s => s.id === this.formData.studentId);
+          if (student) {
+            if (!student.grades) {
+              student.grades = [];
+            }
+            student.grades.push(gradeWithTerm);
+          }
+          // Recalculate all grades immediately
+          this.calculateAllGrades();
+          // Force change detection to update the view
+          this.cdr.detectChanges();
           if (!studentId) this.closeGradeModal();
         },
         error: (error) => {
@@ -441,12 +566,29 @@ export class GradebookComponent implements OnInit {
   }
 
   getGradeForStudent(studentId: number, assessmentId: number): Grade | undefined {
-    return this.grades.find(g => 
+    if (!this.selectedClass) {
+      return undefined;
+    }
+    
+    // First try to find grade with matching term
+    let grade = this.grades.find(g => 
       g.studentId === studentId && 
       g.assessmentId === assessmentId &&
-      g.classId === this.selectedClass?.id &&
-      g.term === this.selectedTerm
+      g.classId === this.selectedClass!.id &&
+      (g.term === this.selectedTerm || g.term === undefined || g.term === null)
     );
+    
+    // If multiple grades exist, prefer the one with matching term
+    if (!grade) {
+      grade = this.grades.find(g => 
+        g.studentId === studentId && 
+        g.assessmentId === assessmentId &&
+        g.classId === this.selectedClass!.id &&
+        g.term === this.selectedTerm
+      );
+    }
+    
+    return grade;
   }
 
   getAssessmentIdByType(type: AssessmentType): number {
@@ -460,10 +602,28 @@ export class GradebookComponent implements OnInit {
   }
 
   calculateAllGrades(): void {
+    // إعادة حساب درجات جميع التلاميذ للفصل الدراسي المحدد
     this.students.forEach(student => {
       this.calculateStudentGrades(student);
     });
     this.calculateRankings();
+    
+    // If currently sorted by ranking, termAverage, or annualAverage, reapply the sort
+    if (this.sortBy === 'ranking' || this.sortBy === 'termAverage' || this.sortBy === 'annualAverage') {
+      // Save current sort state
+      const currentSortBy = this.sortBy;
+      const currentSortDirection = this.sortDirection;
+      // Temporarily reset to allow re-sorting
+      const tempSortBy = this.sortBy;
+      const tempSortDirection = this.sortDirection;
+      this.sortBy = null as any;
+      this.sortDirection = 'asc';
+      // Reapply sort with saved direction
+      this.sortBy = tempSortBy;
+      this.sortDirection = tempSortDirection;
+      // Re-sort with the same field and direction
+      this.sortStudents(currentSortBy as any);
+    }
   }
 
   // Helper function to convert snake_case to camelCase for calculatedGrades properties
@@ -495,10 +655,10 @@ export class GradebookComponent implements OnInit {
       
       if (assessment.type === 'attendance' || assessment.type === 'behavior') {
         // Automatic from attendance/behavior management
-        calculated[key] = this.calculateAutomaticGrade(student, assessment);
+        calculated[key] = this.calculateAutomaticGrade(student, assessment, this.selectedTerm);
       } else if (assessment.type === 'continuous_assessment') {
         // Calculated automatically from notebook + duty + attendance + behavior
-        calculated[key] = this.calculateAutomaticGrade(student, assessment);
+        calculated[key] = this.calculateAutomaticGrade(student, assessment, this.selectedTerm);
         } else {
           // Manual entry
           const grade = this.grades.find(g => 
@@ -531,14 +691,14 @@ export class GradebookComponent implements OnInit {
     };
   }
 
-  calculateAutomaticGrade(student: Student, assessment: Assessment): number {
+  calculateAutomaticGrade(student: Student, assessment: Assessment, term?: number): number {
     switch (assessment.type) {
       case 'attendance':
-        return this.calculateAttendanceGrade(student);
+        return this.calculateAttendanceGrade(student, term);
       case 'behavior':
-        return this.calculateBehaviorGrade(student);
+        return this.calculateBehaviorGrade(student, term);
       case 'continuous_assessment':
-        return this.calculateContinuousAssessment(student);
+        return this.calculateContinuousAssessment(student, term);
       case 'practical_work':
         return this.calculatePracticalWorkGrade(student);
       default:
@@ -546,15 +706,76 @@ export class GradebookComponent implements OnInit {
     }
   }
 
-  calculateAttendanceGrade(student: Student): number {
-    // Calculate from attendance records automatically
+  getTermDateRange(term: number): { start: Date; end: Date } {
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth(); // 0-11 (جانفي = 0, ديسمبر = 11)
+    let start: Date, end: Date;
+    
+    // تحديد سنة بداية العام الدراسي (تبدأ في سبتمبر)
+    // إذا كنا في سبتمبر أو بعد ذلك، العام الدراسي يبدأ في نفس العام
+    // وإلا، العام الدراسي يبدأ في العام السابق
+    const academicYear = (currentMonth >= 8) ? currentYear : currentYear - 1;
+    
+    switch (term) {
+      case 1:
+        // الفصل الأول: سبتمبر إلى ديسمبر من نفس العام الدراسي
+        start = new Date(academicYear, 8, 1); // سبتمبر (الشهر 8 في JavaScript)
+        end = new Date(academicYear, 11, 31); // ديسمبر (الشهر 11)
+        break;
+      case 2:
+        // الفصل الثاني: جانفي إلى مارس من السنة التالية للعام الدراسي
+        // (لأن العام الدراسي يبدأ في سبتمبر)
+        start = new Date(academicYear + 1, 0, 1); // جانفي (الشهر 0)
+        end = new Date(academicYear + 1, 2, 31); // مارس (الشهر 2)
+        break;
+      case 3:
+        // الفصل الثالث: أفريل إلى جوان من السنة التالية للعام الدراسي
+        start = new Date(academicYear + 1, 3, 1); // أفريل (الشهر 3)
+        end = new Date(academicYear + 1, 5, 30); // جوان (الشهر 5)
+        break;
+      default:
+        start = new Date(academicYear, 8, 1);
+        end = new Date(academicYear + 1, 5, 30);
+    }
+    
+    return { start, end };
+  }
+
+  isDateInTerm(date: Date | string, term: number): boolean {
+    const recordDate = typeof date === 'string' ? new Date(date) : date;
+    const { start, end } = this.getTermDateRange(term);
+    
+    // Set time to start/end of day for proper comparison
+    const recordDateOnly = new Date(recordDate.getFullYear(), recordDate.getMonth(), recordDate.getDate());
+    const startDateOnly = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const endDateOnly = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    
+    return recordDateOnly >= startDateOnly && recordDateOnly <= endDateOnly;
+  }
+
+  calculateAttendanceGrade(student: Student, term?: number): number {
+    // حساب نقاط الحضور تلقائياً من سجلات الحضور
+    // يتم حساب النقاط بناءً على الفترة الزمنية للفصل الدراسي المحدد
+    // الفصل الأول: سبتمبر إلى ديسمبر
+    // الفصل الثاني: جانفي إلى مارس
+    // الفصل الثالث: أفريل إلى جوان
     // نبدأ من 3 نقاط
     // كل حضور أو معذور: +0.5
     // كل غياب أو مغادرة مبكرة: -0.5
     // كل متأخر: -0.25
     if (!this.selectedClass) return 3; // Default starting value
     
-    const studentRecords = this.attendanceRecords.filter(r => r.studentId === student.id && r.classId === this.selectedClass?.id);
+    const termFilter = term || this.selectedTerm;
+    // تصفية سجلات الحضور للتلميذ والقسم المحدد
+    let studentRecords = this.attendanceRecords.filter(r => r.studentId === student.id && r.classId === this.selectedClass?.id);
+    
+    // تصفية السجلات حسب الفترة الزمنية للفصل الدراسي
+    studentRecords = studentRecords.filter(r => {
+      if (!r.date) return false;
+      return this.isDateInTerm(r.date, termFilter);
+    });
+    
     if (studentRecords.length === 0) return 3; // Default starting value
     
     // نبدأ من 3 نقاط
@@ -580,16 +801,29 @@ export class GradebookComponent implements OnInit {
     const lateDays = studentRecords.filter(r => r.status === 'late').length;
     score -= lateDays * 0.25;
     
-    // Clamp between 0 and 5
+    // التأكد من أن النتيجة بين 0 و 5
     return Math.max(0, Math.min(5, score));
   }
 
-  calculateBehaviorGrade(student: Student): number {
-    // Calculate from behavior events automatically
+  calculateBehaviorGrade(student: Student, term?: number): number {
+    // حساب نقاط السلوك تلقائياً من أحداث السلوك
+    // يتم حساب النقاط بناءً على الفترة الزمنية للفصل الدراسي المحدد
+    // الفصل الأول: سبتمبر إلى ديسمبر
+    // الفصل الثاني: جانفي إلى مارس
+    // الفصل الثالث: أفريل إلى جوان
     // نبدأ من 3 نقاط، كل سلوك إيجابي +0.5، كل سلوك سلبي -0.5
     if (!this.selectedClass) return 3; // Default starting value
     
-    const studentEvents = this.behaviorEvents.filter(e => e.studentId === student.id && e.classId === this.selectedClass?.id);
+    const termFilter = term || this.selectedTerm;
+    // تصفية أحداث السلوك للتلميذ والقسم المحدد
+    let studentEvents = this.behaviorEvents.filter(e => e.studentId === student.id && e.classId === this.selectedClass?.id);
+    
+    // تصفية الأحداث حسب الفترة الزمنية للفصل الدراسي
+    studentEvents = studentEvents.filter(e => {
+      if (!e.date) return false;
+      return this.isDateInTerm(e.date, termFilter);
+    });
+    
     if (studentEvents.length === 0) return 3; // Default starting value
     
     // نبدأ من 3 نقاط
@@ -606,27 +840,28 @@ export class GradebookComponent implements OnInit {
       }
     });
     
-    // Clamp between 0 and 5
+    // التأكد من أن النتيجة بين 0 و 5
     return Math.max(0, Math.min(5, score));
   }
 
-  calculateContinuousAssessment(student: Student): number {
+  calculateContinuousAssessment(student: Student, term?: number): number {
     // Get calculated grades (attendance and behavior are automatic)
-    const behavior = this.calculateBehaviorGrade(student);
-    const attendance = this.calculateAttendanceGrade(student);
+    const termFilter = term || this.selectedTerm;
+    const behavior = this.calculateBehaviorGrade(student, termFilter);
+    const attendance = this.calculateAttendanceGrade(student, termFilter);
     
     // Get manual grades (both on 5 points scale)
     const dutyGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'duty')?.id &&
       g.classId === this.selectedClass?.id &&
-      g.term === this.selectedTerm
+      g.term === termFilter
     );
     const notebookGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'notebook_correction')?.id &&
       g.classId === this.selectedClass?.id &&
-      g.term === this.selectedTerm
+      g.term === termFilter
     );
     
     const duty = dutyGrade?.score || 0;
@@ -677,8 +912,8 @@ export class GradebookComponent implements OnInit {
     const termFilter = term || this.selectedTerm;
     
     // Calculate grades for the specific term
-    const behavior = this.calculateBehaviorGrade(student);
-    const attendance = this.calculateAttendanceGrade(student);
+    const behavior = this.calculateBehaviorGrade(student, termFilter);
+    const attendance = this.calculateAttendanceGrade(student, termFilter);
     
     const dutyGrade = this.grades.find(g => 
       g.studentId === student.id && 
@@ -721,8 +956,8 @@ export class GradebookComponent implements OnInit {
     const assignment = assignmentGrade?.score || 0;
     const test = testGrade?.score || 0;
     
-    // المعدل = ((التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) ÷ 3 + الاختبار × 2) ÷ 5
-    const part1 = (continuousAssessment + oralExpression + assignment) / 3;
+    // معدل الفصل = ((التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) + (الاختبار × 2)) ÷ 5
+    const part1 = continuousAssessment + oralExpression + assignment;
     const part2 = test * 2;
     const average = (part1 + part2) / 5;
     
@@ -754,13 +989,112 @@ export class GradebookComponent implements OnInit {
   }
 
   calculateRankings(): void {
+    // Create a copy of students with averages for sorting
     const studentsWithAverages = this.students
-      .filter(s => s.averages?.termAverage !== undefined)
-      .sort((a, b) => (b.averages?.termAverage || 0) - (a.averages?.termAverage || 0));
+      .filter(s => s.averages?.termAverage !== undefined && (s.averages?.termAverage || 0) > 0)
+      .map(s => ({ ...s })) // Create a copy to avoid mutating
+      .sort((a, b) => {
+        const avgA = a.averages?.termAverage || 0;
+        const avgB = b.averages?.termAverage || 0;
+        // Sort descending (highest average first)
+        return avgB - avgA;
+      });
     
+    // Assign rankings
     studentsWithAverages.forEach((student, index) => {
-      student.ranking = index + 1;
+      const originalStudent = this.students.find(s => s.id === student.id);
+      if (originalStudent) {
+        originalStudent.ranking = index + 1;
+      }
     });
+    
+    // Students without averages get no ranking
+    this.students.forEach(student => {
+      if (!student.averages?.termAverage || student.averages.termAverage === 0) {
+        student.ranking = undefined;
+      }
+    });
+  }
+
+  sortStudents(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking'): void {
+    // If clicking the same field, toggle direction; otherwise, set to ascending
+    if (this.sortBy === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = field;
+      this.sortDirection = 'asc';
+    }
+
+    // Always recalculate rankings before sorting to ensure they're up to date
+    this.calculateRankings();
+
+    // Create a copy of the array to avoid mutating the original
+    const studentsCopy = [...this.students];
+    
+    studentsCopy.sort((a, b) => {
+      let valueA: any;
+      let valueB: any;
+
+      switch (field) {
+        case 'firstName':
+          valueA = (a.firstName || '').toLowerCase();
+          valueB = (b.firstName || '').toLowerCase();
+          break;
+        case 'lastName':
+          valueA = (a.lastName || '').toLowerCase();
+          valueB = (b.lastName || '').toLowerCase();
+          break;
+        case 'idNumber':
+          valueA = (a.idNumber || '').toString().toLowerCase();
+          valueB = (b.idNumber || '').toString().toLowerCase();
+          break;
+        case 'termAverage':
+          valueA = a.averages?.termAverage || 0;
+          valueB = b.averages?.termAverage || 0;
+          break;
+        case 'annualAverage':
+          valueA = a.averages?.annualAverage || 0;
+          valueB = b.averages?.annualAverage || 0;
+          break;
+        case 'ranking':
+          // For ranking, lower number is better (rank 1 is best)
+          valueA = a.ranking || 999;
+          valueB = b.ranking || 999;
+          break;
+        default:
+          return 0;
+      }
+
+      // String comparison
+      if (typeof valueA === 'string' && typeof valueB === 'string') {
+        const comparison = valueA.localeCompare(valueB, 'ar', { sensitivity: 'base' });
+        return this.sortDirection === 'asc' ? comparison : -comparison;
+      }
+
+      // Number comparison
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        // For ranking, ascending means rank 1 first (lower is better)
+        // For averages, ascending means lower average first
+        if (field === 'ranking') {
+          return this.sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+        } else {
+          // For averages, descending is usually better (higher average first)
+          return this.sortDirection === 'asc' ? valueA - valueB : valueB - valueA;
+        }
+      }
+
+      return 0;
+    });
+
+    // Update the students array
+    this.students = studentsCopy;
+  }
+
+  getSortIcon(field: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'annualAverage' | 'ranking'): string {
+    if (this.sortBy !== field) {
+      return '↕️'; // Neutral icon when not sorted by this field
+    }
+    return this.sortDirection === 'asc' ? '↑' : '↓';
   }
 
   // Excel Import
@@ -1029,7 +1363,7 @@ export class GradebookComponent implements OnInit {
     
      // Headers
      excelData.push([
-       '#', 'الاسم', 'اللقب', 'تصحيح الدفتر (5)', 'الواجب (5)', 'الحضور (5)', 'السلوك (5)',
+       '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تصحيح الدفتر (5)', 'الواجب (5)', 'الحضور (5)', 'السلوك (5)',
        'التقييم المستمر', 'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'المعدل', 'الترتيب'
      ]);
 
@@ -1037,6 +1371,7 @@ export class GradebookComponent implements OnInit {
      this.students.forEach((student, index) => {
        excelData.push([
          index + 1,
+         student.idNumber || '-',
          student.firstName,
          student.lastName,
          student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-',
