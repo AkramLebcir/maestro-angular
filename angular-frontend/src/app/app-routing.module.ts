@@ -11,6 +11,7 @@ import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
 import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
 import { AnnualDistributionComponent } from './pages/annual-distribution/annual-distribution.component';
+import { ReportsComponent } from './pages/reports/reports.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/classes', pathMatch: 'full' },
@@ -27,7 +28,7 @@ const routes: Routes = [
   { path: 'gradebook', component: GradebookComponent },
   { path: 'seating-chart', component: SeatingChartComponent },
   { path: 'annual-distribution', component: AnnualDistributionComponent },
-  { path: 'reports', component: ClassesComponent }, // Placeholder
+  { path: 'reports', component: ReportsComponent },
   { path: 'settings', component: ClassesComponent } // Placeholder
 ];
 

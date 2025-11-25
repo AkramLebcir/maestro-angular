@@ -1,0 +1,284 @@
+<div class="flex-1 p-6">
+  <div class="bg-white rounded-lg shadow-lg p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800">التقارير</h1>
+      <p class="text-sm text-gray-500">
+        جميع التقارير القابلة للتصدير بصيغة PDF في مكان واحد لسهولة الوصول.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <!-- Device logs report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            سجل خروج ودخول الأجهزة
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير مفصل بحركات خروج ودخول أجهزة المخبر.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('deviceLogs', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Lab equipment report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            أجهزة معمل الحاسب الآلي
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير بأجهزة معمل الحاسب وعدد الأجهزة العاملة والمعطلة.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('equipment', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Lab software report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            برامج حواسيب معمل الحاسب الآلي
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير ببرامج الحواسيب المثبتة في معمل الحاسب.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('software', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Lab furniture report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            أثاث معمل الحاسب الآلي
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير بأثاث معمل الحاسب وحالته.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('furniture', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Lab inventory report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            أرقام جرد أجهزة وأثاث المعمل
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير شامل بأرقام الجرد الخاصة بأجهزة وأثاث المعمل.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('inventory', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Checklist report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            فحص المكوّنات المادية والبرمجية
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير بحالة المكوّنات المادية والبرمجية لكل جهاز في المعمل.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('checklist', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Cleaning report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            نظافة معمل الحاسب الآلي
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير دوري عن نظافة معمل الحاسب وحالة التمديدات.
+          </p>
+        </div>
+        <button
+          (click)="navigateToLabTab('cleaning', true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Seating charts report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            مخططات المقاعد
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            طباعة مخططات مقاعد التلاميذ في قاعة القسم أو المخبر.
+          </p>
+        </div>
+        <button
+          (click)="navigateToSeatingCharts()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وطباعة المخططات
+        </button>
+      </div>
+
+      <!-- Students report (basic list / stats) -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            قائمة التلاميذ
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقارير وقوائم التلاميذ حسب الأقسام والمجموعات.
+          </p>
+        </div>
+        <button
+          (click)="navigateToStudents()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقارير التلاميذ
+        </button>
+      </div>
+
+      <!-- Timetable report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            جدول الأوقات
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            طباعة جدول الأوقات الأسبوعي بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTimetable(true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Notebooks report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقارير الدفاتر
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            طباعة تقارير مفصلة للدفاتر المختارة.
+          </p>
+        </div>
+        <button
+          (click)="navigateToNotebooks()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقارير الدفاتر
+        </button>
+      </div>
+
+      <!-- Absence report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير الغيابات
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير الغيابات حسب الأقسام مع إمكانية التصدير إلى PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToAttendance(true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Behavior report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقارير السلوك
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقارير السلوك الفردية وتقارير القسم.
+          </p>
+        </div>
+        <button
+          (click)="navigateToBehavior()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقارير السلوك
+        </button>
+      </div>
+
+      <!-- Gradebook / statistics report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            سجل الدرجات والإحصائيات
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقارير الدرجات وإحصائيات النتائج لكل قسم.
+          </p>
+        </div>
+        <button
+          (click)="navigateToGradebook(true)"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح وتصدير PDF
+        </button>
+      </div>
+
+      <!-- Annual distribution report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            التوزيع السنوي
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقارير التوزيع السنوي للمحتويات التعليمية.
+          </p>
+        </div>
+        <button
+          (click)="navigateToAnnualDistribution()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح التوزيع السنوي
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+

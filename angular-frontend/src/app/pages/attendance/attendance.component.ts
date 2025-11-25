@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
+import { ActivatedRoute } from '@angular/router';
 import html2canvas from 'html2canvas';
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'left_early' | 'unrecorded';
@@ -113,12 +114,25 @@ export class AttendanceComponent implements OnInit {
   weekDays: Date[] = [];
   showWeeklyView = false;
 
-  constructor(private apiService: ApiService) {
+  constructor(
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+  ) {
     this.updateWeekDays();
   }
 
   ngOnInit(): void {
     this.loadClasses();
+
+     // دعم الفتح من صفحة التقارير مع تفعيل تبويب التقارير والتصدير عند الحاجة
+     this.route.queryParams.subscribe((params) => {
+       const autoExport = params['autoExport'] === '1';
+       if (autoExport) {
+         // افتح نافذة التقارير على تقرير الغيابات ثم صدّر PDF
+         this.openReportModal('absences');
+         setTimeout(() => this.exportReportToPDF(), 400);
+       }
+     });
   }
 
   loadClasses(): void {

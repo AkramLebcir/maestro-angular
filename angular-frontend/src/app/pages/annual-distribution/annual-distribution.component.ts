@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { jsPDF } from 'jspdf';
 import { ApiService } from '../../services/api.service';
 
 interface HolidayPeriod {
@@ -227,6 +228,66 @@ export class AnnualDistributionComponent implements OnInit {
         this.errorMessage = 'فشل في إضافة سطر التوزيع';
       },
     });
+  }
+
+  exportDistributionToPdf(): void {
+    if (!this.distributions.length) {
+      this.errorMessage = 'لا يوجد توزيع لطباعته.';
+      return;
+    }
+
+    const pdf = new jsPDF('p', 'mm', 'a4');
+
+    const title = `التوزيع السنوي - ${this.selectedYear}`;
+    const subTitle = `${this.selectedLevel} - ${this.selectedTrack}`;
+
+    pdf.setFont('helvetica', 'bold');
+    pdf.setFontSize(14);
+    pdf.text(title, 105, 15, { align: 'center' });
+
+    pdf.setFontSize(11);
+    pdf.text(subTitle, 105, 22, { align: 'center' });
+
+    const startY = 30;
+    const lineHeight = 7;
+    const colX = [10, 25, 40, 110, 150, 180]; // term, week, unit, domain, start, end
+
+    pdf.setFontSize(9);
+    pdf.setFont('helvetica', 'bold');
+    pdf.text('فصل', colX[0], startY);
+    pdf.text('أسبوع', colX[1], startY);
+    pdf.text('الوحدة / النشاط', colX[2], startY);
+    pdf.text('المجال', colX[3], startY);
+    pdf.text('بداية', colX[4], startY);
+    pdf.text('نهاية', colX[5], startY);
+
+    pdf.setFont('helvetica', 'normal');
+
+    let y = startY + lineHeight;
+    const pageHeight = pdf.internal.pageSize.getHeight();
+
+    for (const row of this.distributions) {
+      if (y > pageHeight - 15) {
+        pdf.addPage();
+        y = 20;
+      }
+
+      pdf.text(String(row.term), colX[0], y);
+      pdf.text(String(row.weekNumber), colX[1], y);
+
+      const unitText = row.unitTitle || '';
+      const domainText = row.domain || '';
+
+      pdf.text(unitText.substring(0, 40), colX[2], y);
+      pdf.text(domainText.substring(0, 30), colX[3], y);
+
+      pdf.text(row.computedStartDate || '-', colX[4], y);
+      pdf.text(row.computedEndDate || '-', colX[5], y);
+
+      y += lineHeight;
+    }
+
+    pdf.save(`التوزيع_السنوي_${this.selectedYear}.pdf`);
   }
 }
 

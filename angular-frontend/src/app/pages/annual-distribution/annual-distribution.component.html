@@ -253,14 +253,22 @@
     </div>
 
     <div class="bg-white rounded-lg shadow p-4">
-      <div class="flex items-center justify-between mb-3">
+      <div class="flex items-center justify-between mb-3 gap-2">
         <h2 class="font-semibold text-gray-700">التوزيع السنوي (مع الإزاحة حسب العطل)</h2>
-        <button
-          (click)="loadDistributions(true)"
-          class="text-xs text-indigo-600 hover:text-indigo-800"
-        >
-          إعادة احتساب التواريخ
-        </button>
+        <div class="flex items-center gap-2">
+          <button
+            (click)="loadDistributions(true)"
+            class="text-xs px-3 py-1 rounded border border-indigo-500 text-indigo-600 hover:bg-indigo-50"
+          >
+            إعادة احتساب التواريخ
+          </button>
+          <button
+            (click)="exportDistributionToPdf()"
+            class="text-xs px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
+          >
+            تصدير PDF
+          </button>
+        </div>
       </div>
       <div class="overflow-x-auto">
         <table class="min-w-full text-sm text-right">

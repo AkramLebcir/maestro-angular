@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ActivatedRoute } from '@angular/router';
 
 export interface Lab {
   id: number;
@@ -203,7 +204,10 @@ export class LabsComponent implements OnInit {
     notes: '',
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+  ) {}
 
   ngOnInit(): void {
     this.loadLabs();
@@ -214,6 +218,55 @@ export class LabsComponent implements OnInit {
     this.loadInventory();
     this.loadChecklist();
     this.loadCleaning();
+
+    // تفعيل التبويب الصحيح والتصدير التلقائي عند القدوم من صفحة التقارير
+    this.route.queryParams.subscribe((params) => {
+      const tab = params['tab'] as string | undefined;
+      const autoExport = params['autoExport'] === '1';
+
+      const validTabs: typeof this.activeTab[] = [
+        'labs',
+        'deviceLogs',
+        'equipment',
+        'software',
+        'furniture',
+        'inventory',
+        'checklist',
+        'cleaning',
+      ];
+
+      if (tab && (validTabs as string[]).includes(tab)) {
+        this.activeTab = tab as typeof this.activeTab;
+
+        if (autoExport) {
+          setTimeout(() => {
+            switch (tab) {
+              case 'deviceLogs':
+                this.exportDeviceLogsToPDF();
+                break;
+              case 'equipment':
+                this.exportEquipmentToPDF();
+                break;
+              case 'software':
+                this.exportSoftwareToPDF();
+                break;
+              case 'furniture':
+                this.exportFurnitureToPDF();
+                break;
+              case 'inventory':
+                this.exportInventoryToPDF();
+                break;
+              case 'checklist':
+                this.exportChecklistToPDF();
+                break;
+              case 'cleaning':
+                this.exportCleaningToPDF();
+                break;
+            }
+          }, 300);
+        }
+      }
+    });
   }
 
   loadLabs(): void {

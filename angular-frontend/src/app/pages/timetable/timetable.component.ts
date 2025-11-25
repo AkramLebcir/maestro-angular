@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { ActivatedRoute } from '@angular/router';
 
 export interface TimetableEntry {
   id: number;
@@ -94,7 +95,10 @@ export class TimetableComponent implements OnInit {
   dragOverDay: number | null = null;
   dragOverTime: string | null = null;
 
-  constructor(private apiService: ApiService) {
+  constructor(
+    private apiService: ApiService,
+    private route: ActivatedRoute,
+  ) {
     // Generate time slots from 8:00 to 16:00 (4:00 PM) - 1 hour intervals
     // Removed 17:00-18:00 (5 PM to 6 PM) slot to fit on one page
     for (let hour = 8; hour <= 16; hour++) {
@@ -110,6 +114,14 @@ export class TimetableComponent implements OnInit {
     this.loadTimetableEntries();
     this.loadClasses();
     this.loadLabs();
+
+    // دعم الفتح من صفحة التقارير مع تنفيذ التصدير مباشرة
+    this.route.queryParams.subscribe((params) => {
+      const autoExport = params['autoExport'] === '1';
+      if (autoExport) {
+        setTimeout(() => this.exportToPDF(), 300);
+      }
+    });
   }
 
   loadTimetableEntries(): void {
