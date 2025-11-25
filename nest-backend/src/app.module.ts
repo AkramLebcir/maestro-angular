@@ -14,6 +14,7 @@ import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { GradesModule } from './grades/grades.module';
 import { WorkstationsModule } from './workstations/workstations.module';
+import { LabManagementModule } from './lab-management/lab-management.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { WorkstationsModule } from './workstations/workstations.module';
     AttendanceModule,
     GradesModule,
     WorkstationsModule,
+    LabManagementModule,
   ],
   controllers: [AppController],
   providers: [AppService],

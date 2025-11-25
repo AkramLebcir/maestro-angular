@@ -1,6 +1,6 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
-    <div class="flex justify-between items-center mb-6">
+    <div class="flex justify-between items-center mb-4">
       <h1 class="text-3xl font-bold text-gray-800">إدارة المخبر</h1>
       <div class="flex gap-3">
         <button 
@@ -14,56 +14,850 @@
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة المخابر</h2>
+    <!-- Tabs -->
+    <div class="mb-4 border-b border-gray-200 flex gap-4 flex-wrap">
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'labs'"
+        [class.border-b-2]="activeTab === 'labs'"
+        [class.border-green-600]="activeTab === 'labs'"
+        (click)="activeTab = 'labs'">
+        المخابر
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'deviceLogs'"
+        [class.border-b-2]="activeTab === 'deviceLogs'"
+        [class.border-green-600]="activeTab === 'deviceLogs'"
+        (click)="activeTab = 'deviceLogs'">
+        متابعة عمل وسلامة الأجهزة
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'equipment'"
+        [class.border-b-2]="activeTab === 'equipment'"
+        [class.border-green-600]="activeTab === 'equipment'"
+        (click)="activeTab = 'equipment'">
+        أجهزة معمل الحاسب
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'software'"
+        [class.border-b-2]="activeTab === 'software'"
+        [class.border-green-600]="activeTab === 'software'"
+        (click)="activeTab = 'software'">
+        برامج حواسيب المعمل
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'furniture'"
+        [class.border-b-2]="activeTab === 'furniture'"
+        [class.border-green-600]="activeTab === 'furniture'"
+        (click)="activeTab = 'furniture'">
+        أثاث معمل الحاسب
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'inventory'"
+        [class.border-b-2]="activeTab === 'inventory'"
+        [class.border-green-600]="activeTab === 'inventory'"
+        (click)="activeTab = 'inventory'">
+        أرقام الجرد
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'checklist'"
+        [class.border-b-2]="activeTab === 'checklist'"
+        [class.border-green-600]="activeTab === 'checklist'"
+        (click)="activeTab = 'checklist'">
+        المكوّنات المادية والبرمجية
+      </button>
+      <button
+        class="pb-2 text-sm font-semibold"
+        [class.text-green-700]="activeTab === 'cleaning'"
+        [class.border-b-2]="activeTab === 'cleaning'"
+        [class.border-green-600]="activeTab === 'cleaning'"
+        (click)="activeTab = 'cleaning'">
+        نظافة معمل الحاسب
+      </button>
+    </div>
 
-    <div class="overflow-x-auto">
-      <table class="w-full border-collapse">
-        <thead>
-          <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم المخبر</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الوصف</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الموقع</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lab of labs" class="border-b border-gray-200 hover:bg-gray-50">
-            <td class="py-3 px-4 text-gray-800">{{ lab.name }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ lab.description || '-' }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ lab.location || '-' }}</td>
-            <td class="py-3 px-4">
-              <span 
-                [class]="lab.isAvailable 
-                  ? 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800' 
-                  : 'px-3 py-1 rounded-full text-sm bg-red-100 text-red-800'">
-                {{ lab.isAvailable ? 'متاح' : 'غير متاح' }}
-              </span>
-            </td>
-            <td class="py-3 px-4">
-              <div class="flex items-center gap-2">
-                <button 
-                  (click)="openEditModal(lab)"
-                  class="p-2 text-blue-600 hover:bg-blue-50 rounded transition">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </button>
-                <button 
-                  (click)="deleteLab(lab.id)"
-                  class="p-2 text-red-600 hover:bg-red-50 rounded transition">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="labs.length === 0">
-            <td colspan="5" class="py-8 text-center text-gray-500">لا توجد مخابر</td>
-          </tr>
-        </tbody>
-      </table>
+    <!-- Labs tab -->
+    <div *ngIf="activeTab === 'labs'">
+      <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة المخابر</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse">
+          <thead>
+            <tr class="bg-gray-100 border-b-2 border-gray-300">
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم المخبر</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">الوصف</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">الموقع</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let lab of labs" class="border-b border-gray-200 hover:bg-gray-50">
+              <td class="py-3 px-4 text-gray-800">{{ lab.name }}</td>
+              <td class="py-3 px-4 text-gray-800">{{ lab.description || '-' }}</td>
+              <td class="py-3 px-4 text-gray-800">{{ lab.location || '-' }}</td>
+              <td class="py-3 px-4">
+                <span 
+                  [class]="lab.isAvailable 
+                    ? 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800' 
+                    : 'px-3 py-1 rounded-full text-sm bg-red-100 text-red-800'">
+                  {{ lab.isAvailable ? 'متاح' : 'غير متاح' }}
+                </span>
+              </td>
+              <td class="py-3 px-4">
+                <div class="flex items-center gap-2">
+                  <button 
+                    (click)="openEditModal(lab)"
+                    class="p-2 text-blue-600 hover:bg-blue-50 rounded transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button 
+                    (click)="deleteLab(lab.id)"
+                    class="p-2 text-red-600 hover:bg-red-50 rounded transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="labs.length === 0">
+              <td colspan="5" class="py-8 text-center text-gray-500">لا توجد مخابر</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Device logs tab -->
+    <div *ngIf="activeTab === 'deviceLogs'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">سجل خروج ودخول الأجهزة</h2>
+        <button
+          (click)="exportDeviceLogsToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveDeviceLog()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">اسم ولقب الأستاذ</label>
+          <input 
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogForm.teacherName"
+            name="teacherName"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">نوع العتاد (من أجهزة المعمل)</label>
+          <select
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogForm.equipmentType"
+            name="equipmentType"
+            required
+          >
+            <option value="" disabled>اختر نوع العتاد</option>
+            <option *ngFor="let eq of equipmentItems" [value]="eq.itemName">
+              {{ eq.itemName }} (عدد: {{ eq.totalCount }})
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">رقم الجرد</label>
+          <select
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogForm.inventoryNumber"
+            name="inventoryNumber"
+            required
+          >
+            <option value="" disabled>اختر رقم الجرد</option>
+            <option *ngFor="let inv of inventoryItems" [value]="inv.inventoryNumber">
+              {{ inv.inventoryNumber }} - {{ inv.category }} {{ inv.label }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">تاريخ الحركة</label>
+          <input 
+            type="date"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogForm.exitDate"
+            name="exitDate"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">نوع العملية</label>
+          <select
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogOperation"
+            name="operationType"
+            required
+          >
+            <option value="exit">خروج الجهاز</option>
+            <option value="return">استلام الجهاز</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">حالة العتاد (✓ / ✗)</label>
+          <select
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceStatus"
+            name="deviceStatus"
+            required
+          >
+            <option value="ok">يعمل ✓</option>
+            <option value="bad">لا يعمل ✗</option>
+          </select>
+        </div>
+        <div class="md:col-span-2">
+          <label class="block text-xs text-gray-600 mb-1">ملاحظات</label>
+          <input 
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="deviceLogForm.notes"
+            name="notes"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-4 hover:bg-green-700 transition">
+          حفظ سجل جديد
+        </button>
+      </form>
+
+      <div id="device-logs-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">#</th>
+              <th class="p-2">تاريخ الخروج</th>
+              <th class="p-2">الأستاذ</th>
+              <th class="p-2">نوع العتاد</th>
+              <th class="p-2">رقم الجرد</th>
+              <th class="p-2">حالة العتاد عند الخروج</th>
+              <th class="p-2">تاريخ الاستلام</th>
+              <th class="p-2">حالة العتاد عند الاستلام</th>
+              <th class="p-2">ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let log of deviceLogs; index as i" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ i + 1 }}</td>
+              <td class="p-2">{{ log.exitDate }}</td>
+              <td class="p-2">{{ log.teacherName }}</td>
+              <td class="p-2">{{ log.equipmentType }}</td>
+              <td class="p-2">{{ log.inventoryNumber }}</td>
+              <td class="p-2 text-center">{{ getStatusIcon(log.exitStatus) }}</td>
+              <td class="p-2">{{ log.returnDate || '-' }}</td>
+              <td class="p-2 text-center">{{ getStatusIcon(log.returnStatus) }}</td>
+              <td class="p-2">{{ log.notes || '-' }}</td>
+            </tr>
+            <tr *ngIf="deviceLogs.length === 0">
+              <td colspan="9" class="py-6 text-center text-gray-500">لا توجد سجلات للأجهزة</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lab equipment tab -->
+    <div *ngIf="activeTab === 'equipment'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">أجهزة معمل الحاسب الآلي</h2>
+        <button
+          (click)="exportEquipmentToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveEquipment()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">اسم الجهاز</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="equipmentForm.itemName"
+            name="eqItemName"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">الموديل</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="equipmentForm.model"
+            name="eqModel"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">العدد الكلي</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="equipmentForm.totalCount"
+            name="eqTotal"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">عدد الذي يعمل</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="equipmentForm.workingCount"
+            name="eqWorking"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">عدد الذي لا يعمل</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="equipmentForm.notWorkingCount"
+            name="eqNotWorking"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
+          حفظ جهاز في السجل
+        </button>
+      </form>
+
+      <div id="equipment-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">#</th>
+              <th class="p-2">اسم الجهاز</th>
+              <th class="p-2">الموديل</th>
+              <th class="p-2">العدد الكلي</th>
+              <th class="p-2">يعمل</th>
+              <th class="p-2">لا يعمل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let eq of equipmentItems; index as i" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ i + 1 }}</td>
+              <td class="p-2">{{ eq.itemName }}</td>
+              <td class="p-2">{{ eq.model || '-' }}</td>
+              <td class="p-2 text-center">{{ eq.totalCount }}</td>
+              <td class="p-2 text-center text-green-700 font-semibold">{{ eq.workingCount }}</td>
+              <td class="p-2 text-center text-red-700 font-semibold">{{ eq.notWorkingCount }}</td>
+            </tr>
+            <tr *ngIf="equipmentItems.length === 0">
+              <td colspan="6" class="py-6 text-center text-gray-500">
+                لا توجد بيانات لأجهزة المعمل بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lab software tab -->
+    <div *ngIf="activeTab === 'software'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">برامج حواسيب معمل الحاسب الآلي</h2>
+        <button
+          (click)="exportSoftwareToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveSoftware()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">اسم البرنامج</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="softwareForm.programName"
+            name="swProgramName"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">الإصدار / المثبّت</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="softwareForm.version"
+            name="swVersion"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-1 hover:bg-green-700 transition">
+          حفظ برنامج
+        </button>
+      </form>
+
+      <div id="software-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">#</th>
+              <th class="p-2">البرنامج</th>
+              <th class="p-2">المثبت / الإصدار</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let sw of softwareItems; index as i" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ i + 1 }}</td>
+              <td class="p-2">{{ sw.programName }}</td>
+              <td class="p-2">{{ sw.version || '-' }}</td>
+            </tr>
+            <tr *ngIf="softwareItems.length === 0">
+              <td colspan="3" class="py-6 text-center text-gray-500">
+                لا توجد بيانات لبرامج حواسيب المعمل بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lab furniture tab -->
+    <div *ngIf="activeTab === 'furniture'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">أثاث معمل الحاسب الآلي</h2>
+        <button
+          (click)="exportFurnitureToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveFurniture()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">اسم الأثاث</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="furnitureForm.itemName"
+            name="furItemName"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">الموديل / الوصف</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="furnitureForm.model"
+            name="furModel"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">العدد الكلي</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="furnitureForm.totalCount"
+            name="furTotal"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">عدد الذي يعمل</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="furnitureForm.workingCount"
+            name="furWorking"
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">عدد الذي لا يعمل</label>
+          <input
+            type="number"
+            min="0"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="furnitureForm.notWorkingCount"
+            name="furNotWorking"
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
+          حفظ قطعة أثاث
+        </button>
+      </form>
+
+      <div id="furniture-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">#</th>
+              <th class="p-2">اسم الأثاث</th>
+              <th class="p-2">الموديل</th>
+              <th class="p-2">العدد الكلي</th>
+              <th class="p-2">يعمل</th>
+              <th class="p-2">لا يعمل</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let f of furnitureItems; index as i" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ i + 1 }}</td>
+              <td class="p-2">{{ f.itemName }}</td>
+              <td class="p-2">{{ f.model || '-' }}</td>
+              <td class="p-2 text-center">{{ f.totalCount }}</td>
+              <td class="p-2 text-center text-green-700 font-semibold">{{ f.workingCount }}</td>
+              <td class="p-2 text-center text-red-700 font-semibold">{{ f.notWorkingCount }}</td>
+            </tr>
+            <tr *ngIf="furnitureItems.length === 0">
+              <td colspan="6" class="py-6 text-center text-gray-500">
+                لا توجد بيانات لأثاث المعمل بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lab inventory tab -->
+    <div *ngIf="activeTab === 'inventory'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">أرقام جرد أجهزة وأثاث المعمل</h2>
+        <button
+          (click)="exportInventoryToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveInventory()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">الفئة</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="inventoryForm.category"
+            name="invCategory"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">وصف الجهاز</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="inventoryForm.label"
+            name="invLabel"
+            required
+          />
+        </div>
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">رقم الجرد</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="inventoryForm.inventoryNumber"
+            name="invNumber"
+            required
+          />
+        </div>
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-1 hover:bg-green-700 transition">
+          حفظ رقم الجرد
+        </button>
+      </form>
+
+      <div id="inventory-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">#</th>
+              <th class="p-2">الفئة</th>
+              <th class="p-2">الجهاز</th>
+              <th class="p-2">رقم الجرد</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let inv of inventoryItems; index as i" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ i + 1 }}</td>
+              <td class="p-2">{{ inv.category }}</td>
+              <td class="p-2">{{ inv.label }}</td>
+              <td class="p-2 text-center font-semibold">{{ inv.inventoryNumber }}</td>
+            </tr>
+            <tr *ngIf="inventoryItems.length === 0">
+              <td colspan="4" class="py-6 text-center text-gray-500">
+                لا توجد أرقام جرد مسجلة بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Hardware / software checklist tab -->
+    <div *ngIf="activeTab === 'checklist'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">فحص المكوّنات المادية والبرمجية لأجهزة المعمل</h2>
+        <button
+          (click)="exportChecklistToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveChecklist()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">رقم الجهاز (1 - 16)</label>
+          <input
+            type="number"
+            min="1"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="checklistForm.deviceNumber"
+            name="chkDeviceNumber"
+            required
+          />
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.hasSystemUnit" name="chkSystemUnit" />
+          <span class="text-sm">وحدة النظام</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.hasMonitor" name="chkMonitor" />
+          <span class="text-sm">الشاشة</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.hasMouse" name="chkMouse" />
+          <span class="text-sm">الفأرة</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.hasKeyboard" name="chkKeyboard" />
+          <span class="text-sm">لوحة المفاتيح</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.hasCabling" name="chkCabling" />
+          <span class="text-sm">التمديدات</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.isClean" name="chkClean" />
+          <span class="text-sm">نظافة الجهاز</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.osInstalled" name="chkOS" />
+          <span class="text-sm">نظام التشغيل</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.officeInstalled" name="chkOffice" />
+          <span class="text-sm">برامج الأوفيس</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.netSupportInstalled" name="chkNetSupport" />
+          <span class="text-sm">نت سبورت</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.desktopCleaned" name="chkDesktopClean" />
+          <span class="text-sm">تنظيف سطح المكتب</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <input type="checkbox" [(ngModel)]="checklistForm.antivirusInstalled" name="chkAntivirus" />
+          <span class="text-sm">مضاد الفيروسات</span>
+        </div>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">تاريخ الفحص</label>
+          <input
+            type="date"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="checklistForm.lastCheckDate"
+            name="chkLastCheckDate"
+            required
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs text-gray-600 mb-1">ملاحظات</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="checklistForm.notes"
+            name="chkNotes"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
+          حفظ فحص الجهاز
+        </button>
+      </form>
+
+      <div id="checklist-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">رقم الجهاز</th>
+              <th class="p-2">وحدة النظام</th>
+              <th class="p-2">الشاشة</th>
+              <th class="p-2">الفأرة</th>
+              <th class="p-2">لوحة المفاتيح</th>
+              <th class="p-2">التمديدات</th>
+              <th class="p-2">نظافة الجهاز</th>
+              <th class="p-2">نظام التشغيل</th>
+              <th class="p-2">الأوفيس</th>
+              <th class="p-2">Net Support</th>
+              <th class="p-2">تنظيف سطح المكتب</th>
+              <th class="p-2">مضاد الفيروسات</th>
+              <th class="p-2">تاريخ الفحص</th>
+              <th class="p-2">ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of checklistItems" class="border-b text-center md:text-center">
+              <td class="p-2 text-center font-semibold">{{ c.deviceNumber }}</td>
+              <td class="p-2 text-center">{{ c.hasSystemUnit ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.hasMonitor ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.hasMouse ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.hasKeyboard ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.hasCabling ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.isClean ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.osInstalled ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.officeInstalled ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.netSupportInstalled ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.desktopCleaned ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.antivirusInstalled ? '✓' : '✗' }}</td>
+              <td class="p-2 text-center">{{ c.lastCheckDate || '-' }}</td>
+              <td class="p-2">{{ c.notes || '-' }}</td>
+            </tr>
+            <tr *ngIf="checklistItems.length === 0">
+              <td colspan="14" class="py-6 text-center text-gray-500">
+                لا توجد سجلات فحص بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Lab cleaning tab -->
+    <div *ngIf="activeTab === 'cleaning'">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-gray-700">نظافة معمل الحاسب الآلي</h2>
+        <button
+          (click)="exportCleaningToPDF()"
+          class="bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
+          تصدير PDF
+        </button>
+      </div>
+
+      <form (ngSubmit)="saveCleaning()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <label class="block text-xs text-gray-600 mb-1 md:col-span-3">حالات النظافة</label>
+        <select
+          class="border p-2 rounded text-sm"
+          [(ngModel)]="cleaningForm.deviceCleanliness"
+          name="clDevice"
+          required>
+          <option value="good">نظافة الجهاز: جيدة</option>
+          <option value="bad">نظافة الجهاز: سيئة</option>
+        </select>
+
+        <select
+          class="border p-2 rounded text-sm"
+          [(ngModel)]="cleaningForm.desktopCleanliness"
+          name="clDesktop"
+          required>
+          <option value="good">نظافة سطح المكتب: جيدة</option>
+          <option value="bad">نظافة سطح المكتب: سيئة</option>
+        </select>
+
+        <select
+          class="border p-2 rounded text-sm"
+          [(ngModel)]="cleaningForm.roomCleanliness"
+          name="clRoom"
+          required>
+          <option value="good">نظافة القاعة: جيدة</option>
+          <option value="bad">نظافة القاعة: سيئة</option>
+        </select>
+
+        <select
+          class="border p-2 rounded text-sm"
+          [(ngModel)]="cleaningForm.wiringStatus"
+          name="clWiring"
+          required>
+          <option value="complete">التمديدات: كاملة</option>
+          <option value="incomplete">التمديدات: غير كاملة</option>
+        </select>
+
+        <div>
+          <label class="block text-xs text-gray-600 mb-1">تاريخ الفحص</label>
+          <input
+            type="date"
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="cleaningForm.checkDate"
+            name="clDate"
+            required
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-xs text-gray-600 mb-1">ملاحظات عامة</label>
+          <input
+            class="border p-2 rounded text-sm w-full"
+            [(ngModel)]="cleaningForm.notes"
+            name="clNotes"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="bg-green-600 text-white py-2 rounded-lg md:col-span-3 hover:bg-green-700 transition">
+          حفظ حالة النظافة
+        </button>
+      </form>
+
+      <div id="cleaning-table" class="overflow-x-auto">
+        <table class="w-full border-collapse text-xs md:text-sm">
+          <thead>
+            <tr class="bg-gray-100 border-b text-center md:text-center">
+              <th class="p-2">تاريخ الفحص</th>
+              <th class="p-2">نظافة الجهاز</th>
+              <th class="p-2">نظافة سطح المكتب</th>
+              <th class="p-2">نظافة القاعة</th>
+              <th class="p-2">التمديدات</th>
+              <th class="p-2">ملاحظات</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let cl of cleaningEntries" class="border-b text-center md:text-center">
+              <td class="p-2 text-center">{{ cl.checkDate || '-' }}</td>
+              <td class="p-2 text-center">
+                {{ cl.deviceCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+              </td>
+              <td class="p-2 text-center">
+                {{ cl.desktopCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+              </td>
+              <td class="p-2 text-center">
+                {{ cl.roomCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+              </td>
+              <td class="p-2 text-center">
+                {{ cl.wiringStatus === 'complete' ? 'كاملة' : 'غير كاملة' }}
+              </td>
+              <td class="p-2">
+                {{ cl.notes || '-' }}
+              </td>
+            </tr>
+            <tr *ngIf="cleaningEntries.length === 0">
+              <td colspan="6" class="py-6 text-center text-gray-500">
+                لا توجد سجلات لنظافة المعمل بعد
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
