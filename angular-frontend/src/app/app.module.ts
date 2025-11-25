@@ -17,6 +17,7 @@ import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
 import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
+import { AnnualDistributionComponent } from './pages/annual-distribution/annual-distribution.component';
 import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
@@ -33,7 +34,8 @@ import { NgChartsModule } from 'ng2-charts';
     AttendanceComponent,
     BehaviorComponent,
     GradebookComponent,
-    SeatingChartComponent
+    SeatingChartComponent,
+    AnnualDistributionComponent
   ],
   imports: [
     BrowserModule,

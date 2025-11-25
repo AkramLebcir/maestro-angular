@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  teacherName = 'الأستاذ محمد أحمد';
+  teacherName = 'الأستاذ لبصير علاء الدين';
   notificationCount = 3;
 }
 

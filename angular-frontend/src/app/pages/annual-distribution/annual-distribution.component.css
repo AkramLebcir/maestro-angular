@@ -1,0 +1,5 @@
+.tab-active {
+  @apply border-indigo-500 text-indigo-600;
+}
+
+

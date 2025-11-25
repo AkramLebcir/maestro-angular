@@ -15,6 +15,7 @@ import { AttendanceModule } from './attendance/attendance.module';
 import { GradesModule } from './grades/grades.module';
 import { WorkstationsModule } from './workstations/workstations.module';
 import { LabManagementModule } from './lab-management/lab-management.module';
+import { AnnualPlanningModule } from './annual-planning/annual-planning.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { LabManagementModule } from './lab-management/lab-management.module';
     GradesModule,
     WorkstationsModule,
     LabManagementModule,
+    AnnualPlanningModule,
   ],
   controllers: [AppController],
   providers: [AppService],
