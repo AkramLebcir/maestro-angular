@@ -9,6 +9,7 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  Query,
 } from '@nestjs/common';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -26,8 +27,14 @@ export class StudentsController {
   }
 
   @Get()
-  async findAll(): Promise<StudentResponseDto[]> {
-    return this.studentsService.findAll();
+  async findAll(
+    @Query('classId') classId?: string,
+    @Query('group') group?: string,
+  ): Promise<StudentResponseDto[]> {
+    return this.studentsService.findAll({
+      classId: classId ? Number(classId) : undefined,
+      group: group ? Number(group) : undefined,
+    });
   }
 
   @Get(':id')
@@ -49,4 +56,5 @@ export class StudentsController {
     return this.studentsService.remove(id);
   }
 }
+
 

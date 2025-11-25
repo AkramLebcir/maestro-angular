@@ -1,0 +1,318 @@
+<div class="p-6 space-y-6" *ngIf="currentClass; else emptyState" dir="rtl">
+  <div class="bg-gradient-to-r from-blue-500 to-blue-400 text-white rounded-3xl p-6 shadow flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+    <div class="flex items-center gap-4">
+      <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold">
+        {{ currentClass!.name.charAt(0) || 'C' }}
+      </div>
+      <div>
+        <p class="uppercase text-sm tracking-wider opacity-80">Seating Chart</p>
+        <h1 class="text-3xl font-semibold">{{ currentClass!.name }}</h1>
+        <p class="text-white/80">{{ currentClass!.subject }}</p>
+        <div class="mt-2 flex gap-2 flex-wrap">
+          <span class="badge">المستوى: {{ currentClass!.level }}</span>
+          <span class="badge">الفوج {{ selectedGroup }}</span>
+          <span class="badge">عدد التلاميذ: {{ stats?.studentCount || '--' }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="flex gap-6 flex-wrap">
+      <div class="stat-pill">
+        <p class="label">متوسط الحضور</p>
+        <p class="value">{{ stats?.averageAttendance ?? 0 }}%</p>
+      </div>
+      <div class="stat-pill">
+        <p class="label">متوسط النقاط</p>
+        <p class="value">{{ stats?.averageGrade ?? 0 }}%</p>
+      </div>
+      <div class="stat-pill">
+        <p class="label">سلوك إيجابي</p>
+        <p class="value">{{ stats?.positiveBehaviorRate ?? 0 }}%</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-4 items-center">
+    <div class="flex flex-col">
+      <label class="text-gray-500 text-sm mb-1">القسم</label>
+      <select
+        class="select-input"
+        [value]="selectedClassId"
+        (change)="changeClass($any($event.target).value)">
+        <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }} - {{ cls.subject }}</option>
+      </select>
+    </div>
+
+    <div class="flex flex-col">
+      <label class="text-gray-500 text-sm mb-1">الفوج</label>
+      <div class="flex gap-2">
+        <button class="group-switch" [class.active]="selectedGroup === 1" (click)="toggleGroup(1)">الفوج 1</button>
+        <button class="group-switch" [class.active]="selectedGroup === 2" (click)="toggleGroup(2)">الفوج 2</button>
+      </div>
+    </div>
+
+    <div class="flex-1 min-w-[200px]">
+      <label class="text-gray-500 text-sm mb-1">بحث عن تلميذ</label>
+      <input class="search-input" placeholder="اكتب اسم التلميذ" [(ngModel)]="searchTerm" />
+    </div>
+
+    <div class="flex gap-3 flex-wrap items-center ml-auto">
+      <button
+        class="ghost-btn"
+        (click)="printSelectedWorkstationsAllClasses()"
+        [disabled]="printLoading || selectedStationsForPrint.size === 0">
+        طباعة الحواسيب المحددة (جميع الأقسام)
+      </button>
+      <button class="ghost-btn" (click)="print('group')" [disabled]="printLoading">طباعة الفوج</button>
+      <button class="ghost-btn" (click)="print('class')" [disabled]="printLoading">طباعة القسم</button>
+      <button class="ghost-btn" (click)="print('all')" [disabled]="printLoading">طباعة جميع الأقسام</button>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center text-sm text-gray-600">
+    <button class="primary-outline" (click)="toggleReorganize()">
+      {{ isReorganizing ? 'إيقاف تنظيم التلاميذ' : 'تنظيم التلاميذ' }}
+    </button>
+    <button class="primary-outline" (click)="toggleStationEditing()">
+      {{ editingStations ? 'إيقاف تحريك الحواسيب' : 'تحريك الحواسيب' }}
+    </button>
+    <button class="primary-btn" (click)="saveAssignments()" [disabled]="saving || !isReorganizing">
+      <span *ngIf="!saving">حفظ توزيع التلاميذ</span>
+      <span *ngIf="saving">... جاري الحفظ</span>
+    </button>
+    <button class="primary-btn" (click)="saveLayoutPositions()" [disabled]="layoutSaving || !layoutDirty">
+      <span *ngIf="!layoutSaving">حفظ أماكن الحواسيب</span>
+      <span *ngIf="layoutSaving">... جاري الحفظ</span>
+    </button>
+    <span class="text-red-500 font-semibold" *ngIf="layoutDirty">هناك تعديلات غير محفوظة</span>
+  </div>
+
+  <div *ngIf="errorMessage" class="alert">{{ errorMessage }}</div>
+
+  <div class="grid grid-cols-12 gap-6">
+    <div class="col-span-12 xl:col-span-9">
+      <div class="bg-white rounded-3xl shadow-lg p-6 relative h-[640px] flex flex-col">
+        <div class="flex items-center justify-between">
+          <h3 class="section-title">مخطط المقاعد (حرف U مقلوب)</h3>
+          <span class="text-xs text-gray-400">يمكن تكبير العرض بالتمرير</span>
+        </div>
+        <div class="seating-stage-wrapper mt-4">
+          <div class="seating-stage" #stageRef>
+            <div
+              *ngFor="let slot of workstationSlots"
+              class="workstation-node"
+              [style.left.%]="slot.x"
+              [style.top.%]="slot.y"
+              cdkDrag
+              cdkDragBoundary=".seating-stage"
+              [cdkDragDisabled]="!editingStations"
+              (cdkDragEnded)="onWorkstationDragEnd($event, slot)">
+              <div class="workstation-card" [class.editing]="editingStations">
+                <div class="card-header">
+                  <div class="card-meta">
+                    <label class="flex items-center gap-2 text-sm text-gray-600">
+                      <input
+                        type="checkbox"
+                        [checked]="selectedStationsForPrint.has(slot.workstationId)"
+                        (change)="toggleStationSelection(slot.workstationId, $any($event.target).checked)" />
+                      {{ slot.label }}
+                    </label>
+                    <span class="text-xs text-gray-500">سعة {{ slot.capacity }}</span>
+                  </div>
+                </div>
+                <div
+                  class="card-drop"
+                  cdkDropList
+                  [id]="slot.dropListId"
+                  [cdkDropListData]="slot.occupants"
+                  [cdkDropListConnectedTo]="connectedLists"
+                  [cdkDropListDisabled]="!isReorganizing"
+                  (cdkDropListDropped)="drop($event)">
+                  <div
+                    *ngFor="let occupant of slot.occupants; let i = index"
+                    class="seat-occupant"
+                    cdkDrag
+                    [cdkDragDisabled]="!isReorganizing">
+                    <div class="avatar" *ngIf="occupant.student.photo; else initials" [style.backgroundImage]="'url(' + occupant.student.photo + ')'" (click)="openSeatPopup(slot, i)"></div>
+                    <ng-template #initials>
+                      <div class="avatar placeholder" (click)="openSeatPopup(slot, i)">{{ getStudentInitials(occupant.student) }}</div>
+                    </ng-template>
+                    <div class="occupant-info">
+                      <div class="name-row">
+                        <p class="name">{{ occupant.student.firstName }} {{ occupant.student.lastName }}</p>
+                        <button class="remove-btn inline" type="button" (click)="clearSeat(slot, i)">✕</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    *ngFor="let placeholder of getSeatPlaceholders(slot)"
+                    class="seat-placeholder"
+                    [class.disabled]="!isReorganizing">
+                    اسحب تلميذين كحد أقصى لهذا الحاسوب
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="loading" class="stage-overlay">
+              <div class="spinner"></div>
+              <p>جاري تحميل المخطط...</p>
+            </div>
+          </div>
+        </div>
+        <div class="seat-popup-backdrop" *ngIf="activeSeat">
+          <div class="seat-popup">
+            <div class="popup-header">
+              <p class="popup-title">{{ activeSeat!.seat.student.firstName }} {{ activeSeat!.seat.student.lastName }} - {{ activeSeat!.slotLabel }}</p>
+              <button class="popup-close" type="button" (click)="closeSeatPopup()">✕</button>
+            </div>
+            <div class="popup-body">
+              <div class="popup-field">
+                <label>الحضور</label>
+                <select [(ngModel)]="activeSeat!.seat.attendanceStatus">
+                  <option *ngFor="let option of attendanceOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+              </div>
+              <div class="popup-field">
+                <label>السلوك</label>
+                <select [(ngModel)]="activeSeat!.seat.behaviorStatus">
+                  <option *ngFor="let option of behaviorOptions" [value]="option.value">{{ option.label }}</option>
+                </select>
+              </div>
+              <div class="popup-field">
+                <label>ملاحظات</label>
+                <textarea rows="3" [(ngModel)]="activeSeat!.seat.behaviorNotes"></textarea>
+              </div>
+            </div>
+            <div class="popup-actions">
+              <button class="primary-btn" type="button" (click)="closeSeatPopup()">تم</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-12 xl:col-span-3">
+      <div class="bg-white rounded-3xl shadow-lg p-6 flex flex-col h-full">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="section-title">التلاميذ المتاحون</h3>
+          <span class="text-sm text-gray-500">{{ studentPool.length }} تلميذاً</span>
+        </div>
+        <div
+          class="students-pool space-y-3 flex-1 overflow-auto"
+          cdkDropList
+          id="pool"
+          [cdkDropListData]="studentPool"
+          [cdkDropListConnectedTo]="connectedLists"
+          [cdkDropListDisabled]="!isReorganizing"
+          (cdkDropListDropped)="drop($event)">
+          <div
+            *ngFor="let seat of studentPool"
+            class="student-chip"
+            [class.hidden]="!matchesSearch(seat)"
+            cdkDrag
+            [cdkDragDisabled]="!isReorganizing">
+            <div class="chip-avatar" *ngIf="seat.student.photo; else chipInitials" [style.backgroundImage]="'url(' + seat.student.photo + ')'"></div>
+            <ng-template #chipInitials>
+              <div class="chip-avatar placeholder">{{ getStudentInitials(seat.student) }}</div>
+            </ng-template>
+            <div class="chip-info">
+              <p>{{ seat.student.firstName }} {{ seat.student.lastName }}</p>
+              <span>الفوج {{ seat.student.group || 'غير محدد' }}</span>
+            </div>
+          </div>
+          <div *ngIf="!studentPool.length" class="text-center text-sm text-gray-400 pt-6">
+            جميع تلاميذ الفوج تم توزيعهم
+          </div>
+        </div>
+        <div class="pt-4 border-t mt-4 text-sm text-gray-500">
+          <p>اختيار الحواسيب للطباعة:</p>
+          <button class="ghost-btn mt-2 w-full" (click)="selectAllStations()">تحديد / إلغاء كل الحواسيب</button>
+          <p class="text-xs mt-2 text-gray-400">إذا لم تحدد شيئاً سيتم طباعة كل الحواسيب.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Print Area -->
+<div id="print-area" *ngIf="printData" #printArea dir="rtl">
+  <ng-container *ngIf="printMode === 'workstation' && workstationPages.length; else defaultPrint">
+    <div *ngFor="let page of workstationPages" class="print-page workstation-page">
+      <div class="print-header workstation">
+        <div>
+          <h1>{{ page.label }}</h1>
+          <p>سعة {{ page.capacity }}</p>
+        </div>
+        <div class="text-left">
+          <p class="text-sm text-white/80">يتضمن جميع الأقسام والفوجات</p>
+        </div>
+      </div>
+      <div class="workstation-entries">
+        <div class="workstation-entry-card" *ngFor="let entry of page.entries">
+          <div class="entry-header">
+            <p class="entry-title">
+              {{ entry.className }} - {{ entry.subject || 'بدون مادة' }}
+            </p>
+            <span class="entry-group">الفوج {{ entry.group }}</span>
+          </div>
+          <div class="entry-body" *ngIf="entry.students.length">
+            <div class="entry-student-row" *ngFor="let student of entry.students">
+              <span class="student-name">{{ student.name }}</span>
+              <span class="student-meta">({{ student.attendance }}، {{ student.behavior }})</span>
+            </div>
+          </div>
+          <p class="text-center text-gray-400 text-sm py-2" *ngIf="!entry.students.length">
+            لا يوجد تلاميذ في هذا الحاسوب لهذا القسم.
+          </p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #defaultPrint>
+  <div *ngFor="let classBlock of printData?.classes">
+    <div *ngFor="let groupBlock of classBlock.groups" class="print-page">
+      <!-- Header -->
+      <div class="print-header">
+        <div>
+          <h1>{{ classBlock.class.name }}</h1>
+          <p>{{ classBlock.class.subject }}</p>
+        </div>
+        <div class="text-left">
+          <p class="text-lg font-bold">الفوج {{ groupBlock.group }}</p>
+          <p class="text-sm">الحضور {{ groupBlock.stats.averageAttendance || 0 }}% | السلوك {{ groupBlock.stats.positiveBehaviorRate || 0 }}%</p>
+        </div>
+      </div>
+
+      <!-- Grid -->
+      <div class="print-grid">
+        <div *ngFor="let workstation of groupBlock.workstations" class="print-card">
+          <div class="print-card-header">
+            <span class="font-bold text-gray-800">{{ workstation.label }}</span>
+            <span class="text-xs text-gray-500">سعة {{ workstation.capacity }}</span>
+          </div>
+          <div class="print-card-body">
+            <ng-container *ngIf="workstation.assignments?.length; else emptyPrint">
+              <div *ngFor="let assignment of workstation.assignments" class="print-student-row">
+                <span class="font-semibold">{{ assignment.student.firstName }} {{ assignment.student.lastName }}</span>
+                <span class="text-xs text-gray-500">
+                  ({{ getAttendanceLabel(assignment.attendanceStatus) }}، {{ getBehaviorLabel(assignment.behaviorStatus) }})
+                </span>
+              </div>
+            </ng-container>
+            <ng-template #emptyPrint>
+              <p class="text-gray-400 text-sm italic text-center py-2">فارغ</p>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #emptyState>
+  <div class="p-12 text-center text-gray-500">
+    لا توجد أقسام متاحة. يرجى إضافة قسم أولاً.
+  </div>
+</ng-template>
+

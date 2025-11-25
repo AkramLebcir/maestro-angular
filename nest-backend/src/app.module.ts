@@ -13,6 +13,7 @@ import { TopicsModule } from './topics/topics.module';
 import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { GradesModule } from './grades/grades.module';
+import { WorkstationsModule } from './workstations/workstations.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { GradesModule } from './grades/grades.module';
     BehaviorEventsModule,
     AttendanceModule,
     GradesModule,
+    WorkstationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

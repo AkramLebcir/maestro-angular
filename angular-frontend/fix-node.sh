@@ -16,3 +16,4 @@ echo "Now you can run npm install safely!"
 echo "Running npm install..."
 npm install
 
+

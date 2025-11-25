@@ -3,3 +3,4 @@ import { CreateNotebookDto } from './create-notebook.dto';
 
 export class UpdateNotebookDto extends PartialType(CreateNotebookDto) {}
 
+

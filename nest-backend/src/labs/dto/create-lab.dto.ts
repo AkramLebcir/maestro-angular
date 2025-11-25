@@ -17,3 +17,4 @@ export class CreateLabDto {
   isAvailable?: boolean;
 }
 
+

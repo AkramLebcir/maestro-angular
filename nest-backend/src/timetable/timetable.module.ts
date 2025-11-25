@@ -14,3 +14,4 @@ import { Lab } from '../labs/lab.entity';
 })
 export class TimetableModule {}
 
+

@@ -46,3 +46,4 @@ export class Timetable {
   updatedAt: Date;
 }
 
+

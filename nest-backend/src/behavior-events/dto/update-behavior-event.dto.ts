@@ -26,3 +26,4 @@ export class UpdateBehaviorEventDto {
   classId?: number;
 }
 
+

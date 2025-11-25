@@ -49,3 +49,4 @@ export class Class {
   updatedAt: Date;
 }
 
+

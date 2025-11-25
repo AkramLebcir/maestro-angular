@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { HeaderComponent } from './components/header/header.component';
@@ -15,6 +16,7 @@ import { NotebooksComponent } from './pages/notebooks/notebooks.component';
 import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
+import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
 import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
@@ -30,12 +32,14 @@ import { NgChartsModule } from 'ng2-charts';
     NotebooksComponent,
     AttendanceComponent,
     BehaviorComponent,
-    GradebookComponent
+    GradebookComponent,
+    SeatingChartComponent
   ],
   imports: [
     BrowserModule,
     HttpClientModule,
     FormsModule,
+    DragDropModule,
     AppRoutingModule,
     NgChartsModule
   ],

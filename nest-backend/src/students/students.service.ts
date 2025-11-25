@@ -39,8 +39,20 @@ export class StudentsService {
     return this.findOne(savedStudent.id);
   }
 
-  async findAll(): Promise<StudentResponseDto[]> {
+  async findAll(filters?: {
+    classId?: number;
+    group?: number;
+  }): Promise<StudentResponseDto[]> {
+    const where: Record<string, any> = {};
+    if (filters?.classId) {
+      where.classId = filters.classId;
+    }
+    if (filters?.group) {
+      where.group = filters.group;
+    }
+
     const students = await this.studentRepository.find({
+      where: Object.keys(where).length ? where : undefined,
       relations: ['class'],
     });
 
