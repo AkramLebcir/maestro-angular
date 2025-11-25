@@ -12,11 +12,12 @@ import { GradebookComponent } from './pages/gradebook/gradebook.component';
 import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
 import { AnnualDistributionComponent } from './pages/annual-distribution/annual-distribution.component';
 import { ReportsComponent } from './pages/reports/reports.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 const routes: Routes = [
-  { path: '', redirectTo: '/classes', pathMatch: 'full' },
+  { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
   { path: 'classes', component: ClassesComponent },
-  { path: 'dashboard', component: ClassesComponent }, // Placeholder
+  { path: 'dashboard', component: DashboardComponent },
   { path: 'students', component: StudentsComponent },
   { path: 'labs', component: LabsComponent },
   { path: 'grades', component: ClassesComponent }, // Placeholder

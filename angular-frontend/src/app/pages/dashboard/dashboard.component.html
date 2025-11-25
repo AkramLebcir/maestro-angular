@@ -1,0 +1,217 @@
+<div class="flex-1 p-6">
+  <!-- Top header summary -->
+  <div class="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">لوحة التحكم</h1>
+        <p class="text-gray-500 text-sm mt-1">
+          ملخص سريع للقسم: الحضور، السلوك، الدرجات وملخّص السجلات
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-6">
+        <!-- Class selector -->
+        <div>
+          <label class="block text-xs text-gray-500 mb-1">اختيار القسم</label>
+          <select
+            class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [(ngModel)]="selectedClassId"
+            (change)="onClassChange()">
+            <option [ngValue]="0">جميع الأقسام</option>
+            <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
+          </select>
+        </div>
+        <div class="text-center">
+          <div class="text-xs text-gray-500 mb-1">معدل الحضور</div>
+          <div class="text-2xl font-bold text-blue-600">{{ averageAttendance | number:'1.0-1' }}%</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs text-gray-500 mb-1">معدل الدرجات</div>
+          <div class="text-2xl font-bold text-emerald-600">{{ averageGrade | number:'1.0-1' }}%</div>
+        </div>
+        <div class="text-center">
+          <div class="text-xs text-gray-500 mb-1">عدد التلاميذ</div>
+          <div class="text-2xl font-bold text-gray-800">{{ totalStudents }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- First row: Attendance + Behavior + Grade Counts + Grade Distribution -->
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+    <!-- Attendance donut -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">الحضور</h2>
+      <div class="flex-1 flex items-center justify-center">
+        <canvas
+          baseChart
+          [data]="attendanceChartData"
+          [options]="attendanceChartOptions"
+          [type]="'doughnut'">
+        </canvas>
+      </div>
+      <div class="mt-4 grid grid-cols-2 gap-2 text-xs text-gray-600">
+        <div>حاضر: <span class="font-semibold text-blue-600">{{ attendanceSummary.present }}</span></div>
+        <div>غائب: <span class="font-semibold text-red-600">{{ attendanceSummary.absent }}</span></div>
+        <div>مرخَّص: <span class="font-semibold text-emerald-600">{{ attendanceSummary.excused }}</span></div>
+        <div>متأخر: <span class="font-semibold text-orange-500">{{ attendanceSummary.late }}</span></div>
+        <div>مريض: <span class="font-semibold text-yellow-500">{{ attendanceSummary.sick }}</span></div>
+      </div>
+    </div>
+
+    <!-- Behavior -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">السلوك</h2>
+      <div class="flex-1 flex items-center justify-center">
+        <canvas
+          baseChart
+          [data]="behaviorChartData"
+          [options]="behaviorChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+      <div class="mt-4 flex justify-around text-center">
+        <div>
+          <div class="text-sm text-gray-500 mb-1">إيجابي</div>
+          <div class="text-xl font-bold text-emerald-600">{{ behaviorSummary.positive }}</div>
+        </div>
+        <div>
+          <div class="text-sm text-gray-500 mb-1">سلبي</div>
+          <div class="text-xl font-bold text-red-600">{{ behaviorSummary.negative }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Grade counts -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">عدد الدرجات</h2>
+      <div class="grid grid-cols-2 gap-3 text-sm">
+        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+          <span class="font-semibold text-gray-700">A</span>
+          <span class="font-bold text-blue-600">{{ gradeCounts.A }}</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+          <span class="font-semibold text-gray-700">B</span>
+          <span class="font-bold text-blue-600">{{ gradeCounts.B }}</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+          <span class="font-semibold text-gray-700">C</span>
+          <span class="font-bold text-blue-600">{{ gradeCounts.C }}</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+          <span class="font-semibold text-gray-700">D</span>
+          <span class="font-bold text-blue-600">{{ gradeCounts.D }}</span>
+        </div>
+        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+          <span class="font-semibold text-gray-700">F</span>
+          <span class="font-bold text-red-600">{{ gradeCounts.F }}</span>
+        </div>
+      </div>
+      <div class="mt-auto pt-4 text-xs text-gray-500">
+        المجموع: 
+        <span class="font-semibold">
+          {{ gradeCounts.A + gradeCounts.B + gradeCounts.C + gradeCounts.D + gradeCounts.F }}
+        </span>
+        تلميذ
+      </div>
+    </div>
+
+    <!-- Grade distribution -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">توزيع الدرجات</h2>
+      <div class="flex-1 flex items-center justify-center">
+        <canvas
+          baseChart
+          [data]="gradeDistributionChartData"
+          [options]="gradeDistributionChartOptions"
+          [type]="'bar'">
+        </canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Second row: Class summary, seating chart preview, gradebook summary -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Class summary -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">ملخص القسم</h2>
+      <div class="grid grid-cols-2 gap-4 text-sm">
+        <div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
+          <div class="text-xs text-blue-600 mb-1">معدل الحضور</div>
+          <div class="text-xl font-bold text-blue-700">{{ averageAttendance | number:'1.0-1' }}%</div>
+        </div>
+        <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
+          <div class="text-xs text-emerald-600 mb-1">معدل الدرجات</div>
+          <div class="text-xl font-bold text-emerald-700">{{ averageGrade | number:'1.0-1' }}%</div>
+        </div>
+        <div class="bg-purple-50 border border-purple-100 rounded-lg p-3">
+          <div class="text-xs text-purple-600 mb-1">إجمالي التلاميذ</div>
+          <div class="text-xl font-bold text-purple-700">{{ totalStudents }}</div>
+        </div>
+        <div class="bg-orange-50 border border-orange-100 rounded-lg p-3">
+          <div class="text-xs text-orange-600 mb-1">إيجابي مقابل سلبي</div>
+          <div class="text-sm">
+            <span class="font-semibold text-emerald-600">{{ behaviorSummary.positive }}</span>
+            /
+            <span class="font-semibold text-red-600">{{ behaviorSummary.negative }}</span>
+          </div>
+        </div>
+      </div>
+      <a routerLink="/reports" class="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
+        عرض تفاصيل التقارير
+        <span class="mr-1">↗</span>
+      </a>
+    </div>
+
+    <!-- Seating chart preview (مجرد توزيع دوائر بسيطة) -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">مخطط المقاعد</h2>
+        <a routerLink="/seating-chart" class="text-sm text-blue-600 hover:text-blue-800">فتح المخطط</a>
+      </div>
+      <div class="flex-1 flex items-center justify-center">
+        <div class="relative w-full h-56">
+          <div
+            *ngFor="let seat of [1,2,3,4,5,6,7,8,9,10,11,12]"
+            class="absolute w-8 h-8 rounded-full bg-blue-100 border border-blue-300 flex items-center justify-center text-xs text-blue-700"
+            [ngStyle]="{
+              top: (20 + (seat % 4) * 15) + '%',
+              right: (10 + (seat * 6) % 70) + '%'
+            }">
+            {{ seat }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Gradebook quick view -->
+    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-gray-800">سجل الدرجات</h2>
+        <a routerLink="/gradebook" class="text-sm text-blue-600 hover:text-blue-800">فتح السجل</a>
+      </div>
+      <div class="space-y-3 text-sm">
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">عدد التلاميذ بمعدل ≥ 10</span>
+          <span class="font-semibold text-emerald-600">--</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">عدد التلاميذ بمعدل &lt; 10</span>
+          <span class="font-semibold text-red-600">--</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">أعلى درجة</span>
+          <span class="font-semibold text-blue-700">--</span>
+        </div>
+        <div class="flex items-center justify-between">
+          <span class="text-gray-600">أقل درجة</span>
+          <span class="font-semibold text-red-700">--</span>
+        </div>
+      </div>
+      <p class="mt-4 text-xs text-gray-500">
+        هذه القيم يمكن ربطها لاحقاً مباشرة ببيانات سجل الدرجات (Gradebook).
+      </p>
+    </div>
+  </div>
+</div>
+
+
