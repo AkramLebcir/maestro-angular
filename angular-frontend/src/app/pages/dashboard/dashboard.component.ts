@@ -71,7 +71,7 @@ export class DashboardComponent implements OnInit {
   // بيانات خام
   classes: Class[] = [];
   /** 0 = جميع الأقسام (Global)، غير ذلك = معرف القسم */
-  selectedClassId = 0;
+  selectedClassId: number = 0;
   selectedClass: Class | null = null;
   students: Student[] = [];
   grades: Grade[] = [];
@@ -229,7 +229,22 @@ export class DashboardComponent implements OnInit {
           this.loadGrades(classId);
         },
         error: err => {
-          console.error('Error loading students for dashboard:', err);
+          console.error('Error loading students for dashboard, falling back to /students:', err);
+          // نفس منطق Gradebook: في حال عدم وجود المسار نستخدم /students ثم نفلتر حسب classId
+          this.api.get<Student[]>('/students').subscribe({
+            next: allStudents => {
+              this.students = (allStudents || []).filter(s => s.classId === classId);
+              this.totalStudents = this.students.length;
+              this.loadAttendance(classId);
+              this.loadBehavior(classId);
+              this.loadGrades(classId);
+            },
+            error: err2 => {
+              console.error('Error loading students fallback for dashboard:', err2);
+              this.students = [];
+              this.totalStudents = 0;
+            }
+          });
         }
       });
     }

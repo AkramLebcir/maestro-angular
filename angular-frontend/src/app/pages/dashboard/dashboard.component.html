@@ -15,7 +15,7 @@
           <select
             class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
             [(ngModel)]="selectedClassId"
-            (change)="onClassChange()">
+            (ngModelChange)="onClassChange()">
             <option [ngValue]="0">جميع الأقسام</option>
             <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
           </select>
