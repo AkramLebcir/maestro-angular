@@ -1,30 +1,26 @@
-<div class="flex-1 p-6">
-  <!-- Top header with title, date and class selector -->
-  <div class="bg-purple-600 rounded-lg px-6 py-4 mb-6 flex flex-col md:flex-row md:items-center md:justify-between text-white">
-    <div class="mb-3 md:mb-0">
+<div class="flex-1 pt-2 pb-4 px-3 md:px-4">
+  <!-- Top header with title and class selector (بدون تاريخ اليوم) -->
+  <div class="bg-blue-600 rounded-lg px-6 py-3 mb-2 flex flex-col md:flex-row md:items-center md:justify-between text-white">
+    <div class="mb-2 md:mb-0">
       <h1 class="text-2xl md:text-3xl font-bold">لوحة التحكم</h1>
-      <p class="text-sm text-purple-100 mt-1">
-        نظرة عامة سريعة على أداء الأقسام والتلاميذ اليوم
+      <p class="text-sm text-blue-100 mt-1">
+        نظرة عامة سريعة على أداء الأقسام والتلاميذ
       </p>
     </div>
-    <div class="flex flex-col md:items-end text-sm">
-      <span class="text-xs opacity-80">تاريخ اليوم</span>
-      <span class="font-semibold text-lg">{{ todayLabel }}</span>
-      <div class="mt-2">
-        <label class="text-xs mr-2">اختيار القسم:</label>
-        <select
-          class="mt-1 px-3 py-1 rounded-md text-purple-900 text-sm focus:outline-none"
-          [(ngModel)]="selectedClassId"
-          (ngModelChange)="onClassChange()">
-          <option [ngValue]="0">جميع الأقسام</option>
-          <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
-        </select>
-      </div>
+    <div class="flex items-center gap-2 text-sm">
+      <label class="text-xs">اختيار القسم:</label>
+      <select
+        class="px-3 py-1 rounded-md text-blue-900 text-sm focus:outline-none"
+        [(ngModel)]="selectedClassId"
+        (ngModelChange)="onClassChange()">
+        <option [ngValue]="0">جميع الأقسام</option>
+        <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
+      </select>
     </div>
   </div>
 
   <!-- Quick stats cards row -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2 mb-3">
     <!-- المعدل العام -->
     <div class="flex items-center bg-white rounded-xl shadow-md px-4 py-4">
       <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mr-3">
@@ -83,10 +79,10 @@
   </div>
 
   <!-- First row: Attendance + Behavior + (Grade Counts + Lab Status) + Grade Distribution -->
-  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-1.5 mb-3">
     <!-- Attendance donut -->
-    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">الحضور</h2>
+    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">الحضور</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -95,7 +91,7 @@
           [type]="'doughnut'">
         </canvas>
       </div>
-      <div class="mt-4 grid grid-cols-2 gap-2 text-xs text-gray-600">
+      <div class="mt-2 grid grid-cols-3 gap-x-3 gap-y-1 text-[11px] text-gray-600">
         <div>حاضر: <span class="font-semibold text-green-600">{{ attendanceSummary.present }}</span></div>
         <div>غائب: <span class="font-semibold text-red-600">{{ attendanceSummary.absent }}</span></div>
         <div>مرخَّص: <span class="font-semibold text-emerald-600">{{ attendanceSummary.excused }}</span></div>
@@ -105,8 +101,8 @@
     </div>
 
     <!-- Behavior -->
-    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">السلوك</h2>
+    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">السلوك</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -128,10 +124,10 @@
     </div>
 
     <!-- Grade counts + Lab status stacked vertically in same column -->
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2.5">
       <!-- Grade counts -->
-      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">عدد الدرجات</h2>
+      <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">عدد الدرجات</h2>
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div class="flex items-center justify-between border-b border-gray-100 pb-1">
             <span class="font-semibold text-gray-700">A</span>
@@ -164,8 +160,8 @@
       </div>
 
       <!-- Lab status card (حالة المخبر) -->
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">حالة المخبر</h2>
+      <div class="bg-white rounded-lg shadow-md p-2.5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">حالة المخبر</h2>
 
         <!-- أجهزة تعمل -->
         <div class="flex items-center mb-3">
@@ -218,8 +214,8 @@
     </div>
 
     <!-- Grade distribution -->
-    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">توزيع الدرجات</h2>
+    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">توزيع الدرجات</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -232,7 +228,7 @@
   </div>
 
   <!-- Second row: Class summary, seating chart preview, gradebook summary -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
     <!-- Class summary -->
     <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
       <h2 class="text-lg font-semibold text-gray-800 mb-4">ملخص القسم</h2>
