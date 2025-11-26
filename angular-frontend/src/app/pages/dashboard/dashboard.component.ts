@@ -85,11 +85,11 @@ export class DashboardComponent implements OnInit {
       {
         data: [0, 0, 0, 0, 0],
         backgroundColor: [
-          '#2563eb', // blue
-          '#ef4444', // red
-          '#22c55e', // green
-          '#f97316', // orange
-          '#eab308'  // yellow
+          '#22c55e', // green - حاضر
+          '#ef4444', // red - غائب
+          '#2563eb', // blue - مرخَّص
+          '#f97316', // orange - متأخر
+          '#eab308'  // yellow - مريض
         ],
         borderWidth: 1
       }

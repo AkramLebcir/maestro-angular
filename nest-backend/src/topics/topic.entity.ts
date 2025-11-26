@@ -15,6 +15,12 @@ export class Topic {
   @Column({ type: 'text', nullable: true })
   description?: string;
 
+  @Column({ nullable: true })
+  level?: string;
+
+  @Column({ nullable: true })
+  track?: string;
+
   @OneToMany(() => TopicElement, (element) => element.topic, { cascade: true })
   elements: TopicElement[];
 

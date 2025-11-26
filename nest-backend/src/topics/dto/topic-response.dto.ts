@@ -5,6 +5,8 @@ export class TopicResponseDto {
   title: string;
   subtitle?: string;
   description?: string;
+  level?: string;
+  track?: string;
   elements?: TopicElementResponseDto[];
   createdAt: Date;
   updatedAt: Date;

@@ -217,22 +217,30 @@
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">اسم الوحدة / النشاط</label>
-          <input
-            type="text"
-            [(ngModel)]="newDistribution.unitTitle"
+          <label class="text-xs text-gray-500 mb-1">عنوان الموضوع (المجال / الوحدة)</label>
+          <select
+            [(ngModel)]="selectedTopicId"
+            (ngModelChange)="onTopicTitleChange()"
             class="border rounded px-2 py-1"
-            placeholder="الوحدة / النشاط"
-          />
+          >
+            <option [ngValue]="null">اختر عنوان الموضوع</option>
+            <option *ngFor="let t of topics" [ngValue]="t.id">
+              {{ t.title }}
+            </option>
+          </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">المجال / الوحدة</label>
-          <input
-            type="text"
-            [(ngModel)]="newDistribution.domain"
+          <label class="text-xs text-gray-500 mb-1">اسم الوحدة / النشاط (العنوان الفرعي)</label>
+          <select
+            [(ngModel)]="selectedSubtitle"
+            (ngModelChange)="onSubtitleChange()"
             class="border rounded px-2 py-1"
-            placeholder="المجال / الوحدة"
-          />
+          >
+            <option [ngValue]="''">اختر العنوان الفرعي</option>
+            <option *ngFor="let sub of topicSubtitles" [ngValue]="sub">
+              {{ sub }}
+            </option>
+          </select>
         </div>
         <div class="flex flex-col">
           <label class="text-xs text-gray-500 mb-1">ملاحظات</label>
@@ -274,28 +282,101 @@
         <table class="min-w-full text-sm text-right">
           <thead class="bg-gray-50">
             <tr>
+              <th class="px-3 py-2">النوع</th>
               <th class="px-3 py-2">الفصل</th>
               <th class="px-3 py-2">الأسبوع</th>
               <th class="px-3 py-2">الوحدة / النشاط</th>
-              <th class="px-3 py-2">المجال</th>
-              <th class="px-3 py-2">تاريخ البداية (محسوب)</th>
-              <th class="px-3 py-2">تاريخ النهاية (محسوب)</th>
+              <th class="px-3 py-2">المجال / اسم العطلة</th>
+              <th class="px-3 py-2">تاريخ البداية</th>
+              <th class="px-3 py-2">تاريخ النهاية</th>
               <th class="px-3 py-2">ملاحظات</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let d of distributions" class="border-b last:border-0">
-              <td class="px-3 py-2">{{ d.term }}</td>
-              <td class="px-3 py-2">{{ d.weekNumber }}</td>
-              <td class="px-3 py-2 whitespace-pre-line">{{ d.unitTitle }}</td>
-              <td class="px-3 py-2">{{ d.domain }}</td>
-              <td class="px-3 py-2">{{ d.computedStartDate || '-' }}</td>
-              <td class="px-3 py-2">{{ d.computedEndDate || '-' }}</td>
-              <td class="px-3 py-2">{{ d.notes }}</td>
+            <tr *ngFor="let row of timelineRows" class="border-b last:border-0">
+              <!-- نوع السطر -->
+              <td class="px-3 py-2">
+                <span
+                  *ngIf="row.kind === 'distribution'; else holidayType"
+                  class="px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700"
+                >
+                  حصة
+                </span>
+                <ng-template #holidayType>
+                  <span class="px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-700">
+                    {{ row.holiday?.type === 'EXAM' ? 'امتحان' : 'عطلة' }}
+                  </span>
+                </ng-template>
+              </td>
+
+              <!-- الفصل -->
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else dash">
+                  {{ row.distribution?.term }}
+                </ng-container>
+                <ng-template #dash>-</ng-template>
+              </td>
+
+              <!-- الأسبوع -->
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else dash2">
+                  {{ row.distribution?.weekNumber }}
+                </ng-container>
+                <ng-template #dash2>-</ng-template>
+              </td>
+
+              <!-- الوحدة / النشاط -->
+              <td class="px-3 py-2 whitespace-pre-line">
+                <ng-container *ngIf="row.kind === 'distribution'; else holidayUnit">
+                  {{ row.distribution?.unitTitle }}
+                </ng-container>
+                <ng-template #holidayUnit>
+                  -
+                </ng-template>
+              </td>
+
+              <!-- المجال أو اسم العطلة -->
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else holidayName">
+                  {{ row.distribution?.domain }}
+                </ng-container>
+                <ng-template #holidayName>
+                  {{ row.holiday?.name }}
+                </ng-template>
+              </td>
+
+              <!-- تواريخ البداية والنهاية -->
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else holidayStart">
+                  {{ row.distribution?.computedStartDate || '-' }}
+                </ng-container>
+                <ng-template #holidayStart>
+                  {{ row.holiday?.startDate }}
+                </ng-template>
+              </td>
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else holidayEnd">
+                  {{ row.distribution?.computedEndDate || '-' }}
+                </ng-container>
+                <ng-template #holidayEnd>
+                  {{ row.holiday?.endDate }}
+                </ng-template>
+              </td>
+
+              <!-- ملاحظات -->
+              <td class="px-3 py-2">
+                <ng-container *ngIf="row.kind === 'distribution'; else holidayNotes">
+                  {{ row.distribution?.notes }}
+                </ng-container>
+                <ng-template #holidayNotes>
+                  {{ row.holiday?.notes }}
+                </ng-template>
+              </td>
             </tr>
-            <tr *ngIf="distributions.length === 0">
-              <td colspan="7" class="px-3 py-4 text-center text-gray-400">
-                لم تتم إضافة أي توزيع بعد لهذه السنة والمستوى.
+
+            <tr *ngIf="timelineRows.length === 0">
+              <td colspan="8" class="px-3 py-4 text-center text-gray-400">
+                لم تتم إضافة أي توزيع أو عطلة بعد لهذه السنة والمستوى.
               </td>
             </tr>
           </tbody>

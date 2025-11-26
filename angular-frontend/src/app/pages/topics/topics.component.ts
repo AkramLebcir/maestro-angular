@@ -18,12 +18,16 @@ export interface Topic {
   elements: TopicElement[];
   createdAt: Date;
   updatedAt: Date;
+  level?: string;
+  track?: string;
 }
 
 export interface CreateTopicDto {
   title: string;
   subtitle?: string;
   description?: string;
+  level?: string;
+  track?: string;
 }
 
 export interface CreateTopicElementDto {
@@ -48,13 +52,33 @@ export class TopicsComponent implements OnInit {
   
   // Search
   searchTerm: string = '';
+  selectedLevelFilter: string = '';
+  selectedTrackFilter: string = '';
   
   // Form data
   topicFormData: CreateTopicDto = {
     title: '',
     subtitle: '',
-    description: ''
+    description: '',
+    level: '',
+    track: ''
   };
+
+  levels: string[] = [
+    'السنة أولى متوسط',
+    'السنة ثانية متوسط',
+    'السنة ثالثة متوسط',
+    'السنة رابعة متوسط',
+    'السنة أولى ثانوي',
+    'السنة ثانية ثانوي',
+    'السنة ثالثة ثانوي',
+  ];
+
+  tracks: string[] = [
+    'جذع مشترك علوم وتكنولوجيا',
+    'جذع مشترك آداب',
+    'متوسط',
+  ];
 
   // Topic element form data
   topicElementFormData: CreateTopicElementDto = {
@@ -113,7 +137,9 @@ export class TopicsComponent implements OnInit {
     this.topicFormData = {
       title: '',
       subtitle: '',
-      description: ''
+      description: '',
+      level: '',
+      track: ''
     };
     this.showModal = true;
   }
@@ -126,7 +152,9 @@ export class TopicsComponent implements OnInit {
     this.topicFormData = {
       title: topic.title,
       subtitle: topic.subtitle || '',
-      description: topic.description || ''
+      description: topic.description || '',
+      level: topic.level || '',
+      track: topic.track || ''
     };
     this.showModal = true;
   }
@@ -145,7 +173,9 @@ export class TopicsComponent implements OnInit {
     const submitData: any = {
       title: this.topicFormData.title,
       subtitle: this.topicFormData.subtitle || undefined,
-      description: this.topicFormData.description || undefined
+      description: this.topicFormData.description || undefined,
+      level: this.topicFormData.level || undefined,
+      track: this.topicFormData.track || undefined
     };
 
     if (this.editingTopic) {
@@ -290,10 +320,28 @@ export class TopicsComponent implements OnInit {
       );
     }
 
+    // Level filter
+    if (this.selectedLevelFilter) {
+      filtered = filtered.filter(topic => topic.level === this.selectedLevelFilter);
+    }
+
+    // Track filter
+    if (this.selectedTrackFilter) {
+      filtered = filtered.filter(topic => topic.track === this.selectedTrackFilter);
+    }
+
     this.filteredTopics = filtered;
   }
 
   onSearchChange(): void {
+    this.applyFilters();
+  }
+
+   onLevelFilterChange(): void {
+    this.applyFilters();
+  }
+
+  onTrackFilterChange(): void {
     this.applyFilters();
   }
 

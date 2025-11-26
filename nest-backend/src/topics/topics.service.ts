@@ -145,6 +145,8 @@ export class TopicsService {
       title: topic.title,
       subtitle: topic.subtitle,
       description: topic.description,
+      level: topic.level,
+      track: topic.track,
       elements: topic.elements?.map((element) => this.mapElementToResponseDto(element)),
       createdAt: topic.createdAt,
       updatedAt: topic.updatedAt,

@@ -2,6 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import { ApiService } from '../../services/api.service';
 
+interface Topic {
+  id: number;
+  title: string;
+  subtitle?: string;
+}
+
 interface HolidayPeriod {
   id?: number;
   year: string;
@@ -25,6 +31,13 @@ interface AnnualDistribution {
   notes?: string;
   computedStartDate?: string;
   computedEndDate?: string;
+}
+
+interface TimelineRow {
+  kind: 'distribution' | 'holiday';
+  distribution?: AnnualDistribution;
+  holiday?: HolidayPeriod;
+  sortDate: string;
 }
 
 @Component({
@@ -59,6 +72,13 @@ export class AnnualDistributionComponent implements OnInit {
 
   holidays: HolidayPeriod[] = [];
   distributions: AnnualDistribution[] = [];
+  timelineRows: TimelineRow[] = [];
+
+  // Topics for linking domain/unit to topics list
+  topics: Topic[] = [];
+  selectedTopicId: number | null = null;
+  topicSubtitles: string[] = [];
+  selectedSubtitle = '';
 
   newHoliday: HolidayPeriod = {
     year: this.selectedYear,
@@ -90,6 +110,7 @@ export class AnnualDistributionComponent implements OnInit {
     this.initYears();
     this.loadHolidays();
     this.loadDistributions(true);
+    this.loadTopics();
   }
 
   private initYears(): void {
@@ -128,6 +149,7 @@ export class AnnualDistributionComponent implements OnInit {
       .subscribe({
         next: (data) => {
           this.holidays = data;
+          this.buildTimeline();
           this.loading = false;
         },
         error: () => {
@@ -175,6 +197,18 @@ export class AnnualDistributionComponent implements OnInit {
     });
   }
 
+  loadTopics(): void {
+    this.api.get<Topic[]>('/topics').subscribe({
+      next: (data) => {
+        this.topics = data || [];
+      },
+      error: () => {
+        // إذا فشل تحميل المواضيع، نترك الحقول تعمل كنصوص عادية
+        this.topics = [];
+      },
+    });
+  }
+
   loadDistributions(withSchedule = false) {
     this.loading = true;
     const baseUrl = withSchedule
@@ -188,6 +222,9 @@ export class AnnualDistributionComponent implements OnInit {
     this.api.get<AnnualDistribution[]>(`${baseUrl}?${params.toString()}`).subscribe({
       next: (data) => {
         this.distributions = data;
+        this.buildTimeline();
+        // تحديث رقم الأسبوع التالي بناءً على آخر أسبوع مسجل
+        this.newDistribution.weekNumber = this.getNextWeekNumber();
         this.loading = false;
       },
       error: () => {
@@ -197,27 +234,98 @@ export class AnnualDistributionComponent implements OnInit {
     });
   }
 
+  /**
+   * يحسب رقم الأسبوع التالي انطلاقاً من أول حصة في هذا التوزيع
+   * (أكبر رقم أسبوع موجود + 1، أو 1 إذا لم توجد حصص بعد).
+   */
+  private getNextWeekNumber(): number {
+    if (!this.distributions || this.distributions.length === 0) {
+      return 1;
+    }
+    const maxWeek = Math.max(...this.distributions.map((d) => d.weekNumber || 0));
+    return maxWeek + 1;
+  }
+
+  private buildTimeline() {
+    const rows: TimelineRow[] = [];
+
+    // Add distributions with effective start date (computed if available, otherwise base date)
+    for (const d of this.distributions) {
+      const sortDate = d.computedStartDate || d.yearStartDate;
+      if (sortDate) {
+        rows.push({
+          kind: 'distribution',
+          distribution: d,
+          sortDate,
+        });
+      }
+    }
+
+    // Add holidays and exams
+    for (const h of this.holidays) {
+      if (h.startDate) {
+        rows.push({
+          kind: 'holiday',
+          holiday: h,
+          sortDate: h.startDate,
+        });
+      }
+    }
+
+    rows.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
+    this.timelineRows = rows;
+  }
+
+  onTopicTitleChange(): void {
+    const topic = this.topics.find((t) => t.id === this.selectedTopicId!);
+    if (topic) {
+      // ربط المجال بعنوان الموضوع
+      this.newDistribution.domain = topic.title;
+
+      // بناء قائمة العناوين الفرعية بناءً على الموضوع المختار (إن وُجدت)
+      this.topicSubtitles = topic.subtitle ? [topic.subtitle] : [];
+      this.selectedSubtitle = this.topicSubtitles[0] || '';
+      this.newDistribution.unitTitle = this.selectedSubtitle;
+    } else {
+      this.newDistribution.domain = '';
+      this.topicSubtitles = [];
+      this.selectedSubtitle = '';
+      this.newDistribution.unitTitle = '';
+    }
+  }
+
+  onSubtitleChange(): void {
+    // ربط اسم الوحدة / النشاط بالعنوان الفرعي المختار
+    this.newDistribution.unitTitle = this.selectedSubtitle || '';
+  }
+
   addDistribution() {
     if (!this.newDistribution.unitTitle || !this.newDistribution.domain || !this.newDistribution.yearStartDate) {
       this.errorMessage = 'الرجاء إدخال عنوان الوحدة، المجال، وتاريخ بداية السنة';
       return;
     }
     this.errorMessage = '';
+
+    // حساب رقم الأسبوع لهذه الحصة اعتماداً على عدد الأسابيع السابقة
+    const nextWeekNumber = this.getNextWeekNumber();
+
     const payload: AnnualDistribution = {
       ...this.newDistribution,
       year: this.selectedYear,
       level: this.selectedLevel,
       track: this.selectedTrack,
+      weekNumber: nextWeekNumber,
     };
     this.api.post<AnnualDistribution>('/annual-planning/distributions', payload).subscribe({
       next: () => {
         this.loadDistributions(true);
+        // تجهيز النموذج للحصة القادمة مع رقم أسبوع تلقائي تالي
         this.newDistribution = {
           year: this.selectedYear,
           level: this.selectedLevel,
           track: this.selectedTrack,
           term: this.newDistribution.term,
-          weekNumber: this.newDistribution.weekNumber + 1,
+          weekNumber: nextWeekNumber + 1,
           yearStartDate: this.newDistribution.yearStartDate,
           unitTitle: '',
           domain: this.newDistribution.domain,
