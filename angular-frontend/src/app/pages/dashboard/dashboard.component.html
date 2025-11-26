@@ -1,42 +1,88 @@
 <div class="flex-1 p-6">
-  <!-- Top header summary -->
-  <div class="bg-white rounded-lg shadow-md p-4 mb-6">
-    <div class="flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800">لوحة التحكم</h1>
-        <p class="text-gray-500 text-sm mt-1">
-          ملخص سريع للقسم: الحضور، السلوك، الدرجات وملخّص السجلات
-        </p>
-      </div>
-      <div class="flex flex-wrap items-center gap-6">
-        <!-- Class selector -->
-        <div>
-          <label class="block text-xs text-gray-500 mb-1">اختيار القسم</label>
-          <select
-            class="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            [(ngModel)]="selectedClassId"
-            (ngModelChange)="onClassChange()">
-            <option [ngValue]="0">جميع الأقسام</option>
-            <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
-          </select>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 mb-1">معدل الحضور</div>
-          <div class="text-2xl font-bold text-green-600">{{ averageAttendance | number:'1.0-1' }}%</div>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 mb-1">معدل الدرجات</div>
-          <div class="text-2xl font-bold text-emerald-600">{{ averageGrade | number:'1.0-1' }}%</div>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 mb-1">عدد التلاميذ</div>
-          <div class="text-2xl font-bold text-gray-800">{{ totalStudents }}</div>
-        </div>
+  <!-- Top header with title, date and class selector -->
+  <div class="bg-purple-600 rounded-lg px-6 py-4 mb-6 flex flex-col md:flex-row md:items-center md:justify-between text-white">
+    <div class="mb-3 md:mb-0">
+      <h1 class="text-2xl md:text-3xl font-bold">لوحة التحكم</h1>
+      <p class="text-sm text-purple-100 mt-1">
+        نظرة عامة سريعة على أداء الأقسام والتلاميذ اليوم
+      </p>
+    </div>
+    <div class="flex flex-col md:items-end text-sm">
+      <span class="text-xs opacity-80">تاريخ اليوم</span>
+      <span class="font-semibold text-lg">{{ todayLabel }}</span>
+      <div class="mt-2">
+        <label class="text-xs mr-2">اختيار القسم:</label>
+        <select
+          class="mt-1 px-3 py-1 rounded-md text-purple-900 text-sm focus:outline-none"
+          [(ngModel)]="selectedClassId"
+          (ngModelChange)="onClassChange()">
+          <option [ngValue]="0">جميع الأقسام</option>
+          <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
       </div>
     </div>
   </div>
 
-  <!-- First row: Attendance + Behavior + Grade Counts + Grade Distribution -->
+  <!-- Quick stats cards row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <!-- المعدل العام -->
+    <div class="flex items-center bg-white rounded-xl shadow-md px-4 py-4">
+      <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+        <svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 19h16M4 12l4-4 4 4 4-4 4 4" />
+        </svg>
+      </div>
+      <div class="flex-1 text-right">
+        <div class="text-xs text-gray-500">المعدل العام (من 20)</div>
+        <div class="text-2xl font-bold text-amber-600">{{ generalAverageOn20 | number:'1.1-1' }}</div>
+      </div>
+    </div>
+
+    <!-- أجهزة المخبر -->
+    <div class="flex items-center bg-white rounded-xl shadow-md px-4 py-4">
+      <div class="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+        <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 5h16v10H4zM8 19h8" />
+        </svg>
+      </div>
+      <div class="flex-1 text-right">
+        <div class="text-xs text-gray-500">أجهزة المخبر</div>
+        <div class="text-2xl font-bold text-purple-600">{{ labStatus.workingDevices.total }}</div>
+      </div>
+    </div>
+
+    <!-- إجمالي التلاميذ -->
+    <div class="flex items-center bg-white rounded-xl shadow-md px-4 py-4">
+      <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-3">
+        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 20h5v-2a4 4 0 00-5-3.87M9 20v-2a4 4 0 013-3.87M9 10a4 4 0 118 0 4 4 0 01-8 0z" />
+        </svg>
+      </div>
+      <div class="flex-1 text-right">
+        <div class="text-xs text-gray-500">إجمالي التلاميذ</div>
+        <div class="text-2xl font-bold text-green-600">{{ totalStudents }}</div>
+      </div>
+    </div>
+
+    <!-- إجمالي الأقسام -->
+    <div class="flex items-center bg-white rounded-xl shadow-md px-4 py-4">
+      <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h7" />
+        </svg>
+      </div>
+      <div class="flex-1 text-right">
+        <div class="text-xs text-gray-500">إجمالي الأقسام</div>
+        <div class="text-2xl font-bold text-blue-600">{{ totalClasses }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- First row: Attendance + Behavior + (Grade Counts + Lab Status) + Grade Distribution -->
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
     <!-- Attendance donut -->
     <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
@@ -81,37 +127,93 @@
       </div>
     </div>
 
-    <!-- Grade counts -->
-    <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">عدد الدرجات</h2>
-      <div class="grid grid-cols-2 gap-3 text-sm">
-        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-          <span class="font-semibold text-gray-700">A</span>
-          <span class="font-bold text-blue-600">{{ gradeCounts.A }}</span>
+    <!-- Grade counts + Lab status stacked vertically in same column -->
+    <div class="flex flex-col gap-4">
+      <!-- Grade counts -->
+      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">عدد الدرجات</h2>
+        <div class="grid grid-cols-2 gap-3 text-sm">
+          <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+            <span class="font-semibold text-gray-700">A</span>
+            <span class="font-bold text-blue-600">{{ gradeCounts.A }}</span>
+          </div>
+          <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+            <span class="font-semibold text-gray-700">B</span>
+            <span class="font-bold text-blue-600">{{ gradeCounts.B }}</span>
+          </div>
+          <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+            <span class="font-semibold text-gray-700">C</span>
+            <span class="font-bold text-blue-600">{{ gradeCounts.C }}</span>
+          </div>
+          <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+            <span class="font-semibold text-gray-700">D</span>
+            <span class="font-bold text-blue-600">{{ gradeCounts.D }}</span>
+          </div>
+          <div class="flex items-center justify-between border-b border-gray-100 pb-1">
+            <span class="font-semibold text-gray-700">F</span>
+            <span class="font-bold text-red-600">{{ gradeCounts.F }}</span>
+          </div>
         </div>
-        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-          <span class="font-semibold text-gray-700">B</span>
-          <span class="font-bold text-blue-600">{{ gradeCounts.B }}</span>
-        </div>
-        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-          <span class="font-semibold text-gray-700">C</span>
-          <span class="font-bold text-blue-600">{{ gradeCounts.C }}</span>
-        </div>
-        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-          <span class="font-semibold text-gray-700">D</span>
-          <span class="font-bold text-blue-600">{{ gradeCounts.D }}</span>
-        </div>
-        <div class="flex items-center justify-between border-b border-gray-100 pb-1">
-          <span class="font-semibold text-gray-700">F</span>
-          <span class="font-bold text-red-600">{{ gradeCounts.F }}</span>
+        <div class="mt-auto pt-4 text-xs text-gray-500">
+          المجموع: 
+          <span class="font-semibold">
+            {{ gradeCounts.A + gradeCounts.B + gradeCounts.C + gradeCounts.D + gradeCounts.F }}
+          </span>
+          تلميذ
         </div>
       </div>
-      <div class="mt-auto pt-4 text-xs text-gray-500">
-        المجموع: 
-        <span class="font-semibold">
-          {{ gradeCounts.A + gradeCounts.B + gradeCounts.C + gradeCounts.D + gradeCounts.F }}
-        </span>
-        تلميذ
+
+      <!-- Lab status card (حالة المخبر) -->
+      <div class="bg-white rounded-lg shadow-md p-4">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">حالة المخبر</h2>
+
+        <!-- أجهزة تعمل -->
+        <div class="flex items-center mb-3">
+          <div class="w-20 text-sm font-semibold text-gray-700 text-left ml-3">
+            {{ labStatus.workingDevices.current }}/{{ labStatus.workingDevices.total }}
+          </div>
+          <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              class="h-3 bg-emerald-500 rounded-full transition-all"
+              [style.width.%]="getLabPercentage('devices')">
+            </div>
+          </div>
+          <div class="w-28 text-right text-xs text-gray-700 mr-3">
+            أجهزة تعمل
+          </div>
+        </div>
+
+        <!-- حالة الأثاث -->
+        <div class="flex items-center mb-3">
+          <div class="w-20 text-sm font-semibold text-gray-700 text-left ml-3">
+            {{ labStatus.furnitureCondition | number:'1.0-0' }}%
+          </div>
+          <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              class="h-3 bg-blue-500 rounded-full transition-all"
+              [style.width.%]="getLabPercentage('furniture')">
+            </div>
+          </div>
+          <div class="w-28 text-right text-xs text-gray-700 mr-3">
+            أثاث المخبر
+          </div>
+        </div>
+
+        <!-- نظافة المخبر -->
+        <div class="flex items-center">
+          <div class="w-20 text-sm font-semibold text-gray-700 text-left ml-3">
+            {{ labStatus.labCleanliness | number:'1.0-0' }}%
+          </div>
+          <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              class="h-3 bg-amber-400 rounded-full transition-all"
+              [style.width.%]="getLabPercentage('cleanliness')">
+            </div>
+          </div>
+          <div class="w-28 text-right text-xs text-gray-700 mr-3">
+            نظافة المخبر
+          </div>
+        </div>
       </div>
     </div>
 

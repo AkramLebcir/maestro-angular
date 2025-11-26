@@ -36,6 +36,18 @@ interface BehaviorEvent {
   date: string;
 }
 
+interface LabStatus {
+  /** عدد الأجهزة التي تعمل من إجمالي الأجهزة في المخبر */
+  workingDevices: {
+    current: number;
+    total: number;
+  };
+  /** حالة أثاث المخبر كنسبة مئوية 0-100 */
+  furnitureCondition: number;
+  /** نظافة/حالة المخبر (طاقة، نظافة، ترتيب...) كنسبة مئوية 0-100 */
+  labCleanliness: number;
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -46,6 +58,7 @@ export class DashboardComponent implements OnInit {
   totalStudents = 0;
   averageAttendance = 0; // %
   averageGrade = 0; // %
+  todayLabel = ''; // مثال: الأربعاء 26 نوفمبر 2025
 
   attendanceSummary = {
     present: 0,
@@ -77,6 +90,16 @@ export class DashboardComponent implements OnInit {
   grades: Grade[] = [];
   attendanceRecords: AttendanceRecord[] = [];
   behaviorEvents: BehaviorEvent[] = [];
+
+  // حالة المخبر (قيم تجريبية يمكن ربطها لاحقاً من API خاص بالمخبر)
+  labStatus: LabStatus = {
+    workingDevices: {
+      current: 27,
+      total: 32
+    },
+    furnitureCondition: 80, // % حالة الأثاث
+    labCleanliness: 60      // % نظافة المخبر
+  };
 
   // Attendance doughnut chart
   attendanceChartData: ChartConfiguration<'doughnut'>['data'] = {
@@ -159,7 +182,26 @@ export class DashboardComponent implements OnInit {
   constructor(private api: ApiService) {}
 
   ngOnInit(): void {
+    // تاريخ اليوم بالعربية
+    const today = new Date();
+    this.todayLabel = today.toLocaleDateString('ar-EG', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+
     this.loadDashboardData();
+  }
+
+  /** المعدل العام على 20 بدل النسبة المئوية */
+  get generalAverageOn20(): number {
+    return (this.averageGrade / 100) * 20;
+  }
+
+  /** إجمالي الأقسام المحملة من الـ API */
+  get totalClasses(): number {
+    return this.classes.length;
   }
 
   /**
@@ -514,6 +556,23 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
+  }
+
+  /**
+   * إرجاع النسبة المئوية لحالة المخبر لاستخدامها في عرض شريط التقدّم
+   */
+  getLabPercentage(type: 'devices' | 'furniture' | 'cleanliness'): number {
+    switch (type) {
+      case 'devices':
+        if (!this.labStatus.workingDevices.total) return 0;
+        return (this.labStatus.workingDevices.current / this.labStatus.workingDevices.total) * 100;
+      case 'furniture':
+        return this.labStatus.furnitureCondition;
+      case 'cleanliness':
+        return this.labStatus.labCleanliness;
+      default:
+        return 0;
+    }
   }
 }
 
