@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 import { ApiService } from '../../services/api.service';
 
 interface Topic {
@@ -46,6 +47,7 @@ interface TimelineRow {
   styleUrls: ['./annual-distribution.component.css'],
 })
 export class AnnualDistributionComponent implements OnInit {
+  @ViewChild('distributionPrintArea') distributionPrintArea?: ElementRef<HTMLElement>;
   activeTab: 'holidays' | 'distribution' = 'holidays';
 
   selectedYear = '';
@@ -338,64 +340,59 @@ export class AnnualDistributionComponent implements OnInit {
     });
   }
 
-  exportDistributionToPdf(): void {
+  async exportDistributionToPdf(): Promise<void> {
     if (!this.distributions.length) {
       this.errorMessage = 'لا يوجد توزيع لطباعته.';
       return;
     }
 
-    const pdf = new jsPDF('p', 'mm', 'a4');
+    try {
+      // نحاول أولاً عبر ViewChild، وإن لم ينجح نستخدم getElementById،
+      // وإن فشل ذلك نلتقط كامل محتوى الصفحة كحل أخير.
+      const container =
+        this.distributionPrintArea?.nativeElement ||
+        (document.getElementById('distribution-print-area') as HTMLElement | null) ||
+        document.body;
 
-    const title = `التوزيع السنوي - ${this.selectedYear}`;
-    const subTitle = `${this.selectedLevel} - ${this.selectedTrack}`;
+      // استخدام html2canvas لالتقاط الجدول مع النص العربي كما هو
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+      });
 
-    pdf.setFont('helvetica', 'bold');
-    pdf.setFontSize(14);
-    pdf.text(title, 105, 15, { align: 'center' });
+      const imgData = canvas.toDataURL('image/png');
 
-    pdf.setFontSize(11);
-    pdf.text(subTitle, 105, 22, { align: 'center' });
+      // نختار A4 بالوضع الأفقي لأن الجدول عريض
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
 
-    const startY = 30;
-    const lineHeight = 7;
-    const colX = [10, 25, 40, 110, 150, 180]; // term, week, unit, domain, start, end
+      const imgWidth = pageWidth - margin * 2;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    pdf.setFontSize(9);
-    pdf.setFont('helvetica', 'bold');
-    pdf.text('فصل', colX[0], startY);
-    pdf.text('أسبوع', colX[1], startY);
-    pdf.text('الوحدة / النشاط', colX[2], startY);
-    pdf.text('المجال', colX[3], startY);
-    pdf.text('بداية', colX[4], startY);
-    pdf.text('نهاية', colX[5], startY);
+      let position = margin;
+      let heightLeft = imgHeight;
 
-    pdf.setFont('helvetica', 'normal');
+      // الصفحة الأولى
+      pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight - margin * 2;
 
-    let y = startY + lineHeight;
-    const pageHeight = pdf.internal.pageSize.getHeight();
-
-    for (const row of this.distributions) {
-      if (y > pageHeight - 15) {
+      // صفحات إضافية إذا كان المحتوى أطول من صفحة واحدة
+      while (heightLeft > 0) {
         pdf.addPage();
-        y = 20;
+        position = margin - (imgHeight - heightLeft);
+        pdf.addImage(imgData, 'PNG', margin, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight - margin * 2;
       }
 
-      pdf.text(String(row.term), colX[0], y);
-      pdf.text(String(row.weekNumber), colX[1], y);
-
-      const unitText = row.unitTitle || '';
-      const domainText = row.domain || '';
-
-      pdf.text(unitText.substring(0, 40), colX[2], y);
-      pdf.text(domainText.substring(0, 30), colX[3], y);
-
-      pdf.text(row.computedStartDate || '-', colX[4], y);
-      pdf.text(row.computedEndDate || '-', colX[5], y);
-
-      y += lineHeight;
+      pdf.save(`التوزيع_السنوي_${this.selectedYear}.pdf`);
+    } catch (error) {
+      console.error('Error exporting annual distribution PDF:', error);
+      this.errorMessage = 'حدث خطأ أثناء تصدير ملف PDF للتوزيع السنوي.';
     }
-
-    pdf.save(`التوزيع_السنوي_${this.selectedYear}.pdf`);
   }
 }
 

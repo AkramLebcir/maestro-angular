@@ -535,12 +535,23 @@ export class GradebookComponent implements OnInit {
         return;
       }
       
-      // Find existing grade to preserve notes and mark
-      const existingGrade = this.grades.find(g => 
+      // Find existing grade to preserve notes and mark (للفصل الحالي فقط)
+      let existingGrade = this.grades.find(g => 
         g.studentId === studentId && 
         g.assessmentId === assessmentId &&
-        g.classId === this.selectedClass!.id
+        g.classId === this.selectedClass!.id &&
+        g.term === this.selectedTerm
       );
+
+      // Backward compatibility: في حال كانت الدرجات القديمة بدون فصل
+      if (!existingGrade) {
+        existingGrade = this.grades.find(g => 
+          g.studentId === studentId && 
+          g.assessmentId === assessmentId &&
+          g.classId === this.selectedClass!.id &&
+          (g.term === undefined || g.term === null)
+        );
+      }
       
       this.formData.studentId = studentId;
       this.formData.assessmentId = assessmentId;
@@ -599,6 +610,66 @@ export class GradebookComponent implements OnInit {
       mark: this.formData.mark || undefined
     };
 
+    // --- تحديث متفائل (لحظي) محلي قبل استجابة الخادم ---
+    // نستخدم معرفًا مؤقتًا إذا كانت الدرجة جديدة حتى يتم استبدالها بالقيمة القادمة من الخادم
+    const tempId = existingGrade ? existingGrade.id : -Date.now();
+    const optimisticGrade: Grade = {
+      id: tempId,
+      studentId: submitData.studentId,
+      assessmentId: submitData.assessmentId,
+      classId: submitData.classId,
+      term: submitData.term,
+      score: submitData.score,
+      maxScore: submitData.maxScore,
+      date: submitData.date,
+      notes: submitData.notes || '',
+      mark: submitData.mark || '',
+      createdAt: existingGrade?.createdAt || new Date(),
+      updatedAt: new Date(),
+      student: existingGrade?.student,
+      assessment: existingGrade?.assessment,
+      class: existingGrade?.class
+    };
+
+    // تحديث مصفوفة الدرجات العامة
+    const gradeIndexLocal = this.grades.findIndex(g => 
+      g.studentId === optimisticGrade.studentId &&
+      g.assessmentId === optimisticGrade.assessmentId &&
+      g.classId === optimisticGrade.classId &&
+      g.term === optimisticGrade.term
+    );
+    if (gradeIndexLocal !== -1) {
+      this.grades = [
+        ...this.grades.slice(0, gradeIndexLocal),
+        optimisticGrade,
+        ...this.grades.slice(gradeIndexLocal + 1)
+      ];
+    } else {
+      this.grades = [...this.grades, optimisticGrade];
+    }
+
+    // تحديث درجات التلميذ
+    const optimisticStudent = this.students.find(s => s.id === optimisticGrade.studentId);
+    if (optimisticStudent) {
+      if (!optimisticStudent.grades) {
+        optimisticStudent.grades = [];
+      }
+      const studentGradeIndexLocal = optimisticStudent.grades.findIndex(g => 
+        g.assessmentId === optimisticGrade.assessmentId &&
+        g.classId === optimisticGrade.classId &&
+        g.term === optimisticGrade.term
+      );
+      if (studentGradeIndexLocal !== -1) {
+        optimisticStudent.grades[studentGradeIndexLocal] = optimisticGrade;
+      } else {
+        optimisticStudent.grades.push(optimisticGrade);
+      }
+    }
+
+    // إعادة الحساب مباشرة حتى تظهر قيمة التقييم المستمر، والمعدل، والرتبة فورًا
+    this.calculateAllGrades();
+    this.cdr.detectChanges();
+
     if (existingGrade) {
       const existingGradeId = existingGrade.id;
       this.apiService.patch<Grade>(`/grades/${existingGradeId}`, submitData).subscribe({
@@ -635,9 +706,8 @@ export class GradebookComponent implements OnInit {
               student.grades.push(gradeWithTerm);
             }
           }
-          // Recalculate all grades immediately
+          // تمت إعادة الحساب مسبقًا بشكل متفائل، لذا لا حاجة لإعادة إضافية هنا
           this.calculateAllGrades();
-          // Force change detection to update the view
           this.cdr.detectChanges();
           if (!studentId) this.closeGradeModal();
         },
@@ -655,7 +725,6 @@ export class GradebookComponent implements OnInit {
     } else {
       this.apiService.post<Grade>('/grades', submitData).subscribe({
         next: (newGrade) => {
-          // Add to local grades immediately for instant calculation
           // Ensure term is set correctly
           const gradeWithTerm = { 
             ...newGrade, 
@@ -663,19 +732,34 @@ export class GradebookComponent implements OnInit {
               ? newGrade.term 
               : this.selectedTerm 
           };
-          // Create new array to trigger change detection
-          this.grades = [...this.grades, gradeWithTerm];
+          // استبدال الدرجة المؤقتة (إن وُجدت) بالدرجة الحقيقية القادمة من الخادم
+          const tempIndex = this.grades.findIndex(g => g.id === tempId);
+          if (tempIndex !== -1) {
+            this.grades = [
+              ...this.grades.slice(0, tempIndex),
+              gradeWithTerm,
+              ...this.grades.slice(tempIndex + 1)
+            ];
+          } else {
+            this.grades = [...this.grades, gradeWithTerm];
+          }
+
           // Update student's grades array
           const student = this.students.find(s => s.id === this.formData.studentId);
           if (student) {
             if (!student.grades) {
               student.grades = [];
             }
-            student.grades.push(gradeWithTerm);
+            const tempStudentIndex = student.grades.findIndex(g => g.id === tempId);
+            if (tempStudentIndex !== -1) {
+              student.grades[tempStudentIndex] = gradeWithTerm;
+            } else {
+              student.grades.push(gradeWithTerm);
+            }
           }
-          // Recalculate all grades immediately
+
+          // الحساب المتفائل سبق تنفيذه؛ يتم هنا فقط ضمان التزامن مع بيانات الخادم
           this.calculateAllGrades();
-          // Force change detection to update the view
           this.cdr.detectChanges();
           if (!studentId) this.closeGradeModal();
         },
@@ -697,25 +781,25 @@ export class GradebookComponent implements OnInit {
     if (!this.selectedClass) {
       return undefined;
     }
-    
-    // First try to find grade with matching term
-    let grade = this.grades.find(g => 
-      g.studentId === studentId && 
+
+    // أولوية مطلقة: الدرجة الخاصة بالفصل الحالي فقط
+    let grade = this.grades.find(g =>
+      g.studentId === studentId &&
       g.assessmentId === assessmentId &&
       g.classId === this.selectedClass!.id &&
-      (g.term === this.selectedTerm || g.term === undefined || g.term === null)
+      g.term === this.selectedTerm
     );
-    
-    // If multiple grades exist, prefer the one with matching term
+
+    // توافق مع الدرجات القديمة بدون فصل: نستخدمها فقط إذا لم توجد درجة للفصل الحالي
     if (!grade) {
-      grade = this.grades.find(g => 
-        g.studentId === studentId && 
+      grade = this.grades.find(g =>
+        g.studentId === studentId &&
         g.assessmentId === assessmentId &&
         g.classId === this.selectedClass!.id &&
-        g.term === this.selectedTerm
+        (g.term === undefined || g.term === null)
       );
     }
-    
+
     return grade;
   }
 
@@ -1102,7 +1186,7 @@ export class GradebookComponent implements OnInit {
     const term1Avg = this.calculateTermAverage(student, 1);
     const term2Avg = this.calculateTermAverage(student, 2);
     const term3Avg = this.calculateTermAverage(student, 3);
-    
+
     // Annual average = average of 3 terms
     const terms = [term1Avg, term2Avg, term3Avg].filter(avg => avg > 0);
     if (terms.length === 0) return 0;
@@ -1114,27 +1198,29 @@ export class GradebookComponent implements OnInit {
   calculateClassAverage(): number {
     if (this.students.length === 0) return 0;
     
-    // Calculate average of annual averages, or term averages if annual is not available
-    const sum = this.students.reduce((acc, s) => {
-      const avg = s.averages?.annualAverage || s.averages?.term1Average || s.averages?.term2Average || s.averages?.term3Average || 0;
+    // معدل القسم يجب أن يعتمد على الفصل الدراسي المحدد فقط
+    const studentsWithTermAverage = this.students.filter(s => (s.averages?.termAverage || 0) > 0);
+    if (studentsWithTermAverage.length === 0) return 0;
+
+    const sum = studentsWithTermAverage.reduce((acc, s) => {
+      const avg = s.averages?.termAverage || 0;
       return acc + avg;
     }, 0);
-    
-    return sum / this.students.length;
+
+    return sum / studentsWithTermAverage.length;
   }
 
   calculateRankings(): void {
-    // Create a copy of students with averages for sorting
-    // Use annual average for ranking, or term average if annual is not available
+    // ترتيب التلاميذ حسب معدل الفصل المحدد فقط (termAverage)
     const studentsWithAverages = this.students
       .filter(s => {
-        const avg = s.averages?.annualAverage || s.averages?.term1Average || s.averages?.term2Average || s.averages?.term3Average || 0;
+        const avg = s.averages?.termAverage || 0;
         return avg > 0;
       })
       .map(s => ({ ...s })) // Create a copy to avoid mutating
       .sort((a, b) => {
-        const avgA = a.averages?.annualAverage || a.averages?.term1Average || a.averages?.term2Average || a.averages?.term3Average || 0;
-        const avgB = b.averages?.annualAverage || b.averages?.term1Average || b.averages?.term2Average || b.averages?.term3Average || 0;
+        const avgA = a.averages?.termAverage || 0;
+        const avgB = b.averages?.termAverage || 0;
         // Sort descending (highest average first)
         return avgB - avgA;
       });
@@ -1149,7 +1235,7 @@ export class GradebookComponent implements OnInit {
     
     // Students without averages get no ranking
     this.students.forEach(student => {
-      const avg = student.averages?.annualAverage || student.averages?.term1Average || student.averages?.term2Average || student.averages?.term3Average || 0;
+      const avg = student.averages?.termAverage || 0;
       if (avg === 0) {
         student.ranking = undefined;
       }
@@ -1454,24 +1540,18 @@ export class GradebookComponent implements OnInit {
   }
 
   getStudentsAbove10(): number {
-    // Count students with annual average >= 10, or any term average >= 10
+    // عدد التلاميذ بمعدل ≥ 10 في الفصل الدراسي المحدد فقط
     return this.students.filter(s => {
-      const annualAvg = s.averages?.annualAverage || 0;
-      const term1Avg = s.averages?.term1Average || 0;
-      const term2Avg = s.averages?.term2Average || 0;
-      const term3Avg = s.averages?.term3Average || 0;
-      return annualAvg >= 10 || term1Avg >= 10 || term2Avg >= 10 || term3Avg >= 10;
+      const termAvg = s.averages?.termAverage || 0;
+      return termAvg >= 10;
     }).length;
   }
 
   getStudentsBelow10(): number {
-    // Count students with all averages < 10
+    // عدد التلاميذ بمعدل < 10 في الفصل الدراسي المحدد فقط
     return this.students.filter(s => {
-      const annualAvg = s.averages?.annualAverage || 0;
-      const term1Avg = s.averages?.term1Average || 0;
-      const term2Avg = s.averages?.term2Average || 0;
-      const term3Avg = s.averages?.term3Average || 0;
-      return annualAvg < 10 && term1Avg < 10 && term2Avg < 10 && term3Avg < 10;
+      const termAvg = s.averages?.termAverage || 0;
+      return termAvg > 0 && termAvg < 10;
     }).length;
   }
 
