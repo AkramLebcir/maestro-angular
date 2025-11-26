@@ -16,6 +16,12 @@ export class SidebarComponent implements OnInit {
       active: false
     },
     { 
+      label: 'بطاقة فنية للأستاذ', 
+      route: '/teacher-card', 
+      icon: 'M5 4h14a2 2 0 012 2v12a2 2 0 01-2 2H5a2 2 0 01-2-2V6a2 2 0 012-2zm4 4a3 3 0 100 6 3 3 0 000-6zm7 1h-3m3 4h-5',
+      active: false
+    },
+    { 
       label: 'إدارة الأقسام', 
       route: '/classes', 
       icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z',

@@ -18,8 +18,9 @@ import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
 import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
 import { AnnualDistributionComponent } from './pages/annual-distribution/annual-distribution.component';
-import { ReportsComponent } from './pages/reports/reports.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ReportsComponent } from './pages/reports/reports.component';
+import { TeacherCardComponent } from './pages/teacher-card/teacher-card.component';
 import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
@@ -38,8 +39,9 @@ import { NgChartsModule } from 'ng2-charts';
     GradebookComponent,
     SeatingChartComponent,
     AnnualDistributionComponent,
+    DashboardComponent,
     ReportsComponent,
-    DashboardComponent
+    TeacherCardComponent
   ],
   imports: [
     BrowserModule,

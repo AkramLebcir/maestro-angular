@@ -1,0 +1,634 @@
+<div class="flex-1 pt-2 pb-4 px-3 md:px-4">
+  <div class="bg-white rounded-xl shadow-md p-5 md:p-6 mb-4 border border-blue-100">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">بطاقة فنية للأستاذ</h1>
+        <p class="text-sm text-gray-500">
+          قم بإدخال معلوماتك الشخصية و المهنية لحفظها و الرجوع إليها بسهولة.
+        </p>
+      </div>
+      <div class="mt-3 md:mt-0 flex items-center gap-3">
+        <button
+          (click)="saveCard()"
+          class="inline-flex items-center px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ البطاقة
+        </button>
+        <button
+          (click)="downloadPdf()"
+          class="inline-flex items-center px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition">
+          طباعة البطاقة PDF
+        </button>
+        <span
+          *ngIf="isSaved"
+          class="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+          تم حفظ البيانات بنجاح
+        </span>
+      </div>
+    </div>
+
+    <!-- نسخة الشاشة (حقول الإدخال) -->
+    <div class="space-y-6">
+      <!-- معلومات أعلى الصفحة -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">المديرية / الولاية :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="teacherCard.wilayaDirectorate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">المؤسسة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="teacherCard.schoolName" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">السنة الدراسية :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="teacherCard.academicYear" />
+          </div>
+        </div>
+        <div class="flex flex-col items-center justify-center gap-3">
+          <div class="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 bg-gray-50">
+            <ng-container *ngIf="teacherCard.photoDataUrl; else photoPlaceholder">
+              <img [src]="teacherCard.photoDataUrl" alt="صورة الأستاذ" class="w-full h-full object-cover" />
+            </ng-container>
+            <ng-template #photoPlaceholder>صورة الأستاذ</ng-template>
+          </div>
+          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="text-xs" />
+        </div>
+      </div>
+
+      <!-- معلومات الهوية والعائلة (عمودان) -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <!-- العمود الأول -->
+        <div class="space-y-3">
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">اللقب :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.lastName" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">الاسم :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.firstName" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">تاريخ الميلاد :</label>
+          <input
+            class="col-span-2 input-field"
+            type="date"
+            [(ngModel)]="teacherCard.birthDate" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">مكان الميلاد :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.birthPlace" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">الحالة العائلية :</label>
+          <select
+            class="col-span-2 input-field"
+            [(ngModel)]="teacherCard.familyStatus">
+            <option value="">اختر...</option>
+            <option value="أعزب">أعزب</option>
+            <option value="متزوج">متزوج</option>
+            <option value="مطلق">مطلق</option>
+            <option value="أرمل">أرمل</option>
+          </select>
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">عدد الأولاد :</label>
+          <input
+            class="col-span-2 input-field"
+            type="number"
+            min="0"
+            [(ngModel)]="teacherCard.childrenCount" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">المتمدرسون منهم :</label>
+          <input
+            class="col-span-2 input-field"
+            type="number"
+            min="0"
+            [(ngModel)]="teacherCard.studyingChildrenCount" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">في المؤسسة :</label>
+          <input
+            class="col-span-2 input-field"
+            type="number"
+            min="0"
+            [(ngModel)]="teacherCard.studyingChildrenInSchoolCount" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">النقطة :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.point" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">الصنف :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.className" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">الرتبة :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.rank" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">الدرجة :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.grade" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">وتيرة الترقية :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.promotionFrequency" />
+        </div>
+      </div>
+
+      <!-- العمود الثاني -->
+      <div class="space-y-3">
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">مؤسسة العمل :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.workInstitution" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">تاريخ أول تعيين :</label>
+          <input
+            class="col-span-2 input-field"
+            type="date"
+            [(ngModel)]="teacherCard.firstAppointmentDate" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">تاريخ الترسيم :</label>
+          <input
+            class="col-span-2 input-field"
+            type="date"
+            [(ngModel)]="teacherCard.tenureDate" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">تاريخ آخر زيارة تفتيشية :</label>
+          <input
+            class="col-span-2 input-field"
+            type="date"
+            [(ngModel)]="teacherCard.lastInspectionDate" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">المؤهل العلمي :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.qualification" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">سنة التخرج :</label>
+          <input
+            class="col-span-2 input-field"
+            type="number"
+            min="1950"
+            max="2100"
+            [(ngModel)]="teacherCard.graduationYear" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">مادة التدريس :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.teachingSubject" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">رقم الضمان الاجتماعي :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.socialSecurityNumber" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">رقم الحساب البريدي :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.postalAccountNumber" />
+        </div>
+
+        <div class="grid grid-cols-3 items-center gap-2">
+          <label class="col-span-1 text-sm text-gray-700">رقم التعاضدية :</label>
+          <input
+            class="col-span-2 input-field"
+            type="text"
+            [(ngModel)]="teacherCard.mutualNumber" />
+        </div>
+      </div>
+    </div>
+
+    <!-- سطر تواريخ السريان و الاتصال -->
+    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-3 items-center gap-2">
+        <label class="col-span-1 text-sm text-gray-700">تاريخ السريان من :</label>
+        <input
+          class="col-span-2 input-field"
+          type="date"
+          [(ngModel)]="teacherCard.effectiveFrom" />
+      </div>
+
+      <div class="grid grid-cols-3 items-center gap-2">
+        <label class="col-span-1 text-sm text-gray-700">إلى :</label>
+        <input
+          class="col-span-2 input-field"
+          type="date"
+          [(ngModel)]="teacherCard.effectiveTo" />
+      </div>
+    </div>
+
+    <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="grid grid-cols-3 items-center gap-2">
+        <label class="col-span-1 text-sm text-gray-700">العنوان :</label>
+        <input
+          class="col-span-2 input-field"
+          type="text"
+          [(ngModel)]="teacherCard.address" />
+      </div>
+
+      <div class="grid grid-cols-3 items-center gap-2">
+        <label class="col-span-1 text-sm text-gray-700">ولاية :</label>
+        <input
+          class="col-span-2 input-field"
+          type="text"
+          [(ngModel)]="teacherCard.wilaya" />
+      </div>
+
+      <div class="grid grid-cols-3 items-center gap-2">
+        <label class="col-span-1 text-sm text-gray-700">رقم الهاتف :</label>
+        <input
+          class="col-span-2 input-field"
+          type="tel"
+          [(ngModel)]="teacherCard.phoneNumber" />
+      </div>
+    </div>
+
+    <!-- معلومات الحالة المهنية والشهادات -->
+    <div class="mt-6 space-y-4">
+      <h2 class="text-base font-semibold text-gray-800">معلومات الحالة المهنية والشهادات والمؤهلات</h2>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الإطار :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.frame" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الصفة :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.status" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الاختصاص :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.specialty" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ التعيين بالمؤسسة الحالية :</label>
+            <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentSchoolAppointmentDate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ التنصيب بها :</label>
+            <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentSchoolInstallationDate" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الدرجة الحالية :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.currentGradeLevel" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ سريان مفعولها :</label>
+            <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentGradeEffectiveDate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">رقم بطاقة التعريف / رخصة السياقة :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.idOrLicenseNumber" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">رقم الهاتف الشخصي :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.personalPhone" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الزمرة الدموية :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.bloodType" />
+          </div>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ آخر تفتيش :</label>
+            <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.lastInspectionDate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">نقطة آخر تفتيش :</label>
+            <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.lastInspectionScore" />
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-3">
+        <h3 class="text-sm font-semibold text-gray-800">الشهادات المتحصّل عليها</h3>
+        <div class="space-y-2">
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input class="input-field" placeholder="الشهادة 1" [(ngModel)]="teacherCard.degree1" />
+            <input class="input-field" placeholder="المؤسسة" [(ngModel)]="teacherCard.degree1Institution" />
+            <input class="input-field" placeholder="السنة" [(ngModel)]="teacherCard.degree1Year" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input class="input-field" placeholder="الشهادة 2" [(ngModel)]="teacherCard.degree2" />
+            <input class="input-field" placeholder="المؤسسة" [(ngModel)]="teacherCard.degree2Institution" />
+            <input class="input-field" placeholder="السنة" [(ngModel)]="teacherCard.degree2Year" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input class="input-field" placeholder="الشهادة 3" [(ngModel)]="teacherCard.degree3" />
+            <input class="input-field" placeholder="المؤسسة" [(ngModel)]="teacherCard.degree3Institution" />
+            <input class="input-field" placeholder="السنة" [(ngModel)]="teacherCard.degree3Year" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- نسخة خاصة للطباعة: نصوص واضحة بدون حقول (مخفية خارج الشاشة لكن موجودة في الـ DOM) -->
+    <div style="position: absolute; left: -9999px; top: -9999px;">
+      <div
+        #printCard
+        class="print-card bg-white">
+      <!-- رأس الصفحة -->
+      <div class="print-header">
+        <div class="print-header-left">
+          <div>مديرية التربية لولاية {{ teacherCard.wilayaDirectorate }}</div>
+          <div>المؤسسة: {{ teacherCard.schoolName }}</div>
+        </div>
+        <div class="print-header-center">
+          <div>الجمهورية الجزائرية الديمقراطية الشعبية</div>
+          <div>وزارة التربية الوطنية</div>
+          <div class="print-title">بطاقة معلومات</div>
+        </div>
+        <div class="print-header-right">
+          <div>السنة الدراسية: {{ teacherCard.academicYear }}</div>
+        </div>
+      </div>
+
+      <div class="print-main">
+        <div class="print-grid">
+          <!-- العمود الأول: معلومات شخصية وعائلية -->
+          <div class="print-column">
+          <div class="print-row">
+            <span class="print-label">اللقب :</span>
+            <span class="print-value">{{ teacherCard.lastName }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الاسم :</span>
+            <span class="print-value">{{ teacherCard.firstName }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ الميلاد :</span>
+            <span class="print-value">{{ teacherCard.birthDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">مكان الميلاد :</span>
+            <span class="print-value">{{ teacherCard.birthPlace }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الحالة العائلية :</span>
+            <span class="print-value">{{ teacherCard.familyStatus }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">عدد الأولاد :</span>
+            <span class="print-value">{{ teacherCard.childrenCount }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">المتمدرسون منهم :</span>
+            <span class="print-value">{{ teacherCard.studyingChildrenCount }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">في المؤسسة :</span>
+            <span class="print-value">{{ teacherCard.studyingChildrenInSchoolCount }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">النقطة :</span>
+            <span class="print-value">{{ teacherCard.point }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الصنف :</span>
+            <span class="print-value">{{ teacherCard.className }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الرتبة :</span>
+            <span class="print-value">{{ teacherCard.rank }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الدرجة :</span>
+            <span class="print-value">{{ teacherCard.grade }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">وتيرة الترقية :</span>
+            <span class="print-value">{{ teacherCard.promotionFrequency }}</span>
+          </div>
+          <!-- صورة الأستاذ: أسفل عمود المعلومات الشخصية -->
+          <div class="print-photo-box">
+            <ng-container *ngIf="teacherCard.photoDataUrl; else printPhotoPlaceholder">
+              <img [src]="teacherCard.photoDataUrl" alt="صورة الأستاذ" class="w-full h-full object-cover" />
+            </ng-container>
+            <ng-template #printPhotoPlaceholder>
+              <div class="print-photo-placeholder">صورة</div>
+            </ng-template>
+          </div>
+        </div>
+
+          <!-- العمود الثاني: معلومات مهنية و اتصال -->
+          <div class="print-column">
+          <div class="print-row">
+            <span class="print-label">مؤسسة العمل :</span>
+            <span class="print-value">{{ teacherCard.workInstitution }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ أول تعيين :</span>
+            <span class="print-value">{{ teacherCard.firstAppointmentDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ الترسيم :</span>
+            <span class="print-value">{{ teacherCard.tenureDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ آخر زيارة تفتيشية :</span>
+            <span class="print-value">{{ teacherCard.lastInspectionDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">المؤهل العلمي :</span>
+            <span class="print-value">{{ teacherCard.qualification }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">سنة التخرج :</span>
+            <span class="print-value">{{ teacherCard.graduationYear }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">مادة التدريس :</span>
+            <span class="print-value">{{ teacherCard.teachingSubject }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم الضمان الاجتماعي :</span>
+            <span class="print-value">{{ teacherCard.socialSecurityNumber }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم الحساب البريدي :</span>
+            <span class="print-value">{{ teacherCard.postalAccountNumber }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم التعاضدية :</span>
+            <span class="print-value">{{ teacherCard.mutualNumber }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم بطاقة التعريف / رخصة السياقة :</span>
+            <span class="print-value">{{ teacherCard.idOrLicenseNumber }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم الهاتف الشخصي :</span>
+            <span class="print-value">{{ teacherCard.personalPhone }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الزمرة الدموية :</span>
+            <span class="print-value">{{ teacherCard.bloodType }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">العنوان :</span>
+            <span class="print-value">{{ teacherCard.address }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">ولاية :</span>
+            <span class="print-value">{{ teacherCard.wilaya }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">رقم الهاتف :</span>
+            <span class="print-value">{{ teacherCard.phoneNumber }}</span>
+          </div>
+        </div>
+      </div>
+      </div>
+
+      <!-- قسم معلومات الحالة المهنية والشهادات -->
+      <div class="print-section-title">معلومات الحالة المهنية والشهادات والمؤهلات</div>
+
+      <div class="print-grid">
+        <div class="print-column">
+          <div class="print-row">
+            <span class="print-label">الإطار :</span>
+            <span class="print-value">{{ teacherCard.frame }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الصفة :</span>
+            <span class="print-value">{{ teacherCard.status }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">الاختصاص :</span>
+            <span class="print-value">{{ teacherCard.specialty }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ أول تعيين في التعليم :</span>
+            <span class="print-value">{{ teacherCard.firstAppointmentDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ الترسيم :</span>
+            <span class="print-value">{{ teacherCard.tenureDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ التعيين بالمؤسسة الحالية :</span>
+            <span class="print-value">{{ teacherCard.currentSchoolAppointmentDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ التنصيب بها :</span>
+            <span class="print-value">{{ teacherCard.currentSchoolInstallationDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+        </div>
+
+        <div class="print-column">
+          <div class="print-row">
+            <span class="print-label">الدرجة الحالية :</span>
+            <span class="print-value">{{ teacherCard.currentGradeLevel }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ سريان مفعولها :</span>
+            <span class="print-value">{{ teacherCard.currentGradeEffectiveDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">تاريخ آخر تفتيش :</span>
+            <span class="print-value">{{ teacherCard.lastInspectionDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+          <div class="print-row">
+            <span class="print-label">نقطة آخر تفتيش :</span>
+            <span class="print-value">{{ teacherCard.lastInspectionScore }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="print-section-title">الشهادات المتحصّل عليها</div>
+
+      <div class="print-degrees">
+        <div class="print-row">
+          <span class="print-label">1- {{ teacherCard.degree1 }}</span>
+          <span class="print-value">المؤسسة: {{ teacherCard.degree1Institution }} – سنة: {{ teacherCard.degree1Year }}</span>
+        </div>
+        <div class="print-row">
+          <span class="print-label">2- {{ teacherCard.degree2 }}</span>
+          <span class="print-value">المؤسسة: {{ teacherCard.degree2Institution }} – سنة: {{ teacherCard.degree2Year }}</span>
+        </div>
+        <div class="print-row">
+          <span class="print-label">3- {{ teacherCard.degree3 }}</span>
+          <span class="print-value">المؤسسة: {{ teacherCard.degree3Institution }} – سنة: {{ teacherCard.degree3Year }}</span>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+

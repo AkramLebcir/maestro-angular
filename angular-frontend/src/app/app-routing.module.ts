@@ -11,13 +11,15 @@ import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
 import { SeatingChartComponent } from './pages/seating-chart/seating-chart.component';
 import { AnnualDistributionComponent } from './pages/annual-distribution/annual-distribution.component';
-import { ReportsComponent } from './pages/reports/reports.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ReportsComponent } from './pages/reports/reports.component';
+import { TeacherCardComponent } from './pages/teacher-card/teacher-card.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'classes', component: ClassesComponent },
   { path: 'dashboard', component: DashboardComponent },
+  { path: 'teacher-card', component: TeacherCardComponent },
+  { path: 'classes', component: ClassesComponent },
   { path: 'students', component: StudentsComponent },
   { path: 'labs', component: LabsComponent },
   { path: 'grades', component: ClassesComponent }, // Placeholder

@@ -1,0 +1,106 @@
+.input-field {
+  @apply w-full px-3 py-2 rounded-md border border-gray-200 bg-gray-50 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-400;
+}
+
+.print-card {
+  /* بطاقة مهيأة للطباعة بحيث تملأ تقريباً كامل صفحة A4 عند التصدير إلى PDF */
+  max-width: 800px; /* عرض تقريبي متوافق مع A4 نسبةً للطول */
+  margin: 0 auto; /* إزالة الهامش الخارجي حتى يقترب الإطار من حدود الورقة */
+  /* نقلل الحشوة الأفقية، خصوصاً من جهة العمود الأول، حتى تقترب الحقول من حافة الإطار */
+  padding: 20px 18px;
+  border-radius: 12px;
+  border: 2px solid #000000;
+  box-sizing: border-box;
+  direction: rtl; /* محاذاة المحتوى افتراضياً لليمين بما يناسب العربية */
+}
+
+.print-title {
+  font-size: 24px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 24px;
+  text-decoration: underline;
+}
+
+.print-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  font-size: 12px;
+  margin-bottom: 16px;
+}
+
+.print-header-center {
+  text-align: center;
+}
+
+.print-main {
+  /* حاوية عليا لجزء المعلومات الأساسية، نستخدمها فقط كحاوية عامة */
+  display: block;
+  margin-bottom: 16px;
+}
+
+.print-photo-box {
+  width: 85px;  /* تصغير مساحة الصورة أكثر */
+  height: 115px;
+  border: 1px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.print-photo-placeholder {
+  font-size: 10px;
+}
+
+.print-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 18px; /* تقليل المسافة بين العمودين أكثر */
+}
+
+.print-column {
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px; /* تقليل المسافة العمودية بين الصفوف داخل العمود أكثر */
+  font-size: 15px;
+}
+
+.print-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2px; /* تقليل المسافة الأفقية بين اسم الحقل والحقل أكثر */
+}
+
+.print-label {
+  min-width: 105px; /* تصغير عرض مساحة اسم الحقل أكثر */
+  text-align: right; /* محاذاة اسم الحقل لليمين */
+}
+
+.print-value {
+  min-width: 190px; /* تصغير عرض الحقل (الخط السفلي) أكثر */
+  border-bottom: 1px solid #000000;
+  text-align: right; /* محاذاة نص الحقل لليمين ليتماشى مع العربية */
+  padding: 6px 4px;
+  font-weight: 500;
+}
+
+.print-section-title {
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  text-align: right;
+  font-size: 14px;
+}
+
+.print-degrees {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+
+
+
