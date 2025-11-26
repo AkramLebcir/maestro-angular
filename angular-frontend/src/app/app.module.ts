@@ -21,6 +21,7 @@ import { AnnualDistributionComponent } from './pages/annual-distribution/annual-
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ReportsComponent } from './pages/reports/reports.component';
 import { TeacherCardComponent } from './pages/teacher-card/teacher-card.component';
+import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-notebook.component';
 import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
@@ -41,7 +42,8 @@ import { NgChartsModule } from 'ng2-charts';
     AnnualDistributionComponent,
     DashboardComponent,
     ReportsComponent,
-    TeacherCardComponent
+    TeacherCardComponent,
+    TeacherNotebookComponent
   ],
   imports: [
     BrowserModule,

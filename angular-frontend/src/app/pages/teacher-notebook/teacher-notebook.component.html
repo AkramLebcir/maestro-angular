@@ -1,0 +1,49 @@
+<div class="page-wrapper">
+  <div class="toolbar">
+    <div class="title-group">
+      <h1>مفكرة الأستاذ</h1>
+      <p>سبورة بيضاء لإضافة ملاحظات سريعة على شكل بطاقات لاصقة ملوّنة.</p>
+    </div>
+
+    <div class="actions">
+      <span class="actions-label">إضافة ملاحظة:</span>
+      <button class="btn color-yellow" (click)="addNote('yellow')">أصفر</button>
+      <button class="btn color-pink" (click)="addNote('pink')">وردي</button>
+      <button class="btn color-blue" (click)="addNote('blue')">أزرق</button>
+      <button class="btn color-green" (click)="addNote('green')">أخضر</button>
+      <button class="btn clear-btn" (click)="clearAll()" *ngIf="notes.length">
+        مسح الكل
+      </button>
+    </div>
+  </div>
+
+  <div class="board" id="board">
+    <div
+      *ngFor="let note of notes"
+      class="sticky"
+      [ngClass]="'color-' + note.color"
+      [style.left.px]="note.x"
+      [style.top.px]="note.y"
+      [style.zIndex]="note.z"
+      (mousedown)="startDrag($event, note)"
+    >
+      <div class="sticky-header">
+        <span class="dot"></span>
+        <button class="delete-btn" (click)="deleteNote(note.id); $event.stopPropagation()">
+          ×
+        </button>
+      </div>
+      <textarea
+        [(ngModel)]="note.text"
+        (input)="onTextChange()"
+        placeholder="اكتب مذكّرتك هنا..."
+      ></textarea>
+    </div>
+
+    <div class="empty-state" *ngIf="!notes.length">
+      <p>ابدأ بإضافة بطاقة ملاحظة من الأعلى لوضع أفكارك على السبورة.</p>
+    </div>
+  </div>
+</div>
+
+

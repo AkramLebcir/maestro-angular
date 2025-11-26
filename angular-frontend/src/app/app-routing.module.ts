@@ -14,6 +14,7 @@ import { AnnualDistributionComponent } from './pages/annual-distribution/annual-
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ReportsComponent } from './pages/reports/reports.component';
 import { TeacherCardComponent } from './pages/teacher-card/teacher-card.component';
+import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-notebook.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -31,6 +32,7 @@ const routes: Routes = [
   { path: 'gradebook', component: GradebookComponent },
   { path: 'seating-chart', component: SeatingChartComponent },
   { path: 'annual-distribution', component: AnnualDistributionComponent },
+  { path: 'teacher-notebook', component: TeacherNotebookComponent },
   { path: 'reports', component: ReportsComponent },
   { path: 'settings', component: ClassesComponent } // Placeholder
 ];
