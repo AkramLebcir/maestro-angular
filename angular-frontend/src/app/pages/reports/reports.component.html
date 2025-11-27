@@ -26,6 +26,40 @@
         </button>
       </div>
 
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير الندوات التربوية
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            عرض وتصدير سجل الندوات التربوية للأستاذ بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTrainingReport('seminars')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير الندوات التربوية
+        </button>
+      </div>
+
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير الزيارات التربوية
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            عرض وتصدير سجل الزيارات التربوية (تبادل خبرات) بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTrainingReport('pedagogical')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير الزيارات التربوية
+        </button>
+      </div>
+
       <!-- Lab equipment report -->
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
@@ -311,6 +345,58 @@
           class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
         >
           فتح بطاقة الأستاذ
+        </button>
+      </div>
+
+      <!-- Training & inspection reports -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير سجل التكوين
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            عرض وتصدير سجل التكوين الخاص بالأستاذ بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTrainingReport('training')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير سجل التكوين
+        </button>
+      </div>
+
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير زيارات المفتش
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            عرض وتصدير سجل زيارات المفتش الخاصة بالأستاذ بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTrainingReport('inspection')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير زيارات المفتش
+        </button>
+      </div>
+
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير دفتر الملاحظات اليومية
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            عرض وتصدير دفتر الملاحظات اليومية للأستاذ بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTrainingReport('daily')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير الملاحظات اليومية
         </button>
       </div>
 

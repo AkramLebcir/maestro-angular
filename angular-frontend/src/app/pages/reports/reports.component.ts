@@ -60,6 +60,12 @@ export class ReportsComponent {
   navigateToTeacherCard(): void {
     this.router.navigate(['/teacher-card']);
   }
+
+  navigateToTrainingReport(report: 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical'): void {
+    this.router.navigate(['/training-inspection'], {
+      queryParams: { report },
+    });
+  }
 }
 
 

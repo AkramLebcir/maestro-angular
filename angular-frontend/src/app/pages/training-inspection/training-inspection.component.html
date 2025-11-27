@@ -34,6 +34,20 @@
           : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
         دفتر الملاحظات اليومية
       </button>
+      <button
+        (click)="setTab('seminars')"
+        [class]="activeTab === 'seminars'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+        الندوات التربوية
+      </button>
+      <button
+        (click)="setTab('pedagogical')"
+        [class]="activeTab === 'pedagogical'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+        الزيارات التربوية
+      </button>
     </div>
 
     <!-- Tab: سجل التكوين -->
@@ -286,6 +300,250 @@
               </div>
               <div class="text-gray-700 whitespace-pre-line">
                 {{ n.content }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: الندوات التربوية -->
+    <div *ngIf="activeTab === 'seminars'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ البداية :</label>
+            <input
+              class="col-span-2 input-field"
+              type="date"
+              [(ngModel)]="newSeminar.startDate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ النهاية :</label>
+            <input
+              class="col-span-2 input-field"
+              type="date"
+              [(ngModel)]="newSeminar.endDate" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">عنوان الندوة / الموضوع :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newSeminar.title" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الجهة المنظمة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newSeminar.organizer" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">المدة الإجمالية :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              placeholder="مثال: 3 أيام، 12 ساعة..."
+              [(ngModel)]="newSeminar.duration" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">مكان الندوة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newSeminar.location" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">المؤطر :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newSeminar.trainer" />
+          </div>
+          <div>
+            <label class="text-sm text-gray-700">ملخص شخصي للمحتوى :</label>
+            <textarea
+              class="input-field min-h-[120px]"
+              [(ngModel)]="newSeminar.summary"></textarea>
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">رفع الملحقات :</label>
+            <div class="col-span-2 flex items-center gap-2">
+              <input
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                (change)="onSeminarAttachmentSelected($event)"
+                class="text-xs" />
+              <span class="text-xs text-gray-500 truncate" *ngIf="newSeminar.attachmentName">
+                {{ newSeminar.attachmentName }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addSeminar()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ الندوة
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800">سجل الندوات التربوية</h2>
+          <button
+            (click)="exportSeminarsPdf()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+            تصدير PDF
+          </button>
+        </div>
+        <div #seminarPrint>
+          <div class="text-center font-semibold text-gray-800 mb-3">
+            تقرير الندوات التربوية
+          </div>
+          <div *ngIf="seminarList.length === 0" class="text-xs text-gray-500">
+            لا توجد ندوات مسجلة بعد.
+          </div>
+          <div class="space-y-2">
+            <div
+              *ngFor="let s of seminarList; let i = index"
+              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800">
+                  {{ s.title || 'ندوة بدون عنوان' }}
+                  -
+                  {{ s.startDate || 'بدون تاريخ' }}
+                  <span *ngIf="s.endDate"> / {{ s.endDate }}</span>
+                </div>
+                <button
+                  (click)="deleteSeminar(i)"
+                  class="text-xs text-red-500 hover:underline">
+                  حذف
+                </button>
+              </div>
+              <div class="text-gray-700">
+                الجهة المنظمة: {{ s.organizer || 'غير محددة' }} – المدة: {{ s.duration || 'غير محددة' }}
+              </div>
+              <div class="text-gray-700">
+                المكان: {{ s.location || 'غير محدد' }} – المؤطر: {{ s.trainer || 'غير محدد' }}
+              </div>
+              <div class="text-gray-600 whitespace-pre-line" *ngIf="s.summary">
+                الملخص: {{ s.summary }}
+              </div>
+              <div class="text-gray-500 text-xs" *ngIf="s.attachmentName">
+                مرفقات: {{ s.attachmentName }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: الزيارات التربوية -->
+    <div *ngIf="activeTab === 'pedagogical'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ ووقت الزيارة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="datetime-local"
+              [(ngModel)]="newPedagogicalVisit.dateTime" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">نوع الزيارة :</label>
+            <select
+              class="col-span-2 input-field"
+              [(ngModel)]="newPedagogicalVisit.type">
+              <option value="">اختر نوع الزيارة...</option>
+              <option value="ترسيم">زيارة ترسيم</option>
+              <option value="تبادل خبرات">زيارة تبادل خبرات</option>
+              <option value="إدارية">زيارة إدارية</option>
+              <option value="متابعة بيداغوجية">زيارة متابعة بيداغوجية</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">اسم الزائر / صاحب الزيارة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newPedagogicalVisit.visitorName" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">القسم والمستوى :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              placeholder="مثال: 3 متوسط - أ"
+              [(ngModel)]="newPedagogicalVisit.classLevel" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="text-sm text-gray-700">ملخص الملاحظات والتوجيهات :</label>
+            <textarea
+              class="input-field min-h-[120px]"
+              [(ngModel)]="newPedagogicalVisit.notes"></textarea>
+          </div>
+          <div>
+            <label class="text-sm text-gray-700">الإجراءات المتخذة للمتابعة :</label>
+            <textarea
+              class="input-field min-h-[100px]"
+              [(ngModel)]="newPedagogicalVisit.followUp"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addPedagogicalVisit()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ الزيارة
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800">سجل الزيارات التربوية</h2>
+          <button
+            (click)="exportPedagogicalVisitsPdf()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+            تصدير PDF
+          </button>
+        </div>
+        <div #pedagogicalVisitPrint>
+          <div class="text-center font-semibold text-gray-800 mb-3">
+            تقرير الزيارات التربوية
+          </div>
+          <div *ngIf="pedagogicalVisits.length === 0" class="text-xs text-gray-500">
+            لا توجد زيارات مسجلة بعد.
+          </div>
+          <div class="space-y-2">
+            <div
+              *ngFor="let v of pedagogicalVisits; let i = index"
+              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800">
+                  {{ v.type || 'زيارة' }} -
+                  {{ v.dateTime ? (v.dateTime | date:'yyyy/MM/dd HH:mm') : 'بدون تاريخ' }}
+                </div>
+                <button
+                  (click)="deletePedagogicalVisit(i)"
+                  class="text-xs text-red-500 hover:underline">
+                  حذف
+                </button>
+              </div>
+              <div class="text-gray-700">
+                الزائر: {{ v.visitorName || 'غير محدد' }} – القسم / المستوى: {{ v.classLevel || 'غير محدد' }}
+              </div>
+              <div class="text-gray-700 whitespace-pre-line" *ngIf="v.notes">
+                الملاحظات والتوجيهات: {{ v.notes }}
+              </div>
+              <div class="text-gray-700 whitespace-pre-line" *ngIf="v.followUp">
+                الإجراءات المتخذة: {{ v.followUp }}
               </div>
             </div>
           </div>

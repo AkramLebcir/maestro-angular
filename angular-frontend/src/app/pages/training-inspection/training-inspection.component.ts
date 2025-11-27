@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -23,6 +24,27 @@ interface DailyNote {
   content: string;
 }
 
+interface SeminarRecord {
+  startDate: string;
+  endDate: string;
+  title: string;
+  organizer: string;
+  duration: string;
+  location: string;
+  trainer: string;
+  summary: string;
+  attachmentName?: string;
+}
+
+interface PedagogicalVisitRecord {
+  dateTime: string;
+  type: string;
+  visitorName: string;
+  classLevel: string;
+  notes: string;
+  followUp: string;
+}
+
 @Component({
   selector: 'app-training-inspection',
   templateUrl: './training-inspection.component.html',
@@ -32,7 +54,10 @@ export class TrainingInspectionComponent {
   @ViewChild('trainingPrint') trainingPrintRef!: ElementRef<HTMLDivElement>;
   @ViewChild('inspectionPrint') inspectionPrintRef!: ElementRef<HTMLDivElement>;
   @ViewChild('dailyPrint') dailyPrintRef!: ElementRef<HTMLDivElement>;
-  activeTab: 'training' | 'inspection' | 'daily' = 'training';
+  @ViewChild('seminarPrint') seminarPrintRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('pedagogicalVisitPrint') pedagogicalVisitPrintRef!: ElementRef<HTMLDivElement>;
+
+  activeTab: 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical' = 'training';
 
   newTraining: TrainingRecord = {
     date: '',
@@ -57,11 +82,60 @@ export class TrainingInspectionComponent {
   };
   dailyNotes: DailyNote[] = [];
 
-  constructor() {
+  newSeminar: SeminarRecord = {
+    startDate: '',
+    endDate: '',
+    title: '',
+    organizer: '',
+    duration: '',
+    location: '',
+    trainer: '',
+    summary: ''
+  };
+  seminarList: SeminarRecord[] = [];
+
+  newPedagogicalVisit: PedagogicalVisitRecord = {
+    dateTime: '',
+    type: '',
+    visitorName: '',
+    classLevel: '',
+    notes: '',
+    followUp: ''
+  };
+  pedagogicalVisits: PedagogicalVisitRecord[] = [];
+
+  constructor(private route: ActivatedRoute) {
     this.loadFromStorage();
+    this.route.queryParams.subscribe(params => {
+      const report = params['report'] as 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical' | undefined;
+      if (!report) return;
+
+      // تحديد التبويب النشط حسب نوع التقرير
+      this.activeTab =
+        report === 'training' ? 'training' :
+        report === 'inspection' ? 'inspection' :
+        report === 'daily' ? 'daily' :
+        report === 'seminars' ? 'seminars' :
+        'pedagogical';
+
+      // ننتظر دورة التغيير حتى يكون القالب محدثاً ثم نصدّر PDF إذا لزم
+      setTimeout(() => {
+        if (report === 'training') {
+          this.exportTrainingPdf();
+        } else if (report === 'inspection') {
+          this.exportInspectionPdf();
+        } else if (report === 'daily') {
+          this.exportDailyNotesPdf();
+        } else if (report === 'seminars') {
+          this.exportSeminarsPdf();
+        } else if (report === 'pedagogical') {
+          this.exportPedagogicalVisitsPdf();
+        }
+      }, 0);
+    });
   }
 
-  setTab(tab: 'training' | 'inspection' | 'daily'): void {
+  setTab(tab: 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical'): void {
     this.activeTab = tab;
   }
 
@@ -71,6 +145,15 @@ export class TrainingInspectionComponent {
     const file = input.files[0];
     this.newTraining.fileName = file.name;
     // يمكن لاحقاً رفع الملف إلى الـ backend، حالياً نكتفي بالاسم
+  }
+
+  onSeminarAttachmentSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    if (!input || !input.files || input.files.length === 0) {
+      this.newSeminar.attachmentName = undefined;
+      return;
+    }
+    this.newSeminar.attachmentName = input.files[0].name;
   }
 
   addTraining(): void {
@@ -118,6 +201,57 @@ export class TrainingInspectionComponent {
     this.saveToStorage();
   }
 
+  addSeminar(): void {
+    if (
+      !this.newSeminar.startDate &&
+      !this.newSeminar.endDate &&
+      !this.newSeminar.title &&
+      !this.newSeminar.organizer &&
+      !this.newSeminar.duration &&
+      !this.newSeminar.location &&
+      !this.newSeminar.trainer &&
+      !this.newSeminar.summary.trim() &&
+      !this.newSeminar.attachmentName
+    ) {
+      return;
+    }
+    this.seminarList.unshift({ ...this.newSeminar });
+    this.newSeminar = {
+      startDate: '',
+      endDate: '',
+      title: '',
+      organizer: '',
+      duration: '',
+      location: '',
+      trainer: '',
+      summary: ''
+    };
+    this.saveToStorage();
+  }
+
+  addPedagogicalVisit(): void {
+    if (
+      !this.newPedagogicalVisit.dateTime &&
+      !this.newPedagogicalVisit.type &&
+      !this.newPedagogicalVisit.visitorName &&
+      !this.newPedagogicalVisit.classLevel &&
+      !this.newPedagogicalVisit.notes.trim() &&
+      !this.newPedagogicalVisit.followUp.trim()
+    ) {
+      return;
+    }
+    this.pedagogicalVisits.unshift({ ...this.newPedagogicalVisit });
+    this.newPedagogicalVisit = {
+      dateTime: '',
+      type: '',
+      visitorName: '',
+      classLevel: '',
+      notes: '',
+      followUp: ''
+    };
+    this.saveToStorage();
+  }
+
   deleteTraining(index: number): void {
     this.trainingList.splice(index, 1);
     this.saveToStorage();
@@ -133,6 +267,16 @@ export class TrainingInspectionComponent {
     this.saveToStorage();
   }
 
+  deleteSeminar(index: number): void {
+    this.seminarList.splice(index, 1);
+    this.saveToStorage();
+  }
+
+  deletePedagogicalVisit(index: number): void {
+    this.pedagogicalVisits.splice(index, 1);
+    this.saveToStorage();
+  }
+
   private loadFromStorage(): void {
     const stored = localStorage.getItem('trainingInspection');
     if (!stored) return;
@@ -141,6 +285,8 @@ export class TrainingInspectionComponent {
       this.trainingList = data.trainingList || [];
       this.inspectionList = data.inspectionList || [];
       this.dailyNotes = data.dailyNotes || [];
+      this.seminarList = data.seminarList || [];
+      this.pedagogicalVisits = data.pedagogicalVisits || [];
     } catch {
       // تجاهل الأخطاء
     }
@@ -150,7 +296,9 @@ export class TrainingInspectionComponent {
     const payload = {
       trainingList: this.trainingList,
       inspectionList: this.inspectionList,
-      dailyNotes: this.dailyNotes
+      dailyNotes: this.dailyNotes,
+      seminarList: this.seminarList,
+      pedagogicalVisits: this.pedagogicalVisits
     };
     localStorage.setItem('trainingInspection', JSON.stringify(payload));
   }
@@ -170,6 +318,16 @@ export class TrainingInspectionComponent {
   async exportDailyNotesPdf(): Promise<void> {
     if (!this.dailyPrintRef) return;
     await this.exportSectionAsPdf(this.dailyPrintRef.nativeElement, 'daily-notes.pdf');
+  }
+
+  async exportSeminarsPdf(): Promise<void> {
+    if (!this.seminarPrintRef) return;
+    await this.exportSectionAsPdf(this.seminarPrintRef.nativeElement, 'seminars.pdf');
+  }
+
+  async exportPedagogicalVisitsPdf(): Promise<void> {
+    if (!this.pedagogicalVisitPrintRef) return;
+    await this.exportSectionAsPdf(this.pedagogicalVisitPrintRef.nativeElement, 'pedagogical-visits.pdf');
   }
 
   private async exportSectionAsPdf(element: HTMLElement, fileName: string): Promise<void> {
