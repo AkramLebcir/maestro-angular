@@ -23,6 +23,8 @@ import { ReportsComponent } from './pages/reports/reports.component';
 import { TeacherCardComponent } from './pages/teacher-card/teacher-card.component';
 import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-notebook.component';
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
+import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
+import { SafeUrlPipe } from './pipes/safe-url.pipe';
 import { NgChartsModule } from 'ng2-charts';
 
 @NgModule({
@@ -43,9 +45,11 @@ import { NgChartsModule } from 'ng2-charts';
     AnnualDistributionComponent,
     DashboardComponent,
     ReportsComponent,
-      TeacherCardComponent,
-      TeacherNotebookComponent,
-      ProgressTrackingComponent
+    TeacherCardComponent,
+    TeacherNotebookComponent,
+    ProgressTrackingComponent,
+    PedagogicalDocsComponent,
+    SafeUrlPipe,
   ],
   imports: [
     BrowserModule,

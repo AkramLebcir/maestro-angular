@@ -1,0 +1,210 @@
+<div class="p-6 space-y-6">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800">الوثائق البيداغوجية</h1>
+      <p class="text-sm text-gray-500 mt-1">
+        رفع وتنظيم المذكرات اليومية، التدرجات السنوية، المناهج، والكتب المدرسية حسب المستوى.
+      </p>
+    </div>
+  </div>
+
+  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">
+    {{ errorMessage }}
+  </div>
+
+  <!-- Upload form -->
+  <section class="bg-white rounded-lg shadow p-4 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700">إضافة وثيقة بيداغوجية</h2>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+      <div class="flex flex-col">
+        <label class="text-xs text-gray-500 mb-1">العنوان</label>
+        <input
+          type="text"
+          [(ngModel)]="newDoc.title"
+          class="border rounded px-2 py-1"
+          placeholder="مثال: مذكرة الأسبوع الأول"
+        />
+      </div>
+      <div class="flex flex-col">
+        <label class="text-xs text-gray-500 mb-1">المستوى</label>
+        <select
+          [(ngModel)]="newDoc.level"
+          class="border rounded px-2 py-1"
+        >
+          <option value="">اختر المستوى</option>
+          <option *ngFor="let lvl of levels" [ngValue]="lvl">
+            {{ lvl }}
+          </option>
+        </select>
+      </div>
+      <div class="flex flex-col">
+        <label class="text-xs text-gray-500 mb-1">نوع الوثيقة</label>
+        <select
+          [(ngModel)]="newDoc.type"
+          class="border rounded px-2 py-1"
+        >
+          <option value="">اختر النوع</option>
+          <option *ngFor="let t of types" [ngValue]="t.value">
+            {{ t.label }}
+          </option>
+        </select>
+      </div>
+      <div class="flex flex-col">
+        <label class="text-xs text-gray-500 mb-1">المادة (اختياري)</label>
+        <input
+          type="text"
+          [(ngModel)]="newDoc.subject"
+          class="border rounded px-2 py-1"
+          placeholder="مثال: رياضيات"
+        />
+      </div>
+    </div>
+
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm">
+      <div class="flex items-center gap-3">
+        <label class="text-xs text-gray-500">ملف الوثيقة</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          class="text-xs"
+          accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
+        />
+        <span *ngIf="newDoc.file" class="text-xs text-gray-600">
+          {{ newDoc.file.name }}
+        </span>
+      </div>
+      <button
+        (click)="submitUpload()"
+        [disabled]="uploadInProgress"
+        class="inline-flex items-center px-4 py-1.5 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700 disabled:opacity-60"
+      >
+        <span *ngIf="!uploadInProgress">حفظ الوثيقة</span>
+        <span *ngIf="uploadInProgress">جاري الرفع...</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Filters -->
+  <section class="flex flex-wrap gap-3 items-center text-sm">
+    <div class="flex flex-col">
+      <label class="text-xs text-gray-500 mb-1">تصفية حسب المستوى</label>
+      <select
+        [(ngModel)]="selectedLevelFilter"
+        (change)="loadDocs()"
+        class="border rounded px-2 py-1"
+      >
+        <option [ngValue]="'all'">جميع المستويات</option>
+        <option *ngFor="let lvl of levels" [ngValue]="lvl">
+          {{ lvl }}
+        </option>
+      </select>
+    </div>
+    <div class="flex flex-col">
+      <label class="text-xs text-gray-500 mb-1">تصفية حسب النوع</label>
+      <select
+        [(ngModel)]="selectedTypeFilter"
+        (change)="loadDocs()"
+        class="border rounded px-2 py-1"
+      >
+        <option [ngValue]="'all'">جميع الأنواع</option>
+        <option *ngFor="let t of types" [ngValue]="t.value">
+          {{ t.label }}
+        </option>
+      </select>
+    </div>
+    <div class="flex-1"></div>
+    <div class="text-xs text-gray-500">
+      عدد الوثائق: <span class="font-semibold text-gray-700">{{ docs.length }}</span>
+    </div>
+  </section>
+
+  <div *ngIf="loading" class="text-sm text-gray-500">
+    جاري تحميل الوثائق...
+  </div>
+
+  <!-- Documents grid as flipbook-like cards -->
+  <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div
+      *ngFor="let doc of docs"
+      class="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer flex flex-col"
+      (click)="openDoc(doc)"
+    >
+      <div class="relative h-40 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-t-xl overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center text-white">
+          <div class="text-center">
+            <div class="text-xs opacity-80 mb-1">
+              {{ doc.type === 'lesson_plan' ? 'مذكرة يومية'
+                   : doc.type === 'progression' ? 'تدرج سنوي'
+                   : doc.type === 'curriculum' ? 'منهاج رسمي'
+                   : 'كتاب مدرسي' }}
+            </div>
+            <div class="text-lg font-bold line-clamp-2 px-4">
+              {{ doc.title }}
+            </div>
+          </div>
+        </div>
+        <!-- Simple flip effect decoration -->
+        <div class="absolute inset-y-0 left-0 w-6 bg-white bg-opacity-10 backdrop-blur-sm transform -skew-x-6 origin-left"></div>
+      </div>
+
+      <div class="p-3 flex-1 flex flex-col text-sm">
+        <div class="flex items-center justify-between mb-1">
+          <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700">
+            المستوى: {{ doc.level }}
+          </span>
+          <span *ngIf="doc.subject" class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">
+            {{ doc.subject }}
+          </span>
+        </div>
+        <div class="text-xs text-gray-400 mb-2">
+          {{ doc.originalFileName }}
+        </div>
+        <div class="mt-auto flex justify-between items-center pt-2 border-t border-gray-100">
+          <span class="text-[11px] text-gray-400">
+            {{ doc.createdAt | date:'yyyy/MM/dd HH:mm' }}
+          </span>
+          <button
+            class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
+          >
+            فتح ككتاب
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!loading && docs.length === 0" class="col-span-full text-center text-gray-400 text-sm py-6">
+      لا توجد وثائق مطابقة لخيارات التصفية الحالية.
+    </div>
+  </section>
+
+  <!-- Preview modal -->
+  <div
+    *ngIf="selectedDoc"
+    class="fixed inset-0 bg-black bg-opacity-80 z-40"
+  >
+    <!-- زر الإغلاق فوق الإطار -->
+    <button
+      class="absolute top-3 left-4 z-50 text-white bg-black/40 px-3 py-1 rounded hover:bg-black/60 text-sm"
+      (click)="closePreview()"
+    >
+      إغلاق ✕
+    </button>
+
+    <!-- iframe بالحجم الكامل تمامًا (العرض والارتفاع = الشاشة) -->
+    <iframe
+      *ngIf="selectedDoc && isPdf(selectedDoc)"
+      [src]="getViewerUrl(selectedDoc) | safeUrl"
+      class="w-screen h-screen border-0 bg-white"
+    ></iframe>
+
+    <!-- عرض الصور / الملفات غير PDF بالحجم الكامل تقريبًا -->
+    <img
+      *ngIf="selectedDoc && !isPdf(selectedDoc)"
+      [src]="getViewerUrl(selectedDoc)"
+      class="w-screen h-screen object-contain bg-white"
+      alt="preview"
+    />
+  </div>
+</div>
+
+

@@ -211,6 +211,60 @@
           </div>
         </div>
       </div>
+
+      <!-- Program progress card (تقدّم إنجاز البرنامج) -->
+      <div class="bg-white rounded-lg shadow-md p-2.5">
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">تقدّم إنجاز البرنامج</h2>
+
+        <!-- حالة التحميل -->
+        <div *ngIf="!subjectProgressLoaded" class="text-xs text-gray-400 text-center py-4">
+          جاري تحميل بيانات التقدّم...
+        </div>
+
+        <!-- عند اكتمال التحميل -->
+        <div *ngIf="subjectProgressLoaded">
+          <!-- جميع الأقسام: عرض المعدّل العام -->
+          <ng-container *ngIf="selectedClassId === 0; else selectedClassProgressTpl">
+            <div class="flex items-center mb-2">
+              <div class="w-20 text-sm font-semibold text-gray-700 text-left ml-3">
+                {{ averageProgramProgressAllClasses | number:'1.0-1' }}%
+              </div>
+              <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  class="h-3 bg-indigo-500 rounded-full transition-all"
+                  [style.width.%]="averageProgramProgressAllClasses">
+                </div>
+              </div>
+              <div class="w-32 text-right text-xs text-gray-700 mr-3">
+                متوسط تقدّم البرنامج<br>لجميع الأقسام
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- قسم معيّن: عرض نسبة هذا القسم فقط -->
+          <ng-template #selectedClassProgressTpl>
+            <div *ngIf="selectedClassProgramProgress !== null; else noProgressForClass" class="flex items-center">
+              <div class="w-20 text-sm font-semibold text-gray-700 text-left ml-3">
+                {{ selectedClassProgramProgress | number:'1.0-1' }}%
+              </div>
+              <div class="flex-1 h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  class="h-3 bg-teal-500 rounded-full transition-all"
+                  [style.width.%]="selectedClassProgramProgress">
+                </div>
+              </div>
+              <div class="w-32 text-right text-xs text-gray-700 mr-3">
+                تقدّم البرنامج<br>للقسم المختار فقط
+              </div>
+            </div>
+            <ng-template #noProgressForClass>
+              <p class="text-xs text-gray-500 text-center py-2">
+                لا توجد بيانات تقدّم مسجّلة لهذا القسم في البرنامج.
+              </p>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
     </div>
 
     <!-- Grade distribution -->

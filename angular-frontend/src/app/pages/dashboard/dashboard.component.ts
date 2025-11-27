@@ -2,6 +2,31 @@ import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { ApiService } from '../../services/api.service';
 
+interface ProgressItem {
+  classId: number;
+  className: string;
+  level: string;
+  lastLessonReached: number;
+  lessonProgressPercentage: number;
+  expectedLesson: number;
+  delayOrAdvanceUnits: number;
+  delayPercentage: number;
+  status: 'advance' | 'delay' | 'onTrack';
+}
+
+interface SubjectProgressResponse {
+  subjectId: number;
+  subjectNameAr: string;
+  level: string;
+  totalLessons: number;
+  currentDate: string;
+  currentWeek: number;
+  expectedLesson: number;
+  items: ProgressItem[];
+  delayed: ProgressItem[];
+  advanced: ProgressItem[];
+}
+
 interface Class {
   id: number;
   name: string;
@@ -101,6 +126,12 @@ export class DashboardComponent implements OnInit {
     labCleanliness: 60      // % نظافة المخبر
   };
 
+  // تقدم إنجاز البرنامج (متوسط جميع الأقسام + قسم معيّن إن اختير)
+  subjectProgressOverview?: SubjectProgressResponse;
+  averageProgramProgressAllClasses = 0; // %
+  selectedClassProgramProgress: number | null = null; // %
+  subjectProgressLoaded = false;
+
   // Attendance doughnut chart
   attendanceChartData: ChartConfiguration<'doughnut'>['data'] = {
     labels: ['حاضر', 'غائب', 'مرخَّص', 'متأخر', 'مريض'],
@@ -192,6 +223,7 @@ export class DashboardComponent implements OnInit {
     });
 
     this.loadDashboardData();
+    this.loadSubjectProgramProgress();
   }
 
   /** المعدل العام على 20 بدل النسبة المئوية */
@@ -233,6 +265,9 @@ export class DashboardComponent implements OnInit {
   onClassChange(): void {
     // إعادة تهيئة القيم قبل التحميل
     this.resetData();
+
+    // تحديث نسبة تقدّم البرنامج للقسم المختار (إن وُجدت بيانات مسبقاً)
+    this.updateSelectedClassProgramProgress();
 
     // 0 => Global dashboard (جميع الأقسام)
     if (this.selectedClassId === 0) {
@@ -322,6 +357,63 @@ export class DashboardComponent implements OnInit {
       ...this.gradeDistributionChartData,
       datasets: [{ ...this.gradeDistributionChartData.datasets[0], data: [0, 0, 0, 0, 0] }]
     };
+  }
+
+  /**
+   * تحميل بيانات تقدّم إنجاز البرنامج لمادة معيّنة
+   * حالياً نستخدم subjectId = 1 مثل شاشة متابعة التقدّم
+   */
+  private loadSubjectProgramProgress(): void {
+    this.subjectProgressLoaded = false;
+    this.api
+      .get<SubjectProgressResponse>('/progress-tracking/subject/1')
+      .subscribe({
+        next: (res) => {
+          this.subjectProgressOverview = res;
+
+          const items = res.items || [];
+          if (items.length > 0) {
+            const sum = items.reduce(
+              (acc, it) => acc + (it.lessonProgressPercentage || 0),
+              0
+            );
+            this.averageProgramProgressAllClasses = sum / items.length;
+          } else {
+            this.averageProgramProgressAllClasses = 0;
+          }
+
+          this.updateSelectedClassProgramProgress();
+          this.subjectProgressLoaded = true;
+        },
+        error: (err) => {
+          console.error('Error loading subject program progress for dashboard:', err);
+          this.subjectProgressOverview = undefined;
+          this.averageProgramProgressAllClasses = 0;
+          this.selectedClassProgramProgress = null;
+          this.subjectProgressLoaded = true;
+        },
+      });
+  }
+
+  /**
+   * تحديث نسبة التقدّم للقسم المختار اعتماداً على البيانات المحمّلة
+   */
+  private updateSelectedClassProgramProgress(): void {
+    if (!this.subjectProgressOverview) {
+      this.selectedClassProgramProgress = null;
+      return;
+    }
+
+    if (this.selectedClassId === 0) {
+      this.selectedClassProgramProgress = null;
+      return;
+    }
+
+    const items = this.subjectProgressOverview.items || [];
+    const found = items.find((it) => it.classId === this.selectedClassId);
+    this.selectedClassProgramProgress = found
+      ? found.lessonProgressPercentage
+      : null;
   }
 
   private loadAttendance(classId?: number): void {
