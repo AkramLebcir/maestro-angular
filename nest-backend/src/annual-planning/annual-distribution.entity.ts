@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Subject } from '../subjects/subject.entity';
 
 @Entity('annual_distribution')
 export class AnnualDistribution {
@@ -28,6 +29,21 @@ export class AnnualDistribution {
 
   @Column()
   domain: string; // e.g. "الوحدة الخامسة"
+
+  // رقم الدرس في المنهاج (لدعم حساب التقدم)
+  @Column({ type: 'int', nullable: true })
+  lessonNumber?: number;
+
+  // ربط اختياري بمادة محددة
+  @ManyToOne(() => Subject, (subject) => subject.annualDistributions, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'subjectId' })
+  subject?: Subject;
+
+  @Column({ nullable: true })
+  subjectId?: number;
 
   @Column({ type: 'text', nullable: true })
   notes?: string;

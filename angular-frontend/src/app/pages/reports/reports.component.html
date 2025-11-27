@@ -277,6 +277,42 @@
           فتح التوزيع السنوي
         </button>
       </div>
+
+      <!-- Progress tracking report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            تقرير تتبع التقدم
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            تقرير تفصيلي لمستوى تقدّم الأقسام حسب الدروس المتوقعة والمنجزة.
+          </p>
+        </div>
+        <button
+          (click)="navigateToProgressTracking()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح تقرير التقدم
+        </button>
+      </div>
+
+      <!-- Teacher info card -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            بطاقة معلومات الأستاذ
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            إدخال وحفظ بيانات الأستاذ وطباعة البطاقة الفنية بصيغة PDF.
+          </p>
+        </div>
+        <button
+          (click)="navigateToTeacherCard()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          فتح بطاقة الأستاذ
+        </button>
+      </div>
     </div>
   </div>
 </div>

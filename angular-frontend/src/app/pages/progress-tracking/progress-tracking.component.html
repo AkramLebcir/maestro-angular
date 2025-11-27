@@ -1,0 +1,159 @@
+<div class="p-6 space-y-6">
+  <!-- أزرار الإجراءات (لا تُطبع في ملف الـ PDF) -->
+  <div class="flex justify-end mb-4 gap-2">
+    <button
+      class="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
+      (click)="loadData()"
+    >
+      تحديث البيانات
+    </button>
+    <button
+      class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700"
+      (click)="downloadPdf()"
+    >
+      تصدير إلى PDF
+    </button>
+  </div>
+
+  <!-- كامل التقرير (العنوان + الجدول) سيتم تضمينه في ملف الـ PDF -->
+  <div #reportContainer>
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-xl font-bold text-gray-800">
+          متابعة إنجاز برنامج مادة الإعلام الآلي
+        </h1>
+        <p class="text-sm text-gray-500 mt-1" *ngIf="overview">
+          إلى غاية يوم:
+          <span class="font-semibold">{{ overview.currentDate }}</span>
+          (الأسبوع رقم {{ overview.currentWeek }} / الدرس المتوقع رقم
+          {{ overview.expectedLesson }})
+        </p>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center text-gray-500 text-sm">
+      جاري تحميل البيانات...
+    </div>
+
+    <div *ngIf="error" class="text-center text-red-600 text-sm">
+      {{ error }}
+    </div>
+
+    <div *ngIf="overview && !loading" class="space-y-6 mt-4">
+    <!-- جدول التقدم الرئيسي -->
+    <div class="bg-white shadow rounded-lg overflow-hidden">
+      <table class="min-w-full border border-gray-200 text-sm">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="border border-gray-200 px-2 py-2 text-center">الأستاذ</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">المستوى والشعبة</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">القسم</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">آخر درس</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">% نسبة التقدم</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">عدد أسابيع التأخر (+/-)</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">ملاحظات</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of tableRows" class="hover:bg-gray-50">
+            <!-- الأستاذ (rowspan) -->
+            <td
+              *ngIf="row.rowSpanTeacher > 0"
+              class="border border-gray-200 px-2 py-1 text-center align-middle"
+              [attr.rowspan]="row.rowSpanTeacher"
+            >
+              {{ teacherFullName || '-' }}
+            </td>
+
+            <!-- المستوى والشعبة (rowspan) -->
+            <td
+              *ngIf="row.rowSpanLevel > 0"
+              class="border border-gray-200 px-2 py-1 text-center align-middle"
+              [attr.rowspan]="row.rowSpanLevel"
+            >
+              {{ row.level }}
+            </td>
+
+            <!-- القسم -->
+            <td class="border border-gray-200 px-2 py-1 text-center">
+              {{ row.className }}
+            </td>
+
+            <!-- آخر درس -->
+            <td class="border border-gray-200 px-2 py-1 text-center">
+              {{ row.data.lastLessonReached }}
+            </td>
+
+            <!-- نسبة التقدم -->
+            <td class="border border-gray-200 px-2 py-1 text-center">
+              {{ row.data.lessonProgressPercentage | number: '1.0-1' }}%
+            </td>
+
+            <!-- عدد أسابيع التأخر/التقدم -->
+            <td class="border border-gray-200 px-2 py-1 text-center">
+              {{ row.data.delayOrAdvanceUnits }}
+            </td>
+
+            <!-- الملاحظات -->
+            <td class="border border-gray-200 px-2 py-1 text-center">
+              {{ formatStatus(row.data) }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- التقارير: الأقسام المتأخرة والمتقدمة -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <!-- المتأخرة -->
+      <div class="bg-white shadow rounded-lg p-4">
+        <h2 class="text-sm font-semibold text-red-600 mb-2">
+          الأقسام المتأخرة (delay &lt; 0)
+        </h2>
+        <div *ngIf="overview.delayed.length === 0" class="text-xs text-gray-500">
+          لا توجد أقسام متأخرة.
+        </div>
+        <ul *ngIf="overview.delayed.length > 0" class="space-y-1 text-xs">
+          <li
+            *ngFor="let item of overview.delayed"
+            class="flex justify-between border-b border-dashed border-gray-200 pb-1"
+          >
+            <span>
+              {{ item.className }} ({{ toArabicLevel(item.level) }})
+            </span>
+            <span class="text-red-600">
+              {{ item.delayOrAdvanceUnits }} درس /
+              {{ item.delayPercentage | number: '1.0-1' }}%
+            </span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- المتقدمة -->
+      <div class="bg-white shadow rounded-lg p-4">
+        <h2 class="text-sm font-semibold text-green-600 mb-2">
+          الأقسام المتقدمة (delay &gt; 0)
+        </h2>
+        <div *ngIf="overview.advanced.length === 0" class="text-xs text-gray-500">
+          لا توجد أقسام متقدمة.
+        </div>
+        <ul *ngIf="overview.advanced.length > 0" class="space-y-1 text-xs">
+          <li
+            *ngFor="let item of overview.advanced"
+            class="flex justify-between border-b border-dashed border-gray-200 pb-1"
+          >
+            <span>
+              {{ item.className }} ({{ toArabicLevel(item.level) }})
+            </span>
+            <span class="text-green-600">
+              +{{ item.delayOrAdvanceUnits }} درس /
+              {{ item.delayPercentage | number: '1.0-1' }}%
+            </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+

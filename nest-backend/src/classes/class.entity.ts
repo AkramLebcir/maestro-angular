@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Lab } from '../labs/lab.entity';
 import { Student } from '../students/student.entity';
+import { Subject } from '../subjects/subject.entity';
 
 export enum ClassLevel {
   FIRST_YEAR_MIDDLE = '1st_year_middle',
@@ -28,6 +29,16 @@ export class Class {
 
   @Column()
   subject: string;
+
+  @ManyToOne(() => Subject, (subject) => subject.classes, {
+    nullable: true,
+    onDelete: 'SET NULL',
+  })
+  @JoinColumn({ name: 'subjectId' })
+  subjectRef?: Subject;
+
+  @Column({ nullable: true })
+  subjectId?: number;
 
   @ManyToOne(() => Lab, (lab) => lab.classes, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'labId' })

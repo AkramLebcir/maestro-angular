@@ -16,6 +16,7 @@ import { GradesModule } from './grades/grades.module';
 import { WorkstationsModule } from './workstations/workstations.module';
 import { LabManagementModule } from './lab-management/lab-management.module';
 import { AnnualPlanningModule } from './annual-planning/annual-planning.module';
+import { ProgressTrackingModule } from './progress-tracking/progress-tracking.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { AnnualPlanningModule } from './annual-planning/annual-planning.module';
     WorkstationsModule,
     LabManagementModule,
     AnnualPlanningModule,
+    ProgressTrackingModule,
   ],
   controllers: [AppController],
   providers: [AppService],

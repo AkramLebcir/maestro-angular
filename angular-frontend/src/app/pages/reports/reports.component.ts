@@ -52,6 +52,14 @@ export class ReportsComponent {
   navigateToAnnualDistribution(): void {
     this.router.navigate(['/annual-distribution']);
   }
+
+  navigateToProgressTracking(): void {
+    this.router.navigate(['/progress-tracking']);
+  }
+
+  navigateToTeacherCard(): void {
+    this.router.navigate(['/teacher-card']);
+  }
 }
 
 

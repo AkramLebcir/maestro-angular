@@ -94,6 +94,12 @@ export class SidebarComponent implements OnInit {
       active: false
     },
     { 
+      label: 'متابعة الإنجاز', 
+      route: '/progress-tracking', 
+      icon: 'M3 17l6-6 4 4 7-7', 
+      active: false
+    },
+    { 
       label: 'مفكرة الأستاذ', 
       route: '/teacher-notebook', 
       icon: 'M4 5h16a1 1 0 011 1v11a2 2 0 01-2 2H5a2 2 0 01-2-2V6a1 1 0 011-1zm3 3h8m-8 4h5', 
