@@ -24,6 +24,7 @@ import { TeacherCardComponent } from './pages/teacher-card/teacher-card.componen
 import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-notebook.component';
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
 import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
+import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
 import { SafeUrlPipe } from './pipes/safe-url.pipe';
 import { NgChartsModule } from 'ng2-charts';
 
@@ -49,6 +50,7 @@ import { NgChartsModule } from 'ng2-charts';
     TeacherNotebookComponent,
     ProgressTrackingComponent,
     PedagogicalDocsComponent,
+    TrainingInspectionComponent,
     SafeUrlPipe,
   ],
   imports: [

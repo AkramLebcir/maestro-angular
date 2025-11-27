@@ -17,6 +17,7 @@ import { TeacherCardComponent } from './pages/teacher-card/teacher-card.componen
 import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-notebook.component';
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
 import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
+import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -37,6 +38,7 @@ const routes: Routes = [
   { path: 'reports', component: ReportsComponent },
   { path: 'progress-tracking', component: ProgressTrackingComponent },
   { path: 'pedagogical-docs', component: PedagogicalDocsComponent },
+  { path: 'training-inspection', component: TrainingInspectionComponent },
   { path: 'settings', component: ClassesComponent } // Placeholder
 ];
 

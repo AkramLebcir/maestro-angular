@@ -1,0 +1,298 @@
+<div class="flex-1 pt-2 pb-4 px-3 md:px-4">
+  <div class="bg-white rounded-xl shadow-md p-5 md:p-6 mb-4 border border-blue-100">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+          التكوين والتفتيش
+        </h1>
+        <p class="text-sm text-gray-500">
+          مساحة لتتبع مسارك التكويني وزيارات المفتش والملاحظات اليومية.
+        </p>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="border-b border-gray-200 mb-4 flex gap-4 overflow-x-auto">
+      <button
+        (click)="setTab('training')"
+        [class]="activeTab === 'training'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+        سجل التكوين
+      </button>
+      <button
+        (click)="setTab('inspection')"
+        [class]="activeTab === 'inspection'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+        زيارات المفتش
+      </button>
+      <button
+        (click)="setTab('daily')"
+        [class]="activeTab === 'daily'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+        دفتر الملاحظات اليومية
+      </button>
+    </div>
+
+    <!-- Tab: سجل التكوين -->
+    <div *ngIf="activeTab === 'training'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ التكوين :</label>
+            <input
+              class="col-span-2 input-field"
+              type="date"
+              [(ngModel)]="newTraining.date" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">موضوع التكوين :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newTraining.topic" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">الجهة المنظمة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newTraining.organizer" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">مكان التكوين :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              [(ngModel)]="newTraining.location" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div class="grid grid-cols-1 gap-2">
+            <label class="text-sm text-gray-700">توجيهات / توصيات / تعليمات :</label>
+            <textarea
+              class="input-field min-h-[96px]"
+              [(ngModel)]="newTraining.notes"></textarea>
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">ملف التكوين :</label>
+            <div class="col-span-2 flex items-center gap-2">
+              <input
+                type="file"
+                (change)="onTrainingFileSelected($event)"
+                class="text-xs" />
+              <span class="text-xs text-gray-500 truncate" *ngIf="newTraining.fileName">
+                {{ newTraining.fileName }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addTraining()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ التكوين
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800">سجل التكوين المحفوظ</h2>
+          <button
+            (click)="exportTrainingPdf()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+            تصدير PDF
+          </button>
+        </div>
+        <div #trainingPrint>
+          <div class="text-center font-semibold text-gray-800 mb-3">
+            تقرير سجل التكوين
+          </div>
+          <div *ngIf="trainingList.length === 0" class="text-xs text-gray-500">
+            لا توجد سجلات تكوين بعد.
+          </div>
+          <div class="space-y-2">
+            <div
+              *ngFor="let t of trainingList; let i = index"
+              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800">
+                  {{ t.topic }} - {{ t.date | date:'yyyy/MM/dd' }}
+                </div>
+                <button
+                  (click)="deleteTraining(i)"
+                  class="text-xs text-red-500 hover:underline">
+                  حذف
+                </button>
+              </div>
+              <div class="text-gray-700">
+                الجهة: {{ t.organizer || 'غير محدد' }} – المكان: {{ t.location || 'غير محدد' }}
+              </div>
+              <div class="text-gray-600" *ngIf="t.notes">
+                ملاحظات: {{ t.notes }}
+              </div>
+              <div class="text-gray-500 text-xs" *ngIf="t.fileName">
+                ملف مرفوع: {{ t.fileName }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: زيارات المفتش -->
+    <div *ngIf="activeTab === 'inspection'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">تاريخ الزيارة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="date"
+              [(ngModel)]="newInspection.date" />
+          </div>
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700">نوع الزيارة :</label>
+            <input
+              class="col-span-2 input-field"
+              type="text"
+              placeholder="مثال: زيارة بيداغوجية، متابعة، تفتيش شامل..."
+              [(ngModel)]="newInspection.type" />
+          </div>
+        </div>
+        <div class="space-y-3">
+          <div>
+            <label class="text-sm text-gray-700">ملاحظات المفتش :</label>
+            <textarea
+              class="input-field min-h-[80px]"
+              [(ngModel)]="newInspection.notes"></textarea>
+          </div>
+          <div>
+            <label class="text-sm text-gray-700">توجيهات / توصيات :</label>
+            <textarea
+              class="input-field min-h-[80px]"
+              [(ngModel)]="newInspection.recommendations"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addInspection()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ زيارة المفتش
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800">سجل زيارات المفتش</h2>
+          <button
+            (click)="exportInspectionPdf()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+            تصدير PDF
+          </button>
+        </div>
+        <div #inspectionPrint>
+          <div class="text-center font-semibold text-gray-800 mb-3">
+            تقرير زيارات المفتش
+          </div>
+          <div *ngIf="inspectionList.length === 0" class="text-xs text-gray-500">
+            لا توجد زيارات مسجلة بعد.
+          </div>
+          <div class="space-y-2">
+            <div
+              *ngFor="let v of inspectionList; let i = index"
+              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800">
+                  {{ v.type }} - {{ v.date | date:'yyyy/MM/dd' }}
+                </div>
+                <button
+                  (click)="deleteInspection(i)"
+                  class="text-xs text-red-500 hover:underline">
+                  حذف
+                </button>
+              </div>
+              <div class="text-gray-700" *ngIf="v.notes">
+                ملاحظات: {{ v.notes }}
+              </div>
+              <div class="text-gray-700" *ngIf="v.recommendations">
+                توجيهات: {{ v.recommendations }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: دفتر الملاحظات اليومية -->
+    <div *ngIf="activeTab === 'daily'" class="space-y-4">
+      <div class="space-y-3">
+        <div class="grid grid-cols-3 items-center gap-2 max-w-xs">
+          <label class="col-span-1 text-sm text-gray-700">تاريخ الملاحظة :</label>
+          <input
+            class="col-span-2 input-field"
+            type="date"
+            [(ngModel)]="newDailyNote.date" />
+        </div>
+        <div>
+          <label class="text-sm text-gray-700">محتوى الملاحظة :</label>
+          <textarea
+            class="input-field min-h-[140px]"
+            placeholder="سجل ملاحظاتك حول سير الدروس، الصعوبات، الأحداث المهمة..."
+            [(ngModel)]="newDailyNote.content"></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addDailyNote()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          حفظ الملاحظة
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800">دفتر الملاحظات</h2>
+          <button
+            (click)="exportDailyNotesPdf()"
+            class="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
+            تصدير PDF
+          </button>
+        </div>
+        <div #dailyPrint>
+          <div class="text-center font-semibold text-gray-800 mb-3">
+            تقرير دفتر الملاحظات اليومية
+          </div>
+          <div *ngIf="dailyNotes.length === 0" class="text-xs text-gray-500">
+            لم تتم إضافة أي ملاحظة بعد.
+          </div>
+          <div class="space-y-2">
+            <div
+              *ngFor="let n of dailyNotes; let i = index"
+              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800">
+                  {{ n.date | date:'yyyy/MM/dd' }}
+                </div>
+                <button
+                  (click)="deleteDailyNote(i)"
+                  class="text-xs text-red-500 hover:underline">
+                  حذف
+                </button>
+              </div>
+              <div class="text-gray-700 whitespace-pre-line">
+                {{ n.content }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
