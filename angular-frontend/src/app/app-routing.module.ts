@@ -25,7 +25,6 @@ const routes: Routes = [
   { path: 'classes', component: ClassesComponent },
   { path: 'students', component: StudentsComponent },
   { path: 'labs', component: LabsComponent },
-  { path: 'grades', component: ClassesComponent }, // Placeholder
   { path: 'timetable', component: TimetableComponent },
   { path: 'topics', component: TopicsComponent },
   { path: 'notebooks', component: NotebooksComponent },

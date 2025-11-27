@@ -1,5 +1,18 @@
 <header class="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400 text-white px-6 py-4 flex justify-between items-center shadow-md">
   <div class="flex items-center gap-4">
+    <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/40">
+      <img
+        *ngIf="teacherPhotoUrl; else initialsAvatar"
+        [src]="teacherPhotoUrl"
+        alt="صورة الأستاذ"
+        class="w-full h-full object-cover"
+      />
+      <ng-template #initialsAvatar>
+        <span class="text-sm font-semibold">
+          {{ teacherName.split(' ')[0]?.[0] || 'أ' }}
+        </span>
+      </ng-template>
+    </div>
     <span class="text-lg font-semibold">{{ teacherName }}</span>
     <div class="relative">
       <svg class="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
