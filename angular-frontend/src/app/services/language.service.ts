@@ -17,6 +17,15 @@ export class LanguageService {
     const savedLang = localStorage.getItem('appLanguage') as LanguageCode;
     if (savedLang && ['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'].includes(savedLang)) {
       this.currentLanguageSubject.next(savedLang);
+      // تحديث اتجاه النص للغة المحفوظة
+      document.documentElement.setAttribute('dir', savedLang === 'AR' ? 'rtl' : 'ltr');
+      document.documentElement.setAttribute('lang', savedLang.toLowerCase());
+    } else {
+      // إذا لم تكن هناك لغة محفوظة، استخدم العربية كافتراضية
+      this.currentLanguageSubject.next('AR');
+      document.documentElement.setAttribute('dir', 'rtl');
+      document.documentElement.setAttribute('lang', 'ar');
+      localStorage.setItem('appLanguage', 'AR');
     }
     this.loadTranslations();
   }

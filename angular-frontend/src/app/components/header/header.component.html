@@ -109,6 +109,26 @@
         *ngIf="isLanguageMenuOpen"
         class="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
       >
+        <!-- عربي (الجزائر) -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('AR')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="10" height="16" fill="#006233" />
+            <rect x="12" y="4" width="10" height="16" fill="#ffffff" />
+            <circle cx="11.5" cy="12" r="4.2" fill="#D21034" />
+            <circle cx="12.7" cy="12" r="3.5" fill="#ffffff" />
+            <polygon
+              points="13.5,9.5 14.3,11.2 16.1,11.2 14.7,12.3 15.3,14 13.5,13.1 11.7,14 12.3,12.3 10.9,11.2 12.7,11.2"
+              fill="#D21034"
+            />
+          </svg>
+          <span class="font-semibold">AR</span>
+          <span class="text-[10px] text-gray-500">العربية</span>
+        </button>
+
         <!-- فرنسي -->
         <button
           type="button"

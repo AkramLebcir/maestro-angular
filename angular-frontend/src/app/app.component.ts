@@ -16,11 +16,12 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private languageService: LanguageService) {}
 
   ngOnInit(): void {
-    // تهيئة اللغة عند بدء التطبيق
+    // تهيئة اللغة عند بدء التطبيق - العربية هي اللغة الافتراضية
     const savedLang = localStorage.getItem('appLanguage') as LanguageCode;
-    if (savedLang) {
+    if (savedLang && ['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'].includes(savedLang)) {
       this.languageService.setLanguage(savedLang);
     } else {
+      // إذا لم تكن هناك لغة محفوظة، استخدم العربية كافتراضية
       this.languageService.setLanguage('AR');
     }
     
