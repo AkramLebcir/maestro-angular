@@ -1,4 +1,5 @@
 import { Component, HostListener, OnInit } from '@angular/core';
+import { LanguageService } from '../../services/language.service';
 
 export type StickyColor = 'yellow' | 'pink' | 'blue' | 'green';
 
@@ -17,6 +18,7 @@ export interface StickyNote {
   styleUrls: ['./teacher-notebook.component.css']
 })
 export class TeacherNotebookComponent implements OnInit {
+  constructor(public languageService: LanguageService) {}
   notes: StickyNote[] = [];
   private zCounter = 1;
   private storageKey = 'teacher-notebook-sticky-notes';
@@ -85,10 +87,14 @@ export class TeacherNotebookComponent implements OnInit {
   }
 
   clearAll(): void {
-    if (confirm('هل تريد مسح جميع الملاحظات من السبورة؟')) {
+    if (confirm(this.languageService.translate('teacherNotebook.clearConfirm'))) {
       this.notes = [];
       this.saveToStorage();
     }
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 
   private loadFromStorage(): void {

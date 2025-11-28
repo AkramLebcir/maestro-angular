@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import * as XLSX from 'xlsx';
 
 export interface Student {
@@ -93,7 +94,14 @@ export class StudentsComponent implements OnInit {
   };
   showImportModal: boolean = false;
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   ngOnInit(): void {
     this.loadStudents();

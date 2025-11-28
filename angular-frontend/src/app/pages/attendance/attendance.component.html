@@ -15,7 +15,7 @@
             </svg>
           </button>
           <div class="bg-blue-700 px-6 py-3 rounded-lg text-center min-w-[200px]">
-            <div class="font-bold text-lg mb-1">{{ selectedLessonSubject || 'الحصة' }}</div>
+            <div class="font-bold text-lg mb-1">{{ selectedLessonSubject || translate('attendance.lesson') }}</div>
             <div class="text-sm">{{ selectedLessonTime }}</div>
           </div>
           <button 
@@ -28,7 +28,7 @@
           <button 
             (click)="goToToday()"
             class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
-            اليوم
+            {{ translate('attendance.today') }}
           </button>
         </div>
       </div>
@@ -36,41 +36,41 @@
       <!-- Class and Lesson Selection -->
       <div class="flex gap-4 items-center">
         <div class="flex-1">
-          <label class="block text-sm font-medium mb-1">القسم</label>
+          <label class="block text-sm font-medium mb-1">{{ translate('attendance.selectClass') }}</label>
           <select 
             [(ngModel)]="selectedClass"
             (change)="onClassChange()"
             class="w-full px-3 py-2 bg-blue-700 border border-blue-500 rounded text-white focus:ring-2 focus:ring-blue-300">
-            <option [ngValue]="null">اختر القسم</option>
+            <option [ngValue]="null">{{ translate('attendance.selectClass') }}</option>
             <option *ngFor="let classItem of classes" [ngValue]="classItem">{{ classItem.name }}</option>
           </select>
         </div>
         <div class="flex-1">
-          <label class="block text-sm font-medium mb-1">وقت الحصة</label>
+          <label class="block text-sm font-medium mb-1">{{ translate('attendance.lessonTime') }}</label>
           <input 
             type="text"
             [(ngModel)]="selectedLessonTime"
             class="w-full px-3 py-2 bg-blue-700 border border-blue-500 rounded text-white placeholder-blue-300"
-            placeholder="08:00-09:00">
+            [placeholder]="translate('attendance.timePlaceholder')">
         </div>
         <div class="flex-1">
-          <label class="block text-sm font-medium mb-1">المادة</label>
+          <label class="block text-sm font-medium mb-1">{{ translate('attendance.subject') }}</label>
           <input 
             type="text"
             [(ngModel)]="selectedLessonSubject"
             class="w-full px-3 py-2 bg-blue-700 border border-blue-500 rounded text-white placeholder-blue-300"
-            placeholder="اسم المادة">
+            [placeholder]="translate('attendance.subjectPlaceholder')">
         </div>
         <div class="flex gap-2">
           <button 
             (click)="showWeeklyView = !showWeeklyView"
             class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
-            {{ showWeeklyView ? 'عرض يومي' : 'عرض أسبوعي' }}
+            {{ showWeeklyView ? translate('attendance.toggleDaily') : translate('attendance.toggleWeekly') }}
           </button>
           <button 
             (click)="openReportModal('absences')"
             class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
-            التقارير
+            {{ translate('attendance.reports') }}
           </button>
         </div>
       </div>
@@ -104,7 +104,7 @@
     <div *ngIf="!showWeeklyView" class="p-6">
       <!-- Date Picker -->
       <div class="mb-4 flex items-center gap-4">
-        <label class="text-sm font-medium text-gray-700">التاريخ:</label>
+        <label class="text-sm font-medium text-gray-700">{{ translate('attendance.date') }}</label>
         <input 
           type="date"
           [value]="formatDateForAPI(selectedDate)"
@@ -166,7 +166,7 @@
       </div>
 
       <div *ngIf="students.length === 0" class="text-center text-gray-500 py-12">
-        لا يوجد تلاميذ في هذا القسم
+        {{ translate('attendance.noStudents') }}
       </div>
     </div>
 
@@ -176,13 +176,13 @@
         <button 
           (click)="navigateWeek('prev')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          ← الأسبوع السابق
+          {{ translate('attendance.prevWeek') }}
         </button>
-        <h3 class="text-lg font-semibold text-gray-800">عرض أسبوعي</h3>
+        <h3 class="text-lg font-semibold text-gray-800">{{ translate('attendance.weeklyViewTitle') }}</h3>
         <button 
           (click)="navigateWeek('next')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          الأسبوع التالي →
+          {{ translate('attendance.nextWeek') }}
         </button>
       </div>
 
@@ -190,7 +190,7 @@
         <table class="w-full border-collapse">
           <thead>
             <tr class="bg-gray-100 border-b-2 border-gray-300">
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم التلميذ</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.studentName') }}</th>
               <th *ngFor="let day of weekDays" class="text-right py-3 px-4 font-semibold text-gray-700 min-w-[120px]">
                 <div>{{ getDayName(day) }}</div>
                 <div class="text-xs font-normal text-gray-500">{{ formatDateShort(day) }}</div>
@@ -242,7 +242,7 @@
         <button 
           (click)="recordAttendanceForWeek()"
           class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-          حفظ الحضور للأسبوع
+          {{ translate('attendance.saveWeek') }}
         </button>
       </div>
     </div>
@@ -260,15 +260,15 @@
     <!-- Sticky Header -->
     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 bg-white rounded-t-lg sticky top-0 z-10">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ reportType === 'absences' ? 'تقرير الغيابات' : 
-           reportType === 'statistics' ? 'إحصائيات الحضور' : 
-           'تقرير حضور القسم' }}
+        {{ reportType === 'absences' ? translate('attendance.absencesReport') : 
+           reportType === 'statistics' ? translate('attendance.statisticsReport') : 
+           translate('attendance.classReport') }}
       </h3>
       <div class="flex gap-2">
         <button 
           (click)="exportReportToPDF()"
           class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
-          تصدير PDF
+          {{ translate('attendance.exportPDF') }}
         </button>
         <button 
           (click)="closeReportModal()"
@@ -288,19 +288,19 @@
           (click)="reportType = 'absences'"
           [class]="reportType === 'absences' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
           class="px-4 py-2 font-semibold">
-          أعلى الغيابات
+          {{ translate('attendance.absencesTab') }}
         </button>
         <button 
           (click)="reportType = 'statistics'"
           [class]="reportType === 'statistics' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
           class="px-4 py-2 font-semibold">
-          الإحصائيات
+          {{ translate('attendance.statisticsTab') }}
         </button>
         <button 
           (click)="reportType = 'class'"
           [class]="reportType === 'class' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
           class="px-4 py-2 font-semibold">
-          حضور القسم
+          {{ translate('attendance.classTab') }}
         </button>
       </div>
 
@@ -309,11 +309,11 @@
       <table class="w-full border-collapse" id="absences-report-table">
         <thead>
           <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم التلميذ</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">أيام الحضور</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">أيام الغياب</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">أيام التأخر</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">نسبة الحضور</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.studentName') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.presentDays') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.absentDays') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.lateDays') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.attendanceRate') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -337,7 +337,7 @@
             </td>
           </tr>
           <tr *ngIf="getHighestAbsencesReport().length === 0">
-            <td colspan="5" class="py-8 text-center text-gray-500">لا توجد بيانات</td>
+            <td colspan="5" class="py-8 text-center text-gray-500">{{ translate('attendance.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -347,19 +347,19 @@
        <div *ngIf="reportType === 'statistics'" class="space-y-6">
          <!-- Statistics by Class -->
          <div>
-           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب القسم</h4>
+          <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('attendance.statisticsByClass') }}</h4>
            <div class="overflow-x-auto">
              <table class="w-full border-collapse border border-gray-300">
                <thead>
                  <tr class="bg-blue-600 text-white">
-                   <th class="border border-blue-700 p-3 text-right font-semibold">القسم</th>
-                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">حاضر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('students.class') }}</th>
+                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">{{ translate('attendance.present') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.absent') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.late') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.excused') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.leftEarly') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.total') }}</th>
+                  <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.attendanceRate') }}</th>
                  </tr>
                </thead>
                <tbody>
@@ -386,7 +386,7 @@
                    </td>
                  </tr>
                  <tr *ngIf="getClassStatisticsArray().length === 0">
-                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">{{ translate('attendance.noData') }}</td>
                  </tr>
                </tbody>
              </table>
@@ -395,19 +395,19 @@
 
          <!-- Statistics by Day -->
          <div>
-           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب اليوم</h4>
+          <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('attendance.statisticsByDay') }}</h4>
            <div class="overflow-x-auto">
              <table class="w-full border-collapse border border-gray-300">
                <thead>
                  <tr class="bg-blue-600 text-white">
-                   <th class="border border-blue-700 p-3 text-right font-semibold">اليوم</th>
-                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">حاضر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.day') }}</th>
+                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">{{ translate('attendance.present') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.absent') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.late') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.excused') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.leftEarly') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.total') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.attendanceRate') }}</th>
                  </tr>
                </thead>
                <tbody>
@@ -434,7 +434,7 @@
                    </td>
                  </tr>
                  <tr *ngIf="getDayStatisticsArray().length === 0">
-                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">{{ translate('attendance.noData') }}</td>
                  </tr>
                </tbody>
              </table>
@@ -443,19 +443,19 @@
 
          <!-- Statistics by Month -->
          <div>
-           <h4 class="text-lg font-semibold text-gray-800 mb-3">إحصائيات حسب الشهر</h4>
+          <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('attendance.statisticsByMonth') }}</h4>
            <div class="overflow-x-auto">
              <table class="w-full border-collapse border border-gray-300">
                <thead>
                  <tr class="bg-blue-600 text-white">
-                   <th class="border border-blue-700 p-3 text-right font-semibold">الشهر</th>
-                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">حاضر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غائب</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">متأخر</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">معذور</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">غادر مبكراً</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">الإجمالي</th>
-                   <th class="border border-blue-700 p-3 text-right font-semibold">نسبة الحضور</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.month') }}</th>
+                   <th class="border border-green-700 p-3 text-right font-semibold bg-green-600">{{ translate('attendance.present') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.absent') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.late') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.excused') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.leftEarly') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.total') }}</th>
+                   <th class="border border-blue-700 p-3 text-right font-semibold">{{ translate('attendance.attendanceRate') }}</th>
                  </tr>
                </thead>
                <tbody>
@@ -482,7 +482,7 @@
                    </td>
                  </tr>
                  <tr *ngIf="getMonthStatisticsArray().length === 0">
-                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">لا توجد بيانات</td>
+                   <td colspan="8" class="border border-gray-300 p-8 text-center text-gray-500">{{ translate('attendance.noData') }}</td>
                  </tr>
                </tbody>
              </table>
@@ -495,11 +495,11 @@
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم التلميذ</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">التاريخ</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">وقت الحصة</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">المادة</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.studentName') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.dateHeader') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.status') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.lessonTimeColumn') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('attendance.lessonSubjectColumn') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -525,7 +525,7 @@
             <td class="py-3 px-4 text-gray-800">{{ record.lessonSubject || '-' }}</td>
           </tr>
           <tr *ngIf="getClassAttendanceReport().length === 0">
-            <td colspan="5" class="py-8 text-center text-gray-500">لا توجد سجلات حضور</td>
+            <td colspan="5" class="py-8 text-center text-gray-500">{{ translate('attendance.noAttendanceRecords') }}</td>
           </tr>
         </tbody>
       </table>

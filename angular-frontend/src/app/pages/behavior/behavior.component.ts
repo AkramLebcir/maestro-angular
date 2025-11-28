@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -130,7 +131,14 @@ export class BehaviorComponent implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
   selectedBehaviorType: 'all' | 'positive' | 'negative' = 'all';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   ngOnInit(): void {
     this.loadClasses();

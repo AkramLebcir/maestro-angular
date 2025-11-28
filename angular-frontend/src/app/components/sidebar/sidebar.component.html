@@ -1,4 +1,4 @@
-<aside class="bg-white w-64 shadow-lg p-4">
+<aside class="bg-white w-64 shadow-lg p-4 h-full md:h-auto fixed md:static top-16 bottom-0 md:top-auto right-0 z-30">
   <nav class="space-y-2">
     <a 
       *ngFor="let item of menuItems; let i = index"
@@ -9,7 +9,7 @@
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon" />
       </svg>
-      <span class="text-sm font-medium">{{ item.label }}</span>
+      <span class="text-sm font-medium">{{ translate(item.labelKey) }}</span>
     </a>
   </nav>
 </aside>

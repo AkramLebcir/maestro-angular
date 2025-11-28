@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 
 interface ProgressItem {
   classId: number;
@@ -210,7 +211,14 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   ngOnInit(): void {
     // تاريخ اليوم بالعربية

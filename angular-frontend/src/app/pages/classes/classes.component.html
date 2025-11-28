@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">إدارة الأقسام</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('classes.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -9,23 +9,23 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span>إضافة قسم جديد</span>
+          <span>{{ translate('classes.addNew') }}</span>
         </button>
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة الأقسام</h2>
+    <h2 class="text-xl font-bold text-gray-700 mb-4">{{ translate('classes.list') }}</h2>
 
     <div class="overflow-x-auto">
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم القسم</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">المستوى</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">عدد التلاميذ</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">المخبر</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الحصص الأسبوعية</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.name') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.level') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.studentCount') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.lab') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.weeklySessions') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -40,7 +40,7 @@
                 <button 
                   (click)="openGroupModal(classItem)"
                   class="p-2 text-purple-600 hover:bg-purple-50 rounded transition"
-                  title="إدارة المجموعات">
+                  [title]="translate('classes.manageGroups')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
@@ -63,7 +63,7 @@
             </td>
           </tr>
           <tr *ngIf="classes.length === 0">
-            <td colspan="6" class="py-8 text-center text-gray-500">لا توجد أقسام</td>
+            <td colspan="6" class="py-8 text-center text-gray-500">{{ translate('classes.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -81,7 +81,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingClass ? 'تعديل القسم' : 'إضافة قسم جديد' }}
+        {{ editingClass ? translate('classes.formTitleEdit') : translate('classes.formTitleAdd') }}
       </h3>
       <button 
         (click)="closeModal()"
@@ -94,60 +94,60 @@
 
     <form #classForm="ngForm" (ngSubmit)="saveClass()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">المستوى</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.level') }}</label>
         <select 
           [(ngModel)]="formData.level"
           name="level"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option value="">اختر المستوى</option>
+          <option value="">{{ translate('classes.selectLevel') }}</option>
           <option *ngFor="let level of classLevels" [value]="level.value">{{ level.label }}</option>
         </select>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">اسم القسم</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.name') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.name"
           name="name"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل اسم القسم">
+          [placeholder]="translate('classes.namePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">المادة</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.subject') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.subject"
           name="subject"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل اسم المادة">
+          [placeholder]="translate('classes.subjectPlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">المخبر</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.lab') }}</label>
         <div class="flex gap-2">
           <select 
             [(ngModel)]="formData.labId"
             name="labId"
             class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="undefined">لا يوجد</option>
+            <option [ngValue]="undefined">{{ translate('classes.noLabOption') }}</option>
             <option *ngFor="let lab of labs" [ngValue]="lab.id">{{ lab.name }}</option>
           </select>
           <button 
             type="button"
             (click)="openLabModal()"
           class="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm">
-            + مخبر جديد
+            {{ translate('classes.newLabButton') }}
           </button>
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الحصص الأسبوعية</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.weeklySessions') }}</label>
         <input 
           type="number"
           [(ngModel)]="formData.weeklySessions"
@@ -156,7 +156,7 @@
           min="0"
           max="20"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="عدد الحصص">
+          [placeholder]="translate('classes.weeklySessionsPlaceholder')">
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -164,13 +164,13 @@
           type="submit"
           [disabled]="!classForm.valid"
           class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingClass ? 'تحديث' : 'إضافة' }}
+          {{ editingClass ? translate('classes.update') : translate('classes.addAction') }}
         </button>
         <button 
           type="button"
           (click)="closeModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('common.cancel') }}
         </button>
       </div>
     </form>
@@ -186,7 +186,7 @@
     class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">إضافة مخبر جديد</h3>
+      <h3 class="text-xl font-bold text-gray-800">{{ translate('classes.addLabTitle') }}</h3>
       <button 
         (click)="closeLabModal()"
         class="text-gray-500 hover:text-gray-700">
@@ -198,34 +198,34 @@
 
     <form #labForm="ngForm" (ngSubmit)="saveLab()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">اسم المخبر *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labNameLabel') }}</label>
         <input 
           type="text"
           [(ngModel)]="labFormData.name"
           name="name"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل اسم المخبر">
+          [placeholder]="translate('classes.labNamePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labDescriptionLabel') }}</label>
         <textarea 
           [(ngModel)]="labFormData.description"
           name="description"
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل وصف المخبر"></textarea>
+          [placeholder]="translate('classes.labDescriptionPlaceholder')"></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الموقع</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labLocationLabel') }}</label>
         <input 
           type="text"
           [(ngModel)]="labFormData.location"
           name="location"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="أدخل موقع المخبر">
+          [placeholder]="translate('classes.labLocationPlaceholder')">
       </div>
 
       <div class="flex items-center gap-2">
@@ -235,7 +235,7 @@
           name="isAvailable"
           id="isAvailable"
           class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-        <label for="isAvailable" class="text-sm font-medium text-gray-700">المخبر متاح</label>
+        <label for="isAvailable" class="text-sm font-medium text-gray-700">{{ translate('classes.labAvailable') }}</label>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -243,13 +243,13 @@
           type="submit"
           [disabled]="!labForm.valid"
           class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          إضافة
+          {{ translate('classes.addAction') }}
         </button>
         <button 
           type="button"
           (click)="closeLabModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('common.cancel') }}
         </button>
       </div>
     </form>
@@ -267,7 +267,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        إدارة المجموعات - {{ currentClassForGroups.name }}
+        {{ translate('classes.manageGroupsTitle') }} - {{ currentClassForGroups.name }}
       </h3>
       <button 
         (click)="closeGroupModal()"
@@ -280,42 +280,42 @@
 
     <!-- Automatic Division Buttons -->
     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-      <h4 class="text-lg font-semibold text-gray-700 mb-3">التقسيم التلقائي</h4>
+      <h4 class="text-lg font-semibold text-gray-700 mb-3">{{ translate('classes.autoAssignTitle') }}</h4>
       <div class="flex flex-wrap gap-3">
         <button 
           (click)="divideByFirstName()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          تقسيم حسب الاسم (أبجدي)
+          {{ translate('classes.autoAssignByFirstName') }}
         </button>
         <button 
           (click)="divideByLastName()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          تقسيم حسب اللقب (أبجدي)
+          {{ translate('classes.autoAssignByLastName') }}
         </button>
         <button 
           (click)="divideByGender()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          تقسيم حسب الجنس
+          {{ translate('classes.autoAssignByGender') }}
         </button>
       </div>
     </div>
 
     <!-- Manual Assignment Section -->
     <div class="mb-6 p-4 bg-yellow-50 rounded-lg">
-      <h4 class="text-lg font-semibold text-gray-700 mb-3">التعيين اليدوي</h4>
+      <h4 class="text-lg font-semibold text-gray-700 mb-3">{{ translate('classes.manualAssignTitle') }}</h4>
       <div class="flex gap-3 items-center">
-        <span class="text-sm text-gray-600">المحدد: {{ selectedStudents.size }} تلميذ</span>
+        <span class="text-sm text-gray-600">{{ translate('classes.selectionCount', { count: selectedStudents.size.toString() }) }}</span>
         <button 
           (click)="assignSelectedToGroup(1)"
           [disabled]="selectedStudents.size === 0"
           class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          تعيين للمجموعة 1
+          {{ translate('classes.assignGroup1') }}
         </button>
         <button 
           (click)="assignSelectedToGroup(2)"
           [disabled]="selectedStudents.size === 0"
           class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          تعيين للمجموعة 2
+          {{ translate('classes.assignGroup2') }}
         </button>
       </div>
     </div>
@@ -325,7 +325,7 @@
       <!-- Ungrouped Students -->
       <div class="border-2 border-gray-200 rounded-lg p-4">
         <h4 class="text-lg font-semibold text-gray-700 mb-3">
-          غير معين ({{ getUngroupedStudents().length }})
+          {{ translate('classes.unassigned') }} ({{ getUngroupedStudents().length }})
         </h4>
         <div class="space-y-2 max-h-96 overflow-y-auto">
           <div 
@@ -341,7 +341,7 @@
             <span class="flex-1 text-sm">{{ student.lastName }} {{ student.firstName }}</span>
           </div>
           <div *ngIf="getUngroupedStudents().length === 0" class="text-gray-400 text-sm text-center py-4">
-            لا يوجد تلاميذ غير معينين
+            {{ translate('classes.noUnassigned') }}
           </div>
         </div>
       </div>
@@ -349,7 +349,7 @@
       <!-- Group 1 -->
       <div class="border-2 border-green-300 rounded-lg p-4 bg-green-50">
         <h4 class="text-lg font-semibold text-green-700 mb-3">
-          المجموعة 1 ({{ getGroup1Students().length }})
+          {{ translate('classes.group1') }} ({{ getGroup1Students().length }})
         </h4>
         <div class="space-y-2 max-h-96 overflow-y-auto">
           <div 
@@ -366,11 +366,11 @@
             <button 
               (click)="removeFromGroup(student.id); $event.stopPropagation()"
               class="text-red-600 hover:text-red-800 text-xs">
-              إزالة
+              {{ translate('classes.remove') }}
             </button>
           </div>
           <div *ngIf="getGroup1Students().length === 0" class="text-gray-400 text-sm text-center py-4">
-            لا يوجد تلاميذ في هذه المجموعة
+            {{ translate('classes.noStudentsInGroup') }}
           </div>
         </div>
       </div>
@@ -378,7 +378,7 @@
       <!-- Group 2 -->
       <div class="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
         <h4 class="text-lg font-semibold text-purple-700 mb-3">
-          المجموعة 2 ({{ getGroup2Students().length }})
+          {{ translate('classes.group2') }} ({{ getGroup2Students().length }})
         </h4>
         <div class="space-y-2 max-h-96 overflow-y-auto">
           <div 
@@ -395,11 +395,11 @@
             <button 
               (click)="removeFromGroup(student.id); $event.stopPropagation()"
               class="text-red-600 hover:text-red-800 text-xs">
-              إزالة
+              {{ translate('classes.remove') }}
             </button>
           </div>
           <div *ngIf="getGroup2Students().length === 0" class="text-gray-400 text-sm text-center py-4">
-            لا يوجد تلاميذ في هذه المجموعة
+            {{ translate('classes.noStudentsInGroup') }}
           </div>
         </div>
       </div>
@@ -409,7 +409,7 @@
       <button 
         (click)="closeGroupModal()"
         class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
-        إغلاق
+        {{ translate('classes.close') }}
       </button>
     </div>
   </div>

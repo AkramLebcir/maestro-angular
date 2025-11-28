@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-reports',
@@ -7,7 +8,14 @@ import { Router } from '@angular/router';
   styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent {
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   navigateToLabTab(tab: string, autoExport: boolean = false): void {
     this.router.navigate(['/labs'], {

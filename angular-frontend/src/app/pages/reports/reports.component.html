@@ -1,9 +1,9 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">التقارير</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('reports.title') }}</h1>
       <p class="text-sm text-gray-500">
-        جميع التقارير القابلة للتصدير بصيغة PDF في مكان واحد لسهولة الوصول.
+        {{ translate('reports.description') }}
       </p>
     </div>
 
@@ -12,51 +12,51 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            سجل خروج ودخول الأجهزة
+            {{ translate('reports.deviceLogs') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير مفصل بحركات خروج ودخول أجهزة المخبر.
+            {{ translate('reports.deviceLogsDesc') }}
           </p>
         </div>
         <button
           (click)="navigateToLabTab('deviceLogs', true)"
           class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
         >
-          فتح وتصدير PDF
+          {{ translate('reports.openExportPDF') }}
         </button>
       </div>
 
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير الندوات التربوية
+            {{ translate('reports.educationalSeminars') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            عرض وتصدير سجل الندوات التربوية للأستاذ بصيغة PDF.
+            {{ translate('reports.educationalSeminarsDesc') }}
           </p>
         </div>
         <button
           (click)="navigateToTrainingReport('seminars')"
           class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
         >
-          فتح تقرير الندوات التربوية
+          {{ translate('reports.openEducationalSeminars') }}
         </button>
       </div>
 
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير الزيارات التربوية
+            {{ translate('reports.pedagogicalVisits') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            عرض وتصدير سجل الزيارات التربوية (تبادل خبرات) بصيغة PDF.
+            {{ translate('reports.pedagogicalVisitsDesc') }}
           </p>
         </div>
         <button
           (click)="navigateToTrainingReport('pedagogical')"
           class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
         >
-          فتح تقرير الزيارات التربوية
+          {{ translate('reports.openPedagogicalVisits') }}
         </button>
       </div>
 

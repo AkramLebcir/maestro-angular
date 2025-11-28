@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import { ActivatedRoute } from '@angular/router';
 import html2canvas from 'html2canvas';
@@ -117,8 +118,13 @@ export class AttendanceComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
+    public languageService: LanguageService
   ) {
     this.updateWeekDays();
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 
   ngOnInit(): void {

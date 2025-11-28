@@ -2,18 +2,18 @@
   <!-- Top header with title and class selector (بدون تاريخ اليوم) -->
   <div class="bg-blue-600 rounded-lg px-6 py-3 mb-2 flex flex-col md:flex-row md:items-center md:justify-between text-white">
     <div class="mb-2 md:mb-0">
-      <h1 class="text-2xl md:text-3xl font-bold">لوحة التحكم</h1>
+      <h1 class="text-2xl md:text-3xl font-bold">{{ translate('dashboard.title') }}</h1>
       <p class="text-sm text-blue-100 mt-1">
-        نظرة عامة سريعة على أداء الأقسام والتلاميذ
+        {{ translate('dashboard.overview') }}
       </p>
     </div>
     <div class="flex items-center gap-2 text-sm">
-      <label class="text-xs">اختيار القسم:</label>
+      <label class="text-xs">{{ translate('dashboard.selectClass') }}</label>
       <select
         class="px-3 py-1 rounded-md text-blue-900 text-sm focus:outline-none"
         [(ngModel)]="selectedClassId"
         (ngModelChange)="onClassChange()">
-        <option [ngValue]="0">جميع الأقسام</option>
+        <option [ngValue]="0">{{ translate('dashboard.allClasses') }}</option>
         <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
       </select>
     </div>
@@ -30,7 +30,7 @@
         </svg>
       </div>
       <div class="flex-1 text-right">
-        <div class="text-xs text-gray-500">المعدل العام (من 20)</div>
+        <div class="text-xs text-gray-500">{{ translate('dashboard.generalAverage') }}</div>
         <div class="text-2xl font-bold text-amber-600">{{ generalAverageOn20 | number:'1.1-1' }}</div>
       </div>
     </div>
@@ -44,7 +44,7 @@
         </svg>
       </div>
       <div class="flex-1 text-right">
-        <div class="text-xs text-gray-500">أجهزة المخبر</div>
+        <div class="text-xs text-gray-500">{{ translate('dashboard.labDevices') }}</div>
         <div class="text-2xl font-bold text-purple-600">{{ labStatus.workingDevices.total }}</div>
       </div>
     </div>
@@ -58,7 +58,7 @@
         </svg>
       </div>
       <div class="flex-1 text-right">
-        <div class="text-xs text-gray-500">إجمالي التلاميذ</div>
+        <div class="text-xs text-gray-500">{{ translate('dashboard.totalStudents') }}</div>
         <div class="text-2xl font-bold text-green-600">{{ totalStudents }}</div>
       </div>
     </div>
@@ -72,7 +72,7 @@
         </svg>
       </div>
       <div class="flex-1 text-right">
-        <div class="text-xs text-gray-500">إجمالي الأقسام</div>
+        <div class="text-xs text-gray-500">{{ translate('dashboard.totalClasses') }}</div>
         <div class="text-2xl font-bold text-blue-600">{{ totalClasses }}</div>
       </div>
     </div>
@@ -82,7 +82,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-1.5 mb-3">
     <!-- Attendance donut -->
     <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
-      <h2 class="text-sm font-semibold text-gray-800 mb-2">الحضور</h2>
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.attendance') }}</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -92,17 +92,17 @@
         </canvas>
       </div>
       <div class="mt-2 grid grid-cols-3 gap-x-3 gap-y-1 text-[11px] text-gray-600">
-        <div>حاضر: <span class="font-semibold text-green-600">{{ attendanceSummary.present }}</span></div>
-        <div>غائب: <span class="font-semibold text-red-600">{{ attendanceSummary.absent }}</span></div>
-        <div>مرخَّص: <span class="font-semibold text-emerald-600">{{ attendanceSummary.excused }}</span></div>
-        <div>متأخر: <span class="font-semibold text-orange-500">{{ attendanceSummary.late }}</span></div>
-        <div>مريض: <span class="font-semibold text-yellow-500">{{ attendanceSummary.sick }}</span></div>
+        <div>{{ translate('dashboard.present') }}: <span class="font-semibold text-green-600">{{ attendanceSummary.present }}</span></div>
+        <div>{{ translate('dashboard.absent') }}: <span class="font-semibold text-red-600">{{ attendanceSummary.absent }}</span></div>
+        <div>{{ translate('dashboard.excused') }}: <span class="font-semibold text-emerald-600">{{ attendanceSummary.excused }}</span></div>
+        <div>{{ translate('dashboard.late') }}: <span class="font-semibold text-orange-500">{{ attendanceSummary.late }}</span></div>
+        <div>{{ translate('dashboard.sick') }}: <span class="font-semibold text-yellow-500">{{ attendanceSummary.sick }}</span></div>
       </div>
     </div>
 
     <!-- Behavior -->
     <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
-      <h2 class="text-sm font-semibold text-gray-800 mb-2">السلوك</h2>
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.behavior') }}</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -155,13 +155,13 @@
           <span class="font-semibold">
             {{ gradeCounts.A + gradeCounts.B + gradeCounts.C + gradeCounts.D + gradeCounts.F }}
           </span>
-          تلميذ
+          {{ translate('dashboard.student') }}
         </div>
       </div>
 
       <!-- Lab status card (حالة المخبر) -->
       <div class="bg-white rounded-lg shadow-md p-2.5">
-        <h2 class="text-sm font-semibold text-gray-800 mb-2">حالة المخبر</h2>
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.labStatus') }}</h2>
 
         <!-- أجهزة تعمل -->
         <div class="flex items-center mb-3">
@@ -191,7 +191,7 @@
             </div>
           </div>
           <div class="w-28 text-right text-xs text-gray-700 mr-3">
-            أثاث المخبر
+            {{ translate('dashboard.labFurniture') }}
           </div>
         </div>
 
@@ -207,14 +207,14 @@
             </div>
           </div>
           <div class="w-28 text-right text-xs text-gray-700 mr-3">
-            نظافة المخبر
+            {{ translate('dashboard.labCleanliness') }}
           </div>
         </div>
       </div>
 
       <!-- Program progress card (تقدّم إنجاز البرنامج) -->
       <div class="bg-white rounded-lg shadow-md p-2.5">
-        <h2 class="text-sm font-semibold text-gray-800 mb-2">تقدّم إنجاز البرنامج</h2>
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.programProgress') }}</h2>
 
         <!-- حالة التحميل -->
         <div *ngIf="!subjectProgressLoaded" class="text-xs text-gray-400 text-center py-4">
@@ -254,12 +254,12 @@
                 </div>
               </div>
               <div class="w-32 text-right text-xs text-gray-700 mr-3">
-                تقدّم البرنامج<br>للقسم المختار فقط
+                {{ translate('dashboard.programProgressForClass') }}
               </div>
             </div>
             <ng-template #noProgressForClass>
               <p class="text-xs text-gray-500 text-center py-2">
-                لا توجد بيانات تقدّم مسجّلة لهذا القسم في البرنامج.
+                {{ translate('dashboard.noProgressData') }}
               </p>
             </ng-template>
           </ng-template>
@@ -269,7 +269,7 @@
 
     <!-- Grade distribution -->
     <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
-      <h2 class="text-sm font-semibold text-gray-800 mb-2">توزيع الدرجات</h2>
+      <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.gradeDistribution') }}</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
           baseChart
@@ -285,10 +285,10 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-3">
     <!-- Class summary -->
     <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
-      <h2 class="text-lg font-semibold text-gray-800 mb-4">ملخص القسم</h2>
+      <h2 class="text-lg font-semibold text-gray-800 mb-4">{{ translate('dashboard.classSummary') }}</h2>
       <div class="grid grid-cols-2 gap-4 text-sm">
         <div class="bg-blue-50 border border-blue-100 rounded-lg p-3">
-          <div class="text-xs text-blue-600 mb-1">معدل الحضور</div>
+          <div class="text-xs text-blue-600 mb-1">{{ translate('dashboard.attendanceRate') }}</div>
           <div class="text-xl font-bold text-blue-700">{{ averageAttendance | number:'1.0-1' }}%</div>
         </div>
         <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
@@ -317,8 +317,8 @@
     <!-- Seating chart preview (مجرد توزيع دوائر بسيطة) -->
     <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-800">مخطط المقاعد</h2>
-        <a routerLink="/seating-chart" class="text-sm text-blue-600 hover:text-blue-800">فتح المخطط</a>
+        <h2 class="text-lg font-semibold text-gray-800">{{ translate('dashboard.seatingChart') }}</h2>
+        <a routerLink="/seating-chart" class="text-sm text-blue-600 hover:text-blue-800">{{ translate('dashboard.openChart') }}</a>
       </div>
       <div class="flex-1 flex items-center justify-center">
         <div class="relative w-full h-56">
@@ -338,29 +338,29 @@
     <!-- Gradebook quick view -->
     <div class="bg-white rounded-lg shadow-md p-4 flex flex-col">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-semibold text-gray-800">سجل الدرجات</h2>
-        <a routerLink="/gradebook" class="text-sm text-blue-600 hover:text-blue-800">فتح السجل</a>
+        <h2 class="text-lg font-semibold text-gray-800">{{ translate('dashboard.gradebookQuickView') }}</h2>
+        <a routerLink="/gradebook" class="text-sm text-blue-600 hover:text-blue-800">{{ translate('gradebook.openGradebook') }}</a>
       </div>
       <div class="space-y-3 text-sm">
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">عدد التلاميذ بمعدل ≥ 10</span>
+          <span class="text-gray-600">{{ translate('gradebook.studentsWithAverage10') }}</span>
           <span class="font-semibold text-emerald-600">--</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">عدد التلاميذ بمعدل &lt; 10</span>
+          <span class="text-gray-600">{{ translate('gradebook.studentsWithAverageBelow10') }}</span>
           <span class="font-semibold text-red-600">--</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">أعلى درجة</span>
+          <span class="text-gray-600">{{ translate('dashboard.highestGrade') }}</span>
           <span class="font-semibold text-blue-700">--</span>
         </div>
         <div class="flex items-center justify-between">
-          <span class="text-gray-600">أقل درجة</span>
+          <span class="text-gray-600">{{ translate('dashboard.lowestGrade') }}</span>
           <span class="font-semibold text-red-700">--</span>
         </div>
       </div>
       <p class="mt-4 text-xs text-gray-500">
-        هذه القيم يمكن ربطها لاحقاً مباشرة ببيانات سجل الدرجات (Gradebook).
+        {{ translate('dashboard.gradebookNote') }}
       </p>
     </div>
   </div>

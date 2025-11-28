@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -305,8 +306,13 @@ export class GradebookComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    public languageService: LanguageService
   ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   ngOnInit(): void {
     this.loadClasses();

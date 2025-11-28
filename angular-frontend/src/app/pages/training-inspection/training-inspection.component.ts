@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
+import { LanguageService } from '../../services/language.service';
 
 interface TrainingRecord {
   date: string;
@@ -104,7 +105,10 @@ export class TrainingInspectionComponent {
   };
   pedagogicalVisits: PedagogicalVisitRecord[] = [];
 
-  constructor(private route: ActivatedRoute) {
+  constructor(
+    private route: ActivatedRoute,
+    public languageService: LanguageService
+  ) {
     this.loadFromStorage();
     this.route.queryParams.subscribe(params => {
       const report = params['report'] as 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical' | undefined;
@@ -353,6 +357,10 @@ export class TrainingInspectionComponent {
     } catch (error) {
       console.error('Error exporting section PDF', error);
     }
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 }
 

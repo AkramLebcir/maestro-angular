@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 
 export interface Student {
   id: number;
@@ -122,7 +123,14 @@ export class ClassesComponent implements OnInit {
     { value: '3rd_year_high', label: 'السنة ثالثة ثانوي' }
   ];
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     this.loadClasses();

@@ -1,9 +1,9 @@
 <div class="p-6 space-y-6">
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-      <h1 class="text-2xl font-bold text-gray-800">الوثائق البيداغوجية</h1>
+      <h1 class="text-2xl font-bold text-gray-800">{{ translate('pedagogicalDocs.title') }}</h1>
       <p class="text-sm text-gray-500 mt-1">
-        رفع وتنظيم المذكرات اليومية، التدرجات السنوية، المناهج، والكتب المدرسية حسب المستوى.
+        {{ translate('pedagogicalDocs.description') }}
       </p>
     </div>
   </div>
@@ -14,55 +14,55 @@
 
   <!-- Upload form -->
   <section class="bg-white rounded-lg shadow p-4 space-y-4">
-    <h2 class="text-lg font-semibold text-gray-700">إضافة وثيقة بيداغوجية</h2>
+    <h2 class="text-lg font-semibold text-gray-700">{{ translate('pedagogicalDocs.addDocument') }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">العنوان</label>
+        <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.titleLabel') }}</label>
         <input
           type="text"
           [(ngModel)]="newDoc.title"
           class="border rounded px-2 py-1"
-          placeholder="مثال: مذكرة الأسبوع الأول"
+          [placeholder]="translate('pedagogicalDocs.titlePlaceholder')"
         />
       </div>
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">المستوى</label>
+        <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.level') }}</label>
         <select
           [(ngModel)]="newDoc.level"
           class="border rounded px-2 py-1"
         >
-          <option value="">اختر المستوى</option>
+          <option value="">{{ translate('pedagogicalDocs.selectLevel') }}</option>
           <option *ngFor="let lvl of levels" [ngValue]="lvl">
             {{ lvl }}
           </option>
         </select>
       </div>
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">نوع الوثيقة</label>
+        <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.documentType') }}</label>
         <select
           [(ngModel)]="newDoc.type"
           class="border rounded px-2 py-1"
         >
-          <option value="">اختر النوع</option>
+          <option value="">{{ translate('pedagogicalDocs.selectType') }}</option>
           <option *ngFor="let t of types" [ngValue]="t.value">
             {{ t.label }}
           </option>
         </select>
       </div>
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">المادة (اختياري)</label>
+        <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.subject') }}</label>
         <input
           type="text"
           [(ngModel)]="newDoc.subject"
           class="border rounded px-2 py-1"
-          placeholder="مثال: رياضيات"
+          [placeholder]="translate('pedagogicalDocs.subjectPlaceholder')"
         />
       </div>
     </div>
 
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 text-sm">
       <div class="flex items-center gap-3">
-        <label class="text-xs text-gray-500">ملف الوثيقة</label>
+        <label class="text-xs text-gray-500">{{ translate('pedagogicalDocs.documentFile') }}</label>
         <input
           type="file"
           (change)="onFileSelected($event)"
@@ -78,8 +78,8 @@
         [disabled]="uploadInProgress"
         class="inline-flex items-center px-4 py-1.5 rounded bg-indigo-600 text-white text-sm hover:bg-indigo-700 disabled:opacity-60"
       >
-        <span *ngIf="!uploadInProgress">حفظ الوثيقة</span>
-        <span *ngIf="uploadInProgress">جاري الرفع...</span>
+        <span *ngIf="!uploadInProgress">{{ translate('pedagogicalDocs.saveDocument') }}</span>
+        <span *ngIf="uploadInProgress">{{ translate('pedagogicalDocs.uploading') }}</span>
       </button>
     </div>
   </section>
@@ -87,13 +87,13 @@
   <!-- Filters -->
   <section class="flex flex-wrap gap-3 items-center text-sm">
     <div class="flex flex-col">
-      <label class="text-xs text-gray-500 mb-1">تصفية حسب المستوى</label>
+      <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.filterByLevel') }}</label>
       <select
         [(ngModel)]="selectedLevelFilter"
         (change)="loadDocs()"
         class="border rounded px-2 py-1"
       >
-        <option [ngValue]="'all'">جميع المستويات</option>
+        <option [ngValue]="'all'">{{ translate('pedagogicalDocs.allLevels') }}</option>
         <option *ngFor="let lvl of levels" [ngValue]="lvl">
           {{ lvl }}
         </option>

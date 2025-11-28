@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import { environment } from '../../../environments/environment';
 
 interface PedagogicalDocument {
@@ -68,7 +69,14 @@ export class PedagogicalDocsComponent implements OnInit {
   // Flipbook preview
   selectedDoc: PedagogicalDocument | null = null;
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
+  }
 
   ngOnInit(): void {
     this.loadDocs();

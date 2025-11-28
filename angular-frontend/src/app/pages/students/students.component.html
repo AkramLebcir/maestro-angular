@@ -1,13 +1,13 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">إدارة التلاميذ</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('students.title') }}</h1>
       <div class="flex gap-3">
         <label class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
-          <span>استيراد من Excel</span>
+          <span>{{ translate('students.importExcel') }}</span>
           <input type="file" accept=".xlsx,.xls" (change)="onExcelFileSelected($event)" class="hidden">
         </label>
         <button 
@@ -16,7 +16,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span>تصدير إلى Excel</span>
+          <span>{{ translate('students.exportExcel') }}</span>
         </button>
         <button 
           (click)="openAddModal()"
@@ -24,7 +24,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span>إضافة تلميذ</span>
+          <span>{{ translate('students.addStudent') }}</span>
         </button>
       </div>
     </div>
@@ -32,99 +32,99 @@
     <!-- Search and Filter Section -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">البحث</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.search') }}</label>
         <input 
           type="text"
           [(ngModel)]="searchTerm"
           (input)="onSearchChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="ابحث بالاسم، اللقب، تاريخ الميلاد، مكان الميلاد، الجنس، القسم، معيد...">
+          [placeholder]="translate('students.searchPlaceholder')">
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب القسم</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.filterByClass') }}</label>
         <select 
           [(ngModel)]="selectedClassFilter"
           (change)="onClassFilterChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option [ngValue]="null">جميع الأقسام</option>
+          <option [ngValue]="null">{{ translate('students.allClasses') }}</option>
           <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب الجنس</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.filterByGender') }}</label>
         <select 
           [(ngModel)]="selectedGenderFilter"
           (change)="onGenderFilterChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option [ngValue]="null">جميع الأجناس</option>
-          <option [ngValue]="'male'">ذكر</option>
-          <option [ngValue]="'female'">أنثى</option>
+          <option [ngValue]="null">{{ translate('students.allGenders') }}</option>
+          <option [ngValue]="'male'">{{ translate('students.male') }}</option>
+          <option [ngValue]="'female'">{{ translate('students.female') }}</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب المعيد</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.filterByRepeater') }}</label>
         <select 
           [(ngModel)]="selectedRepeaterFilter"
           (change)="onRepeaterFilterChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option [ngValue]="null">الكل</option>
-          <option [ngValue]="true">معيد</option>
-          <option [ngValue]="false">غير معيد</option>
+          <option [ngValue]="null">{{ translate('students.allRepeaterOptions') }}</option>
+          <option [ngValue]="true">{{ translate('students.repeaterOnly') }}</option>
+          <option [ngValue]="false">{{ translate('students.nonRepeaterOnly') }}</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب المجموعة</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.filterByGroup') }}</label>
         <select 
           [(ngModel)]="selectedGroupFilter"
           (change)="onGroupFilterChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-          <option [ngValue]="null">جميع المجموعات</option>
-          <option [ngValue]="1">المجموعة 1</option>
-          <option [ngValue]="2">المجموعة 2</option>
+          <option [ngValue]="null">{{ translate('students.allGroups') }}</option>
+          <option [ngValue]="1">{{ translate('classes.group1') }}</option>
+          <option [ngValue]="2">{{ translate('classes.group2') }}</option>
         </select>
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة التلاميذ ({{ filteredStudents.length }})</h2>
+    <h2 class="text-xl font-bold text-gray-700 mb-4">{{ translate('students.listTitle') }} ({{ filteredStudents.length }})</h2>
 
     <div class="overflow-x-auto">
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-100 border-b-2 border-gray-300">
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('photo')">
-              الصورة
+              {{ translate('students.photo') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('idNumber')">
-              رقم الهوية / الكود {{ getSortIcon('idNumber') }}
+              {{ translate('students.idNumberLabel') }} {{ getSortIcon('idNumber') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('lastName')">
-              اللقب {{ getSortIcon('lastName') }}
+              {{ translate('students.lastName') }} {{ getSortIcon('lastName') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('firstName')">
-              الاسم {{ getSortIcon('firstName') }}
+              {{ translate('students.firstName') }} {{ getSortIcon('firstName') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('dateOfBirth')">
-              تاريخ الميلاد {{ getSortIcon('dateOfBirth') }}
+              {{ translate('students.birthDate') }} {{ getSortIcon('dateOfBirth') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('placeOfBirth')">
-              مكان الميلاد {{ getSortIcon('placeOfBirth') }}
+              {{ translate('students.birthPlace') }} {{ getSortIcon('placeOfBirth') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('gender')">
-              الجنس {{ getSortIcon('gender') }}
+              {{ translate('students.gender') }} {{ getSortIcon('gender') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('isRepeater')">
-              معيد {{ getSortIcon('isRepeater') }}
+              {{ translate('students.repeater') }} {{ getSortIcon('isRepeater') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('studentId')">
-              رقم التلميذ {{ getSortIcon('studentId') }}
+              {{ translate('students.studentNumber') }} {{ getSortIcon('studentId') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('classId')">
-              القسم {{ getSortIcon('classId') }}
+              {{ translate('students.class') }} {{ getSortIcon('classId') }}
             </th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 cursor-pointer" (click)="sort('group')">
-              المجموعة {{ getSortIcon('group') }}
+              {{ translate('students.group') }} {{ getSortIcon('group') }}
             </th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -133,7 +133,7 @@
               <img 
                 *ngIf="student.photo" 
                 [src]="student.photo" 
-                alt="صورة التلميذ"
+                [attr.alt]="translate('students.photo')"
                 class="w-12 h-12 rounded-full object-cover">
               <div *ngIf="!student.photo" class="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-gray-400">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,14 +148,14 @@
             <td class="py-3 px-4 text-gray-800">{{ student.placeOfBirth || '-' }}</td>
             <td class="py-3 px-4 text-gray-800">{{ getGenderLabel(student.gender) }}</td>
             <td class="py-3 px-4">
-              <span *ngIf="student.isRepeater" class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-sm">نعم</span>
-              <span *ngIf="!student.isRepeater" class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm">لا</span>
+              <span *ngIf="student.isRepeater" class="px-2 py-1 bg-orange-100 text-orange-800 rounded text-sm">{{ translate('students.yes') }}</span>
+              <span *ngIf="!student.isRepeater" class="px-2 py-1 bg-gray-100 text-gray-800 rounded text-sm">{{ translate('students.no') }}</span>
             </td>
             <td class="py-3 px-4 text-gray-800">{{ student.studentId || '-' }}</td>
             <td class="py-3 px-4 text-gray-800">{{ getClassName(student.classId) }}</td>
             <td class="py-3 px-4 text-gray-800">
-              <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">المجموعة 1</span>
-              <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">المجموعة 2</span>
+              <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">{{ translate('classes.group1') }}</span>
+              <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">{{ translate('classes.group2') }}</span>
               <span *ngIf="!student.group" class="text-gray-400">-</span>
             </td>
             <td class="py-3 px-4">
@@ -178,7 +178,7 @@
             </td>
           </tr>
           <tr *ngIf="filteredStudents.length === 0">
-            <td colspan="12" class="py-8 text-center text-gray-500">لا يوجد تلاميذ</td>
+            <td colspan="12" class="py-8 text-center text-gray-500">{{ translate('students.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -196,7 +196,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingStudent ? 'تعديل التلميذ' : 'إضافة تلميذ جديد' }}
+        {{ editingStudent ? translate('students.editTitle') : translate('students.addTitle') }}
       </h3>
       <button 
         (click)="closeModal()"
@@ -211,7 +211,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Photo Upload -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-1">الصورة</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.photo') }}</label>
           <div class="flex items-center gap-4">
             <div class="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
               <img *ngIf="photoPreview" [src]="photoPreview" alt="Preview" class="w-full h-full object-cover">
@@ -220,7 +220,7 @@
               </svg>
             </div>
             <label class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition cursor-pointer">
-              <span>اختر صورة</span>
+              <span>{{ translate('students.choosePhoto') }}</span>
               <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden">
             </label>
           </div>
@@ -228,42 +228,42 @@
 
         <!-- ID Number -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">رقم الهوية / الكود</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.idNumberLabel') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.idNumber"
             name="idNumber"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل رقم الهوية">
+            [placeholder]="translate('students.idNumberPlaceholder')">
         </div>
 
         <!-- Last Name -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">اللقب *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.lastName') }} *</label>
           <input 
             type="text"
             [(ngModel)]="formData.lastName"
             name="lastName"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل اللقب">
+            [placeholder]="translate('students.lastNamePlaceholder')">
         </div>
 
         <!-- First Name -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">الاسم *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.firstName') }} *</label>
           <input 
             type="text"
             [(ngModel)]="formData.firstName"
             name="firstName"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل الاسم">
+            [placeholder]="translate('students.firstNamePlaceholder')">
         </div>
 
         <!-- Date of Birth -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الميلاد</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.birthDate') }}</label>
           <input 
             type="date"
             [(ngModel)]="formData.dateOfBirth"
@@ -273,31 +273,31 @@
 
         <!-- Place of Birth -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">مكان الميلاد</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.birthPlace') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.placeOfBirth"
             name="placeOfBirth"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل مكان الميلاد">
+            [placeholder]="translate('students.birthPlacePlaceholder')">
         </div>
 
         <!-- Gender -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">الجنس</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.gender') }}</label>
           <select 
             [(ngModel)]="formData.gender"
             name="gender"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="undefined">اختر الجنس</option>
-            <option [ngValue]="'male'">ذكر</option>
-            <option [ngValue]="'female'">أنثى</option>
+            <option [ngValue]="undefined">{{ translate('students.selectGender') }}</option>
+            <option [ngValue]="'male'">{{ translate('students.male') }}</option>
+            <option [ngValue]="'female'">{{ translate('students.female') }}</option>
           </select>
         </div>
 
         <!-- Is Repeater -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">هل التلميذ معيد؟</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.isRepeaterQuestion') }}</label>
           <div class="flex items-center gap-2">
             <input 
               type="checkbox"
@@ -305,78 +305,78 @@
               name="isRepeater"
               id="isRepeater"
               class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-            <label for="isRepeater" class="text-sm font-medium text-gray-700">نعم</label>
+            <label for="isRepeater" class="text-sm font-medium text-gray-700">{{ translate('students.yes') }}</label>
           </div>
         </div>
 
         <!-- Student ID -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">رقم التلميذ</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.studentNumber') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.studentId"
             name="studentId"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل رقم التلميذ">
+            [placeholder]="translate('students.studentNumberPlaceholder')">
         </div>
 
         <!-- Class -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">القسم</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.class') }}</label>
           <select 
             [(ngModel)]="formData.classId"
             name="classId"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="undefined">لا يوجد</option>
+            <option [ngValue]="undefined">{{ translate('students.noneOption') }}</option>
             <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
           </select>
         </div>
 
         <!-- Group -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">المجموعة</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.group') }}</label>
           <select 
             [(ngModel)]="formData.group"
             name="group"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="null">لا يوجد</option>
-            <option [ngValue]="1">المجموعة 1</option>
-            <option [ngValue]="2">المجموعة 2</option>
+            <option [ngValue]="null">{{ translate('students.noneOption') }}</option>
+            <option [ngValue]="1">{{ translate('classes.group1') }}</option>
+            <option [ngValue]="2">{{ translate('classes.group2') }}</option>
           </select>
         </div>
 
         <!-- Email -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.email') }}</label>
           <input 
             type="email"
             [(ngModel)]="formData.email"
             name="email"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل البريد الإلكتروني">
+            [placeholder]="translate('students.emailPlaceholder')">
         </div>
 
         <!-- Student Number -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">رقم الطالب</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.schoolId') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.studentNumber"
             name="studentNumber"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل رقم الطالب">
+            [placeholder]="translate('students.schoolIdPlaceholder')">
         </div>
       </div>
 
       <!-- General Notes -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات عامة</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('students.notes') }}</label>
         <textarea 
           [(ngModel)]="formData.generalNotes"
           name="generalNotes"
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل ملاحظات عامة"></textarea>
+          [placeholder]="translate('students.notesPlaceholder')"></textarea>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -384,13 +384,13 @@
           type="submit"
           [disabled]="!studentForm.valid"
           class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingStudent ? 'تحديث' : 'إضافة' }}
+          {{ editingStudent ? translate('classes.update') : translate('classes.addAction') }}
         </button>
         <button 
           type="button"
           (click)="closeModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('common.cancel') }}
         </button>
       </div>
     </form>
@@ -406,7 +406,7 @@
     class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">استيراد من Excel</h3>
+      <h3 class="text-xl font-bold text-gray-800">{{ translate('students.importExcel') }}</h3>
       <button 
         *ngIf="!isImporting"
         (click)="closeImportModal()"
@@ -421,7 +421,7 @@
       <!-- Progress Bar -->
       <div *ngIf="isImporting">
         <div class="flex justify-between text-sm text-gray-600 mb-2">
-          <span>جاري الاستيراد...</span>
+          <span>{{ translate('students.importing') }}</span>
           <span>{{ importProgress.success + importProgress.failed }} / {{ importProgress.total }}</span>
         </div>
         <div class="w-full bg-gray-200 rounded-full h-2.5">
@@ -438,22 +438,22 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
           </svg>
-          <span class="font-semibold">نجح: {{ importProgress.success }}</span>
+          <span class="font-semibold">{{ translate('students.importSuccess') }} {{ importProgress.success }}</span>
         </div>
         <div class="flex items-center gap-2 text-red-600">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
-          <span class="font-semibold">فشل: {{ importProgress.failed }}</span>
+          <span class="font-semibold">{{ translate('students.importFailed') }} {{ importProgress.failed }}</span>
         </div>
         <div class="text-gray-600">
-          <span class="font-semibold">المجموع: {{ importProgress.total }}</span>
+          <span class="font-semibold">{{ translate('students.importTotal') }} {{ importProgress.total }}</span>
         </div>
       </div>
 
       <!-- Error Details -->
       <div *ngIf="importProgress.errors.length > 0" class="mt-4">
-        <h4 class="text-sm font-semibold text-gray-700 mb-2">تفاصيل الأخطاء:</h4>
+        <h4 class="text-sm font-semibold text-gray-700 mb-2">{{ translate('students.errorDetails') }}</h4>
         <div class="max-h-48 overflow-y-auto bg-gray-50 rounded p-3 space-y-1">
           <div *ngFor="let error of importProgress.errors" class="text-sm text-red-600">
             • {{ error }}
@@ -466,7 +466,7 @@
         <button 
           (click)="closeImportModal()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          إغلاق
+          {{ translate('classes.close') }}
         </button>
       </div>
     </div>

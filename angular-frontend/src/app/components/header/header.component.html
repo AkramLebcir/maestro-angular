@@ -1,5 +1,215 @@
-<header class="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400 text-white px-6 py-4 flex justify-between items-center shadow-md">
-  <div class="flex items-center gap-4">
+<header class="bg-gradient-to-r from-blue-700 via-blue-500 to-blue-400 text-white px-3 md:px-6 py-3 md:py-4 flex justify-between items-center shadow-md fixed inset-x-0 top-0 z-30">
+  <!-- جهة main menu: اسم التطبيق + زر الدائرة بالخطوط - تكون أقصى اليسار في RTL -->
+  <div class="flex items-center gap-2 md:gap-3">
+    <!-- زر القائمة الرئيسية (همبرغر داخل دائرة) في أقصى اليسار -->
+    <button
+      type="button"
+      (click)="toggleMenu.emit()"
+      class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center shadow-md hover:bg-white/30 focus:outline-none"
+      [attr.aria-label]="translate('header.toggleMenu')"
+    >
+      <div class="space-y-1.5">
+        <span class="block w-5 h-0.5 bg-white rounded"></span>
+        <span class="block w-5 h-0.5 bg-white rounded"></span>
+        <span class="block w-5 h-0.5 bg-white rounded"></span>
+      </div>
+    </button>
+
+    <!-- اسم التطبيق بجانب الزر -->
+    <div class="text-lg md:text-xl font-bold">{{ translate('app.title') }}</div>
+  </div>
+
+  <!-- أيقونة لغة التطبيق (علم الجزائر + رمز اللغة الحالية) ثم جرس التنبيهات ثم اسم ولقب الأستاذ ثم الصورة في الحافة -->
+  <div class="flex items-center gap-3 md:gap-4">
+    <!-- قائمة اختيار اللغة -->
+    <div class="relative">
+      <!-- زر اللغة: يعرض العلم + رمز اللغة الحالية -->
+      <button
+        type="button"
+        class="flex items-center gap-1 hover:opacity-80 focus:outline-none"
+        [attr.aria-label]="translate('header.changeLanguage')"
+        (click)="toggleLanguageMenu()"
+      >
+        <!-- العلم الحالي حسب اللغة المختارة -->
+        <ng-container [ngSwitch]="currentLanguageCode">
+          <!-- AR - الجزائر -->
+          <svg *ngSwitchCase="'AR'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="10" height="16" fill="#006233" />
+            <rect x="12" y="4" width="10" height="16" fill="#ffffff" />
+            <circle cx="11.5" cy="12" r="4.2" fill="#D21034" />
+            <circle cx="12.7" cy="12" r="3.5" fill="#ffffff" />
+            <polygon
+              points="13.5,9.5 14.3,11.2 16.1,11.2 14.7,12.3 15.3,14 13.5,13.1 11.7,14 12.3,12.3 10.9,11.2 12.7,11.2"
+              fill="#D21034"
+            />
+          </svg>
+
+          <!-- FR -->
+          <svg *ngSwitchCase="'FR'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="6" height="16" class="fill-blue-600" />
+            <rect x="8" y="4" width="8" height="16" class="fill-white" />
+            <rect x="16" y="4" width="6" height="16" class="fill-red-600" />
+          </svg>
+
+          <!-- EN (علم مبسط للاتحاد) -->
+          <svg *ngSwitchCase="'EN'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-blue-700" />
+            <path d="M2 8h20M2 16h20" class="stroke-white" stroke-width="2" />
+            <path d="M8 4v16M16 4v16" class="stroke-white" stroke-width="2" />
+          </svg>
+
+          <!-- ES -->
+          <svg *ngSwitchCase="'ES'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-yellow-400" />
+            <rect x="2" y="4" width="20" height="4" class="fill-red-600" />
+            <rect x="2" y="16" width="20" height="4" class="fill-red-600" />
+          </svg>
+
+          <!-- IT -->
+          <svg *ngSwitchCase="'IT'" class="w-6 h-6" viewBox="0 0 24 24">
+            <!-- أخضر حقيقي للعلم الإيطالي -->
+            <rect x="2" y="4" width="6" height="16" fill="#009246" />
+            <rect x="8" y="4" width="8" height="16" fill="#ffffff" />
+            <rect x="16" y="4" width="6" height="16" fill="#CE2B37" />
+          </svg>
+
+          <!-- DE -->
+          <svg *ngSwitchCase="'DE'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="5" class="fill-black" />
+            <rect x="2" y="9" width="20" height="5" class="fill-red-600" />
+            <rect x="2" y="14" width="20" height="6" class="fill-yellow-400" />
+          </svg>
+
+          <!-- TR -->
+          <svg *ngSwitchCase="'TR'" class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-red-600" />
+            <circle cx="11" cy="12" r="4" class="fill-white" />
+            <circle cx="12" cy="12" r="3" class="fill-red-600" />
+            <circle cx="14" cy="12" r="1" class="fill-white" />
+          </svg>
+
+          <!-- افتراضي: الجزائر -->
+          <svg *ngSwitchDefault class="w-6 h-6" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="10" height="16" fill="#006233" />
+            <rect x="12" y="4" width="10" height="16" fill="#ffffff" />
+            <circle cx="11.5" cy="12" r="4.2" fill="#D21034" />
+            <circle cx="12.7" cy="12" r="3.5" fill="#ffffff" />
+            <polygon
+              points="13.5,9.5 14.3,11.2 16.1,11.2 14.7,12.3 15.3,14 13.5,13.1 11.7,14 12.3,12.3 10.9,11.2 12.7,11.2"
+              fill="#D21034"
+            />
+          </svg>
+        </ng-container>
+        <!-- رمز اللغة الحالي (AR, FR, EN, ES, IT, DE, TR, ...) -->
+        <span class="text-[10px] md:text-xs font-semibold">{{ currentLanguageCode }}</span>
+      </button>
+
+      <!-- اللغات المتاحة تظهر تحت الأيقونة عند النقر -->
+      <div
+        *ngIf="isLanguageMenuOpen"
+        class="absolute right-0 mt-2 w-40 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
+      >
+        <!-- فرنسي -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('FR')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="6" height="16" class="fill-blue-600" />
+            <rect x="8" y="4" width="8" height="16" class="fill-white" />
+            <rect x="16" y="4" width="6" height="16" class="fill-red-600" />
+          </svg>
+          <span class="font-semibold">FR</span>
+          <span class="text-[10px] text-gray-500">Français</span>
+        </button>
+
+        <!-- إنجليزي -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('EN')"
+        >
+          <!-- علم مبسط للإنجليزي (الاتحاد) -->
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-blue-700" />
+            <path d="M2 8h20M2 16h20" class="stroke-white" stroke-width="2" />
+            <path d="M8 4v16M16 4v16" class="stroke-white" stroke-width="2" />
+          </svg>
+          <span class="font-semibold">EN</span>
+          <span class="text-[10px] text-gray-500">English</span>
+        </button>
+
+        <!-- إسباني -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('ES')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-yellow-400" />
+            <rect x="2" y="4" width="20" height="4" class="fill-red-600" />
+            <rect x="2" y="16" width="20" height="4" class="fill-red-600" />
+          </svg>
+          <span class="font-semibold">ES</span>
+          <span class="text-[10px] text-gray-500">Español</span>
+        </button>
+
+        <!-- إيطالي -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('IT')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="6" height="16" fill="#009246" />
+            <rect x="8" y="4" width="8" height="16" fill="#ffffff" />
+            <rect x="16" y="4" width="6" height="16" fill="#CE2B37" />
+          </svg>
+          <span class="font-semibold">IT</span>
+          <span class="text-[10px] text-gray-500">Italiano</span>
+        </button>
+
+        <!-- ألماني -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('DE')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="5" class="fill-black" />
+            <rect x="2" y="9" width="20" height="5" class="fill-red-600" />
+            <rect x="2" y="14" width="20" height="6" class="fill-yellow-400" />
+          </svg>
+          <span class="font-semibold">DE</span>
+          <span class="text-[10px] text-gray-500">Deutsch</span>
+        </button>
+
+        <!-- تركي -->
+        <button
+          type="button"
+          class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
+          (click)="selectLanguage('TR')"
+        >
+          <svg class="w-5 h-5" viewBox="0 0 24 24">
+            <rect x="2" y="4" width="20" height="16" class="fill-red-600" />
+            <circle cx="11" cy="12" r="4" class="fill-white" />
+            <circle cx="12" cy="12" r="3" class="fill-red-600" />
+            <circle cx="14" cy="12" r="1" class="fill-white" />
+          </svg>
+          <span class="font-semibold">TR</span>
+          <span class="text-[10px] text-gray-500">Türkçe</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="relative">
+      <svg class="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+      </svg>
+      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
+    </div>
+    <span class="hidden sm:inline-block text-sm md:text-lg font-semibold">{{ teacherName }}</span>
     <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/40">
       <img
         *ngIf="teacherPhotoUrl; else initialsAvatar"
@@ -13,15 +223,7 @@
         </span>
       </ng-template>
     </div>
-    <span class="text-lg font-semibold">{{ teacherName }}</span>
-    <div class="relative">
-      <svg class="w-6 h-6 cursor-pointer" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
-    </div>
   </div>
-  <div class="text-xl font-bold">TeacherKit Plus Informatique</div>
 </header>
 
 
