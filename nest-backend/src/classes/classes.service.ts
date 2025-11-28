@@ -16,54 +16,46 @@ export class ClassesService {
     private labRepository: Repository<Lab>,
   ) {}
 
-  async create(createClassDto: CreateClassDto): Promise<ClassResponseDto> {
+  async create(ownerId: number, createClassDto: CreateClassDto): Promise<ClassResponseDto> {
     // Validate lab exists if labId is provided
     if (createClassDto.labId !== undefined && createClassDto.labId !== null) {
       const lab = await this.labRepository.findOne({
-        where: { id: createClassDto.labId },
+        where: { id: createClassDto.labId, ownerId },
       });
       if (!lab) {
         throw new BadRequestException(`Lab with ID ${createClassDto.labId} not found`);
       }
     }
 
-    const classEntity = this.classRepository.create(createClassDto);
+    const classEntity = this.classRepository.create({
+      ...createClassDto,
+      ownerId,
+    });
     const savedClass = await this.classRepository.save(classEntity);
-    return this.findOne(savedClass.id);
+    return this.findOne(ownerId, savedClass.id);
   }
 
-  async findAll(): Promise<ClassResponseDto[]> {
+  async findAll(ownerId: number): Promise<ClassResponseDto[]> {
     const classes = await this.classRepository.find({
+      where: { ownerId },
       relations: ['lab', 'students'],
     });
 
     return classes.map((classEntity) => this.mapToResponseDto(classEntity));
   }
 
-  async findOne(id: number): Promise<ClassResponseDto> {
-    const classEntity = await this.classRepository.findOne({
-      where: { id },
-      relations: ['lab', 'students'],
-    });
-
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${id} not found`);
-    }
-
+  async findOne(ownerId: number, id: number): Promise<ClassResponseDto> {
+    const classEntity = await this.findOwnedClass(ownerId, id, ['lab', 'students']);
     return this.mapToResponseDto(classEntity);
   }
 
-  async update(id: number, updateClassDto: UpdateClassDto): Promise<ClassResponseDto> {
-    const classEntity = await this.classRepository.findOne({ where: { id } });
-
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${id} not found`);
-    }
+  async update(ownerId: number, id: number, updateClassDto: UpdateClassDto): Promise<ClassResponseDto> {
+    const classEntity = await this.findOwnedClass(ownerId, id);
 
     // Validate lab exists if labId is being updated
     if (updateClassDto.labId !== undefined && updateClassDto.labId !== null) {
       const lab = await this.labRepository.findOne({
-        where: { id: updateClassDto.labId },
+        where: { id: updateClassDto.labId, ownerId },
       });
       if (!lab) {
         throw new BadRequestException(`Lab with ID ${updateClassDto.labId} not found`);
@@ -72,29 +64,16 @@ export class ClassesService {
 
     Object.assign(classEntity, updateClassDto);
     await this.classRepository.save(classEntity);
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const classEntity = await this.classRepository.findOne({ where: { id } });
-
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${id} not found`);
-    }
-
+  async remove(ownerId: number, id: number): Promise<void> {
+    const classEntity = await this.findOwnedClass(ownerId, id);
     await this.classRepository.remove(classEntity);
   }
 
-  async getStudentCount(id: number): Promise<number> {
-    const classEntity = await this.classRepository.findOne({
-      where: { id },
-      relations: ['students'],
-    });
-
-    if (!classEntity) {
-      throw new NotFoundException(`Class with ID ${id} not found`);
-    }
-
+  async getStudentCount(ownerId: number, id: number): Promise<number> {
+    const classEntity = await this.findOwnedClass(ownerId, id, ['students']);
     return classEntity.students?.length || 0;
   }
 
@@ -117,6 +96,19 @@ export class ClassesService {
       createdAt: classEntity.createdAt,
       updatedAt: classEntity.updatedAt,
     };
+  }
+
+  private async findOwnedClass(ownerId: number, id: number, relations: string[] = []): Promise<Class> {
+    const classEntity = await this.classRepository.findOne({
+      where: { id, ownerId },
+      relations,
+    });
+
+    if (!classEntity) {
+      throw new NotFoundException(`Class with ID ${id} not found`);
+    }
+
+    return classEntity;
   }
 }
 

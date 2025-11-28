@@ -1,9 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Class } from '../classes/class.entity';
 import { Lab } from '../labs/lab.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('timetable')
-export class Timetable {
+export class Timetable extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -1,11 +1,12 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Student } from '../students/student.entity';
 import { Class } from '../classes/class.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 export type AttendanceStatus = 'present' | 'absent' | 'late' | 'excused' | 'left_early' | 'unrecorded';
 
 @Entity('attendance')
-export class Attendance {
+export class Attendance extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

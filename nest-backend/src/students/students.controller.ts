@@ -15,45 +15,60 @@ import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentResponseDto } from './dto/student-response.dto';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/interfaces/auth-user.interface';
+import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 
 @Controller('students')
+@ModuleAccess('students')
 export class StudentsController {
   constructor(private readonly studentsService: StudentsService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createStudentDto: CreateStudentDto): Promise<StudentResponseDto> {
-    return this.studentsService.create(createStudentDto);
+  async create(
+    @CurrentUser() user: AuthUser,
+    @Body() createStudentDto: CreateStudentDto,
+  ): Promise<StudentResponseDto> {
+    return this.studentsService.create(user.id, createStudentDto);
   }
 
   @Get()
   async findAll(
+    @CurrentUser() user: AuthUser,
     @Query('classId') classId?: string,
     @Query('group') group?: string,
   ): Promise<StudentResponseDto[]> {
-    return this.studentsService.findAll({
+    return this.studentsService.findAll(user.id, {
       classId: classId ? Number(classId) : undefined,
       group: group ? Number(group) : undefined,
     });
   }
 
   @Get(':id')
-  async findOne(@Param('id', ParseIntPipe) id: number): Promise<StudentResponseDto> {
-    return this.studentsService.findOne(id);
+  async findOne(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<StudentResponseDto> {
+    return this.studentsService.findOne(user.id, id);
   }
 
   @Patch(':id')
   async update(
+    @CurrentUser() user: AuthUser,
     @Param('id', ParseIntPipe) id: number,
     @Body() updateStudentDto: UpdateStudentDto,
   ): Promise<StudentResponseDto> {
-    return this.studentsService.update(id, updateStudentDto);
+    return this.studentsService.update(user.id, id, updateStudentDto);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    return this.studentsService.remove(id);
+  async remove(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<void> {
+    return this.studentsService.remove(user.id, id);
   }
 }
 

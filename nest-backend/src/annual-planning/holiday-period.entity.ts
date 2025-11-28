@@ -1,7 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('holiday_period')
-export class HolidayPeriod {
+export class HolidayPeriod extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

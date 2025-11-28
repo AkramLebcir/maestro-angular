@@ -1,8 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Lab } from '../labs/lab.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('lab_furniture')
-export class LabFurniture {
+export class LabFurniture extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

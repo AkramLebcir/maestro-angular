@@ -13,46 +13,35 @@ export class LabsService {
     private labRepository: Repository<Lab>,
   ) {}
 
-  async create(createLabDto: CreateLabDto): Promise<LabResponseDto> {
-    const lab = this.labRepository.create(createLabDto);
+  async create(ownerId: number, createLabDto: CreateLabDto): Promise<LabResponseDto> {
+    const lab = this.labRepository.create({
+      ...createLabDto,
+      ownerId,
+    });
     const savedLab = await this.labRepository.save(lab);
     return this.mapToResponseDto(savedLab);
   }
 
-  async findAll(): Promise<LabResponseDto[]> {
-    const labs = await this.labRepository.find();
+  async findAll(ownerId: number): Promise<LabResponseDto[]> {
+    const labs = await this.labRepository.find({ where: { ownerId } });
     return labs.map((lab) => this.mapToResponseDto(lab));
   }
 
-  async findOne(id: number): Promise<LabResponseDto> {
-    const lab = await this.labRepository.findOne({ where: { id } });
-
-    if (!lab) {
-      throw new NotFoundException(`Lab with ID ${id} not found`);
-    }
-
+  async findOne(ownerId: number, id: number): Promise<LabResponseDto> {
+    const lab = await this.findOwnedLab(ownerId, id);
     return this.mapToResponseDto(lab);
   }
 
-  async update(id: number, updateLabDto: UpdateLabDto): Promise<LabResponseDto> {
-    const lab = await this.labRepository.findOne({ where: { id } });
-
-    if (!lab) {
-      throw new NotFoundException(`Lab with ID ${id} not found`);
-    }
+  async update(ownerId: number, id: number, updateLabDto: UpdateLabDto): Promise<LabResponseDto> {
+    const lab = await this.findOwnedLab(ownerId, id);
 
     Object.assign(lab, updateLabDto);
     await this.labRepository.save(lab);
     return this.mapToResponseDto(lab);
   }
 
-  async remove(id: number): Promise<void> {
-    const lab = await this.labRepository.findOne({ where: { id } });
-
-    if (!lab) {
-      throw new NotFoundException(`Lab with ID ${id} not found`);
-    }
-
+  async remove(ownerId: number, id: number): Promise<void> {
+    const lab = await this.findOwnedLab(ownerId, id);
     await this.labRepository.remove(lab);
   }
 
@@ -66,6 +55,16 @@ export class LabsService {
       createdAt: lab.createdAt,
       updatedAt: lab.updatedAt,
     };
+  }
+
+  private async findOwnedLab(ownerId: number, id: number): Promise<Lab> {
+    const lab = await this.labRepository.findOne({ where: { id, ownerId } });
+
+    if (!lab) {
+      throw new NotFoundException(`Lab with ID ${id} not found`);
+    }
+
+    return lab;
   }
 }
 

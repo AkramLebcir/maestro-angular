@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Class } from '../classes/class.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('students')
-export class Student {
+export class Student extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

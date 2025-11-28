@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinColum
 import { Lab } from '../labs/lab.entity';
 import { Student } from '../students/student.entity';
 import { Subject } from '../subjects/subject.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 export enum ClassLevel {
   FIRST_YEAR_MIDDLE = '1st_year_middle',
@@ -14,7 +15,7 @@ export enum ClassLevel {
 }
 
 @Entity('classes')
-export class Class {
+export class Class extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

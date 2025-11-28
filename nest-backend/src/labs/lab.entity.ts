@@ -1,8 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { Class } from '../classes/class.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('labs')
-export class Lab {
+export class Lab extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

@@ -1,9 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Class } from '../classes/class.entity';
 import { AnnualDistribution } from '../annual-planning/annual-distribution.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('subjects')
-export class Subject {
+export class Subject extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

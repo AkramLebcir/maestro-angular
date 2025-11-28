@@ -1,14 +1,9 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Class } from '../classes/class.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('progress_tracking')
-export class ProgressTracking {
+export class ProgressTracking extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

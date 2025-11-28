@@ -1,12 +1,7 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Workstation } from './workstation.entity';
 import { Student } from '../students/student.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 export enum AttendanceStatus {
   PRESENT = 'present',
@@ -22,7 +17,7 @@ export enum BehaviorStatus {
 }
 
 @Entity('seat_assignments')
-export class SeatAssignment {
+export class SeatAssignment extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

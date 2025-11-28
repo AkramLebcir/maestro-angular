@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { DatabaseModule } from './database/database.module';
@@ -18,6 +19,11 @@ import { LabManagementModule } from './lab-management/lab-management.module';
 import { AnnualPlanningModule } from './annual-planning/annual-planning.module';
 import { ProgressTrackingModule } from './progress-tracking/progress-tracking.module';
 import { PedagogicalDocsModule } from './pedagogical-docs/pedagogical-docs.module';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { ModuleAccessGuard } from './auth/guards/module-access.guard';
 
 @Module({
   imports: [
@@ -40,9 +46,25 @@ import { PedagogicalDocsModule } from './pedagogical-docs/pedagogical-docs.modul
     AnnualPlanningModule,
     ProgressTrackingModule,
     PedagogicalDocsModule,
+    AuthModule,
+    UsersModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: ModuleAccessGuard,
+    },
+  ],
 })
 export class AppModule {}
 

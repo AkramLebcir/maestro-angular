@@ -1,17 +1,11 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  JoinColumn,
-  OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn, OneToMany } from 'typeorm';
 import { Class } from '../classes/class.entity';
 import { Lab } from '../labs/lab.entity';
 import { SeatAssignment } from './seat-assignment.entity';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 @Entity('workstations')
-export class Workstation {
+export class Workstation extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 

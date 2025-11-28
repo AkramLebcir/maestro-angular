@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
 export type PedagogicalDocType =
   | 'lesson_plan'
@@ -7,7 +8,7 @@ export type PedagogicalDocType =
   | 'textbook';
 
 @Entity('pedagogical_documents')
-export class PedagogicalDocument {
+export class PedagogicalDocument extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
