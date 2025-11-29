@@ -10,8 +10,12 @@ import {
 import { ProgressTrackingService } from './progress-tracking.service';
 import { SubjectProgressDto } from './dto/subject-progress.dto';
 import { ProgressTracking } from './progress-tracking.entity';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/interfaces/auth-user.interface';
+import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 
 @Controller('progress-tracking')
+@ModuleAccess('progress-tracking')
 export class ProgressTrackingController {
   constructor(private readonly service: ProgressTrackingService) {}
 
@@ -20,6 +24,7 @@ export class ProgressTrackingController {
    */
   @Patch()
   async upsert(
+    @CurrentUser() user: AuthUser,
     @Body()
     body: {
       classId: number;
@@ -27,7 +32,7 @@ export class ProgressTrackingController {
       lastLessonReached: number;
     },
   ): Promise<ProgressTracking> {
-    return this.service.upsertProgress(body);
+    return this.service.upsertProgress(user.id, body);
   }
 
   /**
@@ -35,10 +40,11 @@ export class ProgressTrackingController {
    */
   @Get('subject/:subjectId')
   async getSubjectProgress(
+    @CurrentUser() user: AuthUser,
     @Param('subjectId', ParseIntPipe) subjectId: number,
     @Query('date') date?: string,
   ): Promise<SubjectProgressDto> {
-    return this.service.getSubjectProgress(subjectId, { date });
+    return this.service.getSubjectProgress(user.id, subjectId, { date });
   }
 }
 

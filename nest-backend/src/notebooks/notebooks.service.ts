@@ -22,33 +22,37 @@ export class NotebooksService {
     private classRepository: Repository<Class>,
   ) {}
 
-  async create(createNotebookDto: CreateNotebookDto): Promise<NotebookResponseDto> {
+  async create(ownerId: number, createNotebookDto: CreateNotebookDto): Promise<NotebookResponseDto> {
     // Validate class exists if classId is provided
     if (createNotebookDto.classId !== undefined && createNotebookDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: createNotebookDto.classId },
+        where: { id: createNotebookDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${createNotebookDto.classId} not found`);
       }
     }
 
-    const notebook = this.notebookRepository.create(createNotebookDto);
+    const notebook = this.notebookRepository.create({
+      ...createNotebookDto,
+      ownerId,
+    });
     const savedNotebook = await this.notebookRepository.save(notebook);
-    return this.findOne(savedNotebook.id);
+    return this.findOne(ownerId, savedNotebook.id);
   }
 
-  async findAll(): Promise<NotebookResponseDto[]> {
+  async findAll(ownerId: number): Promise<NotebookResponseDto[]> {
     const notebooks = await this.notebookRepository.find({
+      where: { ownerId },
       relations: ['class'],
     });
 
     return notebooks.map((notebook) => this.mapToResponseDto(notebook));
   }
 
-  async findOne(id: number): Promise<NotebookResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<NotebookResponseDto> {
     const notebook = await this.notebookRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
       relations: ['class'],
     });
 
@@ -59,8 +63,8 @@ export class NotebooksService {
     return this.mapToResponseDto(notebook);
   }
 
-  async update(id: number, updateNotebookDto: UpdateNotebookDto): Promise<NotebookResponseDto> {
-    const notebook = await this.notebookRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateNotebookDto: UpdateNotebookDto): Promise<NotebookResponseDto> {
+    const notebook = await this.notebookRepository.findOne({ where: { id, ownerId } });
 
     if (!notebook) {
       throw new NotFoundException(`Notebook with ID ${id} not found`);
@@ -69,7 +73,7 @@ export class NotebooksService {
     // Validate class exists if classId is being updated
     if (updateNotebookDto.classId !== undefined && updateNotebookDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: updateNotebookDto.classId },
+        where: { id: updateNotebookDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${updateNotebookDto.classId} not found`);
@@ -78,11 +82,11 @@ export class NotebooksService {
 
     Object.assign(notebook, updateNotebookDto);
     await this.notebookRepository.save(notebook);
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const notebook = await this.notebookRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const notebook = await this.notebookRepository.findOne({ where: { id, ownerId } });
 
     if (!notebook) {
       throw new NotFoundException(`Notebook with ID ${id} not found`);
@@ -111,9 +115,9 @@ export class NotebooksService {
   }
 
   // Course Entry Methods
-  async createCourseEntry(notebookId: number, createCourseEntryDto: CreateCourseEntryDto): Promise<CourseEntryResponseDto> {
-    // Validate notebook exists
-    const notebook = await this.notebookRepository.findOne({ where: { id: notebookId } });
+  async createCourseEntry(ownerId: number, notebookId: number, createCourseEntryDto: CreateCourseEntryDto): Promise<CourseEntryResponseDto> {
+    // Validate notebook exists and belongs to owner
+    const notebook = await this.notebookRepository.findOne({ where: { id: notebookId, ownerId } });
     if (!notebook) {
       throw new NotFoundException(`Notebook with ID ${notebookId} not found`);
     }
@@ -128,25 +132,26 @@ export class NotebooksService {
     const courseEntry = this.courseEntryRepository.create({
       ...createCourseEntryDto,
       notebookId,
+      ownerId,
     });
     const savedCourseEntry = await this.courseEntryRepository.save(courseEntry);
     // Reload with relations
     const reloadedEntry = await this.courseEntryRepository.findOne({
-      where: { id: savedCourseEntry.id },
+      where: { id: savedCourseEntry.id, ownerId },
       relations: ['topic', 'topic.elements'],
     });
     return this.mapCourseEntryToResponseDto(reloadedEntry || savedCourseEntry);
   }
 
-  async findAllCourseEntries(notebookId: number): Promise<CourseEntryResponseDto[]> {
-    // Validate notebook exists
-    const notebook = await this.notebookRepository.findOne({ where: { id: notebookId } });
+  async findAllCourseEntries(ownerId: number, notebookId: number): Promise<CourseEntryResponseDto[]> {
+    // Validate notebook exists and belongs to owner
+    const notebook = await this.notebookRepository.findOne({ where: { id: notebookId, ownerId } });
     if (!notebook) {
       throw new NotFoundException(`Notebook with ID ${notebookId} not found`);
     }
 
     const courseEntries = await this.courseEntryRepository.find({
-      where: { notebookId },
+      where: { notebookId, ownerId },
       relations: ['topic', 'topic.elements'],
       order: {
         date: 'ASC',
@@ -157,9 +162,9 @@ export class NotebooksService {
     return courseEntries.map((entry) => this.mapCourseEntryToResponseDto(entry));
   }
 
-  async findOneCourseEntry(notebookId: number, courseEntryId: number): Promise<CourseEntryResponseDto> {
+  async findOneCourseEntry(ownerId: number, notebookId: number, courseEntryId: number): Promise<CourseEntryResponseDto> {
     const courseEntry = await this.courseEntryRepository.findOne({
-      where: { id: courseEntryId, notebookId },
+      where: { id: courseEntryId, notebookId, ownerId },
       relations: ['topic', 'topic.elements'],
     });
 
@@ -171,12 +176,13 @@ export class NotebooksService {
   }
 
   async updateCourseEntry(
+    ownerId: number,
     notebookId: number,
     courseEntryId: number,
     updateCourseEntryDto: UpdateCourseEntryDto,
   ): Promise<CourseEntryResponseDto> {
     const courseEntry = await this.courseEntryRepository.findOne({
-      where: { id: courseEntryId, notebookId },
+      where: { id: courseEntryId, notebookId, ownerId },
     });
 
     if (!courseEntry) {
@@ -197,7 +203,7 @@ export class NotebooksService {
     // Validate notebook exists if notebookId is being updated
     if (updateCourseEntryDto.notebookId !== undefined && updateCourseEntryDto.notebookId !== notebookId) {
       const notebook = await this.notebookRepository.findOne({
-        where: { id: updateCourseEntryDto.notebookId },
+        where: { id: updateCourseEntryDto.notebookId, ownerId },
       });
       if (!notebook) {
         throw new BadRequestException(`Notebook with ID ${updateCourseEntryDto.notebookId} not found`);
@@ -208,15 +214,15 @@ export class NotebooksService {
     const savedCourseEntry = await this.courseEntryRepository.save(courseEntry);
     // Reload with relations
     const reloadedEntry = await this.courseEntryRepository.findOne({
-      where: { id: savedCourseEntry.id },
+      where: { id: savedCourseEntry.id, ownerId },
       relations: ['topic', 'topic.elements'],
     });
     return this.mapCourseEntryToResponseDto(reloadedEntry || savedCourseEntry);
   }
 
-  async removeCourseEntry(notebookId: number, courseEntryId: number): Promise<void> {
+  async removeCourseEntry(ownerId: number, notebookId: number, courseEntryId: number): Promise<void> {
     const courseEntry = await this.courseEntryRepository.findOne({
-      where: { id: courseEntryId, notebookId },
+      where: { id: courseEntryId, notebookId, ownerId },
     });
 
     if (!courseEntry) {

@@ -12,29 +12,30 @@ export class LabInventoryService {
     private readonly repo: Repository<LabInventoryItem>,
   ) {}
 
-  findAll(labId?: number): Promise<LabInventoryItem[]> {
-    const where = labId ? { labId } : {};
+  findAll(ownerId: number, labId?: number): Promise<LabInventoryItem[]> {
+    const where: any = { ownerId };
+    if (labId) where.labId = labId;
     return this.repo.find({ where, order: { category: 'ASC', label: 'ASC' } });
   }
 
-  async findOne(id: number): Promise<LabInventoryItem> {
-    const item = await this.repo.findOne({ where: { id } });
+  async findOne(ownerId: number, id: number): Promise<LabInventoryItem> {
+    const item = await this.repo.findOne({ where: { id, ownerId } });
     if (!item) throw new NotFoundException('Inventory item not found');
     return item;
   }
 
-  create(dto: CreateLabInventoryItemDto): Promise<LabInventoryItem> {
-    const entity = this.repo.create(dto);
+  create(ownerId: number, dto: CreateLabInventoryItemDto): Promise<LabInventoryItem> {
+    const entity = this.repo.create({ ...dto, ownerId });
     return this.repo.save(entity);
   }
 
-  async update(id: number, dto: UpdateLabInventoryItemDto): Promise<LabInventoryItem> {
-    await this.repo.update(id, dto);
-    return this.findOne(id);
+  async update(ownerId: number, id: number, dto: UpdateLabInventoryItemDto): Promise<LabInventoryItem> {
+    await this.repo.update({ id, ownerId }, dto);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.repo.delete(id);
+  async remove(ownerId: number, id: number): Promise<void> {
+    await this.repo.delete({ id, ownerId });
   }
 }
 

@@ -19,10 +19,10 @@ export class BehaviorEventsService {
     private classRepository: Repository<Class>,
   ) {}
 
-  async create(createBehaviorEventDto: CreateBehaviorEventDto): Promise<BehaviorEventResponseDto> {
-    // Validate student exists
+  async create(ownerId: number, createBehaviorEventDto: CreateBehaviorEventDto): Promise<BehaviorEventResponseDto> {
+    // Validate student exists and belongs to owner
     const student = await this.studentRepository.findOne({
-      where: { id: createBehaviorEventDto.studentId },
+      where: { id: createBehaviorEventDto.studentId, ownerId },
     });
     if (!student) {
       throw new BadRequestException(`Student with ID ${createBehaviorEventDto.studentId} not found`);
@@ -31,7 +31,7 @@ export class BehaviorEventsService {
     // Validate class exists if classId is provided
     if (createBehaviorEventDto.classId !== undefined && createBehaviorEventDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: createBehaviorEventDto.classId },
+        where: { id: createBehaviorEventDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${createBehaviorEventDto.classId} not found`);
@@ -41,16 +41,17 @@ export class BehaviorEventsService {
     // Convert date string to Date
     const behaviorEventData: Partial<BehaviorEvent> = {
       ...createBehaviorEventDto,
+      ownerId,
       date: new Date(createBehaviorEventDto.date),
     };
 
     const behaviorEvent = this.behaviorEventRepository.create(behaviorEventData);
     const savedBehaviorEvent = await this.behaviorEventRepository.save(behaviorEvent);
-    return this.findOne(savedBehaviorEvent.id);
+    return this.findOne(ownerId, savedBehaviorEvent.id);
   }
 
-  async findAll(query?: { studentId?: number; classId?: number }): Promise<BehaviorEventResponseDto[]> {
-    const where: any = {};
+  async findAll(ownerId: number, query?: { studentId?: number; classId?: number }): Promise<BehaviorEventResponseDto[]> {
+    const where: any = { ownerId };
     
     if (query?.studentId) {
       where.studentId = query.studentId;
@@ -69,9 +70,9 @@ export class BehaviorEventsService {
     return behaviorEvents.map((event) => this.mapToResponseDto(event));
   }
 
-  async findOne(id: number): Promise<BehaviorEventResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<BehaviorEventResponseDto> {
     const behaviorEvent = await this.behaviorEventRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
       relations: ['student', 'class'],
     });
 
@@ -82,8 +83,8 @@ export class BehaviorEventsService {
     return this.mapToResponseDto(behaviorEvent);
   }
 
-  async update(id: number, updateBehaviorEventDto: UpdateBehaviorEventDto): Promise<BehaviorEventResponseDto> {
-    const behaviorEvent = await this.behaviorEventRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateBehaviorEventDto: UpdateBehaviorEventDto): Promise<BehaviorEventResponseDto> {
+    const behaviorEvent = await this.behaviorEventRepository.findOne({ where: { id, ownerId } });
 
     if (!behaviorEvent) {
       throw new NotFoundException(`Behavior event with ID ${id} not found`);
@@ -92,7 +93,7 @@ export class BehaviorEventsService {
     // Validate student exists if studentId is being updated
     if (updateBehaviorEventDto.studentId !== undefined && updateBehaviorEventDto.studentId !== null) {
       const student = await this.studentRepository.findOne({
-        where: { id: updateBehaviorEventDto.studentId },
+        where: { id: updateBehaviorEventDto.studentId, ownerId },
       });
       if (!student) {
         throw new BadRequestException(`Student with ID ${updateBehaviorEventDto.studentId} not found`);
@@ -102,7 +103,7 @@ export class BehaviorEventsService {
     // Validate class exists if classId is being updated
     if (updateBehaviorEventDto.classId !== undefined && updateBehaviorEventDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: updateBehaviorEventDto.classId },
+        where: { id: updateBehaviorEventDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${updateBehaviorEventDto.classId} not found`);
@@ -132,11 +133,11 @@ export class BehaviorEventsService {
 
     Object.assign(behaviorEvent, fieldsToUpdate);
     await this.behaviorEventRepository.save(behaviorEvent);
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const behaviorEvent = await this.behaviorEventRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const behaviorEvent = await this.behaviorEventRepository.findOne({ where: { id, ownerId } });
 
     if (!behaviorEvent) {
       throw new NotFoundException(`Behavior event with ID ${id} not found`);

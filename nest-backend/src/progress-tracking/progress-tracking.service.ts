@@ -30,18 +30,27 @@ export class ProgressTrackingService {
   /**
    * إنشاء/تحديث آخر درس منجز لقسم معيّن
    */
-  async upsertProgress(payload: {
+  async upsertProgress(ownerId: number, payload: {
     classId: number;
     teacherId?: number;
     lastLessonReached: number;
   }): Promise<ProgressTracking> {
+    // Validate class exists and belongs to owner
+    const classEntity = await this.classRepo.findOne({
+      where: { id: payload.classId, ownerId },
+    });
+    if (!classEntity) {
+      throw new NotFoundException(`Class with ID ${payload.classId} not found`);
+    }
+
     let entity = await this.progressRepo.findOne({
-      where: { classId: payload.classId },
+      where: { classId: payload.classId, ownerId },
     });
 
     if (!entity) {
       entity = this.progressRepo.create({
         classId: payload.classId,
+        ownerId,
       });
     }
 
@@ -55,21 +64,24 @@ export class ProgressTrackingService {
    * إرجاع تقرير مادة واحدة على مستوى جميع الأقسام المرتبطة بها.
    */
   async getSubjectProgress(
+    ownerId: number,
     subjectId: number,
     opts?: { date?: string },
   ): Promise<SubjectProgressDto> {
     // يمكن لاحقاً استخدام subjectId فعلياً لربطه بجدول المواد، حالياً نستخدمه كـ وسم فقط
-    let subject = await this.subjectRepo.findOne({ where: { id: subjectId } });
+    let subject = await this.subjectRepo.findOne({ where: { id: subjectId, ownerId } });
     if (!subject) {
       subject = this.subjectRepo.create({
         nameAr: `مادة #${subjectId}`,
         level: '',
         totalLessons: 16, // قيمة افتراضية معقولة
+        ownerId,
       });
     }
 
-    // نأتي بجميع الأقسام (يمكن تصفيتها لاحقاً حسب المستوى/الشعبة)
+    // نأتي بجميع الأقسام الخاصة بالمستخدم (يمكن تصفيتها لاحقاً حسب المستوى/الشعبة)
     const classes = await this.classRepo.find({
+      where: { ownerId },
       order: { level: 'ASC', name: 'ASC' },
     });
 
@@ -79,17 +91,18 @@ export class ProgressTrackingService {
     const progressRows =
       classIds.length > 0
         ? await this.progressRepo.find({
-            where: { classId: In(classIds) },
+            where: { classId: In(classIds), ownerId },
           })
         : [];
 
     // استخراج آخر درس من دفاتر الأستاذ (notebooks/course_entries)
-    const lastLessonByClass = await this.getLastLessonFromNotebooks(classIds);
+    const lastLessonByClass = await this.getLastLessonFromNotebooks(ownerId, classIds);
 
     const today = opts?.date ? new Date(opts.date) : new Date();
     const currentDateStr = today.toISOString().slice(0, 10);
 
     const { currentWeek, expectedLesson } = await this.computeExpectedLesson(
+      ownerId,
       subjectId,
       today,
     );
@@ -153,12 +166,12 @@ export class ProgressTrackingService {
    * currentWeek = الفارق بالأيام / 7 + 1
    * expectedLesson = الدرس ذو lessonNumber الأعلى الذي weekNumber <= currentWeek
    */
-  private async computeExpectedLesson(subjectId: number, date: Date): Promise<{
+  private async computeExpectedLesson(ownerId: number, subjectId: number, date: Date): Promise<{
     currentWeek: number;
     expectedLesson: number;
   }> {
     const distributions = await this.distRepo.find({
-      where: { subjectId },
+      where: { subjectId, ownerId },
       order: { term: 'ASC', weekNumber: 'ASC' },
     });
 
@@ -193,6 +206,7 @@ export class ProgressTrackingService {
    * نعتمد على أكبر قيمة في حقل order، وإن لم يوجد نستخدم الترتيب الزمني.
    */
   private async getLastLessonFromNotebooks(
+    ownerId: number,
     classIds: number[],
   ): Promise<Map<number, number>> {
     const result = new Map<number, number>();
@@ -201,7 +215,7 @@ export class ProgressTrackingService {
     }
 
     const notebooks = await this.notebookRepo.find({
-      where: { classId: In(classIds) },
+      where: { classId: In(classIds), ownerId },
     });
     if (notebooks.length === 0) {
       return result;
@@ -209,7 +223,7 @@ export class ProgressTrackingService {
 
     const notebookIds = notebooks.map((n) => n.id);
     const entries = await this.courseEntryRepo.find({
-      where: { notebookId: In(notebookIds) },
+      where: { notebookId: In(notebookIds), ownerId },
       order: { date: 'ASC', startTime: 'ASC' },
     });
 

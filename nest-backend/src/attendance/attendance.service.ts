@@ -19,18 +19,18 @@ export class AttendanceService {
     private classRepository: Repository<Class>,
   ) {}
 
-  async create(createAttendanceDto: CreateAttendanceDto): Promise<AttendanceResponseDto> {
-    // Validate student exists
+  async create(ownerId: number, createAttendanceDto: CreateAttendanceDto): Promise<AttendanceResponseDto> {
+    // Validate student exists and belongs to owner
     const student = await this.studentRepository.findOne({
-      where: { id: createAttendanceDto.studentId },
+      where: { id: createAttendanceDto.studentId, ownerId },
     });
     if (!student) {
       throw new BadRequestException(`Student with ID ${createAttendanceDto.studentId} not found`);
     }
 
-    // Validate class exists
+    // Validate class exists and belongs to owner
     const classEntity = await this.classRepository.findOne({
-      where: { id: createAttendanceDto.classId },
+      where: { id: createAttendanceDto.classId, ownerId },
     });
     if (!classEntity) {
       throw new BadRequestException(`Class with ID ${createAttendanceDto.classId} not found`);
@@ -39,6 +39,7 @@ export class AttendanceService {
     // Check if attendance record already exists for this student, class, date, and lessonTime
     // Only check for duplicates if lessonTime matches (or both are null/undefined)
     const whereClause: any = {
+      ownerId,
       studentId: createAttendanceDto.studentId,
       classId: createAttendanceDto.classId,
       date: new Date(createAttendanceDto.date),
@@ -65,16 +66,17 @@ export class AttendanceService {
     // Convert date string to Date
     const attendanceData: Partial<Attendance> = {
       ...createAttendanceDto,
+      ownerId,
       date: new Date(createAttendanceDto.date),
     };
 
     const attendance = this.attendanceRepository.create(attendanceData);
     const savedAttendance = await this.attendanceRepository.save(attendance);
-    return this.findOne(savedAttendance.id);
+    return this.findOne(ownerId, savedAttendance.id);
   }
 
-  async findAll(query?: { studentId?: number; classId?: number; date?: string }): Promise<AttendanceResponseDto[]> {
-    const where: any = {};
+  async findAll(ownerId: number, query?: { studentId?: number; classId?: number; date?: string }): Promise<AttendanceResponseDto[]> {
+    const where: any = { ownerId };
 
     if (query?.studentId) {
       where.studentId = query.studentId;
@@ -97,9 +99,9 @@ export class AttendanceService {
     return attendanceRecords.map((record) => this.mapToResponseDto(record));
   }
 
-  async findOne(id: number): Promise<AttendanceResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<AttendanceResponseDto> {
     const attendance = await this.attendanceRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
       relations: ['student', 'class'],
     });
 
@@ -110,8 +112,8 @@ export class AttendanceService {
     return this.mapToResponseDto(attendance);
   }
 
-  async update(id: number, updateAttendanceDto: UpdateAttendanceDto): Promise<AttendanceResponseDto> {
-    const attendance = await this.attendanceRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateAttendanceDto: UpdateAttendanceDto): Promise<AttendanceResponseDto> {
+    const attendance = await this.attendanceRepository.findOne({ where: { id, ownerId } });
 
     if (!attendance) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);
@@ -120,7 +122,7 @@ export class AttendanceService {
     // Validate student exists if studentId is being updated
     if (updateAttendanceDto.studentId !== undefined && updateAttendanceDto.studentId !== null) {
       const student = await this.studentRepository.findOne({
-        where: { id: updateAttendanceDto.studentId },
+        where: { id: updateAttendanceDto.studentId, ownerId },
       });
       if (!student) {
         throw new BadRequestException(`Student with ID ${updateAttendanceDto.studentId} not found`);
@@ -130,7 +132,7 @@ export class AttendanceService {
     // Validate class exists if classId is being updated
     if (updateAttendanceDto.classId !== undefined && updateAttendanceDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: updateAttendanceDto.classId },
+        where: { id: updateAttendanceDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${updateAttendanceDto.classId} not found`);
@@ -166,11 +168,11 @@ export class AttendanceService {
 
     Object.assign(attendance, fieldsToUpdate);
     await this.attendanceRepository.save(attendance);
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const attendance = await this.attendanceRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const attendance = await this.attendanceRepository.findOne({ where: { id, ownerId } });
 
     if (!attendance) {
       throw new NotFoundException(`Attendance record with ID ${id} not found`);

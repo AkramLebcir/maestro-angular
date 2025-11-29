@@ -19,22 +19,26 @@ export class TopicsService {
     private topicElementRepository: Repository<TopicElement>,
   ) {}
 
-  async create(createTopicDto: CreateTopicDto): Promise<TopicResponseDto> {
-    const topic = this.topicRepository.create(createTopicDto);
+  async create(ownerId: number, createTopicDto: CreateTopicDto): Promise<TopicResponseDto> {
+    const topic = this.topicRepository.create({
+      ...createTopicDto,
+      ownerId,
+    });
     const savedTopic = await this.topicRepository.save(topic);
     return this.mapToResponseDto(savedTopic);
   }
 
-  async findAll(): Promise<TopicResponseDto[]> {
+  async findAll(ownerId: number): Promise<TopicResponseDto[]> {
     const topics = await this.topicRepository.find({
+      where: { ownerId },
       order: { createdAt: 'DESC' },
     });
     return topics.map((topic) => this.mapToResponseDto(topic));
   }
 
-  async findOne(id: number): Promise<TopicResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<TopicResponseDto> {
     const topic = await this.topicRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
     });
 
     if (!topic) {
@@ -44,8 +48,8 @@ export class TopicsService {
     return this.mapToResponseDto(topic);
   }
 
-  async update(id: number, updateTopicDto: UpdateTopicDto): Promise<TopicResponseDto> {
-    const topic = await this.topicRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateTopicDto: UpdateTopicDto): Promise<TopicResponseDto> {
+    const topic = await this.topicRepository.findOne({ where: { id, ownerId } });
 
     if (!topic) {
       throw new NotFoundException(`Topic with ID ${id} not found`);
@@ -56,8 +60,8 @@ export class TopicsService {
     return this.mapToResponseDto(topic);
   }
 
-  async remove(id: number): Promise<void> {
-    const topic = await this.topicRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const topic = await this.topicRepository.findOne({ where: { id, ownerId } });
 
     if (!topic) {
       throw new NotFoundException(`Topic with ID ${id} not found`);
@@ -67,9 +71,9 @@ export class TopicsService {
   }
 
   // Topic Elements methods
-  async createElement(topicId: number, createElementDto: CreateTopicElementDto): Promise<TopicElementResponseDto> {
-    // Verify topic exists
-    const topic = await this.topicRepository.findOne({ where: { id: topicId } });
+  async createElement(ownerId: number, topicId: number, createElementDto: CreateTopicElementDto): Promise<TopicElementResponseDto> {
+    // Verify topic exists and belongs to owner
+    const topic = await this.topicRepository.findOne({ where: { id: topicId, ownerId } });
     if (!topic) {
       throw new NotFoundException(`Topic with ID ${topicId} not found`);
     }
@@ -79,7 +83,7 @@ export class TopicsService {
     if (order === undefined) {
       const maxOrder = await this.topicElementRepository
         .createQueryBuilder('element')
-        .where('element.topicId = :topicId', { topicId })
+        .where('element.topicId = :topicId AND element.ownerId = :ownerId', { topicId, ownerId })
         .select('MAX(element.order)', 'max')
         .getRawOne();
       order = (maxOrder?.max ?? -1) + 1;
@@ -89,20 +93,21 @@ export class TopicsService {
       content: createElementDto.content,
       order: order,
       topicId: topicId, // Use topicId from URL parameter, not from DTO
+      ownerId,
     });
     const savedElement = await this.topicElementRepository.save(element);
     return this.mapElementToResponseDto(savedElement);
   }
 
-  async findElementsByTopic(topicId: number): Promise<TopicElementResponseDto[]> {
-    // Verify topic exists
-    const topic = await this.topicRepository.findOne({ where: { id: topicId } });
+  async findElementsByTopic(ownerId: number, topicId: number): Promise<TopicElementResponseDto[]> {
+    // Verify topic exists and belongs to owner
+    const topic = await this.topicRepository.findOne({ where: { id: topicId, ownerId } });
     if (!topic) {
       throw new NotFoundException(`Topic with ID ${topicId} not found`);
     }
 
     const elements = await this.topicElementRepository.find({
-      where: { topicId },
+      where: { topicId, ownerId },
       order: { order: 'ASC' },
     });
 
@@ -110,12 +115,13 @@ export class TopicsService {
   }
 
   async updateElement(
+    ownerId: number,
     topicId: number,
     elementId: number,
     updateElementDto: UpdateTopicElementDto,
   ): Promise<TopicElementResponseDto> {
     const element = await this.topicElementRepository.findOne({
-      where: { id: elementId, topicId },
+      where: { id: elementId, topicId, ownerId },
     });
 
     if (!element) {
@@ -127,9 +133,9 @@ export class TopicsService {
     return this.mapElementToResponseDto(element);
   }
 
-  async removeElement(topicId: number, elementId: number): Promise<void> {
+  async removeElement(ownerId: number, topicId: number, elementId: number): Promise<void> {
     const element = await this.topicElementRepository.findOne({
-      where: { id: elementId, topicId },
+      where: { id: elementId, topicId, ownerId },
     });
 
     if (!element) {

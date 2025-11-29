@@ -1,5 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { LanguageService, LanguageCode } from './services/language.service';
+import { AuthService } from './services/auth.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -11,9 +14,15 @@ export class AppComponent implements OnInit, OnDestroy {
   title = 'TeacherKit Plus Informatique';
   isSidebarOpen = false;
   currentLanguage: LanguageCode = 'AR';
+  showLayout = true; // Show header/sidebar by default
   private languageSubscription?: Subscription;
+  private routerSubscription?: Subscription;
 
-  constructor(private languageService: LanguageService) {}
+  constructor(
+    private languageService: LanguageService,
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     // تهيئة اللغة عند بدء التطبيق - العربية هي اللغة الافتراضية
@@ -30,11 +39,28 @@ export class AppComponent implements OnInit, OnDestroy {
       this.currentLanguage = lang;
     });
     this.currentLanguage = this.languageService.getCurrentLanguage();
+
+    // Check route to show/hide layout
+    this.updateLayoutVisibility(this.router.url);
+    
+    // Subscribe to route changes
+    this.routerSubscription = this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.updateLayoutVisibility(event.urlAfterRedirects);
+      });
+  }
+
+  private updateLayoutVisibility(url: string): void {
+    this.showLayout = !url.includes('/login');
   }
 
   ngOnDestroy(): void {
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
+    }
+    if (this.routerSubscription) {
+      this.routerSubscription.unsubscribe();
     }
   }
 

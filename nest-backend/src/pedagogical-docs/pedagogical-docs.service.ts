@@ -13,17 +13,21 @@ export class PedagogicalDocsService {
   ) {}
 
   async create(
+    ownerId: number,
     dto: CreatePedagogicalDocumentDto & {
       fileUrl: string;
       originalFileName: string;
     },
   ): Promise<PedagogicalDocument> {
-    const entity = this.repo.create(dto);
+    const entity = this.repo.create({
+      ...dto,
+      ownerId,
+    });
     return this.repo.save(entity);
   }
 
-  async findAll(filters: PedagogicalDocumentFilterDto): Promise<PedagogicalDocument[]> {
-    const where: any = {};
+  async findAll(ownerId: number, filters: PedagogicalDocumentFilterDto): Promise<PedagogicalDocument[]> {
+    const where: any = { ownerId };
     if (filters.level) {
       where.level = filters.level;
     }

@@ -1,7 +1,7 @@
-<div class="min-h-screen bg-gray-100 flex flex-col pt-16" [dir]="dir">
-  <app-header (toggleMenu)="isSidebarOpen = !isSidebarOpen"></app-header>
+<div class="min-h-screen" [dir]="dir" [ngClass]="showLayout ? 'bg-gray-100 flex flex-col pt-16' : ''">
+  <app-header *ngIf="showLayout" (toggleMenu)="isSidebarOpen = !isSidebarOpen"></app-header>
 
-  <div class="flex flex-1 relative">
+  <div *ngIf="showLayout" class="flex flex-1 relative">
     <!-- خلفية شفافة لإغلاق القائمة على الشاشات الصغيرة -->
     <div
       *ngIf="isSidebarOpen"
@@ -15,6 +15,10 @@
     <main class="flex-1 overflow-auto">
       <router-outlet></router-outlet>
     </main>
+  </div>
+
+  <div *ngIf="!showLayout">
+    <router-outlet></router-outlet>
   </div>
 </div>
 

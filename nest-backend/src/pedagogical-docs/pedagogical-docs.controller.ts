@@ -16,6 +16,9 @@ import { PedagogicalDocsService } from './pedagogical-docs.service';
 import { CreatePedagogicalDocumentDto } from './dto/create-pedagogical-document.dto';
 import { PedagogicalDocumentFilterDto } from './dto/pedagogical-document-filter.dto';
 import { PedagogicalDocument } from './pedagogical-document.entity';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/interfaces/auth-user.interface';
+import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 
 const storage = diskStorage({
   destination: (_req, _file, cb) => {
@@ -44,6 +47,7 @@ const allowedMimeTypes = new Set([
 ]);
 
 @Controller('pedagogical-docs')
+@ModuleAccess('pedagogical-docs')
 export class PedagogicalDocsController {
   constructor(private readonly service: PedagogicalDocsService) {}
 
@@ -64,6 +68,7 @@ export class PedagogicalDocsController {
     }),
   )
   async uploadDocument(
+    @CurrentUser() user: AuthUser,
     @UploadedFile() file: any,
     @Body() dto: CreatePedagogicalDocumentDto,
   ): Promise<PedagogicalDocument> {
@@ -73,7 +78,7 @@ export class PedagogicalDocsController {
       );
     }
     const fileUrl = `/uploads/pedagogical-docs/${file.filename}`;
-    return this.service.create({
+    return this.service.create(user.id, {
       ...dto,
       fileUrl,
       originalFileName: file.originalname,
@@ -82,9 +87,10 @@ export class PedagogicalDocsController {
 
   @Get()
   async listDocuments(
+    @CurrentUser() user: AuthUser,
     @Query() filters: PedagogicalDocumentFilterDto,
   ): Promise<PedagogicalDocument[]> {
-    return this.service.findAll(filters);
+    return this.service.findAll(user.id, filters);
   }
 }
 

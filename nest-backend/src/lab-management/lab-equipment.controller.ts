@@ -12,37 +12,54 @@ import {
 import { LabEquipmentService } from './lab-equipment.service';
 import { CreateLabEquipmentDto } from './dto/create-lab-equipment.dto';
 import { UpdateLabEquipmentDto } from './dto/update-lab-equipment.dto';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { AuthUser } from '../auth/interfaces/auth-user.interface';
+import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 
 @Controller('lab-equipment')
+@ModuleAccess('lab-management')
 export class LabEquipmentController {
   constructor(private readonly service: LabEquipmentService) {}
 
   @Get()
-  findAll(@Query('labId') labId?: string) {
-    return this.service.findAll(labId ? Number(labId) : undefined);
+  findAll(
+    @CurrentUser() user: AuthUser,
+    @Query('labId') labId?: string,
+  ) {
+    return this.service.findAll(user.id, labId ? Number(labId) : undefined);
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseIntPipe) id: number) {
-    return this.service.findOne(id);
+  findOne(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.service.findOne(user.id, id);
   }
 
   @Post()
-  create(@Body() dto: CreateLabEquipmentDto) {
-    return this.service.create(dto);
+  create(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: CreateLabEquipmentDto,
+  ) {
+    return this.service.create(user.id, dto);
   }
 
   @Patch(':id')
   update(
+    @CurrentUser() user: AuthUser,
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateLabEquipmentDto,
   ) {
-    return this.service.update(id, dto);
+    return this.service.update(user.id, id, dto);
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.service.remove(id);
+  remove(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.service.remove(user.id, id);
   }
 }
 

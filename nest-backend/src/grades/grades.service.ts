@@ -19,18 +19,18 @@ export class GradesService {
     private classRepository: Repository<Class>,
   ) {}
 
-  async create(createGradeDto: CreateGradeDto): Promise<GradeResponseDto> {
-    // Validate student exists
+  async create(ownerId: number, createGradeDto: CreateGradeDto): Promise<GradeResponseDto> {
+    // Validate student exists and belongs to owner
     const student = await this.studentRepository.findOne({
-      where: { id: createGradeDto.studentId },
+      where: { id: createGradeDto.studentId, ownerId },
     });
     if (!student) {
       throw new BadRequestException(`Student with ID ${createGradeDto.studentId} not found`);
     }
 
-    // Validate class exists
+    // Validate class exists and belongs to owner
     const classEntity = await this.classRepository.findOne({
-      where: { id: createGradeDto.classId },
+      where: { id: createGradeDto.classId, ownerId },
     });
     if (!classEntity) {
       throw new BadRequestException(`Class with ID ${createGradeDto.classId} not found`);
@@ -39,6 +39,7 @@ export class GradesService {
     // Convert date string to Date
     const gradeData: Partial<Grade> = {
       ...createGradeDto,
+      ownerId,
       date: new Date(createGradeDto.date),
     };
 
@@ -49,14 +50,14 @@ export class GradesService {
     // Assessment ID 5 is continuous_assessment - don't recalculate if we're creating it
     const CONTINUOUS_ASSESSMENT_ID = 5;
     if (createGradeDto.assessmentId !== CONTINUOUS_ASSESSMENT_ID) {
-      await this.updateContinuousAssessment(createGradeDto.studentId, createGradeDto.classId);
+      await this.updateContinuousAssessment(ownerId, createGradeDto.studentId, createGradeDto.classId);
     }
     
-    return this.findOne(savedGrade.id);
+    return this.findOne(ownerId, savedGrade.id);
   }
 
-  async findAll(classId?: number): Promise<GradeResponseDto[]> {
-    const where: any = {};
+  async findAll(ownerId: number, classId?: number): Promise<GradeResponseDto[]> {
+    const where: any = { ownerId };
     if (classId !== undefined) {
       where.classId = classId;
     }
@@ -70,9 +71,9 @@ export class GradesService {
     return grades.map((grade) => this.mapToResponseDto(grade));
   }
 
-  async findOne(id: number): Promise<GradeResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<GradeResponseDto> {
     const grade = await this.gradeRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
       relations: ['student', 'class'],
     });
 
@@ -83,8 +84,8 @@ export class GradesService {
     return this.mapToResponseDto(grade);
   }
 
-  async update(id: number, updateGradeDto: UpdateGradeDto): Promise<GradeResponseDto> {
-    const grade = await this.gradeRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateGradeDto: UpdateGradeDto): Promise<GradeResponseDto> {
+    const grade = await this.gradeRepository.findOne({ where: { id, ownerId } });
 
     if (!grade) {
       throw new NotFoundException(`Grade with ID ${id} not found`);
@@ -93,7 +94,7 @@ export class GradesService {
     // Validate student exists if studentId is being updated
     if (updateGradeDto.studentId !== undefined) {
       const student = await this.studentRepository.findOne({
-        where: { id: updateGradeDto.studentId },
+        where: { id: updateGradeDto.studentId, ownerId },
       });
       if (!student) {
         throw new BadRequestException(`Student with ID ${updateGradeDto.studentId} not found`);
@@ -103,7 +104,7 @@ export class GradesService {
     // Validate class exists if classId is being updated
     if (updateGradeDto.classId !== undefined) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: updateGradeDto.classId },
+        where: { id: updateGradeDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${updateGradeDto.classId} not found`);
@@ -155,14 +156,14 @@ export class GradesService {
     if (finalAssessmentId !== CONTINUOUS_ASSESSMENT_ID) {
       const finalStudentId = updateGradeDto.studentId !== undefined ? updateGradeDto.studentId : grade.studentId;
       const finalClassId = updateGradeDto.classId !== undefined ? updateGradeDto.classId : grade.classId;
-      await this.updateContinuousAssessment(finalStudentId, finalClassId);
+      await this.updateContinuousAssessment(ownerId, finalStudentId, finalClassId);
     }
     
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const grade = await this.gradeRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const grade = await this.gradeRepository.findOne({ where: { id, ownerId } });
 
     if (!grade) {
       throw new NotFoundException(`Grade with ID ${id} not found`);
@@ -177,7 +178,7 @@ export class GradesService {
     // Recalculate continuous assessment after deletion (unless we deleted the continuous assessment itself)
     const CONTINUOUS_ASSESSMENT_ID = 5;
     if (assessmentId !== CONTINUOUS_ASSESSMENT_ID) {
-      await this.updateContinuousAssessment(studentId, classId);
+      await this.updateContinuousAssessment(ownerId, studentId, classId);
     }
   }
 
@@ -186,7 +187,7 @@ export class GradesService {
    * Formula: notebook + duty + attendance + behavior (all out of 5, total out of 20)
    * Assessment IDs: notebook_correction=1, duty=2, attendance=3, behavior=4, continuous_assessment=5
    */
-  private async updateContinuousAssessment(studentId: number, classId: number): Promise<void> {
+  private async updateContinuousAssessment(ownerId: number, studentId: number, classId: number): Promise<void> {
     // Assessment IDs based on frontend definition
     const NOTEBOOK_CORRECTION_ID = 1;
     const DUTY_ID = 2;
@@ -197,10 +198,10 @@ export class GradesService {
     // Get all related grades for this student and class
     const grades = await this.gradeRepository.find({
       where: [
-        { studentId, classId, assessmentId: NOTEBOOK_CORRECTION_ID },
-        { studentId, classId, assessmentId: DUTY_ID },
-        { studentId, classId, assessmentId: ATTENDANCE_ID },
-        { studentId, classId, assessmentId: BEHAVIOR_ID },
+        { ownerId, studentId, classId, assessmentId: NOTEBOOK_CORRECTION_ID },
+        { ownerId, studentId, classId, assessmentId: DUTY_ID },
+        { ownerId, studentId, classId, assessmentId: ATTENDANCE_ID },
+        { ownerId, studentId, classId, assessmentId: BEHAVIOR_ID },
       ],
     });
 
@@ -223,6 +224,7 @@ export class GradesService {
     // Find existing continuous assessment grade
     const existingContinuousGrade = await this.gradeRepository.findOne({
       where: {
+        ownerId,
         studentId,
         classId,
         assessmentId: CONTINUOUS_ASSESSMENT_ID,
@@ -244,6 +246,7 @@ export class GradesService {
     } else {
       // Create new continuous assessment grade
       const continuousGrade = this.gradeRepository.create({
+        ownerId,
         studentId,
         classId,
         assessmentId: CONTINUOUS_ASSESSMENT_ID,

@@ -19,10 +19,10 @@ export class TimetableService {
     private labRepository: Repository<Lab>,
   ) {}
 
-  async create(createTimetableDto: CreateTimetableDto): Promise<TimetableResponseDto> {
-    // Validate class exists
+  async create(ownerId: number, createTimetableDto: CreateTimetableDto): Promise<TimetableResponseDto> {
+    // Validate class exists and belongs to owner
     const classEntity = await this.classRepository.findOne({
-      where: { id: createTimetableDto.classId },
+      where: { id: createTimetableDto.classId, ownerId },
     });
     if (!classEntity) {
       throw new BadRequestException(`Class with ID ${createTimetableDto.classId} not found`);
@@ -31,7 +31,7 @@ export class TimetableService {
     // Validate lab exists if labId is provided
     if (createTimetableDto.labId !== undefined && createTimetableDto.labId !== null) {
       const lab = await this.labRepository.findOne({
-        where: { id: createTimetableDto.labId },
+        where: { id: createTimetableDto.labId, ownerId },
       });
       if (!lab) {
         throw new BadRequestException(`Lab with ID ${createTimetableDto.labId} not found`);
@@ -49,6 +49,7 @@ export class TimetableService {
     const startHour = this.extractHour(createTimetableDto.startTime);
     const existingEntries = await this.timetableRepository.find({
       where: {
+        ownerId,
         dayOfWeek: createTimetableDto.dayOfWeek,
       },
     });
@@ -62,13 +63,17 @@ export class TimetableService {
       }
     }
 
-    const timetable = this.timetableRepository.create(createTimetableDto);
+    const timetable = this.timetableRepository.create({
+      ...createTimetableDto,
+      ownerId,
+    });
     const savedTimetable = await this.timetableRepository.save(timetable);
-    return this.findOne(savedTimetable.id);
+    return this.findOne(ownerId, savedTimetable.id);
   }
 
-  async findAll(): Promise<TimetableResponseDto[]> {
+  async findAll(ownerId: number): Promise<TimetableResponseDto[]> {
     const timetables = await this.timetableRepository.find({
+      where: { ownerId },
       relations: ['class', 'lab'],
       order: {
         dayOfWeek: 'ASC',
@@ -79,9 +84,9 @@ export class TimetableService {
     return timetables.map((timetable) => this.mapToResponseDto(timetable));
   }
 
-  async findOne(id: number): Promise<TimetableResponseDto> {
+  async findOne(ownerId: number, id: number): Promise<TimetableResponseDto> {
     const timetable = await this.timetableRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
       relations: ['class', 'lab'],
     });
 
@@ -92,8 +97,8 @@ export class TimetableService {
     return this.mapToResponseDto(timetable);
   }
 
-  async update(id: number, updateTimetableDto: UpdateTimetableDto): Promise<TimetableResponseDto> {
-    const timetable = await this.timetableRepository.findOne({ where: { id } });
+  async update(ownerId: number, id: number, updateTimetableDto: UpdateTimetableDto): Promise<TimetableResponseDto> {
+    const timetable = await this.timetableRepository.findOne({ where: { id, ownerId } });
 
     if (!timetable) {
       throw new NotFoundException(`Timetable entry with ID ${id} not found`);
@@ -102,7 +107,7 @@ export class TimetableService {
     // Validate class exists if classId is being updated
     if (updateTimetableDto.classId !== undefined && updateTimetableDto.classId !== null) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: updateTimetableDto.classId },
+        where: { id: updateTimetableDto.classId, ownerId },
       });
       if (!classEntity) {
         throw new BadRequestException(`Class with ID ${updateTimetableDto.classId} not found`);
@@ -112,7 +117,7 @@ export class TimetableService {
     // Validate lab exists if labId is being updated
     if (updateTimetableDto.labId !== undefined && updateTimetableDto.labId !== null) {
       const lab = await this.labRepository.findOne({
-        where: { id: updateTimetableDto.labId },
+        where: { id: updateTimetableDto.labId, ownerId },
       });
       if (!lab) {
         throw new BadRequestException(`Lab with ID ${updateTimetableDto.labId} not found`);
@@ -148,6 +153,7 @@ export class TimetableService {
       const startHour = this.extractHour(startTime);
       const existingEntries = await this.timetableRepository.find({
         where: {
+          ownerId,
           dayOfWeek: dayOfWeek,
         },
       });
@@ -168,11 +174,11 @@ export class TimetableService {
 
     Object.assign(timetable, updateTimetableDto);
     await this.timetableRepository.save(timetable);
-    return this.findOne(id);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    const timetable = await this.timetableRepository.findOne({ where: { id } });
+  async remove(ownerId: number, id: number): Promise<void> {
+    const timetable = await this.timetableRepository.findOne({ where: { id, ownerId } });
 
     if (!timetable) {
       throw new NotFoundException(`Timetable entry with ID ${id} not found`);

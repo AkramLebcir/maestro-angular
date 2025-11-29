@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,19 @@ import { environment } from '../../environments/environment';
 export class ApiService {
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) { }
+
+  private getHeaders(): HttpHeaders {
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return headers;
+  }
 
   /**
    * Example: Get data from backend
@@ -22,35 +35,45 @@ export class ApiService {
    * Generic GET request
    */
   get<T>(endpoint: string): Observable<T> {
-    return this.http.get<T>(`${this.apiUrl}${endpoint}`);
+    return this.http.get<T>(`${this.apiUrl}${endpoint}`, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Generic POST request
    */
   post<T>(endpoint: string, body: any): Observable<T> {
-    return this.http.post<T>(`${this.apiUrl}${endpoint}`, body);
+    return this.http.post<T>(`${this.apiUrl}${endpoint}`, body, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Generic PUT request
    */
   put<T>(endpoint: string, body: any): Observable<T> {
-    return this.http.put<T>(`${this.apiUrl}${endpoint}`, body);
+    return this.http.put<T>(`${this.apiUrl}${endpoint}`, body, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Generic PATCH request
    */
   patch<T>(endpoint: string, body: any): Observable<T> {
-    return this.http.patch<T>(`${this.apiUrl}${endpoint}`, body);
+    return this.http.patch<T>(`${this.apiUrl}${endpoint}`, body, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
    * Generic DELETE request
    */
   delete<T>(endpoint: string): Observable<T> {
-    return this.http.delete<T>(`${this.apiUrl}${endpoint}`);
+    return this.http.delete<T>(`${this.apiUrl}${endpoint}`, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
@@ -72,7 +95,9 @@ export class ApiService {
     }
     formData.append('file', payload.file);
 
-    return this.http.post(`${this.apiUrl}/pedagogical-docs`, formData);
+    return this.http.post(`${this.apiUrl}/pedagogical-docs`, formData, {
+      headers: this.getHeaders()
+    });
   }
 
   /**
@@ -89,6 +114,9 @@ export class ApiService {
     if (filters?.type) {
       params = params.set('type', filters.type);
     }
-    return this.http.get<any[]>(`${this.apiUrl}/pedagogical-docs`, { params });
+    return this.http.get<any[]>(`${this.apiUrl}/pedagogical-docs`, {
+      params,
+      headers: this.getHeaders()
+    });
   }
 }

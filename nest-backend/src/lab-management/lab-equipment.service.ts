@@ -12,29 +12,30 @@ export class LabEquipmentService {
     private readonly repo: Repository<LabEquipment>,
   ) {}
 
-  findAll(labId?: number): Promise<LabEquipment[]> {
-    const where = labId ? { labId } : {};
+  findAll(ownerId: number, labId?: number): Promise<LabEquipment[]> {
+    const where: any = { ownerId };
+    if (labId) where.labId = labId;
     return this.repo.find({ where, order: { itemName: 'ASC', id: 'ASC' } });
   }
 
-  async findOne(id: number): Promise<LabEquipment> {
-    const item = await this.repo.findOne({ where: { id } });
+  async findOne(ownerId: number, id: number): Promise<LabEquipment> {
+    const item = await this.repo.findOne({ where: { id, ownerId } });
     if (!item) throw new NotFoundException('Lab equipment not found');
     return item;
   }
 
-  create(dto: CreateLabEquipmentDto): Promise<LabEquipment> {
-    const entity = this.repo.create(dto);
+  create(ownerId: number, dto: CreateLabEquipmentDto): Promise<LabEquipment> {
+    const entity = this.repo.create({ ...dto, ownerId });
     return this.repo.save(entity);
   }
 
-  async update(id: number, dto: UpdateLabEquipmentDto): Promise<LabEquipment> {
-    await this.repo.update(id, dto);
-    return this.findOne(id);
+  async update(ownerId: number, id: number, dto: UpdateLabEquipmentDto): Promise<LabEquipment> {
+    await this.repo.update({ id, ownerId }, dto);
+    return this.findOne(ownerId, id);
   }
 
-  async remove(id: number): Promise<void> {
-    await this.repo.delete(id);
+  async remove(ownerId: number, id: number): Promise<void> {
+    await this.repo.delete({ id, ownerId });
   }
 }
 

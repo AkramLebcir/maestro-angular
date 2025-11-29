@@ -230,18 +230,55 @@
       <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{{ notificationCount }}</span>
     </div>
     <span class="hidden sm:inline-block text-sm md:text-lg font-semibold">{{ teacherName }}</span>
-    <div class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/40">
-      <img
-        *ngIf="teacherPhotoUrl; else initialsAvatar"
-        [src]="teacherPhotoUrl"
-        alt="صورة الأستاذ"
-        class="w-full h-full object-cover"
-      />
-      <ng-template #initialsAvatar>
-        <span class="text-sm font-semibold">
-          {{ teacherName.split(' ')[0]?.[0] || 'أ' }}
-        </span>
-      </ng-template>
+    <div class="relative">
+      <button
+        type="button"
+        (click)="toggleUserMenu()"
+        class="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center overflow-hidden border border-white/40 hover:bg-white/30 focus:outline-none"
+      >
+        <img
+          *ngIf="teacherPhotoUrl; else initialsAvatar"
+          [src]="teacherPhotoUrl"
+          alt="صورة المستخدم"
+          class="w-full h-full object-cover"
+        />
+        <ng-template #initialsAvatar>
+          <span class="text-sm font-semibold">
+            {{ teacherName.split(' ')[0]?.[0] || 'أ' }}
+          </span>
+        </ng-template>
+      </button>
+
+      <!-- User Menu Dropdown -->
+      <div
+        *ngIf="isUserMenuOpen"
+        class="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
+      >
+        <div class="px-4 py-2 border-b border-gray-200">
+          <div class="text-sm font-semibold text-gray-900">{{ teacherName }}</div>
+          <div class="text-xs text-gray-500">{{ currentUser?.email }}</div>
+          <div class="text-xs mt-1">
+            <span [class]="currentUser?.role === 'admin' ? 'px-2 py-0.5 text-xs font-semibold rounded-full bg-purple-100 text-purple-800' : 'px-2 py-0.5 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'">
+              {{ currentUser?.role === 'admin' ? 'مسؤول' : 'أستاذ' }}
+            </span>
+          </div>
+        </div>
+        <button
+          *ngIf="currentUser?.role === 'admin'"
+          type="button"
+          (click)="goToAdmin()"
+          class="w-full px-4 py-2 text-right text-sm text-gray-700 hover:bg-gray-100"
+        >
+          لوحة التحكم
+        </button>
+        <button
+          type="button"
+          (click)="logout()"
+          class="w-full px-4 py-2 text-right text-sm text-red-600 hover:bg-red-50"
+        >
+          تسجيل الخروج
+        </button>
+      </div>
     </div>
   </div>
 </header>

@@ -27,6 +27,11 @@ import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-d
 import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
 import { SafeUrlPipe } from './pipes/safe-url.pipe';
 import { NgChartsModule } from 'ng2-charts';
+import { LoginComponent } from './pages/login/login.component';
+import { AdminComponent } from './pages/admin/admin.component';
+import { UsersManagementComponent } from './pages/admin/users-management/users-management.component';
+import { ModuleAccessComponent } from './pages/admin/module-access/module-access.component';
+import { MonitoringComponent } from './pages/admin/monitoring/monitoring.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +57,11 @@ import { NgChartsModule } from 'ng2-charts';
     PedagogicalDocsComponent,
     TrainingInspectionComponent,
     SafeUrlPipe,
+    LoginComponent,
+    AdminComponent,
+    UsersManagementComponent,
+    ModuleAccessComponent,
+    MonitoringComponent,
   ],
   imports: [
     BrowserModule,

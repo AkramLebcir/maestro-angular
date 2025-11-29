@@ -1,0 +1,195 @@
+<div>
+  <!-- Header with Create Button -->
+  <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">إدارة المستخدمين</h2>
+    <button
+      (click)="openCreateForm()"
+      class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+    >
+      + إضافة مستخدم جديد
+    </button>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+    {{ successMessage }}
+  </div>
+
+  <!-- Users Table -->
+  <div *ngIf="!isLoading && users.length > 0" class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">البريد الإلكتروني</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الدور</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">آخر تسجيل دخول</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <tr *ngFor="let user of users" class="hover:bg-gray-50">
+          <td class="px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">
+              {{ (user.firstName || '') + ' ' + (user.lastName || '') || 'بدون اسم' }}
+            </div>
+            <div *ngIf="user.username" class="text-sm text-gray-500">{{ user.username }}</div>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="user.role === 'admin' ? 'px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'">
+              {{ user.role === 'admin' ? 'مسؤول' : 'أستاذ' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <span [class]="user.isActive ? 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800'">
+              {{ user.isActive ? 'نشط' : 'معطل' }}
+            </span>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(user.lastLoginAt) }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 space-x-reverse">
+            <button
+              (click)="openEditForm(user)"
+              class="text-blue-600 hover:text-blue-900"
+            >
+              تعديل
+            </button>
+            <button
+              (click)="toggleUserStatus(user)"
+              [class]="user.isActive ? 'text-orange-600 hover:text-orange-900' : 'text-green-600 hover:text-green-900'"
+            >
+              {{ user.isActive ? 'تعطيل' : 'تفعيل' }}
+            </button>
+            <button
+              (click)="deleteUser(user)"
+              class="text-red-600 hover:text-red-900"
+            >
+              حذف
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="text-center py-12">
+    <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+    <p class="mt-4 text-gray-600">جاري التحميل...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && users.length === 0" class="text-center py-12">
+    <p class="text-gray-600">لا يوجد مستخدمين</p>
+  </div>
+
+  <!-- User Form Modal -->
+  <div *ngIf="showUserForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4" (click)="closeForm()">
+    <div class="bg-white rounded-lg shadow-xl max-w-md w-full p-6" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">
+        {{ editingUser ? 'تعديل مستخدم' : 'إضافة مستخدم جديد' }}
+      </h3>
+
+      <form (ngSubmit)="saveUser()" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الاسم الأول</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.firstName"
+            name="firstName"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الاسم الأخير</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.lastName"
+            name="lastName"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">البريد الإلكتروني *</label>
+          <input
+            type="email"
+            [(ngModel)]="formData.email"
+            name="email"
+            required
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">اسم المستخدم (اختياري)</label>
+          <input
+            type="text"
+            [(ngModel)]="formData.username"
+            name="username"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            كلمة المرور {{ editingUser ? '(اتركه فارغاً للحفاظ على الكلمة الحالية)' : '*' }}
+          </label>
+          <input
+            type="password"
+            [(ngModel)]="formData.password"
+            name="password"
+            [required]="!editingUser"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الدور</label>
+          <select
+            [(ngModel)]="formData.role"
+            name="role"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          >
+            <option value="teacher">أستاذ</option>
+            <option value="admin">مسؤول</option>
+          </select>
+        </div>
+
+        <div class="flex items-center">
+          <input
+            type="checkbox"
+            [(ngModel)]="formData.isActive"
+            name="isActive"
+            id="isActive"
+            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+          />
+          <label for="isActive" class="mr-2 block text-sm text-gray-700">الحساب نشط</label>
+        </div>
+
+        <div class="flex justify-end space-x-2 space-x-reverse pt-4">
+          <button
+            type="button"
+            (click)="closeForm()"
+            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50"
+          >
+            إلغاء
+          </button>
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+          >
+            {{ editingUser ? 'تحديث' : 'إنشاء' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+

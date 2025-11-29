@@ -18,9 +18,9 @@ import { JwtStrategy } from './strategies/jwt.strategy';
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET', 'super-secret-key'),
         signOptions: {
-          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '4h'),
+          expiresIn: configService.get<string>('JWT_EXPIRES_IN', '4h') || '4h',
         },
-      }),
+      } as any),
     }),
   ],
   controllers: [AuthController],

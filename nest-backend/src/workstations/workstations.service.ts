@@ -48,9 +48,9 @@ export class WorkstationsService {
     private readonly gradeRepository: Repository<Grade>,
   ) {}
 
-  async getLayout(classId: number, group?: number) {
-    const workstations = await this.loadLayout(classId, group);
-    const stats = await this.buildStats(classId, workstations);
+  async getLayout(ownerId: number, classId: number, group?: number) {
+    const workstations = await this.loadLayout(ownerId, classId, group);
+    const stats = await this.buildStats(ownerId, classId, workstations);
 
     return {
       classId,
@@ -60,18 +60,34 @@ export class WorkstationsService {
     };
   }
 
-  async configureLayout(dto: ConfigureLayoutDto) {
+  async configureLayout(ownerId: number, dto: ConfigureLayoutDto) {
+    // Validate class exists and belongs to owner
+    const classEntity = await this.classRepository.findOne({
+      where: { id: dto.classId, ownerId },
+    });
+    if (!classEntity) {
+      throw new NotFoundException(`Class with ID ${dto.classId} not found`);
+    }
+
     const totalStations = dto.totalStations ?? this.DEFAULT_STATIONS;
     const capacity = dto.capacity ?? this.DEFAULT_CAPACITY;
 
-    await this.workstationRepository.delete({ classId: dto.classId });
-    await this.createDefaultLayout(dto.classId, totalStations, capacity);
-    return this.getLayout(dto.classId);
+    await this.workstationRepository.delete({ classId: dto.classId, ownerId });
+    await this.createDefaultLayout(ownerId, dto.classId, totalStations, capacity);
+    return this.getLayout(ownerId, dto.classId);
   }
 
-  async saveAssignments(dto: SaveAssignmentsDto) {
+  async saveAssignments(ownerId: number, dto: SaveAssignmentsDto) {
+    // Validate class exists and belongs to owner
+    const classEntity = await this.classRepository.findOne({
+      where: { id: dto.classId, ownerId },
+    });
+    if (!classEntity) {
+      throw new NotFoundException(`Class with ID ${dto.classId} not found`);
+    }
+
     const group = dto.group ?? 1;
-    const layout = await this.loadLayout(dto.classId);
+    const layout = await this.loadLayout(ownerId, dto.classId);
     const workstationMap = new Map(layout.map((ws) => [ws.id, ws]));
 
     const seatKeys = new Set<string>();
@@ -100,8 +116,8 @@ export class WorkstationsService {
     });
 
     const studentIds = dto.assignments.map((a) => a.studentId);
-    const students = await this.studentRepository.findBy({
-      id: In(studentIds),
+    const students = await this.studentRepository.find({
+      where: { id: In(studentIds), ownerId },
     });
     const studentMap = new Map(students.map((student) => [student.id, student]));
 
@@ -127,6 +143,7 @@ export class WorkstationsService {
     await this.assignmentRepository.delete({
       classId: dto.classId,
       group,
+      ownerId,
     });
 
     const newAssignments = dto.assignments.map((assignment) => {
@@ -138,6 +155,7 @@ export class WorkstationsService {
         workstationId: assignment.workstationId,
         studentId: assignment.studentId,
         seatIndex: assignment.seatIndex ?? 0,
+        ownerId,
         attendanceStatus:
           assignment.attendanceStatus ?? AttendanceStatus.PRESENT,
         behaviorStatus:
@@ -150,12 +168,20 @@ export class WorkstationsService {
       await this.assignmentRepository.save(newAssignments);
     }
 
-    return this.getLayout(dto.classId, group);
+    return this.getLayout(ownerId, dto.classId, group);
   }
 
-  async updatePositions(dto: UpdateWorkstationPositionsDto) {
+  async updatePositions(ownerId: number, dto: UpdateWorkstationPositionsDto) {
+    // Validate class exists and belongs to owner
+    const classEntity = await this.classRepository.findOne({
+      where: { id: dto.classId, ownerId },
+    });
+    if (!classEntity) {
+      throw new NotFoundException(`Class with ID ${dto.classId} not found`);
+    }
+
     const workstations = await this.workstationRepository.find({
-      where: { classId: dto.classId },
+      where: { classId: dto.classId, ownerId },
     });
     const map = new Map(workstations.map((ws) => [ws.id, ws]));
 
@@ -177,15 +203,16 @@ export class WorkstationsService {
     }
 
     await this.workstationRepository.save(Array.from(map.values()));
-    return this.getLayout(dto.classId);
+    return this.getLayout(ownerId, dto.classId);
   }
 
   async updateAssignmentStatus(
+    ownerId: number,
     id: number,
     dto: UpdateAssignmentStatusDto,
   ) {
     const assignment = await this.assignmentRepository.findOne({
-      where: { id },
+      where: { id, ownerId },
     });
 
     if (!assignment) {
@@ -208,7 +235,7 @@ export class WorkstationsService {
     return this.assignmentRepository.save(assignment);
   }
 
-  async getPrintableLayout(dto: PrintLayoutDto) {
+  async getPrintableLayout(ownerId: number, dto: PrintLayoutDto) {
     if (!dto.includeAllClasses && !dto.classId) {
       throw new BadRequestException(
         'classId is required unless includeAllClasses is true',
@@ -216,7 +243,7 @@ export class WorkstationsService {
     }
 
     const classIds = dto.includeAllClasses
-      ? (await this.classRepository.find({ select: ['id'] })).map(
+      ? (await this.classRepository.find({ where: { ownerId }, select: ['id'] })).map(
           (cls) => cls.id,
         )
       : [dto.classId as number];
@@ -225,7 +252,7 @@ export class WorkstationsService {
 
     for (const classId of classIds) {
       const classEntity = await this.classRepository.findOne({
-        where: { id: classId },
+        where: { id: classId, ownerId },
         relations: ['lab'],
       });
 
@@ -242,7 +269,7 @@ export class WorkstationsService {
 
       const groups = [];
       for (const group of groupNumbers) {
-        const layout = await this.getLayout(classId, group);
+        const layout = await this.getLayout(ownerId, classId, group);
         let filteredWorkstations = layout.workstations;
         if (dto.workstationIds && dto.workstationIds.length) {
           const allowed = new Set(dto.workstationIds);
@@ -293,12 +320,13 @@ export class WorkstationsService {
   }
 
   private async createDefaultLayout(
+    ownerId: number,
     classId: number,
     totalStations: number,
     capacity: number,
   ) {
     const classEntity = await this.classRepository.findOne({
-      where: { id: classId },
+      where: { id: classId, ownerId },
     });
 
     if (!classEntity) {
@@ -312,6 +340,7 @@ export class WorkstationsService {
         capacity,
         classId,
         labId: classEntity.labId ?? null,
+        ownerId,
         positionIndex: index + 1,
         layoutPreset: 'u-default',
         x: coord.x,
@@ -323,31 +352,32 @@ export class WorkstationsService {
     await this.workstationRepository.save(workstations);
   }
 
-  private async loadLayout(classId: number, group?: number) {
-    await this.ensureLayoutExists(classId);
+  private async loadLayout(ownerId: number, classId: number, group?: number) {
+    await this.ensureLayoutExists(ownerId, classId);
 
     const qb = this.workstationRepository
       .createQueryBuilder('workstation')
       .leftJoinAndSelect(
         'workstation.assignments',
         'assignment',
-        group ? 'assignment.group = :group' : '1=1',
-        group ? { group } : {},
+        group ? 'assignment.group = :group AND assignment.ownerId = :ownerId' : 'assignment.ownerId = :ownerId',
+        group ? { group, ownerId } : { ownerId },
       )
       .leftJoinAndSelect('assignment.student', 'student')
-      .where('workstation.classId = :classId', { classId })
+      .where('workstation.classId = :classId AND workstation.ownerId = :ownerId', { classId, ownerId })
       .orderBy('workstation.positionIndex', 'ASC')
       .addOrderBy('assignment.seatIndex', 'ASC');
 
     return qb.getMany();
   }
 
-  private async ensureLayoutExists(classId: number) {
+  private async ensureLayoutExists(ownerId: number, classId: number) {
     const count = await this.workstationRepository.count({
-      where: { classId },
+      where: { classId, ownerId },
     });
     if (count === 0) {
       await this.createDefaultLayout(
+        ownerId,
         classId,
         this.DEFAULT_STATIONS,
         this.DEFAULT_CAPACITY,
@@ -392,7 +422,7 @@ export class WorkstationsService {
     return coords;
   }
 
-  private async buildStats(classId: number, workstations: Workstation[]) {
+  private async buildStats(ownerId: number, classId: number, workstations: Workstation[]) {
     const assignments = workstations.flatMap(
       (ws) => ws.assignments ?? [],
     );
@@ -419,7 +449,7 @@ export class WorkstationsService {
         : 0;
 
     const grades = await this.gradeRepository.find({
-      where: { classId },
+      where: { classId, ownerId },
       select: ['score', 'maxScore'],
     });
     const averageGrade =
@@ -436,7 +466,7 @@ export class WorkstationsService {
         : null;
 
     const studentCount = await this.studentRepository.count({
-      where: { classId },
+      where: { classId, ownerId },
     });
 
     const stats: SeatingStats = {

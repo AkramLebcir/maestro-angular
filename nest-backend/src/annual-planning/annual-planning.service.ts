@@ -20,20 +20,24 @@ export class AnnualPlanningService {
   ) {}
 
   // Holiday CRUD
-  async createHoliday(dto: CreateHolidayPeriodDto): Promise<HolidayPeriodResponseDto> {
-    const entity = this.holidayRepo.create(dto);
+  async createHoliday(ownerId: number, dto: CreateHolidayPeriodDto): Promise<HolidayPeriodResponseDto> {
+    const entity = this.holidayRepo.create({
+      ...dto,
+      ownerId,
+    });
     const saved = await this.holidayRepo.save(entity);
     return this.mapHoliday(saved);
   }
 
-  async findAllHolidays(year?: string): Promise<HolidayPeriodResponseDto[]> {
-    const where = year ? { year } : {};
+  async findAllHolidays(ownerId: number, year?: string): Promise<HolidayPeriodResponseDto[]> {
+    const where: any = { ownerId };
+    if (year) where.year = year;
     const holidays = await this.holidayRepo.find({ where, order: { startDate: 'ASC' } });
     return holidays.map((h) => this.mapHoliday(h));
   }
 
-  async updateHoliday(id: number, dto: UpdateHolidayPeriodDto): Promise<HolidayPeriodResponseDto> {
-    const entity = await this.holidayRepo.findOne({ where: { id } });
+  async updateHoliday(ownerId: number, id: number, dto: UpdateHolidayPeriodDto): Promise<HolidayPeriodResponseDto> {
+    const entity = await this.holidayRepo.findOne({ where: { id, ownerId } });
     if (!entity) {
       throw new NotFoundException(`HolidayPeriod with ID ${id} not found`);
     }
@@ -42,8 +46,8 @@ export class AnnualPlanningService {
     return this.mapHoliday(saved);
   }
 
-  async removeHoliday(id: number): Promise<void> {
-    const entity = await this.holidayRepo.findOne({ where: { id } });
+  async removeHoliday(ownerId: number, id: number): Promise<void> {
+    const entity = await this.holidayRepo.findOne({ where: { id, ownerId } });
     if (!entity) {
       throw new NotFoundException(`HolidayPeriod with ID ${id} not found`);
     }
@@ -51,18 +55,24 @@ export class AnnualPlanningService {
   }
 
   // Annual distribution CRUD
-  async createDistribution(dto: CreateAnnualDistributionDto): Promise<AnnualDistributionResponseDto> {
-    const entity = this.distributionRepo.create(dto);
+  async createDistribution(ownerId: number, dto: CreateAnnualDistributionDto): Promise<AnnualDistributionResponseDto> {
+    const entity = this.distributionRepo.create({
+      ...dto,
+      ownerId,
+    });
     const saved = await this.distributionRepo.save(entity);
     return this.mapDistribution(saved);
   }
 
-  async findAllDistributions(filters?: {
-    year?: string;
-    level?: string;
-    track?: string;
-  }): Promise<AnnualDistributionResponseDto[]> {
-    const where: any = {};
+  async findAllDistributions(
+    ownerId: number,
+    filters?: {
+      year?: string;
+      level?: string;
+      track?: string;
+    }
+  ): Promise<AnnualDistributionResponseDto[]> {
+    const where: any = { ownerId };
     if (filters?.year) where.year = filters.year;
     if (filters?.level) where.level = filters.level;
     if (filters?.track) where.track = filters.track;
@@ -75,10 +85,11 @@ export class AnnualPlanningService {
   }
 
   async updateDistribution(
+    ownerId: number,
     id: number,
     dto: UpdateAnnualDistributionDto,
   ): Promise<AnnualDistributionResponseDto> {
-    const entity = await this.distributionRepo.findOne({ where: { id } });
+    const entity = await this.distributionRepo.findOne({ where: { id, ownerId } });
     if (!entity) {
       throw new NotFoundException(`AnnualDistribution with ID ${id} not found`);
     }
@@ -87,8 +98,8 @@ export class AnnualPlanningService {
     return this.mapDistribution(saved);
   }
 
-  async removeDistribution(id: number): Promise<void> {
-    const entity = await this.distributionRepo.findOne({ where: { id } });
+  async removeDistribution(ownerId: number, id: number): Promise<void> {
+    const entity = await this.distributionRepo.findOne({ where: { id, ownerId } });
     if (!entity) {
       throw new NotFoundException(`AnnualDistribution with ID ${id} not found`);
     }
@@ -98,17 +109,20 @@ export class AnnualPlanningService {
   /**
    * Returns distributions with computed start/end dates after applying holiday shifts.
    */
-  async getScheduledDistributions(filters: {
-    year: string;
-    level?: string;
-    track?: string;
-  }): Promise<AnnualDistributionResponseDto[]> {
-    const distributions = await this.findAllDistributions(filters);
+  async getScheduledDistributions(
+    ownerId: number,
+    filters: {
+      year: string;
+      level?: string;
+      track?: string;
+    }
+  ): Promise<AnnualDistributionResponseDto[]> {
+    const distributions = await this.findAllDistributions(ownerId, filters);
     if (distributions.length === 0) {
       return [];
     }
 
-    const holidays = await this.findAllHolidays(filters.year);
+    const holidays = await this.findAllHolidays(ownerId, filters.year);
     const holidayRanges = holidays.map((h) => ({
       start: new Date(h.startDate),
       end: new Date(h.endDate),

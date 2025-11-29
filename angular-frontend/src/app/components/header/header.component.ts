@@ -1,6 +1,8 @@
 import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
+import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LanguageService, LanguageCode } from '../../services/language.service';
+import { AuthService, User } from '../../services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -11,6 +13,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   teacherName = 'الأستاذ';
   teacherPhotoUrl: string | null = null;
   notificationCount = 3;
+  currentUser: User | null = null;
+  isUserMenuOpen = false;
 
   @Output() toggleMenu = new EventEmitter<void>();
 
@@ -18,8 +22,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
   currentLanguageCode: LanguageCode = 'AR';
   isLanguageMenuOpen = false;
   private languageSubscription?: Subscription;
+  private userSubscription?: Subscription;
 
-  constructor(public languageService: LanguageService) {}
+  constructor(
+    public languageService: LanguageService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
 
   toggleLanguageMenu(): void {
     this.isLanguageMenuOpen = !this.isLanguageMenuOpen;
@@ -41,19 +50,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
     });
     this.currentLanguageCode = this.languageService.getCurrentLanguage();
 
+    // الاشتراك في تغييرات المستخدم
+    this.userSubscription = this.authService.currentUser$.subscribe((user) => {
+      this.currentUser = user;
+      if (user) {
+        const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
+        this.teacherName = fullName || user.email || 'المستخدم';
+      }
+    });
+
     // جلب بيانات بطاقة الأستاذ من التخزين المحلي إن وُجدت
     const stored = localStorage.getItem('teacherCard');
     if (stored) {
       try {
         const data = JSON.parse(stored);
-        const firstName = data.firstName || '';
-        const lastName = data.lastName || '';
-
-        const fullName = `${firstName} ${lastName}`.trim();
-        if (fullName) {
-          this.teacherName = fullName;
-        }
-
         if (data.photoDataUrl) {
           this.teacherPhotoUrl = data.photoDataUrl;
         }
@@ -67,6 +77,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
     }
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
+    }
+  }
+
+  toggleUserMenu(): void {
+    this.isUserMenuOpen = !this.isUserMenuOpen;
+  }
+
+  logout(): void {
+    this.authService.logout();
+  }
+
+  goToAdmin(): void {
+    this.router.navigate(['/admin']);
+    this.isUserMenuOpen = false;
   }
 }
 

@@ -18,28 +18,34 @@ import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-noteb
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
 import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
 import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
+import { LoginComponent } from './pages/login/login.component';
+import { AdminComponent } from './pages/admin/admin.component';
+import { AuthGuard } from './guards/auth.guard';
+import { AdminGuard } from './guards/admin.guard';
 
 const routes: Routes = [
+  { path: 'login', component: LoginComponent },
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent },
-  { path: 'teacher-card', component: TeacherCardComponent },
-  { path: 'classes', component: ClassesComponent },
-  { path: 'students', component: StudentsComponent },
-  { path: 'labs', component: LabsComponent },
-  { path: 'timetable', component: TimetableComponent },
-  { path: 'topics', component: TopicsComponent },
-  { path: 'notebooks', component: NotebooksComponent },
-  { path: 'attendance', component: AttendanceComponent },
-  { path: 'behavior', component: BehaviorComponent },
-  { path: 'gradebook', component: GradebookComponent },
-  { path: 'seating-chart', component: SeatingChartComponent },
-  { path: 'annual-distribution', component: AnnualDistributionComponent },
-  { path: 'teacher-notebook', component: TeacherNotebookComponent },
-  { path: 'reports', component: ReportsComponent },
-  { path: 'progress-tracking', component: ProgressTrackingComponent },
-  { path: 'pedagogical-docs', component: PedagogicalDocsComponent },
-  { path: 'training-inspection', component: TrainingInspectionComponent },
-  { path: 'settings', component: ClassesComponent } // Placeholder
+  { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+  { path: 'admin', component: AdminComponent, canActivate: [AuthGuard, AdminGuard] },
+  { path: 'teacher-card', component: TeacherCardComponent, canActivate: [AuthGuard] },
+  { path: 'classes', component: ClassesComponent, canActivate: [AuthGuard] },
+  { path: 'students', component: StudentsComponent, canActivate: [AuthGuard] },
+  { path: 'labs', component: LabsComponent, canActivate: [AuthGuard] },
+  { path: 'timetable', component: TimetableComponent, canActivate: [AuthGuard] },
+  { path: 'topics', component: TopicsComponent, canActivate: [AuthGuard] },
+  { path: 'notebooks', component: NotebooksComponent, canActivate: [AuthGuard] },
+  { path: 'attendance', component: AttendanceComponent, canActivate: [AuthGuard] },
+  { path: 'behavior', component: BehaviorComponent, canActivate: [AuthGuard] },
+  { path: 'gradebook', component: GradebookComponent, canActivate: [AuthGuard] },
+  { path: 'seating-chart', component: SeatingChartComponent, canActivate: [AuthGuard] },
+  { path: 'annual-distribution', component: AnnualDistributionComponent, canActivate: [AuthGuard] },
+  { path: 'teacher-notebook', component: TeacherNotebookComponent, canActivate: [AuthGuard] },
+  { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },
+  { path: 'progress-tracking', component: ProgressTrackingComponent, canActivate: [AuthGuard] },
+  { path: 'pedagogical-docs', component: PedagogicalDocsComponent, canActivate: [AuthGuard] },
+  { path: 'training-inspection', component: TrainingInspectionComponent, canActivate: [AuthGuard] },
+  { path: 'settings', component: ClassesComponent, canActivate: [AuthGuard] } // Placeholder
 ];
 
 @NgModule({
