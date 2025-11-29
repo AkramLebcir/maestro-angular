@@ -24,6 +24,19 @@ import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 export class BehaviorEventsController {
   constructor(private readonly behaviorEventsService: BehaviorEventsService) {}
 
+  @Post('report')
+  @HttpCode(HttpStatus.CREATED)
+  async createReport(
+    @CurrentUser() user: AuthUser,
+    @Body() createBehaviorEventDto: CreateBehaviorEventDto,
+  ): Promise<BehaviorEventResponseDto> {
+    // Map the special report endpoint to the standard create logic
+    if (!createBehaviorEventDto.behaviorId) {
+      createBehaviorEventDto.behaviorId = 0; // Default ID
+    }
+    return this.behaviorEventsService.create(user.id, createBehaviorEventDto);
+  }
+
   @Post()
   @HttpCode(HttpStatus.CREATED)
   async create(

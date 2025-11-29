@@ -1,0 +1,93 @@
+<div class="page">
+  <header class="page-header">
+    <div>
+      <h1>الإجازات والعقوبات</h1>
+      <p class="description">
+        مركز واحد لعرض شهادات التقدير والمخالفات السلوكية لكل قسم.
+      </p>
+    </div>
+    <div class="tabs">
+      <button
+        type="button"
+        [class.active]="activeTab === 'achievements'"
+        (click)="onTabChange('achievements')"
+      >
+        الإنجازات
+      </button>
+      <button
+        type="button"
+        [class.active]="activeTab === 'penalties'"
+        (click)="onTabChange('penalties')"
+      >
+        العقوبات / التقارير
+      </button>
+    </div>
+  </header>
+
+  <section *ngIf="activeTab === 'achievements'">
+    <div class="certificate-region">
+      <h3>مولّد الشهادات</h3>
+      <p>حرِّر قالب الشهادة مباشرةً هنا لطباعته أو تصديره.</p>
+      <app-certificate-generator [embedMode]="true"></app-certificate-generator>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="controls">
+      <label for="classPickerCert">عرض الشهادات السابقة للقسم:</label>
+      <select id="classPickerCert" (change)="onClassChange($event)" [value]="selectedClassId">
+        <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="isLoadingCertificates" class="status">جارٍ تحميل سجل الشهادات...</div>
+    <div *ngIf="!isLoadingCertificates && certificateHistory.length === 0" class="status">
+      لا توجد شهادات مسجلة لهذا القسم.
+    </div>
+
+    <ul class="reports-list" *ngIf="certificateHistory.length">
+      <li *ngFor="let cert of certificateHistory">
+        <div class="report-header">
+          <div>
+            <p class="student">{{ cert.studentName }}</p>
+            <small class="class">{{ cert.templateName }}</small>
+          </div>
+          <span class="date">{{ cert.issueDate }}</span>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <section *ngIf="activeTab === 'penalties'">
+    <app-report-generator [embedMode]="true"></app-report-generator>
+
+    <div class="divider"></div>
+
+    <div class="controls">
+      <label for="classPicker">عرض التقارير السابقة للقسم:</label>
+      <select id="classPicker" (change)="onClassChange($event)" [value]="selectedClassId">
+        <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="isLoadingReports" class="status">جارٍ تحميل التقارير...</div>
+    <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
+    <div *ngIf="!isLoadingReports && !errorMessage && behaviorReports.length === 0" class="status">
+      لا توجد تقارير سلوك في الوقت الحالي.
+    </div>
+
+    <ul class="reports-list" *ngIf="behaviorReports.length">
+      <li *ngFor="let report of behaviorReports">
+        <div class="report-header">
+          <div>
+            <p class="student">{{ report.studentName }}</p>
+            <small class="class">{{ report.className || 'غير محدد' }}</small>
+          </div>
+          <span class="date">{{ report.date }}</span>
+        </div>
+        <p class="description">{{ report.description }}</p>
+      </li>
+    </ul>
+  </section>
+</div>
+

@@ -18,6 +18,7 @@ import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-noteb
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
 import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
 import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
+import { AchievementsPenaltiesComponent } from './pages/achievements-penalties/achievements-penalties.component';
 import { LoginComponent } from './pages/login/login.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { AuthGuard } from './guards/auth.guard';
@@ -39,6 +40,7 @@ const routes: Routes = [
   { path: 'behavior', component: BehaviorComponent, canActivate: [AuthGuard] },
   { path: 'gradebook', component: GradebookComponent, canActivate: [AuthGuard] },
   { path: 'seating-chart', component: SeatingChartComponent, canActivate: [AuthGuard] },
+  { path: 'achievements-penalties', component: AchievementsPenaltiesComponent, canActivate: [AuthGuard] },
   { path: 'annual-distribution', component: AnnualDistributionComponent, canActivate: [AuthGuard] },
   { path: 'teacher-notebook', component: TeacherNotebookComponent, canActivate: [AuthGuard] },
   { path: 'reports', component: ReportsComponent, canActivate: [AuthGuard] },

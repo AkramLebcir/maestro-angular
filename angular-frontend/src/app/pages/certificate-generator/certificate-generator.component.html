@@ -1,0 +1,140 @@
+<div class="certificate-page" [class.embed-mode]="embedMode">
+  <header class="certificate-header" *ngIf="!embedMode">
+    <div>
+      <h1>إصدار شهادات التقدير</h1>
+      <p>اختر التلميذ والقالب وعدّل النص ثم حمّل الشهادة كهاتف PDF.</p>
+    </div>
+  </header>
+
+  <section class="certificate-builder">
+    <div class="card form-card">
+      <div class="form-group">
+        <label>القسم</label>
+        <select [(ngModel)]="selectedClassId" (ngModelChange)="updateStudents()">
+          <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>التلميذ</label>
+        <select [(ngModel)]="selectedStudentId">
+          <option *ngFor="let student of students" [value]="student.id">
+            {{ student.firstName }} {{ student.lastName ?? '' }}
+          </option>
+        </select>
+        <small *ngIf="isLoadingStudents">جار التحميل...</small>
+      </div>
+
+      <div class="templates-section">
+        <div
+          *ngFor="let template of availableTemplates"
+          (click)="selectTemplate(template.id)"
+          [class.selected]="template.id === selectedTemplateId"
+          class="template-card"
+        >
+          <div class="template-icon" [ngSwitch]="template.name">
+            <span *ngSwitchCase="'تقدير تفوق دراسي'">⭐</span>
+            <span *ngSwitchCase="'تقدير حسن سلوك'">🤝</span>
+            <span *ngSwitchCase="'تقدير مشاركة فعالة'">🙌</span>
+            <span *ngSwitchDefault>🏅</span>
+          </div>
+          <h3>{{ template.name }}</h3>
+          <p>{{ template.description }}</p>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>النص الرئيسي للشهادة</label>
+        <textarea [(ngModel)]="mainText" rows="3"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>سبب التقدير</label>
+        <textarea [(ngModel)]="reason" rows="2"></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>تاريخ الإصدار</label>
+          <input type="date" [(ngModel)]="issueDate" />
+        </div>
+        <div class="form-group">
+          <label>السنة الدراسية</label>
+          <input type="text" [(ngModel)]="academicYear" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>توقيع الأستاذ</label>
+        <input type="text" [(ngModel)]="signatureName" />
+      </div>
+
+      <div class="actions">
+        <button (click)="issueCertificate()" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'جارٍ الإصدار...' : 'إصدار الشهادة' }}
+        </button>
+        <button class="secondary" (click)="downloadPdf()" [disabled]="isExporting">
+          {{ isExporting ? 'يُجهّز PDF...' : 'تصدير PDF' }}
+        </button>
+      </div>
+
+      <div class="feedback">
+        <p class="success" *ngIf="message">{{ message }}</p>
+        <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+      </div>
+    </div>
+
+    <div class="card preview-card">
+      <div class="preview-label">معاينة الشهادة</div>
+      <div class="certificate-preview" #certificatePreview>
+        <div class="certificate-border" [ngClass]="getSelectedTheme()">
+          <div class="certificate-inner-border">
+            <div class="certificate-header-decoration">
+              <div class="decoration-icon">
+                <ng-container [ngSwitch]="getSelectedTheme()">
+                  <span *ngSwitchCase="'theme-modern'">🌟</span>
+                  <span *ngSwitchCase="'theme-creative'">✨</span>
+                  <span *ngSwitchDefault>🎓</span>
+                </ng-container>
+              </div>
+            </div>
+            
+            <div class="certificate-content">
+              <h1 class="cert-title">شهادة تقدير</h1>
+              <div class="cert-subtitle">تُمنح هذه الشهادة إلى الطالب(ة)</div>
+              
+              <h2 class="student-name">{{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}</h2>
+              
+              <p class="main-text">{{ mainText }}</p>
+              
+              <div class="reason-section">
+                <span class="reason-label">وذلك تقديراً:</span>
+                <p class="reason-text">{{ reason }}</p>
+              </div>
+
+              <div class="cert-footer">
+                <div class="date-section">
+                  <div class="meta-label">تاريخ الإصدار</div>
+                  <div class="meta-value">{{ issueDate }}</div>
+                  <div class="meta-sub">السنة الدراسية: {{ academicYear }}</div>
+                </div>
+                
+                <div class="seal-container">
+                  <div class="seal">
+                    <span>تميز</span>
+                  </div>
+                </div>
+
+                <div class="signature-section">
+                  <div class="signature-line">{{ signatureName || 'توقيع الأستاذ' }}</div>
+                  <div class="signature-label">توقيع الأستاذ</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+

@@ -25,6 +25,8 @@ import { TeacherNotebookComponent } from './pages/teacher-notebook/teacher-noteb
 import { ProgressTrackingComponent } from './pages/progress-tracking/progress-tracking.component';
 import { PedagogicalDocsComponent } from './pages/pedagogical-docs/pedagogical-docs.component';
 import { TrainingInspectionComponent } from './pages/training-inspection/training-inspection.component';
+import { CertificateGeneratorComponent } from './pages/certificate-generator/certificate-generator.component';
+import { AchievementsPenaltiesComponent } from './pages/achievements-penalties/achievements-penalties.component';
 import { SafeUrlPipe } from './pipes/safe-url.pipe';
 import { NgChartsModule } from 'ng2-charts';
 import { LoginComponent } from './pages/login/login.component';
@@ -32,6 +34,7 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { UsersManagementComponent } from './pages/admin/users-management/users-management.component';
 import { ModuleAccessComponent } from './pages/admin/module-access/module-access.component';
 import { MonitoringComponent } from './pages/admin/monitoring/monitoring.component';
+import { ReportGeneratorComponent } from './pages/report-generator/report-generator.component';
 
 @NgModule({
   declarations: [
@@ -56,12 +59,15 @@ import { MonitoringComponent } from './pages/admin/monitoring/monitoring.compone
     ProgressTrackingComponent,
     PedagogicalDocsComponent,
     TrainingInspectionComponent,
+    CertificateGeneratorComponent,
+    AchievementsPenaltiesComponent,
     SafeUrlPipe,
     LoginComponent,
     AdminComponent,
     UsersManagementComponent,
     ModuleAccessComponent,
     MonitoringComponent,
+    ReportGeneratorComponent,
   ],
   imports: [
     BrowserModule,

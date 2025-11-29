@@ -1,0 +1,125 @@
+<div class="report-generator">
+  <!-- Input Section -->
+  <div class="card input-section">
+    <h2 class="form-title">إعداد التقرير</h2>
+    
+    <div class="form-grid">
+      <div class="form-group">
+        <label>القسم</label>
+        <select class="form-control" [(ngModel)]="selectedClassId" (change)="onClassChange()">
+          <option [ngValue]="undefined" disabled>اختر القسم</option>
+          <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>التلميذ</label>
+        <select class="form-control" [(ngModel)]="selectedStudentId" (change)="onStudentChange()">
+          <option [ngValue]="undefined" disabled>اختر التلميذ</option>
+          <option *ngFor="let student of students" [value]="student.id">
+            {{ student.firstName }} {{ student.lastName }}
+          </option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>نوع التقرير</label>
+        <select class="form-control" [(ngModel)]="reportType" (change)="onTypeChange()">
+          <option value="ACADEMIC">تقرير أكاديمي</option>
+          <option value="BEHAVIORAL">تقرير سلوكي</option>
+          <option value="FOLLOW_UP">تقرير متابعة خاص</option>
+          <option value="CHEATING">تقرير غش</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>سبب التقرير</label>
+        <select class="form-control" [(ngModel)]="reportReason" (change)="generateContent()">
+          <option [ngValue]="undefined" disabled>اختر السبب</option>
+          <option *ngFor="let reason of getReasons()" [value]="reason">{{ reason }}</option>
+        </select>
+      </div>
+
+      <div class="form-group full-width">
+        <label>نص التقرير (يتم توليده تلقائياً ويمكن تعديله)</label>
+        <textarea class="form-control" [(ngModel)]="generatedContent" rows="6"></textarea>
+      </div>
+
+      <div class="form-group full-width">
+        <label>وصف وتفاصيل إضافية</label>
+        <textarea class="form-control" [(ngModel)]="additionalDetails" rows="3" placeholder="أضف ملاحظات شخصية أو أمثلة محددة..."></textarea>
+      </div>
+
+      <div class="form-group full-width">
+        <label>التوصيات والإجراءات المقترحة</label>
+        <textarea class="form-control" [(ngModel)]="recommendations" rows="3" placeholder="اكتب التوصيات الموجهة للتلميذ أو الولي..."></textarea>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" (click)="saveAndPrint()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'جارٍ الحفظ...' : 'إصدار وحفظ التقرير' }}
+      </button>
+      <!-- <button class="btn btn-secondary" (click)="previewPdf()">معاينة PDF</button> -->
+    </div>
+
+    <div class="feedback" *ngIf="message || errorMessage">
+      <p class="success" *ngIf="message">{{ message }}</p>
+      <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </div>
+  </div>
+
+  <!-- Preview Section -->
+  <div class="card preview-section">
+    <h2 class="form-title">معاينة التقرير</h2>
+    <div class="preview-container">
+      <div class="report-preview" #reportPreview>
+        <div class="report-header">
+          <h3>الجمهورية الجزائرية الديمقراطية الشعبية</h3>
+          <h4>وزارة التربية الوطنية</h4>
+          <p>المؤسسة: {{ schoolName }}</p>
+        </div>
+
+        <h2 class="report-title">{{ getReportTitle() }}</h2>
+
+        <div class="student-info">
+          <div class="info-row">
+            <span>اسم التلميذ:</span>
+            <span>{{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}</span>
+          </div>
+          <div class="info-row">
+            <span>القسم:</span>
+            <span>{{ selectedClass?.name }}</span>
+          </div>
+          <div class="info-row">
+            <span>الأستاذ:</span>
+            <span>{{ teacherName }}</span>
+          </div>
+          <div class="info-row">
+            <span>التاريخ:</span>
+            <span>{{ reportDate | date:'yyyy/MM/dd' }}</span>
+          </div>
+        </div>
+
+        <div class="report-body">
+          <p>{{ generatedContent }}</p>
+          <p *ngIf="additionalDetails"><strong>ملاحظات إضافية:</strong><br>{{ additionalDetails }}</p>
+        </div>
+
+        <div class="recommendations" *ngIf="recommendations">
+          <span class="rec-title">التوصيات والإجراءات:</span>
+          <p>{{ recommendations }}</p>
+        </div>
+
+        <div class="signatures">
+          <div class="sig-box">
+            <span class="sig-title">توقيع الأستاذ</span>
+          </div>
+          <div class="sig-box">
+            <span class="sig-title">توقيع الولي / الإدارة</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

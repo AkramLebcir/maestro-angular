@@ -131,6 +131,17 @@ export class BehaviorEventsService {
       fieldsToUpdate.classId = updateBehaviorEventDto.classId || null;
     }
 
+    // Add new fields support for update
+    if ('type' in updateBehaviorEventDto) {
+      fieldsToUpdate.type = (updateBehaviorEventDto as any).type;
+    }
+    if ('reason' in updateBehaviorEventDto) {
+      fieldsToUpdate.reason = (updateBehaviorEventDto as any).reason;
+    }
+    if ('recommendations' in updateBehaviorEventDto) {
+      fieldsToUpdate.recommendations = (updateBehaviorEventDto as any).recommendations;
+    }
+
     Object.assign(behaviorEvent, fieldsToUpdate);
     await this.behaviorEventRepository.save(behaviorEvent);
     return this.findOne(ownerId, id);

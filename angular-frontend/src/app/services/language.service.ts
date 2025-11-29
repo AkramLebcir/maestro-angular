@@ -205,6 +205,15 @@ export class LanguageService {
         'DE': 'Verhaltensverwaltung',
         'TR': 'Davranış Yönetimi'
       },
+      'menu.achievementsPenalties': {
+        'AR': 'الإجازات والعقوبات',
+        'FR': 'Distinctions & sanctions',
+        'EN': 'Achievements & Penalties',
+        'ES': 'Logros y sanciones',
+        'IT': 'Risultati e sanzioni',
+        'DE': 'Erfolge & Sanktionen',
+        'TR': 'Başarılar ve Cezalar'
+      },
       'menu.gradebook': {
         'AR': 'سجل الدرجات',
         'FR': 'Carnet de notes',

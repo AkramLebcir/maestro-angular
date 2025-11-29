@@ -1,26 +1,35 @@
-import { IsInt, IsString, IsDateString, IsOptional } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateBehaviorEventDto {
-  @Type(() => Number)
-  @IsInt()
+  @IsNumber()
+  @IsNotEmpty()
   studentId: number;
 
-  @Type(() => Number)
-  @IsInt()
-  behaviorId: number;
+  @IsNumber()
+  @IsOptional()
+  behaviorId?: number;
 
   @IsDateString()
+  @IsNotEmpty()
   date: string;
 
-  @IsOptional()
   @IsString()
+  @IsOptional()
   description?: string;
 
+  @IsNumber()
   @IsOptional()
-  @Type(() => Number)
-  @IsInt()
   classId?: number;
+
+  @IsString()
+  @IsOptional()
+  type?: string;
+
+  @IsString()
+  @IsOptional()
+  reason?: string;
+
+  @IsString()
+  @IsOptional()
+  recommendations?: string;
 }
-
-

@@ -1,0 +1,220 @@
+.report-generator {
+  display: grid;
+  grid-template-columns: 6fr 4fr; /* 60% Input, 40% Preview */
+  gap: 2rem;
+  margin-top: 1.5rem;
+  align-items: start;
+}
+
+.card {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  padding: 1.5rem;
+}
+
+.form-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* Grid for form fields */
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 0; /* Handled by grid gap */
+}
+
+.form-group.full-width {
+  grid-column: span 2;
+}
+
+.form-group label {
+  display: block;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.5rem;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  transition: border-color 0.2s;
+}
+
+.form-control:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+textarea.form-control {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Preview Section */
+.preview-section {
+  position: sticky;
+  top: 1rem;
+}
+
+.preview-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  /* Removed min-height to let it fit content naturally */
+}
+
+.report-preview {
+  background: white;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  border: 1px solid #e5e7eb;
+  /* Ensure preview fits nicely */
+  font-size: 0.9rem; 
+}
+
+.report-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #000;
+  padding-bottom: 0.5rem;
+}
+
+.report-header h3, .report-header h4 {
+  margin: 0.25rem 0;
+}
+
+.report-title {
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 1rem 0;
+  text-decoration: underline;
+  color: #000;
+}
+
+.student-info {
+  margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  border: 1px solid #eee;
+  padding: 1rem;
+  background: #fafafa;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 0.25rem;
+}
+
+.info-row span:first-child {
+  font-weight: bold;
+  color: #555;
+}
+
+.report-body {
+  font-size: 1rem;
+  line-height: 1.6;
+  text-align: justify;
+  margin-bottom: 1.5rem;
+  white-space: pre-wrap;
+}
+
+.recommendations {
+  margin-bottom: 1.5rem;
+  background: #f0f9ff;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #bae6fd;
+}
+
+.rec-title {
+  font-weight: bold;
+  color: #0369a1;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.signatures {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 3rem;
+}
+
+.sig-box {
+  text-align: center;
+  width: 150px;
+}
+
+.sig-title {
+  font-weight: bold;
+  margin-bottom: 2rem;
+  display: block;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #ccc;
+  padding-bottom: 5px;
+}
+
+.actions {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%; /* Full width button */
+}
+
+.btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.btn-primary:hover {
+  background: #2563eb;
+}
+
+.btn-secondary {
+  background: #64748b;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #475569;
+}
+
+@media (max-width: 1024px) {
+  .report-generator {
+    grid-template-columns: 1fr;
+  }
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-group.full-width {
+    grid-column: auto;
+  }
+}

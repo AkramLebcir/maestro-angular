@@ -21,6 +21,7 @@ import { ProgressTrackingModule } from './progress-tracking/progress-tracking.mo
 import { PedagogicalDocsModule } from './pedagogical-docs/pedagogical-docs.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
+import { CertificatesModule } from './certificates/certificates.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ModuleAccessGuard } from './auth/guards/module-access.guard';
@@ -46,6 +47,7 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     AnnualPlanningModule,
     ProgressTrackingModule,
     PedagogicalDocsModule,
+    CertificatesModule,
     AuthModule,
     UsersModule,
   ],

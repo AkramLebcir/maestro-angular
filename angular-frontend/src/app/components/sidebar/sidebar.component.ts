@@ -86,6 +86,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
+      labelKey: 'menu.achievementsPenalties',
+      route: '/achievements-penalties', 
+      icon: 'M5 3h14a2 2 0 012 2v4a5 5 0 01-5 5h-1v3h2a1 1 0 011 1v3H5v-3a1 1 0 011-1h2v-3h-1a5 5 0 01-5-5V5a2 2 0 012-2z',
+      active: false
+    },
+    { 
       labelKey: 'menu.gradebook',
       route: '/gradebook', 
       icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',

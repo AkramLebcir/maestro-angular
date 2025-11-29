@@ -24,6 +24,15 @@ export class BehaviorEvent extends TenantOwnedEntity {
   @Column({ type: 'text', nullable: true })
   description: string;
 
+  @Column({ type: 'varchar', nullable: true, default: 'BEHAVIORAL' })
+  type: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  reason: string;
+
+  @Column({ type: 'text', nullable: true })
+  recommendations: string;
+
   @ManyToOne(() => Class, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'classId' })
   class: Class;
