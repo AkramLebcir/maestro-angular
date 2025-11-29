@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { LanguageService } from '../../services/language.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,11 +11,13 @@ import { LanguageService } from '../../services/language.service';
   styleUrls: ['./sidebar.component.css']
 })
 export class SidebarComponent implements OnInit, OnDestroy {
+  isAdmin = false;
   menuItems: Array<{ 
     labelKey: string;
     route: string; 
     icon: string; 
     active: boolean;
+    adminOnly?: boolean;
   }> = [
     { 
       labelKey: 'menu.dashboard',
@@ -128,18 +131,39 @@ export class SidebarComponent implements OnInit, OnDestroy {
       labelKey: 'menu.settings',
       route: '/settings', 
       icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
-      active: false
+      active: false,
+      adminOnly: true
     }
   ];
 
   private languageSubscription?: Subscription;
+  private userSubscription?: Subscription;
 
   constructor(
     private router: Router,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    // Check if user is admin
+    this.isAdmin = this.authService.isAdmin();
+    
+    // Update settings route for admin
+    const settingsItem = this.menuItems.find(item => item.route === '/settings');
+    if (settingsItem && this.isAdmin) {
+      settingsItem.route = '/admin';
+    }
+
+    // Subscribe to user changes
+    this.userSubscription = this.authService.currentUser$.subscribe(user => {
+      this.isAdmin = this.authService.isAdmin();
+      const settingsItem = this.menuItems.find(item => item.labelKey === 'menu.settings');
+      if (settingsItem) {
+        settingsItem.route = this.isAdmin ? '/admin' : '/settings';
+      }
+    });
+
     // الاشتراك في تغييرات اللغة
     this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
       // تحديث الترجمة عند تغيير اللغة
@@ -165,6 +189,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     if (this.languageSubscription) {
       this.languageSubscription.unsubscribe();
+    }
+    if (this.userSubscription) {
+      this.userSubscription.unsubscribe();
     }
   }
 

@@ -45,7 +45,7 @@ const routes: Routes = [
   { path: 'progress-tracking', component: ProgressTrackingComponent, canActivate: [AuthGuard] },
   { path: 'pedagogical-docs', component: PedagogicalDocsComponent, canActivate: [AuthGuard] },
   { path: 'training-inspection', component: TrainingInspectionComponent, canActivate: [AuthGuard] },
-  { path: 'settings', component: ClassesComponent, canActivate: [AuthGuard] } // Placeholder
+  { path: 'settings', redirectTo: '/admin', pathMatch: 'full' } // Redirect to admin panel for admins
 ];
 
 @NgModule({

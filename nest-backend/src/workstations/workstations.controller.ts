@@ -31,11 +31,13 @@ export class WorkstationsController {
     @Query('group') group?: string,
   ) {
     const parsedGroup =
-      group !== undefined && group !== null ? Number(group) : undefined;
+      group !== undefined && group !== null && group !== '' 
+        ? Number(group) 
+        : undefined;
     return this.workstationsService.getLayout(
       user.id,
       classId,
-      parsedGroup as number | undefined,
+      parsedGroup,
     );
   }
 

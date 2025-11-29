@@ -37,7 +37,7 @@ export class ModuleAccessComponent implements OnInit {
     { key: 'pedagogical-docs', name: 'الوثائق التربوية', description: 'إدارة الوثائق التعليمية' },
     { key: 'training-inspection', name: 'التفتيش التربوي', description: 'سجل التفتيش' },
     { key: 'annual-distribution', name: 'التوزيع السنوي', description: 'توزيع المنهاج السنوي' },
-    { key: 'behavior', name: 'السلوك', description: 'تسجيل أحداث السلوك' },
+    { key: 'behavior-events', name: 'السلوك', description: 'تسجيل أحداث السلوك' },
     { key: 'labs', name: 'المختبرات', description: 'إدارة المختبرات' },
     { key: 'lab-management', name: 'إدارة المختبر', description: 'إدارة مخزون المختبر' },
   ];

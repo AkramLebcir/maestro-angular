@@ -25,14 +25,18 @@ export class ModuleAccessGuard implements CanActivate {
       return false;
     }
 
+    // Admins have access to all modules
     if (user.role === UserRole.ADMIN) {
       return true;
     }
 
+    // If allowedModules is null, undefined, or empty array, grant access (backward compatibility)
+    // This means if no modules are explicitly restricted, allow access
     if (!user.allowedModules || user.allowedModules.length === 0) {
       return true;
     }
 
+    // Check if user has access to the required module
     return user.allowedModules.includes(requiredModule);
   }
 }
