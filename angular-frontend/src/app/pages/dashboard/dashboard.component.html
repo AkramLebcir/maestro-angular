@@ -208,11 +208,11 @@
       </div>
       <div class="mt-4 flex justify-around text-center">
         <div>
-          <div class="text-sm text-gray-500 mb-1">إيجابي</div>
+          <div class="text-sm text-gray-500 mb-1">{{ translate('dashboard.behaviorPositive') }}</div>
           <div class="text-xl font-bold text-emerald-600">{{ behaviorSummary.positive }}</div>
         </div>
         <div>
-          <div class="text-sm text-gray-500 mb-1">سلبي</div>
+          <div class="text-sm text-gray-500 mb-1">{{ translate('dashboard.behaviorNegative') }}</div>
           <div class="text-xl font-bold text-red-600">{{ behaviorSummary.negative }}</div>
         </div>
       </div>
@@ -222,7 +222,7 @@
     <div class="flex flex-col gap-2.5">
       <!-- Grade counts -->
       <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
-        <h2 class="text-sm font-semibold text-gray-800 mb-2">عدد الدرجات</h2>
+        <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.gradeCountsTitle') }}</h2>
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div class="flex items-center justify-between border-b border-gray-100 pb-1">
             <span class="font-semibold text-gray-700">A</span>
@@ -246,7 +246,7 @@
           </div>
         </div>
         <div class="mt-auto pt-4 text-xs text-gray-500">
-          المجموع: 
+          {{ translate('dashboard.gradeCountsTotalLabel') }}
           <span class="font-semibold">
             {{ gradeCounts.A + gradeCounts.B + gradeCounts.C + gradeCounts.D + gradeCounts.F }}
           </span>
@@ -331,7 +331,7 @@
                 </div>
               </div>
               <div class="w-32 text-right text-xs text-gray-700 mr-3">
-                متوسط تقدّم البرنامج<br>لجميع الأقسام
+                <span [innerHTML]="translate('dashboard.programProgressAllClassesLabel')"></span>
               </div>
             </div>
           </ng-container>
@@ -387,15 +387,15 @@
           <div class="text-xl font-bold text-blue-700">{{ averageAttendance | number:'1.0-1' }}%</div>
         </div>
         <div class="bg-emerald-50 border border-emerald-100 rounded-lg p-3">
-          <div class="text-xs text-emerald-600 mb-1">معدل الدرجات</div>
+          <div class="text-xs text-emerald-600 mb-1">{{ translate('dashboard.averageGradeLabel') }}</div>
           <div class="text-xl font-bold text-emerald-700">{{ averageGrade | number:'1.0-1' }}%</div>
         </div>
         <div class="bg-purple-50 border border-purple-100 rounded-lg p-3">
-          <div class="text-xs text-purple-600 mb-1">إجمالي التلاميذ</div>
+          <div class="text-xs text-purple-600 mb-1">{{ translate('dashboard.totalStudents') }}</div>
           <div class="text-xl font-bold text-purple-700">{{ totalStudents }}</div>
         </div>
         <div class="bg-orange-50 border border-orange-100 rounded-lg p-3">
-          <div class="text-xs text-orange-600 mb-1">إيجابي مقابل سلبي</div>
+          <div class="text-xs text-orange-600 mb-1">{{ translate('dashboard.behaviorPositiveVsNegative') }}</div>
           <div class="text-sm">
             <span class="font-semibold text-emerald-600">{{ behaviorSummary.positive }}</span>
             /
@@ -404,7 +404,7 @@
         </div>
       </div>
       <a routerLink="/reports" class="mt-4 inline-flex items-center text-sm text-blue-600 hover:text-blue-800">
-        عرض تفاصيل التقارير
+        {{ translate('dashboard.viewReports') }}
         <span class="mr-1">↗</span>
       </a>
     </div>

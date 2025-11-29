@@ -479,6 +479,24 @@ export class LanguageService {
         'DE': 'Schneller Überblick über Klassen- und Schülerleistungen',
         'TR': 'Sınıf ve öğrenci performansının hızlı özeti'
       },
+      'dashboard.averageGradeLabel': {
+        'AR': 'معدل النقاط',
+        'FR': 'Moyenne des notes',
+        'EN': 'Average grade',
+        'ES': 'Nota media',
+        'IT': 'Voto medio',
+        'DE': 'Durchschnittsnote',
+        'TR': 'Ortalama not'
+      },
+      'dashboard.viewReports': {
+        'AR': 'عرض التقارير',
+        'FR': 'Voir les rapports',
+        'EN': 'View reports',
+        'ES': 'Ver informes',
+        'IT': 'Visualizza rapporti',
+        'DE': 'Berichte anzeigen',
+        'TR': 'Raporları görüntüle'
+      },
       'dashboard.selectClass': {
         'AR': 'اختيار القسم:',
         'FR': 'Sélectionner la classe:',
@@ -505,6 +523,24 @@ export class LanguageService {
         'IT': 'Media generale (su 20)',
         'DE': 'Durchschnitt (von 20)',
         'TR': 'Genel ortalama (20 üzerinden)'
+      },
+      'dashboard.gradeCountsTitle': {
+        'AR': 'عدد الدرجات',
+        'FR': 'Nombre de notes',
+        'EN': 'Grade counts',
+        'ES': 'Cantidad de notas',
+        'IT': 'Conteggio voti',
+        'DE': 'Notenzählung',
+        'TR': 'Not Sayımı'
+      },
+      'dashboard.gradeCountsTotalLabel': {
+        'AR': 'المجموع:',
+        'FR': 'Total :',
+        'EN': 'Total:',
+        'ES': 'Total:',
+        'IT': 'Totale:',
+        'DE': 'Gesamt:',
+        'TR': 'Toplam:'
       },
       'dashboard.labDevices': {
         'AR': 'أجهزة المخبر',
@@ -550,6 +586,33 @@ export class LanguageService {
         'IT': 'Comportamento',
         'DE': 'Verhalten',
         'TR': 'Davranış'
+      },
+      'dashboard.behaviorPositive': {
+        'AR': 'إيجابي',
+        'FR': 'Positif',
+        'EN': 'Positive',
+        'ES': 'Positivo',
+        'IT': 'Positivo',
+        'DE': 'Positiv',
+        'TR': 'Pozitif'
+      },
+      'dashboard.behaviorNegative': {
+        'AR': 'سلبي',
+        'FR': 'Négatif',
+        'EN': 'Negative',
+        'ES': 'Negativo',
+        'IT': 'Negativo',
+        'DE': 'Negativ',
+        'TR': 'Negatif'
+      },
+      'dashboard.behaviorPositiveVsNegative': {
+        'AR': 'إيجابي مقابل سلبي',
+        'FR': 'Positif vs Négatif',
+        'EN': 'Positive vs Negative',
+        'ES': 'Positivo vs Negativo',
+        'IT': 'Positivo vs Negativo',
+        'DE': 'Positiv vs Negativ',
+        'TR': 'Pozitif vs Negatif'
       },
       'dashboard.present': {
         'AR': 'حاضر',
@@ -649,6 +712,15 @@ export class LanguageService {
         'IT': 'Progresso del programma solo per la classe selezionata',
         'DE': 'Programmfortschritt nur für ausgewählte Klasse',
         'TR': 'Yalnızca seçili sınıf için program ilerlemesi'
+      },
+      'dashboard.programProgressAllClassesLabel': {
+        'AR': 'تقدّم البرنامج لجميع الأقسام (المعدل العام)',
+        'FR': 'Progression du programme pour toutes les classes (Moyenne générale)',
+        'EN': 'Program progress for all classes (General average)',
+        'ES': 'Progreso del programa para todas las clases (Promedio general)',
+        'IT': 'Progresso del programma per tutte le classi (Media generale)',
+        'DE': 'Programmfortschritt für alle Klassen (Gesamtdurchschnitt)',
+        'TR': 'Tüm sınıflar için program ilerlemesi (Genel ortalama)'
       },
       'dashboard.noProgressData': {
         'AR': 'لا توجد بيانات تقدّم مسجّلة لهذا القسم في البرنامج.',
