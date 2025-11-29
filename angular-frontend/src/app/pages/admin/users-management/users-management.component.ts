@@ -38,6 +38,11 @@ export class UsersManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // Verify user is admin before loading
+    if (!this.authService.isAdmin()) {
+      this.errorMessage = 'ليس لديك صلاحيات للوصول إلى هذه الصفحة. يجب أن تكون مسؤولاً.';
+      return;
+    }
     this.loadUsers();
   }
 
@@ -45,12 +50,28 @@ export class UsersManagementComponent implements OnInit {
     this.isLoading = true;
     this.apiService.get<UserListItem[]>('/users').subscribe({
       next: (data) => {
-        this.users = data;
+        this.users = data || [];
         this.isLoading = false;
+        this.clearMessages();
       },
       error: (error) => {
         console.error('Error loading users:', error);
-        this.errorMessage = 'حدث خطأ أثناء تحميل قائمة المستخدمين';
+        let errorMsg = 'حدث خطأ أثناء تحميل قائمة المستخدمين';
+        
+        if (error.status === 401) {
+          errorMsg = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
+        } else if (error.status === 403) {
+          errorMsg = 'ليس لديك صلاحيات للوصول إلى هذه الصفحة. يجب أن تكون مسؤولاً.';
+        } else if (error.status === 0 || error.status === 504) {
+          errorMsg = 'لا يمكن الاتصال بالخادم. تأكد من أن الخادم يعمل.';
+        } else if (error.error?.message) {
+          errorMsg = `خطأ: ${error.error.message}`;
+        } else if (error.message) {
+          errorMsg = `خطأ: ${error.message}`;
+        }
+        
+        this.errorMessage = errorMsg;
+        this.users = [];
         this.isLoading = false;
       }
     });

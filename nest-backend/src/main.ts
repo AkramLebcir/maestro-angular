@@ -1,3 +1,9 @@
+// Polyfill for crypto if needed (required by @nestjs/schedule)
+import { webcrypto } from 'crypto';
+if (typeof globalThis.crypto === 'undefined') {
+  (globalThis as any).crypto = webcrypto;
+}
+
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { NestExpressApplication } from '@nestjs/platform-express';

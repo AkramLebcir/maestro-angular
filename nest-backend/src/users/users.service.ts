@@ -37,9 +37,14 @@ export class UsersService {
   }
 
   async findAll(): Promise<User[]> {
-    return this.usersRepository.find({
-      order: { createdAt: 'DESC' },
-    });
+    try {
+      return await this.usersRepository.find({
+        order: { createdAt: 'DESC' },
+        select: ['id', 'firstName', 'lastName', 'email', 'username', 'role', 'isActive', 'allowedModules', 'lastLoginAt', 'createdAt', 'updatedAt'],
+      });
+    } catch (error) {
+      throw error;
+    }
   }
 
   async findOne(id: number): Promise<User> {

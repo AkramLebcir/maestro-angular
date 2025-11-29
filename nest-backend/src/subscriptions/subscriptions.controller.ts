@@ -70,6 +70,65 @@ export class SubscriptionsController {
 
   // ========== Subscriptions ==========
 
+  // ========== Stats ==========
+
+  @Get('stats/overview')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  getStats() {
+    return this.subscriptionsService.getSubscriptionStats();
+  }
+
+  // ========== Payments ==========
+
+  @Post('payments')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  createPayment(@Body() createDto: CreatePaymentDto) {
+    return this.subscriptionsService.createPayment(createDto);
+  }
+
+  @Get('payments')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async findAllPayments() {
+    try {
+      return await this.subscriptionsService.findAllPayments();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  @Get('payments/my-payments')
+  async getMyPayments(@Request() req) {
+    const userId = req.user.id;
+    return this.subscriptionsService.findPaymentsByUser(userId);
+  }
+
+  @Get('payments/user/:userId')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  findPaymentsByUser(@Param('userId', ParseIntPipe) userId: number) {
+    return this.subscriptionsService.findPaymentsByUser(userId);
+  }
+
+  @Get('payments/:id')
+  findPaymentById(@Param('id', ParseIntPipe) id: number) {
+    return this.subscriptionsService.findPaymentById(id);
+  }
+
+  @Patch('payments/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN)
+  updatePayment(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateDto: UpdatePaymentDto,
+  ) {
+    return this.subscriptionsService.updatePayment(id, updateDto);
+  }
+
+  // ========== Subscriptions ==========
+
   @Post('request')
   async requestSubscription(@Request() req, @Body() body: { planId: number; notes?: string }) {
     // Allow teachers to request a subscription
@@ -136,63 +195,6 @@ export class SubscriptionsController {
   @Roles(UserRole.ADMIN)
   cancelSubscription(@Param('id', ParseIntPipe) id: number) {
     return this.subscriptionsService.cancelSubscription(id);
-  }
-
-  // ========== Payments ==========
-
-  @Post('payments')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  createPayment(@Body() createDto: CreatePaymentDto) {
-    return this.subscriptionsService.createPayment(createDto);
-  }
-
-  @Get('payments')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async findAllPayments() {
-    try {
-      return await this.subscriptionsService.findAllPayments();
-    } catch (error) {
-      throw error;
-    }
-  }
-
-  @Get('payments/my-payments')
-  async getMyPayments(@Request() req) {
-    const userId = req.user.id;
-    return this.subscriptionsService.findPaymentsByUser(userId);
-  }
-
-  @Get('payments/user/:userId')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  findPaymentsByUser(@Param('userId', ParseIntPipe) userId: number) {
-    return this.subscriptionsService.findPaymentsByUser(userId);
-  }
-
-  @Get('payments/:id')
-  findPaymentById(@Param('id', ParseIntPipe) id: number) {
-    return this.subscriptionsService.findPaymentById(id);
-  }
-
-  @Patch('payments/:id')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  updatePayment(
-    @Param('id', ParseIntPipe) id: number,
-    @Body() updateDto: UpdatePaymentDto,
-  ) {
-    return this.subscriptionsService.updatePayment(id, updateDto);
-  }
-
-  // ========== Stats ==========
-
-  @Get('stats/overview')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  getStats() {
-    return this.subscriptionsService.getSubscriptionStats();
   }
 }
 
