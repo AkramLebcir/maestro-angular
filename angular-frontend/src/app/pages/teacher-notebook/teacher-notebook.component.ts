@@ -25,6 +25,7 @@ export class TeacherNotebookComponent implements OnInit {
   private activeNote: StickyNote | null = null;
   private dragOffsetX = 0;
   private dragOffsetY = 0;
+  Math = Math; // لجعل Math متاحاً في الـ template
 
   ngOnInit(): void {
     this.loadFromStorage();
@@ -37,15 +38,22 @@ export class TeacherNotebookComponent implements OnInit {
       color,
       x: 40 + (this.notes.length * 12) % 120,
       y: 40 + (this.notes.length * 18) % 120,
-      z: ++this.zCounter
+      z: this.getNextZIndex()
     };
     this.notes = [...this.notes, newNote];
     this.saveToStorage();
   }
 
   bringToFront(note: StickyNote): void {
-    note.z = ++this.zCounter;
+    note.z = this.getNextZIndex();
     this.saveToStorage();
+  }
+
+  private getNextZIndex(): number {
+    // الحد الأقصى لـ z-index هو 20 لضمان عدم ظهور الملاحظات فوق الـ header (z-30) والـ sidebar (z-30)
+    const maxZIndex = 20;
+    this.zCounter = (this.zCounter % maxZIndex) + 1;
+    return this.zCounter;
   }
 
   startDrag(event: MouseEvent, note: StickyNote): void {

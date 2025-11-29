@@ -12,6 +12,9 @@
   margin-bottom: 1rem;
   gap: 1rem;
   flex-wrap: wrap;
+  position: relative;
+  z-index: 25; /* أعلى من الملاحظات (20) ولكن أقل من header/sidebar (30) */
+  background: transparent;
 }
 
 .title-group h1 {
@@ -100,6 +103,8 @@
   cursor: grab;
   box-sizing: border-box;
   backdrop-filter: blur(1px);
+  /* ضمان أن الملاحظات لا تظهر فوق الـ header والـ sidebar (z-30) */
+  max-z-index: 20;
 }
 
 .sticky:active {

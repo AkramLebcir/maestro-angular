@@ -24,7 +24,7 @@
       [ngClass]="'color-' + note.color"
       [style.left.px]="note.x"
       [style.top.px]="note.y"
-      [style.zIndex]="note.z"
+      [style.zIndex]="Math.min(note.z, 20)"
       (mousedown)="startDrag($event, note)"
     >
       <div class="sticky-header">

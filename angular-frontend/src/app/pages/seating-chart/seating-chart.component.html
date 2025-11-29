@@ -1,3 +1,75 @@
+<!-- Room Setup Modal -->
+<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" *ngIf="showRoomSetup" dir="rtl">
+  <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">تصميم القاعة</h2>
+      <button class="text-gray-400 hover:text-gray-600 text-2xl" (click)="closeRoomSetup()">×</button>
+    </div>
+    
+    <div class="space-y-6">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">عدد الصفوف</label>
+        <div class="flex gap-3">
+          <button 
+            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
+            [class.border-blue-500]="roomRows === 3"
+            [class.bg-blue-50]="roomRows === 3"
+            [class.border-gray-200]="roomRows !== 3"
+            (click)="roomRows = 3">
+            3 صفوف
+          </button>
+          <button 
+            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
+            [class.border-blue-500]="roomRows === 4"
+            [class.bg-blue-50]="roomRows === 4"
+            [class.border-gray-200]="roomRows !== 4"
+            (click)="roomRows = 4">
+            4 صفوف
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">نوع الطاولة</label>
+        <div class="flex gap-3">
+          <button 
+            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
+            [class.border-blue-500]="tableType === 'single'"
+            [class.bg-blue-50]="tableType === 'single'"
+            [class.border-gray-200]="tableType !== 'single'"
+            (click)="tableType = 'single'">
+            <div class="text-center">
+              <div class="text-lg font-semibold mb-1">طاولة فردية</div>
+              <div class="text-xs text-gray-500">تلميذ واحد</div>
+            </div>
+          </button>
+          <button 
+            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
+            [class.border-blue-500]="tableType === 'double'"
+            [class.bg-blue-50]="tableType === 'double'"
+            [class.border-gray-200]="tableType !== 'double'"
+            (click)="tableType = 'double'">
+            <div class="text-center">
+              <div class="text-lg font-semibold mb-1">طاولة مزدوجة</div>
+              <div class="text-xs text-gray-500">تلميذان</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <div class="pt-4 border-t">
+        <button 
+          class="w-full px-6 py-3 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition"
+          (click)="createClassroomLayout()"
+          [disabled]="creatingLayout">
+          <span *ngIf="!creatingLayout">إنشاء التخطيط</span>
+          <span *ngIf="creatingLayout">... جاري الإنشاء</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="p-6 space-y-6" *ngIf="currentClass; else emptyState" dir="rtl">
   <div class="bg-gradient-to-r from-blue-500 to-blue-400 text-white rounded-3xl p-6 shadow flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
     <div class="flex items-center gap-4">
@@ -5,17 +77,21 @@
         {{ currentClass!.name.charAt(0) || 'C' }}
       </div>
       <div>
-        <p class="uppercase text-sm tracking-wider opacity-80">Seating Chart</p>
+        <p class="uppercase text-sm tracking-wider opacity-80">
+          <span *ngIf="layoutMode === 'workstations'">مخطط الحواسيب (المخبر)</span>
+          <span *ngIf="layoutMode === 'classroom'">مخطط الجلوس (القاعة)</span>
+        </p>
         <h1 class="text-3xl font-semibold">{{ currentClass!.name }}</h1>
         <p class="text-white/80">{{ currentClass!.subject }}</p>
         <div class="mt-2 flex gap-2 flex-wrap">
           <span class="badge">المستوى: {{ currentClass!.level }}</span>
-          <span class="badge">الفوج {{ selectedGroup }}</span>
-          <span class="badge">عدد التلاميذ: {{ stats?.studentCount || '--' }}</span>
+          <span class="badge" *ngIf="layoutMode === 'workstations'">الفوج {{ selectedGroup }}</span>
+          <span class="badge" *ngIf="layoutMode === 'classroom'">جميع التلاميذ</span>
+          <span class="badge">عدد التلاميذ: {{ layoutMode === 'classroom' ? allClassStudents.length : (stats?.studentCount || '--') }}</span>
         </div>
       </div>
     </div>
-    <div class="flex gap-6 flex-wrap">
+    <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'workstations' && stats">
       <div class="stat-pill">
         <p class="label">متوسط الحضور</p>
         <p class="value">{{ stats?.averageAttendance ?? 0 }}%</p>
@@ -27,6 +103,20 @@
       <div class="stat-pill">
         <p class="label text-green-100">السلوك الإيجابي</p>
         <p class="value text-green-300">{{ stats?.positiveBehaviorRate ?? 0 }}%</p>
+      </div>
+    </div>
+    <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'classroom' && classroomLayout">
+      <div class="stat-pill">
+        <p class="label">عدد الطاولات</p>
+        <p class="value">{{ classroomLayout.desks?.length || 0 }}</p>
+      </div>
+      <div class="stat-pill">
+        <p class="label">عدد الصفوف</p>
+        <p class="value">{{ classroomLayout.layout?.rows || 0 }}</p>
+      </div>
+      <div class="stat-pill">
+        <p class="label text-green-100">نوع الطاولة</p>
+        <p class="value text-green-300">{{ classroomLayout.layout?.tableType === 'single' ? 'فردية' : 'مزدوجة' }}</p>
       </div>
     </div>
   </div>
@@ -43,6 +133,24 @@
     </div>
 
     <div class="flex flex-col">
+      <label class="text-gray-500 text-sm mb-1">نوع المخطط</label>
+      <div class="flex gap-2">
+        <button 
+          class="group-switch" 
+          [class.active]="layoutMode === 'workstations'" 
+          (click)="toggleLayoutMode('workstations')">
+          مخطط الحواسيب (U)
+        </button>
+        <button 
+          class="group-switch" 
+          [class.active]="layoutMode === 'classroom'" 
+          (click)="toggleLayoutMode('classroom')">
+          مخطط الجلوس (قاعة)
+        </button>
+      </div>
+    </div>
+
+    <div class="flex flex-col" *ngIf="layoutMode === 'workstations'">
       <label class="text-gray-500 text-sm mb-1">الفوج</label>
       <div class="flex gap-2">
         <button class="group-switch" [class.active]="selectedGroup === 1" (click)="toggleGroup(1)">الفوج 1</button>
@@ -69,19 +177,31 @@
   </div>
 
   <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center text-sm text-gray-600">
+    <button class="primary-outline" (click)="openRoomSetup()" *ngIf="layoutMode === 'classroom'">
+      <span *ngIf="!classroomLayout">إنشاء تخطيط قاعة</span>
+      <span *ngIf="classroomLayout">تعديل تخطيط القاعة</span>
+    </button>
     <button class="primary-outline" (click)="toggleReorganize()">
       {{ isReorganizing ? 'إيقاف تنظيم التلاميذ' : 'تنظيم التلاميذ' }}
     </button>
     <button class="primary-outline" (click)="toggleStationEditing()">
-      {{ editingStations ? 'إيقاف تحريك الحواسيب' : 'تحريك الحواسيب' }}
+      <span *ngIf="layoutMode === 'workstations'">{{ editingStations ? 'إيقاف تحريك الحواسيب' : 'تحريك الحواسيب' }}</span>
+      <span *ngIf="layoutMode === 'classroom'">{{ editingStations ? 'إيقاف تحريك الطاولات' : 'تحريك الطاولات' }}</span>
     </button>
-    <button class="primary-btn" (click)="saveAssignments()" [disabled]="saving || !isReorganizing">
+    <button class="primary-btn" (click)="layoutMode === 'classroom' ? saveClassroomAssignments() : saveAssignments()" [disabled]="saving || !isReorganizing">
       <span *ngIf="!saving">حفظ توزيع التلاميذ</span>
       <span *ngIf="saving">... جاري الحفظ</span>
     </button>
-    <button class="primary-btn" (click)="saveLayoutPositions()" [disabled]="layoutSaving || !layoutDirty">
-      <span *ngIf="!layoutSaving">حفظ أماكن الحواسيب</span>
+    <button class="primary-btn" (click)="layoutMode === 'classroom' ? saveClassroomDeskPositions() : saveLayoutPositions()" [disabled]="layoutSaving || !layoutDirty">
+      <span *ngIf="!layoutSaving">
+        <span *ngIf="layoutMode === 'workstations'">حفظ أماكن الحواسيب</span>
+        <span *ngIf="layoutMode === 'classroom'">حفظ أماكن الطاولات</span>
+      </span>
       <span *ngIf="layoutSaving">... جاري الحفظ</span>
+    </button>
+    <button class="primary-btn" (click)="layoutMode === 'classroom' ? exportClassroomLayoutToPdf() : print('group')" [disabled]="printLoading">
+      <span *ngIf="!printLoading">تصدير PDF</span>
+      <span *ngIf="printLoading">... جاري التصدير</span>
     </button>
     <span class="text-red-500 font-semibold" *ngIf="layoutDirty">هناك تعديلات غير محفوظة</span>
   </div>
@@ -92,11 +212,14 @@
     <div class="col-span-12 xl:col-span-9">
       <div class="bg-white rounded-3xl shadow-lg p-6 relative h-[640px] flex flex-col">
         <div class="flex items-center justify-between">
-          <h3 class="section-title">مخطط المقاعد (حرف U مقلوب)</h3>
+          <h3 class="section-title">
+            <span *ngIf="layoutMode === 'workstations'">مخطط الحواسيب (حرف U مقلوب)</span>
+            <span *ngIf="layoutMode === 'classroom'">مخطط الجلوس (القاعة الدراسية)</span>
+          </h3>
           <span class="text-xs text-gray-400">يمكن تكبير العرض بالتمرير</span>
         </div>
         <div class="seating-stage-wrapper mt-4">
-          <div class="seating-stage" #stageRef>
+          <div class="seating-stage" [class.classroom-layout]="layoutMode === 'classroom'" #stageRef>
             <div
               *ngFor="let slot of workstationSlots"
               class="workstation-node"
@@ -106,7 +229,7 @@
               cdkDragBoundary=".seating-stage"
               [cdkDragDisabled]="!editingStations"
               (cdkDragEnded)="onWorkstationDragEnd($event, slot)">
-              <div class="workstation-card" [class.editing]="editingStations">
+              <div class="workstation-card" [class.editing]="editingStations" [attr.data-capacity]="slot.capacity">
                 <div class="card-header">
                   <div class="card-meta">
                     <label class="flex items-center gap-2 text-sm text-gray-600">
@@ -130,6 +253,8 @@
                   <div
                     *ngFor="let occupant of slot.occupants; let i = index"
                     class="seat-occupant"
+                    [class.double-seat-left]="slot.capacity === 2 && i === 0"
+                    [class.double-seat-right]="slot.capacity === 2 && i === 1"
                     cdkDrag
                     [cdkDragDisabled]="!isReorganizing">
                     <div class="avatar" *ngIf="occupant.student.photo; else initials" [style.backgroundImage]="'url(' + occupant.student.photo + ')'" (click)="openSeatPopup(slot, i)"></div>
@@ -141,13 +266,20 @@
                         <p class="name">{{ occupant.student.firstName }} {{ occupant.student.lastName }}</p>
                         <button class="remove-btn inline" type="button" (click)="clearSeat(slot, i)">✕</button>
                       </div>
+                      <span class="text-xs text-gray-400" *ngIf="slot.capacity === 2">
+                        {{ i === 0 ? 'يسار' : 'يمين' }}
+                      </span>
                     </div>
                   </div>
                   <div
                     *ngFor="let placeholder of getSeatPlaceholders(slot)"
                     class="seat-placeholder"
                     [class.disabled]="!isReorganizing">
-                    اسحب تلميذين كحد أقصى لهذا الحاسوب
+                    <span *ngIf="layoutMode === 'workstations'">اسحب تلميذين كحد أقصى لهذا الحاسوب</span>
+                    <span *ngIf="layoutMode === 'classroom'">
+                      <span *ngIf="slot.capacity === 1">اسحب تلميذ واحد لهذه الطاولة</span>
+                      <span *ngIf="slot.capacity === 2">اسحب تلميذين لهذه الطاولة</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -155,6 +287,13 @@
             <div *ngIf="loading" class="stage-overlay">
               <div class="spinner"></div>
               <p>جاري تحميل المخطط...</p>
+            </div>
+            <div *ngIf="!loading && layoutMode === 'classroom' && !classroomLayout && workstationSlots.length === 0" class="stage-overlay" style="background: rgba(255, 255, 255, 0.95);">
+              <div class="text-center">
+                <p class="text-lg font-semibold text-gray-700 mb-4">لا يوجد تخطيط قاعة</p>
+                <p class="text-sm text-gray-500 mb-6">يرجى إنشاء تخطيط جديد للقاعة</p>
+                <button class="primary-btn" (click)="openRoomSetup()">إنشاء تخطيط قاعة</button>
+              </div>
             </div>
           </div>
         </div>
@@ -220,10 +359,11 @@
             </div>
           </div>
           <div *ngIf="!studentPool.length" class="text-center text-sm text-gray-400 pt-6">
-            جميع تلاميذ الفوج تم توزيعهم
+            <span *ngIf="layoutMode === 'workstations'">جميع تلاميذ الفوج تم توزيعهم</span>
+            <span *ngIf="layoutMode === 'classroom'">جميع التلاميذ تم توزيعهم</span>
           </div>
         </div>
-        <div class="pt-4 border-t mt-4 text-sm text-gray-500">
+        <div class="pt-4 border-t mt-4 text-sm text-gray-500" *ngIf="layoutMode === 'workstations'">
           <p>اختيار الحواسيب للطباعة:</p>
           <button class="ghost-btn mt-2 w-full" (click)="selectAllStations()">تحديد / إلغاء كل الحواسيب</button>
           <p class="text-xs mt-2 text-gray-400">إذا لم تحدد شيئاً سيتم طباعة كل الحواسيب.</p>

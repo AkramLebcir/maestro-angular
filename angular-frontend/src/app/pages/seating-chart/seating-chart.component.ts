@@ -158,6 +158,14 @@ export class SeatingChartComponent implements OnInit {
   searchTerm = '';
   errorMessage = '';
 
+  // Classroom Layout Settings
+  showRoomSetup = false;
+  roomRows: 3 | 4 = 3;
+  tableType: 'single' | 'double' = 'single';
+  creatingLayout = false;
+  classroomLayout: any = null;
+  layoutMode: 'workstations' | 'classroom' = 'workstations'; // وضع التخطيط: حواسيب أو قاعة
+
   attendanceOptions = [
     { value: 'present', label: 'حاضر' },
     { value: 'absent', label: 'غائب' },
@@ -206,6 +214,42 @@ export class SeatingChartComponent implements OnInit {
     this.loading = true;
     this.errorMessage = '';
 
+    if (this.layoutMode === 'classroom') {
+      // تحميل تخطيط القاعة الدراسية
+      this.apiService
+        .get<any>(`/classroom-layout/class/${this.selectedClassId}`)
+        .subscribe({
+          next: (classroomLayout) => {
+            if (classroomLayout) {
+              this.classroomLayout = classroomLayout;
+              this.loadStudentsForClassroom();
+            } else {
+              // لا يوجد تخطيط قاعة - عرض رسالة مع زر لإنشاء تخطيط
+              this.errorMessage = '';
+              this.loading = false;
+              // تحميل التلاميذ فقط لعرضهم
+              this.loadStudentsForClassroom();
+            }
+          },
+          error: (error) => {
+            // في حالة 404 أو عدم وجود تخطيط، لا نعرض خطأ
+            if (error.status === 404) {
+              this.errorMessage = '';
+              this.loading = false;
+              this.loadStudentsForClassroom();
+            } else {
+              this.errorMessage = 'تعذر تحميل تخطيط القاعة';
+              this.loading = false;
+            }
+          },
+        });
+    } else {
+      // تحميل تخطيط الحواسيب (المخبر)
+      this.loadWorkstationLayout();
+    }
+  }
+
+  loadWorkstationLayout(): void {
     forkJoin({
       students: this.apiService.get<Student[]>(
         `/students?classId=${this.selectedClassId}`,
@@ -229,6 +273,82 @@ export class SeatingChartComponent implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  loadStudentsForClassroom(): void {
+    this.apiService
+      .get<Student[]>(`/students?classId=${this.selectedClassId}`)
+      .subscribe({
+        next: (students) => {
+          this.allClassStudents = students;
+          if (this.classroomLayout) {
+            this.buildClassroomSeatGrid();
+          } else {
+            // لا يوجد تخطيط - إعداد القوائم الفارغة
+            this.workstationSlots = [];
+            this.studentPool = students.map((student) => this.createSeatFromStudent(student));
+            this.connectedLists = ['pool'];
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error loading students:', error);
+          this.errorMessage = 'تعذر تحميل قائمة التلاميذ';
+          this.loading = false;
+        },
+      });
+  }
+
+  buildClassroomSeatGrid(): void {
+    if (!this.classroomLayout) {
+      return;
+    }
+
+    // مخطط الجلوس يعرض جميع التلاميذ في القسم (ليس حسب الفوج)
+    const relevantStudents = this.allClassStudents;
+
+    this.slotLookup.clear();
+    this.workstationSlots = this.classroomLayout.desks.map((desk: any) => {
+      const occupants: StudentSeat[] = (desk.assignments || []).map(
+        (assignment: any) => ({
+          student: assignment.student,
+          attendanceStatus: 'present',
+          behaviorStatus: 'neutral',
+          behaviorNotes: '',
+          assignmentId: assignment.id,
+          seatPosition: assignment.seatPosition,
+        }),
+      );
+
+      const slot: WorkstationSlot = {
+        dropListId: `desk-${desk.id}`,
+        workstationId: desk.id,
+        label: desk.label,
+        capacity: desk.capacity,
+        x: desk.x,
+        y: desk.y,
+        zone: '',
+        occupants,
+      };
+
+      this.slotLookup.set(slot.dropListId, slot);
+      return slot;
+    });
+
+    const assignedIds = new Set(
+      this.workstationSlots
+        .flatMap((slot) => slot.occupants)
+        .map((seat) => seat.student.id),
+    );
+
+    this.studentPool = relevantStudents
+      .filter((student) => !assignedIds.has(student.id))
+      .map((student) => this.createSeatFromStudent(student));
+
+    this.connectedLists = [
+      'pool',
+      ...this.workstationSlots.map((slot) => slot.dropListId),
+    ];
   }
 
   buildSeatGrid(): void {
@@ -301,6 +421,18 @@ export class SeatingChartComponent implements OnInit {
       return;
     }
     this.selectedGroup = group;
+    // تحديث الفوج فقط لمخطط الحواسيب (المخبر)
+    if (this.layoutMode === 'workstations') {
+      this.loadStudentsAndLayout();
+    }
+  }
+
+  toggleLayoutMode(mode: 'workstations' | 'classroom'): void {
+    if (this.layoutMode === mode) {
+      return;
+    }
+    this.layoutMode = mode;
+    this.classroomLayout = null;
     this.loadStudentsAndLayout();
   }
 
@@ -315,7 +447,8 @@ export class SeatingChartComponent implements OnInit {
 
   toggleReorganize(): void {
     if (this.editingStations) {
-      alert('أوقف تحريك الحواسيب أولاً.');
+      const itemName = this.layoutMode === 'workstations' ? 'الحواسيب' : 'الطاولات';
+      alert(`أوقف تحريك ${itemName} أولاً.`);
       return;
     }
     this.isReorganizing = !this.isReorganizing;
@@ -344,7 +477,8 @@ export class SeatingChartComponent implements OnInit {
       targetSlot.occupants.length >= targetSlot.capacity &&
       event.previousContainer !== event.container
     ) {
-      alert('هذا الحاسوب ممتلئ (2 تلاميذ كحد أقصى).');
+      const capacityText = targetSlot.capacity === 1 ? 'تلميذ واحد' : `${targetSlot.capacity} تلاميذ`;
+      alert(`هذه الطاولة ممتلئة (${capacityText} كحد أقصى).`);
       return;
     }
 
@@ -358,6 +492,11 @@ export class SeatingChartComponent implements OnInit {
     if (targetSlot && targetSlot.occupants.length > targetSlot.capacity) {
       const extras = targetSlot.occupants.splice(targetSlot.capacity);
       this.studentPool.push(...extras);
+    }
+
+    // تحديث layoutDirty عند التغيير
+    if (targetSlot && event.previousContainer !== event.container) {
+      this.layoutDirty = true;
     }
   }
 
@@ -713,6 +852,151 @@ export class SeatingChartComponent implements OnInit {
     return Array.from(pagesMap.values()).sort((a, b) =>
       a.label.localeCompare(b.label, 'ar'),
     );
+  }
+
+  // Classroom Layout Functions
+  openRoomSetup(): void {
+    this.showRoomSetup = true;
+  }
+
+  closeRoomSetup(): void {
+    this.showRoomSetup = false;
+  }
+
+  createClassroomLayout(): void {
+    if (!this.selectedClassId) {
+      alert('يرجى اختيار قسم أولاً');
+      return;
+    }
+
+    this.creatingLayout = true;
+    const payload = {
+      classId: this.selectedClassId,
+      rows: this.roomRows,
+      tableType: this.tableType,
+    };
+
+    this.apiService.post<any>('/classroom-layout', payload).subscribe({
+      next: (layout) => {
+        this.classroomLayout = layout;
+        this.loadStudentsForClassroom();
+        this.showRoomSetup = false;
+        this.creatingLayout = false;
+        alert('تم إنشاء تخطيط القاعة بنجاح');
+      },
+      error: (error) => {
+        console.error('Error creating classroom layout:', error);
+        alert('تعذر إنشاء تخطيط القاعة');
+        this.creatingLayout = false;
+      },
+    });
+  }
+
+  saveClassroomAssignments(): void {
+    if (!this.selectedClassId || !this.classroomLayout) {
+      return;
+    }
+
+    this.saving = true;
+    const assignments = this.workstationSlots.flatMap((slot) =>
+      slot.occupants.map((seat, index) => ({
+        deskId: slot.workstationId,
+        studentId: seat.student.id,
+        seatPosition:
+          slot.capacity === 2
+            ? index === 0
+              ? 'left'
+              : 'right'
+            : 'center',
+      })),
+    );
+
+    this.apiService
+      .post<any>('/classroom-layout/assignments', {
+        classId: this.selectedClassId,
+        assignments,
+      })
+      .subscribe({
+        next: (layout) => {
+          this.classroomLayout = layout;
+          this.buildClassroomSeatGrid();
+          this.saving = false;
+          alert('تم حفظ مخطط المقاعد بنجاح');
+        },
+        error: (error) => {
+          console.error('Error saving classroom assignments:', error);
+          alert('تعذر حفظ المخطط، حاول مرة أخرى');
+          this.saving = false;
+        },
+      });
+  }
+
+  saveClassroomDeskPositions(): void {
+    if (!this.selectedClassId || !this.classroomLayout || !this.layoutDirty) {
+      return;
+    }
+
+    this.layoutSaving = true;
+    const positions = this.workstationSlots.map((slot) => ({
+      deskId: slot.workstationId,
+      x: slot.x,
+      y: slot.y,
+    }));
+
+    this.apiService
+      .patch<any>('/classroom-layout/positions', {
+        classId: this.selectedClassId,
+        positions,
+      })
+      .subscribe({
+        next: (layout) => {
+          this.classroomLayout = layout;
+          this.buildClassroomSeatGrid();
+          this.layoutDirty = false;
+          this.layoutSaving = false;
+          this.editingStations = false;
+          alert('تم حفظ أماكن الطاولات');
+        },
+        error: (error) => {
+          console.error('Error saving desk positions:', error);
+          alert('تعذر حفظ أماكن الطاولات');
+          this.layoutSaving = false;
+        },
+      });
+  }
+
+  exportClassroomLayoutToPdf(): void {
+    if (!this.classroomLayout || !this.stageRef) {
+      return;
+    }
+
+    this.printLoading = true;
+    setTimeout(() => {
+      html2canvas(this.stageRef!.nativeElement, { scale: 2 }).then((canvas) => {
+        const imgData = canvas.toDataURL('image/png');
+        const doc = new jsPDF({
+          orientation: 'landscape',
+          unit: 'pt',
+          format: 'a4',
+        });
+
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const ratio = Math.min(
+          pageWidth / canvas.width,
+          pageHeight / canvas.height,
+        );
+        const imgWidth = canvas.width * ratio;
+        const imgHeight = canvas.height * ratio;
+        const x = (pageWidth - imgWidth) / 2;
+        const y = (pageHeight - imgHeight) / 2;
+
+        doc.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
+        const filename = `مخطط-المقاعد-${this.currentClass?.name || 'قاعة'}-${new Date().toISOString().split('T')[0]}.pdf`;
+        doc.save(filename);
+        this.printLoading = false;
+      });
+    }, 500);
   }
 }
 

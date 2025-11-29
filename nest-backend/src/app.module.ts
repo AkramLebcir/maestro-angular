@@ -25,6 +25,7 @@ import { UsersModule } from './users/users.module';
 import { CertificatesModule } from './certificates/certificates.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { ClassroomLayoutModule } from './classroom-layout/classroom-layout.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ModuleAccessGuard } from './auth/guards/module-access.guard';
@@ -54,6 +55,7 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     CertificatesModule,
     NotificationsModule,
     SubscriptionsModule,
+    ClassroomLayoutModule,
     AuthModule,
     UsersModule,
   ],

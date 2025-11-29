@@ -64,9 +64,24 @@
   background-image: radial-gradient(circle at top, rgba(59, 130, 246, 0.08), transparent 60%);
 }
 
+/* تحسين عرض مخطط القاعة الدراسية */
+.seating-stage.classroom-layout {
+  min-height: 800px;
+  background: linear-gradient(to bottom, #f8fafc 0%, #ffffff 50%, #f8fafc 100%);
+  background-size: 100% 100px;
+}
+
 .workstation-node {
   position: absolute;
   transform: translate(-50%, -50%);
+  /* ضمان عدم تراكب الطاولات */
+  z-index: 1;
+}
+
+/* تحسين المسافات المرئية بين الطاولات في مخطط القاعة */
+.seating-stage.classroom-layout .workstation-node {
+  margin: 0;
+  /* المسافات يتم حسابها من المواضع (x, y) في Backend */
 }
 
 .workstation-card {
@@ -77,6 +92,14 @@
   padding: 16px 20px;
   border: 3px solid #3b82f6;
   transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.workstation-card[data-capacity="2"] {
+  width: 240px;
+}
+
+.workstation-card[data-capacity="1"] {
+  width: 160px;
 }
 
 .workstation-card.editing {
@@ -107,6 +130,16 @@
   @apply flex gap-2 items-start bg-white rounded-2xl border border-gray-100 p-2 cursor-grab;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   width: 100%;
+}
+
+.seat-occupant.double-seat-left {
+  border-left: 4px solid #3b82f6;
+  border-radius: 12px 0 0 12px;
+}
+
+.seat-occupant.double-seat-right {
+  border-right: 4px solid #3b82f6;
+  border-radius: 0 12px 12px 0;
 }
 
 .avatar {
