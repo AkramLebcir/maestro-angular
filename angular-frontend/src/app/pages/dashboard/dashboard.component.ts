@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
+import { NotificationService, Notification, NotificationStats } from '../../services/notification.service';
 
 interface ProgressItem {
   classId: number;
@@ -115,6 +116,12 @@ export class DashboardComponent implements OnInit {
     lowestGrade: 20
   };
 
+  // إخطارات النظام
+  notifications: Notification[] = [];
+  notificationStats: NotificationStats | null = null;
+  showNotificationsPanel = false;
+  notificationsLoaded = false;
+
   // بيانات خام
   classes: Class[] = [];
   /** 0 = جميع الأقسام (Global)، غير ذلك = معرف القسم */
@@ -221,7 +228,8 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    public notificationService: NotificationService
   ) {}
 
   translate(key: string): string {
@@ -240,6 +248,10 @@ export class DashboardComponent implements OnInit {
 
     this.loadDashboardData();
     this.loadSubjectProgramProgress();
+    // تحميل الإشعارات الموجودة أولاً
+    this.loadNotifications();
+    // ثم إنشاء إشعارات جديدة
+    this.generateNotifications();
   }
 
   /** المعدل العام على 20 بدل النسبة المئوية */
@@ -699,6 +711,109 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
+  }
+
+  /**
+   * إنشاء الإشعارات تلقائياً
+   */
+  private generateNotifications(): void {
+    this.notificationService.generateNotifications().subscribe({
+      next: () => {
+        // إعادة تحميل الإشعارات بعد الإنشاء
+        setTimeout(() => this.loadNotifications(), 500);
+      },
+      error: err => {
+        console.error('Error generating notifications:', err);
+        // حتى في حالة الخطأ، نحاول تحميل الإشعارات الموجودة
+        this.loadNotifications();
+      }
+    });
+  }
+
+  /**
+   * تحديث الإشعارات يدوياً
+   */
+  refreshNotifications(): void {
+    this.notificationsLoaded = false;
+    this.generateNotifications();
+  }
+
+  /**
+   * تحميل الإخطارات
+   */
+  private loadNotifications(): void {
+    this.notificationsLoaded = false;
+
+    // تحميل الإخطارات
+    this.notificationService.getNotifications().subscribe({
+      next: notifications => {
+        this.notifications = notifications || [];
+        this.notificationsLoaded = true;
+      },
+      error: err => {
+        console.error('Error loading notifications:', err);
+        this.notifications = [];
+        this.notificationsLoaded = true;
+      }
+    });
+
+    // تحميل إحصائيات الإخطارات
+    this.notificationService.getNotificationStats().subscribe({
+      next: stats => {
+        this.notificationStats = stats;
+      },
+      error: err => {
+        console.error('Error loading notification stats:', err);
+        this.notificationStats = null;
+      }
+    });
+  }
+
+  /**
+   * وضع علامة قراءة على إخطار
+   */
+  markNotificationAsRead(notification: Notification): void {
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.id).subscribe({
+        next: updatedNotification => {
+          const index = this.notifications.findIndex(n => n.id === notification.id);
+          if (index !== -1) {
+            this.notifications[index] = updatedNotification;
+            // تحديث الإحصائيات
+            if (this.notificationStats) {
+              this.notificationStats.unread = Math.max(0, this.notificationStats.unread - 1);
+            }
+          }
+        },
+        error: err => {
+          console.error('Error marking notification as read:', err);
+        }
+      });
+    }
+  }
+
+  /**
+   * وضع علامة قراءة على جميع الإخطارات
+   */
+  markAllNotificationsAsRead(): void {
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.notifications.forEach(n => n.isRead = true);
+        if (this.notificationStats) {
+          this.notificationStats.unread = 0;
+        }
+      },
+      error: err => {
+        console.error('Error marking all notifications as read:', err);
+      }
+    });
+  }
+
+  /**
+   * تبديل عرض لوحة الإخطارات
+   */
+  toggleNotificationsPanel(): void {
+    this.showNotificationsPanel = !this.showNotificationsPanel;
   }
 
   /**

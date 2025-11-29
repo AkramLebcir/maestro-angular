@@ -722,6 +722,51 @@ export class LanguageService {
         'DE': 'Niedrigste Note',
         'TR': 'En düşük not'
       },
+      'notifications.title': {
+        'AR': 'الإشعارات',
+        'FR': 'Notifications',
+        'EN': 'Notifications',
+        'ES': 'Notificaciones',
+        'IT': 'Notifiche',
+        'DE': 'Benachrichtigungen',
+        'TR': 'Bildirimler'
+      },
+      'notifications.markAllRead': {
+        'AR': 'وضع علامة قراءة على الكل',
+        'FR': 'Marquer tout comme lu',
+        'EN': 'Mark all as read',
+        'ES': 'Marcar todo como leído',
+        'IT': 'Segna tutto come letto',
+        'DE': 'Alle als gelesen markieren',
+        'TR': 'Tümünü okundu olarak işaretle'
+      },
+      'notifications.viewAll': {
+        'AR': 'عرض جميع الإشعارات',
+        'FR': 'Voir toutes les notifications',
+        'EN': 'View all notifications',
+        'ES': 'Ver todas las notificaciones',
+        'IT': 'Visualizza tutte le notifiche',
+        'DE': 'Alle Benachrichtigungen anzeigen',
+        'TR': 'Tüm bildirimleri görüntüle'
+      },
+      'notifications.loading': {
+        'AR': 'جاري تحميل الإشعارات...',
+        'FR': 'Chargement des notifications...',
+        'EN': 'Loading notifications...',
+        'ES': 'Cargando notificaciones...',
+        'IT': 'Caricamento notifiche...',
+        'DE': 'Benachrichtigungen werden geladen...',
+        'TR': 'Bildirimler yükleniyor...'
+      },
+      'notifications.none': {
+        'AR': 'لا توجد إخطارات',
+        'FR': 'Aucune notification',
+        'EN': 'No notifications',
+        'ES': 'No hay notificaciones',
+        'IT': 'Nessuna notifica',
+        'DE': 'Keine Benachrichtigungen',
+        'TR': 'Bildirim yok'
+      },
       'dashboard.classAverage': {
         'AR': 'معدل القسم',
         'FR': 'Moyenne de la classe',

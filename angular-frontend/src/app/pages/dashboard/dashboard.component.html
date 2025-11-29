@@ -1,5 +1,5 @@
 <div class="flex-1 pt-2 pb-4 px-3 md:px-4">
-  <!-- Top header with title and class selector (بدون تاريخ اليوم) -->
+  <!-- Top header with title, notifications and class selector -->
   <div class="bg-blue-600 rounded-lg px-6 py-3 mb-2 flex flex-col md:flex-row md:items-center md:justify-between text-white">
     <div class="mb-2 md:mb-0">
       <h1 class="text-2xl md:text-3xl font-bold">{{ translate('dashboard.title') }}</h1>
@@ -7,15 +7,110 @@
         {{ translate('dashboard.overview') }}
       </p>
     </div>
-    <div class="flex items-center gap-2 text-sm">
-      <label class="text-xs">{{ translate('dashboard.selectClass') }}</label>
-      <select
-        class="px-3 py-1 rounded-md text-blue-900 text-sm focus:outline-none"
-        [(ngModel)]="selectedClassId"
-        (ngModelChange)="onClassChange()">
-        <option [ngValue]="0">{{ translate('dashboard.allClasses') }}</option>
-        <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
-      </select>
+    <div class="flex items-center gap-4">
+      <!-- Notifications Button -->
+      <div class="relative">
+        <button
+          (click)="toggleNotificationsPanel()"
+          class="relative p-2 rounded-md hover:bg-blue-700 transition-colors"
+          title="الإشعارات">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 17h5l-5 5v-5zM4.558 4.558a4.5 4.5 0 019 0c0 1.281.839 2.383 2.065 2.856A4.5 4.5 0 0118 10.5c0 2.206.895 4.233 2.346 5.618a.75.75 0 01-.394 1.183A5.5 5.5 0 0115 17H9a5.5 5.5 0 01-4.953-2.683.75.75 0 01-.394-1.183A4.5 4.5 0 014.5 10.5a4.5 4.5 0 014.5-4.5z"/>
+          </svg>
+          <!-- Notification Badge -->
+          <span *ngIf="notificationStats && notificationStats.unread > 0"
+                class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+            {{ notificationStats.unread > 99 ? '99+' : notificationStats.unread }}
+          </span>
+        </button>
+
+        <!-- Notifications Panel -->
+        <div *ngIf="showNotificationsPanel"
+             class="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-800">{{ translate('notifications.title') }}</h3>
+              <div class="flex items-center gap-3">
+                <button (click)="refreshNotifications()"
+                        class="text-sm text-blue-600 hover:text-blue-800 p-1"
+                        title="تحديث الإشعارات">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+                <button *ngIf="notificationStats && notificationStats.unread > 0"
+                        (click)="markAllNotificationsAsRead()"
+                        class="text-sm text-blue-600 hover:text-blue-800">
+                  {{ translate('notifications.markAllRead') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="max-h-80 overflow-y-auto">
+            <div *ngIf="!notificationsLoaded" class="p-4 text-center text-gray-500">
+              {{ translate('notifications.loading') }}
+            </div>
+
+            <div *ngIf="notificationsLoaded && notifications.length === 0" class="p-4 text-center text-gray-500">
+              {{ translate('notifications.none') }}
+            </div>
+
+            <div *ngFor="let notification of notifications"
+                 [ngClass]="notification.isRead ? 'bg-gray-50' : 'bg-blue-50'"
+                 class="p-4 border-b border-gray-100 hover:bg-gray-100 cursor-pointer"
+                 (click)="markNotificationAsRead(notification)">
+              <div class="flex items-start gap-3">
+                <div class="text-2xl">{{ notificationService.getNotificationIcon(notification.type) }}</div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center justify-between">
+                    <h4 [ngClass]="notification.isRead ? 'text-gray-800' : 'text-gray-900 font-semibold'"
+                        class="text-sm truncate">
+                      {{ notification.title }}
+                    </h4>
+                    <span *ngIf="!notification.isRead"
+                          class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
+                  </div>
+                  <p class="text-sm text-gray-600 mt-1 line-clamp-2">
+                    {{ notification.message }}
+                  </p>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs text-gray-500">
+                      {{ notification.createdAt | date:'short' }}
+                    </span>
+                    <span [ngClass]="notificationService.getNotificationColor(notification.priority)"
+                          class="text-xs px-2 py-1 rounded-full bg-opacity-20 capitalize">
+                      {{ notification.priority === 'urgent' ? 'عاجل' :
+                          notification.priority === 'high' ? 'عالي' :
+                          notification.priority === 'medium' ? 'متوسط' : 'منخفض' }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="notificationsLoaded && notifications.length > 0"
+               class="p-3 bg-gray-50 border-t border-gray-200 text-center">
+            <button class="text-sm text-blue-600 hover:text-blue-800">
+              {{ translate('notifications.viewAll') }}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Class Selector -->
+      <div class="flex items-center gap-2 text-sm">
+        <label class="text-xs">{{ translate('dashboard.selectClass') }}</label>
+        <select
+          class="px-3 py-1 rounded-md text-blue-900 text-sm focus:outline-none"
+          [(ngModel)]="selectedClassId"
+          (ngModelChange)="onClassChange()">
+          <option [ngValue]="0">{{ translate('dashboard.allClasses') }}</option>
+          <option *ngFor="let c of classes" [ngValue]="c.id">{{ c.name }}</option>
+        </select>
+      </div>
     </div>
   </div>
 

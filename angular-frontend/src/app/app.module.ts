@@ -34,6 +34,9 @@ import { AdminComponent } from './pages/admin/admin.component';
 import { UsersManagementComponent } from './pages/admin/users-management/users-management.component';
 import { ModuleAccessComponent } from './pages/admin/module-access/module-access.component';
 import { MonitoringComponent } from './pages/admin/monitoring/monitoring.component';
+import { SubscriptionManagementComponent } from './pages/admin/subscription-management/subscription-management.component';
+import { SubscriptionStatusComponent } from './pages/subscription-status/subscription-status.component';
+import { SubscriptionPaymentComponent } from './pages/subscription-payment/subscription-payment.component';
 import { ReportGeneratorComponent } from './pages/report-generator/report-generator.component';
 
 @NgModule({
@@ -67,6 +70,9 @@ import { ReportGeneratorComponent } from './pages/report-generator/report-genera
     UsersManagementComponent,
     ModuleAccessComponent,
     MonitoringComponent,
+    SubscriptionManagementComponent,
+    SubscriptionStatusComponent,
+    SubscriptionPaymentComponent,
     ReportGeneratorComponent,
   ],
   imports: [

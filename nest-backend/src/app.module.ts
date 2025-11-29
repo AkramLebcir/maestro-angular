@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { DatabaseModule } from './database/database.module';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -22,6 +23,8 @@ import { PedagogicalDocsModule } from './pedagogical-docs/pedagogical-docs.modul
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { CertificatesModule } from './certificates/certificates.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ModuleAccessGuard } from './auth/guards/module-access.guard';
@@ -32,6 +35,7 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
       isGlobal: true,
       envFilePath: '.env',
     }),
+    ScheduleModule.forRoot(),
     DatabaseModule,
     ClassesModule,
     LabsModule,
@@ -48,6 +52,8 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     ProgressTrackingModule,
     PedagogicalDocsModule,
     CertificatesModule,
+    NotificationsModule,
+    SubscriptionsModule,
     AuthModule,
     UsersModule,
   ],

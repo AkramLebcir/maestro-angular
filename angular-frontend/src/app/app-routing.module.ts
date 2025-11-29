@@ -21,6 +21,8 @@ import { TrainingInspectionComponent } from './pages/training-inspection/trainin
 import { AchievementsPenaltiesComponent } from './pages/achievements-penalties/achievements-penalties.component';
 import { LoginComponent } from './pages/login/login.component';
 import { AdminComponent } from './pages/admin/admin.component';
+import { SubscriptionStatusComponent } from './pages/subscription-status/subscription-status.component';
+import { SubscriptionPaymentComponent } from './pages/subscription-payment/subscription-payment.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -47,6 +49,8 @@ const routes: Routes = [
   { path: 'progress-tracking', component: ProgressTrackingComponent, canActivate: [AuthGuard] },
   { path: 'pedagogical-docs', component: PedagogicalDocsComponent, canActivate: [AuthGuard] },
   { path: 'training-inspection', component: TrainingInspectionComponent, canActivate: [AuthGuard] },
+  { path: 'subscription-status', component: SubscriptionStatusComponent, canActivate: [AuthGuard] },
+  { path: 'subscription-payment', component: SubscriptionPaymentComponent, canActivate: [AuthGuard] },
   { path: 'settings', redirectTo: '/admin', pathMatch: 'full' } // Redirect to admin panel for admins
 ];
 

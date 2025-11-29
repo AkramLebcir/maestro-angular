@@ -1,0 +1,425 @@
+<div>
+  <!-- Header -->
+  <div class="mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">إدارة الاشتراكات والمدفوعات</h2>
+    <p class="text-gray-600 mt-2">إدارة الباقات والاشتراكات والمدفوعات للأساتذة</p>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+    {{ errorMessage }}
+  </div>
+  <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+    {{ successMessage }}
+  </div>
+
+  <!-- Tabs -->
+  <div class="bg-white rounded-lg shadow-sm mb-6">
+    <div class="border-b border-gray-200">
+      <nav class="flex -mb-px">
+        <button
+          (click)="setActiveSection('stats')"
+          [class]="activeSection === 'stats' 
+            ? 'border-blue-500 text-blue-600 font-semibold' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="px-6 py-4 border-b-2 transition-colors"
+        >
+          الإحصائيات
+        </button>
+        <button
+          (click)="setActiveSection('plans')"
+          [class]="activeSection === 'plans' 
+            ? 'border-blue-500 text-blue-600 font-semibold' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="px-6 py-4 border-b-2 transition-colors"
+        >
+          الباقات
+        </button>
+        <button
+          (click)="setActiveSection('subscriptions')"
+          [class]="activeSection === 'subscriptions' 
+            ? 'border-blue-500 text-blue-600 font-semibold' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="px-6 py-4 border-b-2 transition-colors"
+        >
+          الاشتراكات
+        </button>
+        <button
+          (click)="setActiveSection('payments')"
+          [class]="activeSection === 'payments' 
+            ? 'border-blue-500 text-blue-600 font-semibold' 
+            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+          class="px-6 py-4 border-b-2 transition-colors"
+        >
+          المدفوعات
+        </button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div *ngIf="activeSection === 'stats'" class="bg-white rounded-lg shadow-sm p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-6">نظرة عامة</h3>
+    <div *ngIf="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="bg-blue-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600">إجمالي الاشتراكات</div>
+        <div class="text-2xl font-bold text-blue-600">{{ stats.subscriptions.total }}</div>
+      </div>
+      <div class="bg-green-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600">الاشتراكات النشطة</div>
+        <div class="text-2xl font-bold text-green-600">{{ stats.subscriptions.active }}</div>
+      </div>
+      <div class="bg-yellow-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600">قيد الانتظار</div>
+        <div class="text-2xl font-bold text-yellow-600">{{ stats.subscriptions.pending }}</div>
+      </div>
+      <div class="bg-purple-50 p-4 rounded-lg">
+        <div class="text-sm text-gray-600">إجمالي الإيرادات</div>
+        <div class="text-2xl font-bold text-purple-600">{{ formatCurrency(stats.revenue.total) }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Plans Section -->
+  <div *ngIf="activeSection === 'plans'" class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-gray-800">الباقات</h3>
+      <button
+        (click)="openCreatePlanForm()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+      >
+        + إضافة باقة جديدة
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">جاري التحميل...</div>
+
+    <div *ngIf="!isLoading && plans.length === 0" class="text-center py-8 text-gray-500">
+      لا توجد باقات حالياً
+    </div>
+
+    <div *ngIf="!isLoading && plans.length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الاسم</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">النوع</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">السعر</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المدة (شهر)</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let plan of plans" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ plan.name }}</div>
+              <div class="text-sm text-gray-500">{{ plan.nameEn }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              {{ plan.type === 'semester' ? 'فصل دراسي' : 'سنة دراسية' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(plan.price) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ plan.durationMonths }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="plan.isActive ? 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800'">
+                {{ plan.isActive ? 'نشط' : 'معطل' }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+              <button (click)="openEditPlanForm(plan)" class="text-blue-600 hover:text-blue-900">تعديل</button>
+              <button (click)="deletePlan(plan)" class="text-red-600 hover:text-red-900">حذف</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Subscriptions Section -->
+  <div *ngIf="activeSection === 'subscriptions'" class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-gray-800">الاشتراكات</h3>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">جاري التحميل...</div>
+
+    <div *ngIf="!isLoading && subscriptions.length === 0" class="text-center py-8 text-gray-500">
+      لا توجد اشتراكات حالياً
+    </div>
+
+    <div *ngIf="!isLoading && subscriptions.length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الأستاذ</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الباقة</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ البداية</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ الانتهاء</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let subscription of subscriptions" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ subscription.user ? (subscription.user.firstName || '') + ' ' + (subscription.user.lastName || '') : 'غير معروف' }}
+              </div>
+              <div class="text-sm text-gray-500">{{ subscription.user?.email }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">{{ subscription.plan?.name }}</div>
+              <div class="text-sm text-gray-500">{{ formatCurrency(subscription.plan?.price || 0) }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getSubscriptionStatusClass(subscription.status)">
+                {{ getSubscriptionStatusText(subscription.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(subscription.startDate) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(subscription.endDate) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+              <button
+                *ngIf="subscription.status === 'pending'"
+                (click)="openActivateModal(subscription)"
+                class="text-green-600 hover:text-green-900"
+              >
+                تفعيل
+              </button>
+              <button
+                *ngIf="subscription.status === 'active'"
+                (click)="cancelSubscription(subscription)"
+                class="text-red-600 hover:text-red-900"
+              >
+                إلغاء
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Payments Section -->
+  <div *ngIf="activeSection === 'payments'" class="bg-white rounded-lg shadow-sm p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-gray-800">المدفوعات</h3>
+      <button
+        (click)="openCreatePaymentForm()"
+        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+      >
+        + إضافة دفعة جديدة
+      </button>
+    </div>
+
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">جاري التحميل...</div>
+
+    <div *ngIf="!isLoading && payments.length === 0" class="text-center py-8 text-gray-500">
+      لا توجد مدفوعات حالياً
+    </div>
+
+    <div *ngIf="!isLoading && payments.length > 0" class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الأستاذ</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المبلغ</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">طريقة الدفع</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">تاريخ الدفع</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let payment of payments" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">
+                {{ payment.user ? (payment.user.firstName || '') + ' ' + (payment.user.lastName || '') : 'غير معروف' }}
+              </div>
+              <div class="text-sm text-gray-500">{{ payment.user?.email }}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ formatCurrency(payment.amount) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ getPaymentMethodText(payment.method) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [class]="getPaymentStatusClass(payment.status)">
+                {{ getPaymentStatusText(payment.status) }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(payment.paidAt || '') }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <button (click)="openUpdatePaymentModal(payment)" class="text-blue-600 hover:text-blue-900">تعديل</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Plan Form Modal -->
+  <div *ngIf="showPlanForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePlanForm()">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">{{ editingPlan ? 'تعديل الباقة' : 'إضافة باقة جديدة' }}</h3>
+      <form (ngSubmit)="savePlan()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">الاسم (عربي)</label>
+            <input type="text" [(ngModel)]="planForm.name" name="name" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">الاسم (إنجليزي)</label>
+            <input type="text" [(ngModel)]="planForm.nameEn" name="nameEn" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">النوع</label>
+            <select [(ngModel)]="planForm.type" name="type" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <option value="semester">فصل دراسي</option>
+              <option value="annual">سنة دراسية</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">السعر (دج)</label>
+            <input type="number" [(ngModel)]="planForm.price" name="price" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="0" step="0.01">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">المدة (شهر)</label>
+            <input type="number" [(ngModel)]="planForm.durationMonths" name="durationMonths" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="1">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+            <select [(ngModel)]="planForm.isActive" name="isActive" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <option [value]="true">نشط</option>
+              <option [value]="false">معطل</option>
+            </select>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">الوصف (عربي)</label>
+          <textarea [(ngModel)]="planForm.description" name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">الوصف (إنجليزي)</label>
+          <textarea [(ngModel)]="planForm.descriptionEn" name="descriptionEn" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closePlanForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">إلغاء</button>
+          <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Activate Subscription Modal -->
+  <div *ngIf="showActivateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeActivateModal()">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">تفعيل الاشتراك</h3>
+      <form (ngSubmit)="activateSubscription()">
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ البداية</label>
+          <input type="date" [(ngModel)]="activateForm.startDate" name="startDate" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+          <textarea [(ngModel)]="activateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closeActivateModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">إلغاء</button>
+          <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">تفعيل</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Form Modal -->
+  <div *ngIf="showPaymentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePaymentForm()">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">إضافة دفعة جديدة</h3>
+      <form (ngSubmit)="savePayment()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">الاشتراك</label>
+            <select [(ngModel)]="paymentForm.subscriptionId" name="subscriptionId" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+              <option [value]="0">اختر الاشتراك</option>
+              <option *ngFor="let sub of subscriptions" [value]="sub.id">
+                {{ sub.user ? (sub.user.firstName || '') + ' ' + (sub.user.lastName || '') : 'غير معروف' }} - {{ sub.plan?.name }}
+              </option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">المبلغ (دج)</label>
+            <input type="number" [(ngModel)]="paymentForm.amount" name="amount" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="0" step="0.01">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">طريقة الدفع</label>
+            <select [(ngModel)]="paymentForm.method" name="method" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <option value="manual">يدوي/تحويل بنكي</option>
+              <option value="card">بطاقة ذهبية</option>
+              <option value="other">أخرى</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الدفع</label>
+            <input type="date" [(ngModel)]="paymentForm.paidAt" name="paidAt" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">رقم المعاملة</label>
+            <input type="text" [(ngModel)]="paymentForm.transactionId" name="transactionId" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">رقم الإيصال</label>
+            <input type="text" [(ngModel)]="paymentForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+          <textarea [(ngModel)]="paymentForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closePaymentForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">إلغاء</button>
+          <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Update Modal -->
+  <div *ngIf="showPaymentUpdateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePaymentUpdateModal()">
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 mb-4">تحديث سجل الدفع</h3>
+      <form (ngSubmit)="updatePayment()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">الحالة</label>
+            <select [(ngModel)]="paymentUpdateForm.status" name="status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+              <option value="pending">قيد الانتظار</option>
+              <option value="completed">مكتمل</option>
+              <option value="failed">فشل</option>
+              <option value="refunded">مسترد</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">تاريخ الدفع</label>
+            <input type="date" [(ngModel)]="paymentUpdateForm.paidAt" name="paidAt" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">رقم المعاملة</label>
+            <input type="text" [(ngModel)]="paymentUpdateForm.transactionId" name="transactionId" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">رقم الإيصال</label>
+            <input type="text" [(ngModel)]="paymentUpdateForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+          <textarea [(ngModel)]="paymentUpdateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closePaymentUpdateModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">إلغاء</button>
+          <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">حفظ</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
