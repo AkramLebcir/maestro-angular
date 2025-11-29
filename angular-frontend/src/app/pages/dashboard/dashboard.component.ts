@@ -107,6 +107,14 @@ export class DashboardComponent implements OnInit {
     F: 0
   };
 
+  // إحصائيات سجل الدرجات للـ quick view
+  gradebookStats = {
+    studentsWithAverage10OrAbove: 0,
+    studentsWithAverageBelow10: 0,
+    highestGrade: 0,
+    lowestGrade: 20
+  };
+
   // بيانات خام
   classes: Class[] = [];
   /** 0 = جميع الأقسام (Global)، غير ذلك = معرف القسم */
@@ -345,6 +353,12 @@ export class DashboardComponent implements OnInit {
     this.attendanceSummary = { present: 0, absent: 0, excused: 0, late: 0, sick: 0 };
     this.behaviorSummary = { positive: 0, negative: 0 };
     this.gradeCounts = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+    this.gradebookStats = {
+      studentsWithAverage10OrAbove: 0,
+      studentsWithAverageBelow10: 0,
+      highestGrade: 0,
+      lowestGrade: 20
+    };
     this.students = [];
     this.attendanceRecords = [];
     this.behaviorEvents = [];
@@ -640,6 +654,35 @@ export class DashboardComponent implements OnInit {
     });
 
     this.gradeCounts = gradeCounts;
+
+    // حساب إحصائيات سجل الدرجات
+    let studentsWithAverage10OrAbove = 0;
+    let studentsWithAverageBelow10 = 0;
+    let highestGrade = 0;
+    let lowestGrade = 20;
+
+    averages.forEach(avg => {
+      if (avg >= 10) {
+        studentsWithAverage10OrAbove++;
+      } else {
+        studentsWithAverageBelow10++;
+      }
+
+      if (avg > highestGrade) {
+        highestGrade = avg;
+      }
+
+      if (avg < lowestGrade) {
+        lowestGrade = avg;
+      }
+    });
+
+    this.gradebookStats = {
+      studentsWithAverage10OrAbove,
+      studentsWithAverageBelow10,
+      highestGrade: averages.length > 0 ? highestGrade : 0,
+      lowestGrade: averages.length > 0 ? lowestGrade : 0
+    };
 
     this.gradeDistributionChartData = {
       ...this.gradeDistributionChartData,
