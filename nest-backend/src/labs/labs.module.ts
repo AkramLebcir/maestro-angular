@@ -13,3 +13,4 @@ import { Lab } from './lab.entity';
 export class LabsModule {}
 
 
+

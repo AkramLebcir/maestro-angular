@@ -14,3 +14,4 @@ export class NotificationResponseDto {
   createdAt: Date;
   updatedAt: Date;
 }
+

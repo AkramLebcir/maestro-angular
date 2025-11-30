@@ -1,3 +1,16 @@
 /* Attendance component styles */
-
-
+.status-banner.status-present {
+  background-color: #15803d !important;
+  border-color: #166534 !important;
+}
+.status-button {
+  transition: background-color 0.2s ease;
+}
+.status-present-button {
+  border: 1px solid #86efac !important;
+  background-color: #dcfce7 !important;
+  color: #166534 !important;
+}
+.status-present-button:hover {
+  background-color: #bbf7d0 !important;
+}

@@ -4,3 +4,4 @@ import { CreateLabSoftwareDto } from './create-lab-software.dto';
 export class UpdateLabSoftwareDto extends PartialType(CreateLabSoftwareDto) {}
 
 
+

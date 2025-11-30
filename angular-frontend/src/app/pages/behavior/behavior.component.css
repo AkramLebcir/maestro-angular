@@ -1,3 +1,18 @@
+
 /* Behavior component styles */
-
-
+.behavior-positive-card {
+  background: #ecfdf3;
+  border: 1px solid #bbf7d0;
+  color: #0f5132;
+}
+.behavior-positive-card:hover {
+  background: #bbf7d0;
+}
+.behavior-positive-card span {
+  color: inherit;
+}
+.behavior-positive-card--active {
+  background: #047857;
+  border-color: #065f46;
+  color: #ffffff;
+}

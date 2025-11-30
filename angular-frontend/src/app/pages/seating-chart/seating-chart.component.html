@@ -94,15 +94,15 @@
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'workstations' && stats">
       <div class="stat-pill">
         <p class="label">متوسط الحضور</p>
-        <p class="value">{{ stats?.averageAttendance ?? 0 }}%</p>
+        <p class="value">{{ stats.averageAttendance ?? 0 }}%</p>
       </div>
       <div class="stat-pill">
         <p class="label">متوسط النقاط</p>
-        <p class="value">{{ stats?.averageGrade ?? 0 }}%</p>
+        <p class="value">{{ stats.averageGrade ?? 0 }}%</p>
       </div>
       <div class="stat-pill">
         <p class="label text-green-100">السلوك الإيجابي</p>
-        <p class="value text-green-300">{{ stats?.positiveBehaviorRate ?? 0 }}%</p>
+        <p class="value text-green-300">{{ stats.positiveBehaviorRate ?? 0 }}%</p>
       </div>
     </div>
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'classroom' && classroomLayout">
@@ -163,16 +163,16 @@
       <input class="search-input" placeholder="اكتب اسم التلميذ" [(ngModel)]="searchTerm" />
     </div>
 
-    <div class="flex gap-3 flex-wrap items-center ml-auto">
+      <div class="flex gap-3 flex-wrap items-center ml-auto">
       <button
-        class="ghost-btn"
+        class="ghost-btn btn-export-pdf"
         (click)="printSelectedWorkstationsAllClasses()"
         [disabled]="printLoading || selectedStationsForPrint.size === 0">
         طباعة الحواسيب المحددة (جميع الأقسام)
       </button>
-      <button class="ghost-btn" (click)="print('group')" [disabled]="printLoading">طباعة الفوج</button>
-      <button class="ghost-btn" (click)="print('class')" [disabled]="printLoading">طباعة القسم</button>
-      <button class="ghost-btn" (click)="print('all')" [disabled]="printLoading">طباعة جميع الأقسام</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('group')" [disabled]="printLoading">طباعة الفوج</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('class')" [disabled]="printLoading">طباعة القسم</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('all')" [disabled]="printLoading">طباعة جميع الأقسام</button>
     </div>
   </div>
 
@@ -199,7 +199,7 @@
       </span>
       <span *ngIf="layoutSaving">... جاري الحفظ</span>
     </button>
-    <button class="primary-btn" (click)="layoutMode === 'classroom' ? exportClassroomLayoutToPdf() : print('group')" [disabled]="printLoading">
+    <button class="primary-btn btn-export-pdf" (click)="layoutMode === 'classroom' ? exportClassroomLayoutToPdf() : print('group')" [disabled]="printLoading">
       <span *ngIf="!printLoading">تصدير PDF</span>
       <span *ngIf="printLoading">... جاري التصدير</span>
     </button>

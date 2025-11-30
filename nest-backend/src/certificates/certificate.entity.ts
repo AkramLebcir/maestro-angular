@@ -51,3 +51,4 @@ export class Certificate extends TenantOwnedEntity {
   createdAt: Date;
 }
 
+

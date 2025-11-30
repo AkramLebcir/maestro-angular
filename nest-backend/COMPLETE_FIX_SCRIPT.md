@@ -82,3 +82,4 @@ export class ModuleController {
 2. عند البحث عن existing records للتحقق من التكرار، يجب إضافة ownerId في where clause
 3. جميع الاستعلامات يجب أن تعزل البيانات بـ ownerId
 
+

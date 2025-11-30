@@ -56,3 +56,4 @@ export class DeskAssignment extends TenantOwnedEntity {
   updatedAt: Date;
 }
 
+

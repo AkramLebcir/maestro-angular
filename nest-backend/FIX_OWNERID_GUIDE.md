@@ -104,3 +104,4 @@ export class MyEntity extends TenantOwnedEntity {
 - `ownerId: number` column
 - `owner: User` relation
 
+

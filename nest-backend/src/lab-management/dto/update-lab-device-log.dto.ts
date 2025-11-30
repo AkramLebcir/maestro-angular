@@ -4,3 +4,4 @@ import { CreateLabDeviceLogDto } from './create-lab-device-log.dto';
 export class UpdateLabDeviceLogDto extends PartialType(CreateLabDeviceLogDto) {}
 
 
+

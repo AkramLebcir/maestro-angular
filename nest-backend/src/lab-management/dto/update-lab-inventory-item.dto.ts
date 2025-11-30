@@ -4,3 +4,4 @@ import { CreateLabInventoryItemDto } from './create-lab-inventory-item.dto';
 export class UpdateLabInventoryItemDto extends PartialType(CreateLabInventoryItemDto) {}
 
 
+

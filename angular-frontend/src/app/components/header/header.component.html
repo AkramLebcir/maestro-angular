@@ -244,7 +244,7 @@
         />
         <ng-template #initialsAvatar>
           <span class="text-sm font-semibold">
-            {{ teacherName.split(' ')[0]?.[0] || 'أ' }}
+            {{ teacherName.split(' ')[0][0] || 'أ' }}
           </span>
         </ng-template>
       </button>

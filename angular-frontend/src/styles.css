@@ -49,3 +49,29 @@
   -webkit-line-clamp: 3;
 }
 
+/* Export buttons should stay consistent across the app */
+.btn-export-pdf,
+button.btn-export-pdf {
+  background-color: #dc2626 !important;
+  border-color: #dc2626 !important;
+  color: #fff !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-export-pdf:hover,
+button.btn-export-pdf:hover {
+  background-color: #b91c1c !important;
+  border-color: #b91c1c !important;
+}
+.btn-export-excel,
+button.btn-export-excel {
+  background-color: #15803d !important;
+  border-color: #15803d !important;
+  color: #fff !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.btn-export-excel:hover,
+button.btn-export-excel:hover {
+  background-color: #166534 !important;
+  border-color: #166534 !important;
+}
+

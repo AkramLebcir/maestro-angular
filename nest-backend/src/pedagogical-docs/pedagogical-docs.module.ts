@@ -12,3 +12,4 @@ import { PedagogicalDocsController } from './pedagogical-docs.controller';
 export class PedagogicalDocsModule {}
 
 
+

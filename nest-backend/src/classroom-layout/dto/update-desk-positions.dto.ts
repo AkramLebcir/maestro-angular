@@ -22,3 +22,4 @@ export class UpdateDeskPositionsDto {
   positions: DeskPosition[];
 }
 
+

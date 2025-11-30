@@ -5,3 +5,4 @@ export class UpdateNotificationDto {
   @IsBoolean()
   isRead?: boolean;
 }
+

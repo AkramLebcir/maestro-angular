@@ -73,7 +73,7 @@
         <button (click)="issueCertificate()" [disabled]="isSubmitting">
           {{ isSubmitting ? 'جارٍ الإصدار...' : 'إصدار الشهادة' }}
         </button>
-        <button class="secondary" (click)="downloadPdf()" [disabled]="isExporting">
+        <button class="secondary btn-export-pdf" (click)="downloadPdf()" [disabled]="isExporting">
           {{ isExporting ? 'يُجهّز PDF...' : 'تصدير PDF' }}
         </button>
       </div>

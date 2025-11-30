@@ -31,3 +31,4 @@ export class CertificateTemplate extends TenantOwnedEntity {
   createdAt: Date;
 }
 
+

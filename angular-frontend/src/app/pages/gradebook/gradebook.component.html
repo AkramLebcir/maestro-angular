@@ -78,7 +78,7 @@
         <div class="flex gap-2">
           <button 
             (click)="exportToExcel()"
-            class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
+            class="btn-export-excel bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition">
             {{ translate('gradebook.exportExcel') }}
           </button>
           <button 
@@ -615,7 +615,7 @@
       <div class="flex gap-2">
         <button 
           (click)="exportReportToPDF()"
-          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
+          class="btn-export-pdf bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
           تصدير PDF
         </button>
         <button 
