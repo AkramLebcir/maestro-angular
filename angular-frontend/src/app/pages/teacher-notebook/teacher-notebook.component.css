@@ -91,6 +91,7 @@
   overflow: hidden;
   padding: 1.25rem;
   min-height: 420px;
+  border: 2px solid #e5e7eb;
 }
 
 .sticky {
