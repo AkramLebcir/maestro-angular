@@ -1,8 +1,9 @@
-import { Component, EventEmitter, OnInit, OnDestroy, Output } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy, Output, HostListener, ViewChild, ElementRef } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { LanguageService, LanguageCode } from '../../services/language.service';
 import { AuthService, User } from '../../services/auth.service';
+import { NotificationService, Notification, NotificationStats } from '../../services/notification.service';
 
 @Component({
   selector: 'app-header',
@@ -12,7 +13,7 @@ import { AuthService, User } from '../../services/auth.service';
 export class HeaderComponent implements OnInit, OnDestroy {
   teacherName = 'الأستاذ';
   teacherPhotoUrl: string | null = null;
-  notificationCount = 3;
+  notificationCount = 0;
   currentUser: User | null = null;
   isUserMenuOpen = false;
 
@@ -24,10 +25,19 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private languageSubscription?: Subscription;
   private userSubscription?: Subscription;
 
+  // إعدادات الإشعارات
+  notifications: Notification[] = [];
+  notificationStats: NotificationStats | null = null;
+  showNotificationsPanel = false;
+  notificationsLoaded = false;
+  @ViewChild('notificationsPanel', { static: false }) notificationsPanelRef?: ElementRef;
+  @ViewChild('notificationsButton', { static: false }) notificationsButtonRef?: ElementRef;
+
   constructor(
     public languageService: LanguageService,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public notificationService: NotificationService
   ) {}
 
   toggleLanguageMenu(): void {
@@ -71,6 +81,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
         // في حال وجود خطأ في الـ JSON نتجاهله ونبقي القيم الافتراضية
       }
     }
+
+    // تحميل الإشعارات
+    this.loadNotifications();
   }
 
   ngOnDestroy(): void {
@@ -93,6 +106,114 @@ export class HeaderComponent implements OnInit, OnDestroy {
   goToAdmin(): void {
     this.router.navigate(['/admin']);
     this.isUserMenuOpen = false;
+  }
+
+  /**
+   * تبديل عرض لوحة الإشعارات
+   */
+  toggleNotificationsPanel(): void {
+    this.showNotificationsPanel = !this.showNotificationsPanel;
+    if (this.showNotificationsPanel && !this.notificationsLoaded) {
+      this.loadNotifications();
+    }
+  }
+
+  /**
+   * تحميل الإشعارات
+   */
+  private loadNotifications(): void {
+    this.notificationsLoaded = false;
+
+    // تحميل الإشعارات
+    this.notificationService.getNotifications().subscribe({
+      next: notifications => {
+        this.notifications = notifications || [];
+        this.notificationsLoaded = true;
+      },
+      error: err => {
+        console.error('Error loading notifications:', err);
+        this.notifications = [];
+        this.notificationsLoaded = true;
+      }
+    });
+
+    // تحميل إحصائيات الإشعارات
+    this.notificationService.getNotificationStats().subscribe({
+      next: stats => {
+        this.notificationStats = stats;
+        this.notificationCount = stats?.unread || 0;
+      },
+      error: err => {
+        console.error('Error loading notification stats:', err);
+        this.notificationStats = null;
+        this.notificationCount = 0;
+      }
+    });
+  }
+
+  /**
+   * تحديث الإشعارات يدوياً
+   */
+  refreshNotifications(): void {
+    this.notificationsLoaded = false;
+    this.loadNotifications();
+  }
+
+  /**
+   * وضع علامة قراءة على إشعار
+   */
+  markNotificationAsRead(notification: Notification): void {
+    if (!notification.isRead) {
+      this.notificationService.markAsRead(notification.id).subscribe({
+        next: updatedNotification => {
+          const index = this.notifications.findIndex(n => n.id === notification.id);
+          if (index !== -1) {
+            this.notifications[index] = updatedNotification;
+            // تحديث الإحصائيات
+            if (this.notificationStats) {
+              this.notificationStats.unread = Math.max(0, this.notificationStats.unread - 1);
+              this.notificationCount = this.notificationStats.unread;
+            }
+          }
+        },
+        error: err => {
+          console.error('Error marking notification as read:', err);
+        }
+      });
+    }
+  }
+
+  /**
+   * وضع علامة قراءة على جميع الإشعارات
+   */
+  markAllNotificationsAsRead(): void {
+    this.notificationService.markAllAsRead().subscribe({
+      next: () => {
+        this.notifications.forEach(n => n.isRead = true);
+        if (this.notificationStats) {
+          this.notificationStats.unread = 0;
+          this.notificationCount = 0;
+        }
+      },
+      error: err => {
+        console.error('Error marking all notifications as read:', err);
+      }
+    });
+  }
+
+  /**
+   * إغلاق لوحة الإشعارات عند النقر خارجها
+   */
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.showNotificationsPanel) {
+      const clickedInsidePanel = this.notificationsPanelRef?.nativeElement?.contains(event.target);
+      const clickedInsideButton = this.notificationsButtonRef?.nativeElement?.contains(event.target);
+      
+      if (!clickedInsidePanel && !clickedInsideButton) {
+        this.showNotificationsPanel = false;
+      }
+    }
   }
 }
 
