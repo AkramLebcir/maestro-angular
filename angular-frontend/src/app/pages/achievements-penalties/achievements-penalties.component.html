@@ -68,6 +68,15 @@
       <select id="classPicker" (change)="onClassChange($event)" [value]="selectedClassId">
         <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
       </select>
+      <button 
+        type="button" 
+        class="btn-export-pdf"
+        (click)="exportPenaltiesToPDF()"
+        [disabled]="isExportingPdf || behaviorReports.length === 0"
+        title="تصدير قائمة العقوبات والتقارير إلى PDF"
+      >
+        {{ isExportingPdf ? 'جارٍ التصدير...' : 'تصدير PDF' }}
+      </button>
     </div>
 
     <div *ngIf="isLoadingReports" class="status">جارٍ تحميل التقارير...</div>
@@ -76,7 +85,7 @@
       لا توجد تقارير سلوك في الوقت الحالي.
     </div>
 
-    <ul class="reports-list" *ngIf="behaviorReports.length">
+    <ul class="reports-list" #penaltiesList *ngIf="behaviorReports.length">
       <li *ngFor="let report of behaviorReports">
         <div class="report-header">
           <div>

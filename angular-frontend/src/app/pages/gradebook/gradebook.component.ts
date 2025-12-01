@@ -71,6 +71,7 @@ export interface Student {
   firstName: string;
   lastName: string;
   idNumber?: string; // رقم الهوية أو الكود
+  dateOfBirth?: Date | string; // تاريخ الميلاد
   gender?: 'male' | 'female';
   classId?: number;
   class?: {
@@ -1748,8 +1749,8 @@ export class GradebookComponent implements OnInit {
     
      // Headers
      excelData.push([
-       '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تصحيح الدفتر (5)', 'الواجب (5)', 'الحضور (5)', 'السلوك (5)',
-       'التقييم المستمر', 'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'المعدل', 'الترتيب'
+       '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تاريخ الميلاد', 'تصحيح الدفتر (5)', 'الواجب (5)', 'الحضور (5)', 'السلوك (5)',
+       'التقييم المستمر', 'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'المعدل', 'التقديرات', 'الإرشادات', 'الترتيب'
      ]);
 
      // Data rows
@@ -1759,6 +1760,7 @@ export class GradebookComponent implements OnInit {
          student.idNumber || '-',
          student.firstName,
          student.lastName,
+         this.formatDateOfBirth(student.dateOfBirth),
          student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-',
          student.calculatedGrades?.duty?.toFixed(2) || '-',
          student.calculatedGrades?.attendance?.toFixed(2) || '-',
@@ -1768,6 +1770,8 @@ export class GradebookComponent implements OnInit {
          student.calculatedGrades?.assignment?.toFixed(2) || '-',
          student.calculatedGrades?.test?.toFixed(2) || '-',
          student.averages?.termAverage?.toFixed(2) || '-',
+         this.getGradeRating(student),
+         this.getGuidance(student),
          student.ranking || '-'
        ]);
      });
@@ -1903,6 +1907,314 @@ export class GradebookComponent implements OnInit {
       console.error('Error exporting to PDF:', error);
       alert('حدث خطأ أثناء تصدير PDF');
     }
+  }
+
+  async exportGradesToPDF(): Promise<void> {
+    if (!this.selectedClass) {
+      alert('يرجى اختيار قسم أولاً');
+      return;
+    }
+
+    try {
+      // Create a temporary container for export
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '297mm'; // Landscape A4 width
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+
+      // Add title
+      const title = document.createElement('h2');
+      title.textContent = 'نتائج الفصل';
+      title.style.textAlign = 'right';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      
+      // Add class name and date
+      const info = document.createElement('div');
+      info.style.textAlign = 'right';
+      info.style.marginBottom = '20px';
+      info.style.fontSize = '14px';
+      info.style.color = '#6b7280';
+      
+      const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
+      const termInfo = `الفصل: ${this.selectedTerm === 1 ? 'الأول' : this.selectedTerm === 2 ? 'الثاني' : 'الثالث'}`;
+      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      info.innerHTML = `${classInfo} | ${termInfo}<br>${dateInfo}`;
+      
+      exportContainer.appendChild(title);
+      exportContainer.appendChild(info);
+
+      // Create table programmatically with all columns
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.border = '1px solid #000';
+      table.style.fontSize = '10px';
+
+      // Create header row
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#2563eb';
+      headerRow.style.color = '#ffffff';
+      
+      const headers = [
+        '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تاريخ الميلاد',
+        'تصحيح الدفتر', 'الواجب', 'الحضور', 'السلوك', 'التقييم المستمر',
+        'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'معدل الفصل',
+        'التقديرات', 'الإرشادات', 'الترتيب'
+      ];
+      
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.border = '1px solid #000';
+        th.style.padding = '6px';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        headerRow.appendChild(th);
+      });
+      
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Create body rows
+      const tbody = document.createElement('tbody');
+      this.students.forEach((student, index) => {
+        const row = document.createElement('tr');
+        row.style.borderBottom = '1px solid #ccc';
+        
+        if ((student.averages?.termAverage || 0) < 10) {
+          row.style.backgroundColor = '#fee2e2';
+        }
+
+        const cells = [
+          (index + 1).toString(),
+          student.idNumber || '-',
+          student.firstName,
+          student.lastName,
+          this.formatDateOfBirth(student.dateOfBirth),
+          student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-',
+          student.calculatedGrades?.duty?.toFixed(2) || '-',
+          student.calculatedGrades?.attendance?.toFixed(2) || '-',
+          student.calculatedGrades?.behavior?.toFixed(2) || '-',
+          student.calculatedGrades?.continuousAssessment?.toFixed(2) || '-',
+          student.calculatedGrades?.oralExpression?.toFixed(2) || '-',
+          student.calculatedGrades?.assignment?.toFixed(2) || '-',
+          student.calculatedGrades?.test?.toFixed(2) || '-',
+          (student.averages?.termAverage || 0).toFixed(2),
+          this.getGradeRating(student),
+          this.getGuidance(student),
+          student.ranking?.toString() || '-'
+        ];
+
+        cells.forEach((cellText, cellIndex) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.border = '1px solid #ccc';
+          td.style.padding = '6px';
+          td.style.textAlign = cellIndex === 0 || cellIndex === cells.length - 1 ? 'center' : 'right';
+          
+          // Color for term average
+          if (cellIndex === 13) {
+            const avg = student.averages?.termAverage || 0;
+            if (avg < 10) {
+              td.style.color = '#dc2626';
+              td.style.fontWeight = 'bold';
+            } else {
+              td.style.color = '#16a34a';
+              td.style.fontWeight = 'bold';
+            }
+          }
+          
+          row.appendChild(td);
+        });
+        
+        tbody.appendChild(row);
+      });
+
+      // Add footer rows
+      const footerRow1 = document.createElement('tr');
+      footerRow1.style.backgroundColor = '#f3f4f6';
+      footerRow1.style.fontWeight = 'bold';
+      const footerCell1 = document.createElement('td');
+      footerCell1.textContent = 'معدل القسم:';
+      footerCell1.colSpan = 16;
+      footerCell1.style.textAlign = 'right';
+      footerCell1.style.padding = '6px';
+      footerCell1.style.border = '1px solid #ccc';
+      const footerCell1Value = document.createElement('td');
+      footerCell1Value.textContent = this.calculateClassAverage().toFixed(2);
+      footerCell1Value.style.textAlign = 'center';
+      footerCell1Value.style.padding = '6px';
+      footerCell1Value.style.border = '1px solid #ccc';
+      footerRow1.appendChild(footerCell1);
+      footerRow1.appendChild(footerCell1Value);
+      tbody.appendChild(footerRow1);
+
+      const footerRow2 = document.createElement('tr');
+      footerRow2.style.backgroundColor = '#dbeafe';
+      const footerCell2 = document.createElement('td');
+      footerCell2.textContent = `عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):`;
+      footerCell2.colSpan = 16;
+      footerCell2.style.textAlign = 'right';
+      footerCell2.style.padding = '6px';
+      footerCell2.style.border = '1px solid #ccc';
+      const footerCell2Value = document.createElement('td');
+      footerCell2Value.textContent = this.getStudentsAbove10().toString();
+      footerCell2Value.style.textAlign = 'center';
+      footerCell2Value.style.color = '#16a34a';
+      footerCell2Value.style.fontWeight = 'bold';
+      footerCell2Value.style.padding = '6px';
+      footerCell2Value.style.border = '1px solid #ccc';
+      footerRow2.appendChild(footerCell2);
+      footerRow2.appendChild(footerCell2Value);
+      tbody.appendChild(footerRow2);
+
+      const footerRow3 = document.createElement('tr');
+      footerRow3.style.backgroundColor = '#fee2e2';
+      const footerCell3 = document.createElement('td');
+      footerCell3.textContent = `عدد التلاميذ بمعدل < 10 (في الفصل المحدد):`;
+      footerCell3.colSpan = 16;
+      footerCell3.style.textAlign = 'right';
+      footerCell3.style.padding = '6px';
+      footerCell3.style.border = '1px solid #ccc';
+      const footerCell3Value = document.createElement('td');
+      footerCell3Value.textContent = this.getStudentsBelow10().toString();
+      footerCell3Value.style.textAlign = 'center';
+      footerCell3Value.style.color = '#dc2626';
+      footerCell3Value.style.fontWeight = 'bold';
+      footerCell3Value.style.padding = '6px';
+      footerCell3Value.style.border = '1px solid #ccc';
+      footerRow3.appendChild(footerCell3);
+      footerRow3.appendChild(footerCell3Value);
+      tbody.appendChild(footerRow3);
+
+      table.appendChild(tbody);
+      exportContainer.appendChild(table);
+      
+      document.body.appendChild(exportContainer);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 1.2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight,
+        windowWidth: exportContainer.scrollWidth,
+        windowHeight: exportContainer.scrollHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Calculate PDF dimensions (landscape A4 for wider table)
+      const imgWidth = 297; // A4 width in mm (landscape)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+      
+      // Calculate scale to fit on page(s)
+      const pageHeight = 210; // A4 height in mm (landscape)
+      const pageWidth = 297; // A4 width in mm (landscape)
+      const margin = 10; // Margin on all sides
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = pageWidth - (2 * margin);
+      
+      // Scale to fit width first
+      let finalWidth = Math.min(imgWidth, availableWidth);
+      let finalHeight = (canvas.height * finalWidth) / canvas.width;
+      
+      // Position content from top
+      const xOffset = (pageWidth - finalWidth) / 2; // Center horizontally
+      const yOffset = margin; // Start from top with margin
+
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      // Add additional pages if content is taller than one page
+      let heightLeft = finalHeight - availableHeight;
+      let position = -availableHeight;
+
+      while (heightLeft > 0) {
+        position = position - availableHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, position, finalWidth, finalHeight);
+        heightLeft -= availableHeight;
+      }
+
+      const fileName = `نتائج_الفصل_${this.selectedClass.name}_الفصل_${this.selectedTerm === 1 ? 'الأول' : this.selectedTerm === 2 ? 'الثاني' : 'الثالث'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error exporting grades to PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+    }
+  }
+
+  // Calculate grade rating based on term average
+  getGradeRating(student: Student): string {
+    const average = student.averages?.termAverage || 0;
+    if (average >= 18) {
+      return 'ممتاز';
+    } else if (average >= 16) {
+      return 'عمل جيد جدا';
+    } else if (average >= 14) {
+      return 'عمل جيد';
+    } else if (average >= 12) {
+      return 'عمل حسن';
+    } else if (average >= 10) {
+      return 'عمل متوسط';
+    } else if (average >= 8) {
+      return 'دون الوسط';
+    } else if (average >= 4) {
+      return 'عمل ناقص';
+    } else {
+      return 'عمل ناقص جدا';
+    }
+  }
+
+  // Calculate guidance based on term average
+  getGuidance(student: Student): string {
+    const average = student.averages?.termAverage || 0;
+    if (average >= 18) {
+      return 'تلميذ نجيب يتمتع بقدرات عالية وجدية متميزة، أتمنى لك التوفيق';
+    } else if (average >= 16) {
+      return 'عمل يستحق الشكر والتشجيع، واصل';
+    } else if (average >= 14) {
+      return 'نتائج مرضية وفي تحسن مستمر، لديك إمكانيات لمواصلة ذلك';
+    } else if (average >= 12) {
+      return 'نتائج حسنة، لديك امكانيات لمواصلة ذلك';
+    } else if (average >= 10) {
+      return 'كان بالإمكان أن تكون النتائج أفضل';
+    } else if (average >= 8) {
+      return 'عليك بمضاعفة مجهوداتك';
+    } else if (average >= 6) {
+      return 'عليك ببذل المزيد من الجهد لتحسين نتائجك';
+    } else {
+      return 'عمل ناقص عليك بمضاعفة مجهودك';
+    }
+  }
+
+  // Format date of birth for display
+  formatDateOfBirth(date: Date | string | undefined): string {
+    if (!date) return '-';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    if (this.languageService.getCurrentLanguage() === 'AR') {
+      return `${year}/${month}/${day}`;
+    }
+    return `${day}/${month}/${year}`;
   }
 }
 

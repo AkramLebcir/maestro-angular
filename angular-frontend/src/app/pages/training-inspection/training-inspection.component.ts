@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { LanguageService } from '../../services/language.service';
+import { AuthService } from '../../services/auth.service';
 
 interface TrainingRecord {
   date: string;
@@ -107,7 +108,8 @@ export class TrainingInspectionComponent {
 
   constructor(
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private authService: AuthService
   ) {
     this.loadFromStorage();
     this.route.queryParams.subscribe(params => {
@@ -281,8 +283,13 @@ export class TrainingInspectionComponent {
     this.saveToStorage();
   }
 
+  private getStorageKey(): string {
+    const user = this.authService.getCurrentUser();
+    return user ? `trainingInspection_${user.id}` : 'trainingInspection';
+  }
+
   private loadFromStorage(): void {
-    const stored = localStorage.getItem('trainingInspection');
+    const stored = localStorage.getItem(this.getStorageKey());
     if (!stored) return;
     try {
       const data = JSON.parse(stored);
@@ -304,7 +311,7 @@ export class TrainingInspectionComponent {
       seminarList: this.seminarList,
       pedagogicalVisits: this.pedagogicalVisits
     };
-    localStorage.setItem('trainingInspection', JSON.stringify(payload));
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(payload));
   }
 
   // -------- PDF EXPORTS --------

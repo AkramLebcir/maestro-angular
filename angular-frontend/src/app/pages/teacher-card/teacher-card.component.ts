@@ -1,6 +1,7 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { AuthService } from '../../services/auth.service';
 
 interface TeacherCardForm {
   // معلومات أعلى الصفحة
@@ -71,7 +72,8 @@ interface TeacherCardForm {
   templateUrl: './teacher-card.component.html',
   styleUrls: ['./teacher-card.component.css']
 })
-export class TeacherCardComponent {
+export class TeacherCardComponent implements OnInit {
+  private baseStorageKey = 'teacherCard';
   teacherCard: TeacherCardForm = {
     ministryHeader: 'الجمهورية الجزائرية الديمقراطية الشعبية',
     directorate: '',
@@ -136,9 +138,31 @@ export class TeacherCardComponent {
   isSaved = false;
   @ViewChild('printCard') printCardRef!: ElementRef<HTMLDivElement>;
 
+  constructor(private authService: AuthService) {}
+
+  ngOnInit(): void {
+    this.loadCard();
+  }
+
+  private getStorageKey(): string {
+    const user = this.authService.getCurrentUser();
+    return user ? `${this.baseStorageKey}_${user.id}` : this.baseStorageKey;
+  }
+
+  private loadCard(): void {
+    const stored = localStorage.getItem(this.getStorageKey());
+    if (stored) {
+      try {
+        this.teacherCard = { ...this.teacherCard, ...JSON.parse(stored) };
+      } catch (error) {
+        console.error('Error parsing teacher card data', error);
+      }
+    }
+  }
+
   saveCard(): void {
     // حالياً نخزن البيانات محلياً فقط (يمكن ربطها بالـ backend لاحقاً)
-    localStorage.setItem('teacherCard', JSON.stringify(this.teacherCard));
+    localStorage.setItem(this.getStorageKey(), JSON.stringify(this.teacherCard));
     this.isSaved = true;
     setTimeout(() => (this.isSaved = false), 3000);
   }
@@ -182,13 +206,6 @@ export class TeacherCardComponent {
       pdf.save('teacher-card.pdf');
     } catch (error) {
       console.error('Error generating teacher card PDF', error);
-    }
-  }
-
-  constructor() {
-    const stored = localStorage.getItem('teacherCard');
-    if (stored) {
-      this.teacherCard = { ...this.teacherCard, ...JSON.parse(stored) };
     }
   }
 

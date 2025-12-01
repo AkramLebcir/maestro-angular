@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
+import { ApiService } from '../../services/api.service';
+import { CertificateService } from '../../services/certificate.service';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-reports',
@@ -8,9 +13,15 @@ import { LanguageService } from '../../services/language.service';
   styleUrls: ['./reports.component.css'],
 })
 export class ReportsComponent {
+  isExportingPDF = false;
+  isExportingCertificates = false;
+  isExportingPenalties = false;
+
   constructor(
     private router: Router,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private apiService: ApiService,
+    private certificateService: CertificateService
   ) {}
 
   translate(key: string): string {
@@ -73,6 +84,639 @@ export class ReportsComponent {
     this.router.navigate(['/training-inspection'], {
       queryParams: { report },
     });
+  }
+
+  navigateToCertificatesPenalties(): void {
+    this.router.navigate(['/achievements-penalties']);
+  }
+
+  navigateToCertificatesWithExport(): void {
+    this.router.navigate(['/achievements-penalties'], {
+      queryParams: { tab: 'achievements', autoExport: '1' }
+    });
+  }
+
+  navigateToPenaltiesWithExport(): void {
+    this.router.navigate(['/achievements-penalties'], {
+      queryParams: { tab: 'penalties', autoExport: '1' }
+    });
+  }
+
+  async exportCertificatesPenaltiesToPDF(): Promise<void> {
+    if (this.isExportingPDF) {
+      return;
+    }
+
+    this.isExportingPDF = true;
+
+    try {
+      // Load all classes
+      const classes = await firstValueFrom(this.apiService.get<any[]>('/classes'));
+      if (!classes || classes.length === 0) {
+        alert('لا توجد أقسام متاحة');
+        this.isExportingPDF = false;
+        return;
+      }
+
+      // Create export container
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير الشهادات والعقوبات';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('div');
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.marginBottom = '30px';
+      dateInfo.style.fontSize = '14px';
+      dateInfo.style.color = '#6b7280';
+      exportContainer.appendChild(dateInfo);
+
+      // Process each class
+      for (const cls of classes) {
+        // Add class section header
+        const classHeader = document.createElement('h2');
+        classHeader.textContent = `القسم: ${cls.name}`;
+        classHeader.style.fontSize = '18px';
+        classHeader.style.fontWeight = 'bold';
+        classHeader.style.marginTop = '30px';
+        classHeader.style.marginBottom = '15px';
+        classHeader.style.color = '#1f2937';
+        classHeader.style.borderBottom = '2px solid #e5e7eb';
+        classHeader.style.paddingBottom = '5px';
+        exportContainer.appendChild(classHeader);
+
+        // Load certificates for this class
+        try {
+          const certificates = await firstValueFrom(this.certificateService.getCertificates(undefined, cls.id));
+          
+          if (certificates && certificates.length > 0) {
+            const certSection = document.createElement('div');
+            certSection.style.marginBottom = '20px';
+            
+            const certTitle = document.createElement('h3');
+            certTitle.textContent = 'الشهادات';
+            certTitle.style.fontSize = '16px';
+            certTitle.style.fontWeight = 'bold';
+            certTitle.style.marginBottom = '10px';
+            certTitle.style.color = '#059669';
+            certSection.appendChild(certTitle);
+
+            const certTable = document.createElement('table');
+            certTable.style.width = '100%';
+            certTable.style.borderCollapse = 'collapse';
+            certTable.style.marginBottom = '15px';
+            certTable.style.fontSize = '12px';
+
+            // Table header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = '#f3f4f6';
+            ['اسم التلميذ', 'نوع الشهادة', 'تاريخ الإصدار'].forEach(headerText => {
+              const th = document.createElement('th');
+              th.textContent = headerText;
+              th.style.padding = '8px';
+              th.style.border = '1px solid #d1d5db';
+              th.style.textAlign = 'right';
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            certTable.appendChild(thead);
+
+            // Table body
+            const tbody = document.createElement('tbody');
+            certificates.forEach(cert => {
+              const row = document.createElement('tr');
+              const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
+              const templateName = cert.template?.name || 'شهادة';
+              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
+              
+              [studentName, templateName, issueDate].forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                td.style.padding = '8px';
+                td.style.border = '1px solid #d1d5db';
+                row.appendChild(td);
+              });
+              tbody.appendChild(row);
+            });
+            certTable.appendChild(tbody);
+            certSection.appendChild(certTable);
+            exportContainer.appendChild(certSection);
+          }
+        } catch (error) {
+          console.error('Error loading certificates:', error);
+        }
+
+        // Load behavior reports for this class
+        try {
+          const behaviorEvents = await firstValueFrom(this.apiService.get<any[]>(`/behavior-events?classId=${cls.id}`));
+          
+          if (behaviorEvents && behaviorEvents.length > 0) {
+            const penaltySection = document.createElement('div');
+            penaltySection.style.marginBottom = '20px';
+            
+            const penaltyTitle = document.createElement('h3');
+            penaltyTitle.textContent = 'العقوبات والتقارير';
+            penaltyTitle.style.fontSize = '16px';
+            penaltyTitle.style.fontWeight = 'bold';
+            penaltyTitle.style.marginBottom = '10px';
+            penaltyTitle.style.color = '#dc2626';
+            penaltySection.appendChild(penaltyTitle);
+
+            const penaltyTable = document.createElement('table');
+            penaltyTable.style.width = '100%';
+            penaltyTable.style.borderCollapse = 'collapse';
+            penaltyTable.style.marginBottom = '15px';
+            penaltyTable.style.fontSize = '12px';
+
+            // Table header
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = '#f3f4f6';
+            ['اسم التلميذ', 'التاريخ', 'الوصف'].forEach(headerText => {
+              const th = document.createElement('th');
+              th.textContent = headerText;
+              th.style.padding = '8px';
+              th.style.border = '1px solid #d1d5db';
+              th.style.textAlign = 'right';
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            penaltyTable.appendChild(thead);
+
+            // Table body
+            const tbody = document.createElement('tbody');
+            behaviorEvents.forEach(event => {
+              const row = document.createElement('tr');
+              const studentName = event.student 
+                ? `${event.student.firstName || ''} ${event.student.lastName || ''}`.trim() 
+                : 'غير معروف';
+              const date = new Date(event.date).toLocaleDateString('ar-EG');
+              const description = event.description || 'لا يوجد تفاصيل';
+              
+              [studentName, date, description].forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                td.style.padding = '8px';
+                td.style.border = '1px solid #d1d5db';
+                row.appendChild(td);
+              });
+              tbody.appendChild(row);
+            });
+            penaltyTable.appendChild(tbody);
+            penaltySection.appendChild(penaltyTable);
+            exportContainer.appendChild(penaltySection);
+          }
+        } catch (error) {
+          console.error('Error loading behavior reports:', error);
+        }
+
+        // Add page break between classes (except last)
+        if (cls !== classes[classes.length - 1]) {
+          const pageBreak = document.createElement('div');
+          pageBreak.style.pageBreakAfter = 'always';
+          exportContainer.appendChild(pageBreak);
+        }
+      }
+
+      // Generate PDF
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Create PDF
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = 297; // A4 height in mm
+      const margin = 10;
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = imgWidth - (2 * margin);
+
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+
+      if (imgHeight > availableHeight) {
+        const scale = availableHeight / imgHeight;
+        finalHeight = availableHeight;
+        finalWidth = imgWidth * scale;
+      }
+
+      if (finalWidth > availableWidth) {
+        const scale = availableWidth / finalWidth;
+        finalWidth = availableWidth;
+        finalHeight = finalHeight * scale;
+      }
+
+      const xOffset = (210 - finalWidth) / 2;
+      let yOffset = margin;
+      let heightLeft = imgHeight;
+
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        yOffset = heightLeft - imgHeight + margin;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save PDF
+      const fileName = `تقرير_الشهادات_والعقوبات_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      this.isExportingPDF = false;
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+      this.isExportingPDF = false;
+    }
+  }
+
+  async exportCertificatesToPDF(): Promise<void> {
+    if (this.isExportingCertificates) {
+      return;
+    }
+
+    this.isExportingCertificates = true;
+
+    try {
+      const classes = await firstValueFrom(this.apiService.get<any[]>('/classes'));
+      if (!classes || classes.length === 0) {
+        alert('لا توجد أقسام متاحة');
+        this.isExportingCertificates = false;
+        return;
+      }
+
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير الشهادات';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      const dateInfo = document.createElement('div');
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.marginBottom = '30px';
+      dateInfo.style.fontSize = '14px';
+      dateInfo.style.color = '#6b7280';
+      exportContainer.appendChild(dateInfo);
+
+      for (const cls of classes) {
+        const classHeader = document.createElement('h2');
+        classHeader.textContent = `القسم: ${cls.name}`;
+        classHeader.style.fontSize = '18px';
+        classHeader.style.fontWeight = 'bold';
+        classHeader.style.marginTop = '30px';
+        classHeader.style.marginBottom = '15px';
+        classHeader.style.color = '#1f2937';
+        classHeader.style.borderBottom = '2px solid #e5e7eb';
+        classHeader.style.paddingBottom = '5px';
+        exportContainer.appendChild(classHeader);
+
+        try {
+          const certificates = await firstValueFrom(this.certificateService.getCertificates(undefined, cls.id));
+          
+          if (certificates && certificates.length > 0) {
+            const certTable = document.createElement('table');
+            certTable.style.width = '100%';
+            certTable.style.borderCollapse = 'collapse';
+            certTable.style.marginBottom = '20px';
+            certTable.style.fontSize = '12px';
+
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = '#f3f4f6';
+            ['اسم التلميذ', 'نوع الشهادة', 'تاريخ الإصدار'].forEach(headerText => {
+              const th = document.createElement('th');
+              th.textContent = headerText;
+              th.style.padding = '8px';
+              th.style.border = '1px solid #d1d5db';
+              th.style.textAlign = 'right';
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            certTable.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            certificates.forEach(cert => {
+              const row = document.createElement('tr');
+              const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
+              const templateName = cert.template?.name || 'شهادة';
+              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
+              
+              [studentName, templateName, issueDate].forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                td.style.padding = '8px';
+                td.style.border = '1px solid #d1d5db';
+                row.appendChild(td);
+              });
+              tbody.appendChild(row);
+            });
+            certTable.appendChild(tbody);
+            exportContainer.appendChild(certTable);
+          } else {
+            const noData = document.createElement('div');
+            noData.textContent = 'لا توجد شهادات مسجلة لهذا القسم';
+            noData.style.textAlign = 'center';
+            noData.style.padding = '15px';
+            noData.style.color = '#6b7280';
+            noData.style.marginBottom = '20px';
+            exportContainer.appendChild(noData);
+          }
+        } catch (error) {
+          console.error('Error loading certificates:', error);
+        }
+
+        if (cls !== classes[classes.length - 1]) {
+          const pageBreak = document.createElement('div');
+          pageBreak.style.pageBreakAfter = 'always';
+          exportContainer.appendChild(pageBreak);
+        }
+      }
+
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      document.body.removeChild(exportContainer);
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = 297;
+      const margin = 10;
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = imgWidth - (2 * margin);
+
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+
+      if (imgHeight > availableHeight) {
+        const scale = availableHeight / imgHeight;
+        finalHeight = availableHeight;
+        finalWidth = imgWidth * scale;
+      }
+
+      if (finalWidth > availableWidth) {
+        const scale = availableWidth / finalWidth;
+        finalWidth = availableWidth;
+        finalHeight = finalHeight * scale;
+      }
+
+      const xOffset = (210 - finalWidth) / 2;
+      let yOffset = margin;
+      let heightLeft = imgHeight;
+
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        yOffset = heightLeft - imgHeight + margin;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const fileName = `تقرير_الشهادات_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      this.isExportingCertificates = false;
+    } catch (error) {
+      console.error('Error exporting certificates PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+      this.isExportingCertificates = false;
+    }
+  }
+
+  async exportPenaltiesToPDF(): Promise<void> {
+    if (this.isExportingPenalties) {
+      return;
+    }
+
+    this.isExportingPenalties = true;
+
+    try {
+      const classes = await firstValueFrom(this.apiService.get<any[]>('/classes'));
+      if (!classes || classes.length === 0) {
+        alert('لا توجد أقسام متاحة');
+        this.isExportingPenalties = false;
+        return;
+      }
+
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير العقوبات والتقارير';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      const dateInfo = document.createElement('div');
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.marginBottom = '30px';
+      dateInfo.style.fontSize = '14px';
+      dateInfo.style.color = '#6b7280';
+      exportContainer.appendChild(dateInfo);
+
+      for (const cls of classes) {
+        const classHeader = document.createElement('h2');
+        classHeader.textContent = `القسم: ${cls.name}`;
+        classHeader.style.fontSize = '18px';
+        classHeader.style.fontWeight = 'bold';
+        classHeader.style.marginTop = '30px';
+        classHeader.style.marginBottom = '15px';
+        classHeader.style.color = '#1f2937';
+        classHeader.style.borderBottom = '2px solid #e5e7eb';
+        classHeader.style.paddingBottom = '5px';
+        exportContainer.appendChild(classHeader);
+
+        try {
+          const behaviorEvents = await firstValueFrom(this.apiService.get<any[]>(`/behavior-events?classId=${cls.id}`));
+          
+          if (behaviorEvents && behaviorEvents.length > 0) {
+            const penaltyTable = document.createElement('table');
+            penaltyTable.style.width = '100%';
+            penaltyTable.style.borderCollapse = 'collapse';
+            penaltyTable.style.marginBottom = '20px';
+            penaltyTable.style.fontSize = '12px';
+
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            headerRow.style.backgroundColor = '#f3f4f6';
+            ['اسم التلميذ', 'التاريخ', 'الوصف'].forEach(headerText => {
+              const th = document.createElement('th');
+              th.textContent = headerText;
+              th.style.padding = '8px';
+              th.style.border = '1px solid #d1d5db';
+              th.style.textAlign = 'right';
+              headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            penaltyTable.appendChild(thead);
+
+            const tbody = document.createElement('tbody');
+            behaviorEvents.forEach(event => {
+              const row = document.createElement('tr');
+              const studentName = event.student 
+                ? `${event.student.firstName || ''} ${event.student.lastName || ''}`.trim() 
+                : 'غير معروف';
+              const date = new Date(event.date).toLocaleDateString('ar-EG');
+              const description = event.description || 'لا يوجد تفاصيل';
+              
+              [studentName, date, description].forEach(cellText => {
+                const td = document.createElement('td');
+                td.textContent = cellText;
+                td.style.padding = '8px';
+                td.style.border = '1px solid #d1d5db';
+                row.appendChild(td);
+              });
+              tbody.appendChild(row);
+            });
+            penaltyTable.appendChild(tbody);
+            exportContainer.appendChild(penaltyTable);
+          } else {
+            const noData = document.createElement('div');
+            noData.textContent = 'لا توجد تقارير سلوك مسجلة لهذا القسم';
+            noData.style.textAlign = 'center';
+            noData.style.padding = '15px';
+            noData.style.color = '#6b7280';
+            noData.style.marginBottom = '20px';
+            exportContainer.appendChild(noData);
+          }
+        } catch (error) {
+          console.error('Error loading behavior reports:', error);
+        }
+
+        if (cls !== classes[classes.length - 1]) {
+          const pageBreak = document.createElement('div');
+          pageBreak.style.pageBreakAfter = 'always';
+          exportContainer.appendChild(pageBreak);
+        }
+      }
+
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      document.body.removeChild(exportContainer);
+
+      const imgWidth = 210;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageHeight = 297;
+      const margin = 10;
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = imgWidth - (2 * margin);
+
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+
+      if (imgHeight > availableHeight) {
+        const scale = availableHeight / imgHeight;
+        finalHeight = availableHeight;
+        finalWidth = imgWidth * scale;
+      }
+
+      if (finalWidth > availableWidth) {
+        const scale = availableWidth / finalWidth;
+        finalWidth = availableWidth;
+        finalHeight = finalHeight * scale;
+      }
+
+      const xOffset = (210 - finalWidth) / 2;
+      let yOffset = margin;
+      let heightLeft = imgHeight;
+
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      heightLeft -= pageHeight;
+
+      while (heightLeft > 0) {
+        yOffset = heightLeft - imgHeight + margin;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+        heightLeft -= pageHeight;
+      }
+
+      const fileName = `تقرير_العقوبات_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      this.isExportingPenalties = false;
+    } catch (error) {
+      console.error('Error exporting penalties PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+      this.isExportingPenalties = false;
+    }
   }
 }
 

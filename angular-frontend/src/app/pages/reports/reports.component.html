@@ -1,4 +1,4 @@
-<div class="flex-1 p-6">
+<div class="flex-1 p-6 reports-page">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800">{{ translate('reports.title') }}</h1>
@@ -273,6 +273,42 @@
           class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
         >
           فتح تقارير السلوك
+        </button>
+      </div>
+
+      <!-- Certificates report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            {{ translate('reports.certificates') }}
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            {{ translate('reports.certificatesDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToCertificatesWithExport()"
+          class="mt-2 btn-export-pdf text-white px-4 py-2 rounded-lg text-sm transition w-full text-center"
+        >
+          {{ translate('reports.openExportCertificates') }}
+        </button>
+      </div>
+
+      <!-- Penalties report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            {{ translate('reports.penalties') }}
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            {{ translate('reports.penaltiesDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToPenaltiesWithExport()"
+          class="mt-2 btn-export-pdf text-white px-4 py-2 rounded-lg text-sm transition w-full text-center"
+        >
+          {{ translate('reports.openExportPenalties') }}
         </button>
       </div>
 

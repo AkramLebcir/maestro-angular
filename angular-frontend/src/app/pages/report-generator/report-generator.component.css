@@ -176,35 +176,41 @@ textarea.form-control {
 .actions {
   margin-top: 2rem;
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
 .btn {
   padding: 0.75rem 1.5rem;
-  border-radius: 0.5rem;
+  border-radius: 0.75rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
-  transition: all 0.2s;
-  width: 100%; /* Full width button */
+  transition: all 0.2s ease;
+  flex: 1; /* Make buttons stretch equally */
 }
 
 .btn-primary {
-  background: #3b82f6;
+  background: #0ea5e9;
   color: white;
 }
 
-.btn-primary:hover {
-  background: #2563eb;
+.btn-primary:hover:not(:disabled) {
+  background: #0284c7;
 }
 
 .btn-secondary {
-  background: #64748b;
-  color: white;
+  background: #f3f4f6;
+  color: #0f172a;
 }
 
-.btn-secondary:hover {
-  background: #475569;
+.btn-secondary:hover:not(:disabled) {
+  background: #e5e7eb;
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 1024px) {

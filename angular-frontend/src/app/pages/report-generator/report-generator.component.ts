@@ -41,6 +41,7 @@ export class ReportGeneratorComponent implements OnInit {
   schoolName = 'اسم المؤسسة هنا'; // Default placeholder
   
   isSubmitting = false;
+  isExporting = false;
   message = '';
   errorMessage = '';
 
@@ -231,5 +232,29 @@ export class ReportGeneratorComponent implements OnInit {
     pdf.addImage(imgData, 'JPEG', 0, 0, pdfWidth, pdfHeight);
     const filename = `تقرير-${this.selectedStudent?.firstName}-${new Date().toISOString().split('T')[0]}.pdf`;
     pdf.save(filename);
+  }
+
+  async exportPenaltiesToPDF(): Promise<void> {
+    if (!this.selectedStudentId || !this.reportPreview?.nativeElement) {
+      this.errorMessage = 'يرجى اختيار التلميذ أولاً';
+      return;
+    }
+
+    if (!this.generatedContent) {
+      this.errorMessage = 'يرجى ملء محتوى التقرير أولاً';
+      return;
+    }
+
+    this.isExporting = true;
+    this.errorMessage = '';
+
+    try {
+      await this.generatePdf();
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      this.errorMessage = 'حدث خطأ أثناء تصدير PDF';
+    } finally {
+      this.isExporting = false;
+    }
   }
 }

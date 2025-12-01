@@ -75,6 +75,30 @@ interface LabStatus {
   labCleanliness: number;
 }
 
+interface LabEquipmentItem {
+  id: number;
+  itemName: string;
+  totalCount: number;
+  workingCount: number;
+  notWorkingCount: number;
+}
+
+interface LabFurnitureItem {
+  id: number;
+  itemName: string;
+  totalCount: number;
+  workingCount: number;
+  notWorkingCount: number;
+}
+
+interface LabCleaningRecord {
+  id: number;
+  deviceCleanliness: string;
+  desktopCleanliness: string;
+  roomCleanliness: string;
+  checkDate: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
@@ -127,14 +151,14 @@ export class DashboardComponent implements OnInit {
   attendanceRecords: AttendanceRecord[] = [];
   behaviorEvents: BehaviorEvent[] = [];
 
-  // حالة المخبر (قيم تجريبية يمكن ربطها لاحقاً من API خاص بالمخبر)
+  // حالة المخبر
   labStatus: LabStatus = {
     workingDevices: {
-      current: 27,
-      total: 32
+      current: 0,
+      total: 0
     },
-    furnitureCondition: 80, // % حالة الأثاث
-    labCleanliness: 60      // % نظافة المخبر
+    furnitureCondition: 0,
+    labCleanliness: 0
   };
 
   // تقدم إنجاز البرنامج (متوسط جميع الأقسام + قسم معيّن إن اختير)
@@ -243,6 +267,7 @@ export class DashboardComponent implements OnInit {
 
     this.loadDashboardData();
     this.loadSubjectProgramProgress();
+    this.loadLabStatus();
     // إنشاء إشعارات جديدة
     this.generateNotifications();
   }
@@ -346,6 +371,70 @@ export class DashboardComponent implements OnInit {
         }
       });
     }
+  }
+
+  /**
+   * تحميل بيانات حالة المخبر من الـ API
+   */
+  private loadLabStatus(): void {
+    // 1. Equipment (Devices)
+    this.api.get<LabEquipmentItem[]>('/lab-equipment').subscribe({
+      next: (items) => {
+        if (!items) return;
+        let total = 0;
+        let working = 0;
+        items.forEach(item => {
+          total += item.totalCount || 0;
+          working += item.workingCount || 0;
+        });
+        this.labStatus.workingDevices = { current: working, total: total };
+      },
+      error: (err) => console.error('Error loading lab equipment', err)
+    });
+
+    // 2. Furniture
+    this.api.get<LabFurnitureItem[]>('/lab-furniture').subscribe({
+      next: (items) => {
+        if (!items || items.length === 0) return;
+        let total = 0;
+        let working = 0;
+        items.forEach(item => {
+          total += item.totalCount || 0;
+          working += item.workingCount || 0;
+        });
+        
+        if (total > 0) {
+          this.labStatus.furnitureCondition = (working / total) * 100;
+        }
+      },
+      error: (err) => console.error('Error loading lab furniture', err)
+    });
+
+    // 3. Cleaning
+    this.api.get<LabCleaningRecord[]>('/lab-cleaning').subscribe({
+      next: (records) => {
+        if (!records || records.length === 0) return;
+        // Get the latest record (assuming ID order usually correlates with time, or we could sort by date)
+        const latest = records[records.length - 1];
+        
+        const scoreMap: Record<string, number> = {
+          'good': 100,
+          'average': 50,
+          'bad': 0,
+          'excellent': 100,
+          'poor': 0,
+          'complete': 100,
+          'incomplete': 0
+        };
+
+        const s1 = scoreMap[latest.deviceCleanliness] !== undefined ? scoreMap[latest.deviceCleanliness] : 50;
+        const s2 = scoreMap[latest.desktopCleanliness] !== undefined ? scoreMap[latest.desktopCleanliness] : 50;
+        const s3 = scoreMap[latest.roomCleanliness] !== undefined ? scoreMap[latest.roomCleanliness] : 50;
+
+        this.labStatus.labCleanliness = (s1 + s2 + s3) / 3;
+      },
+      error: (err) => console.error('Error loading lab cleaning', err)
+    });
   }
 
   /**

@@ -34,6 +34,7 @@ declare module 'jspdf' {
     splitTextToSize(text: string, maxWidth: number, options?: any): string[];
     getNumberOfPages(): number;
     setPage(pageNumber: number): jsPDF;
+    addImage(imgData: string, format: string, x: number, y: number, width: number, height: number, alias?: string, compression?: string, rotation?: number): jsPDF;
     internal: {
       pageSize: {
         getWidth(): number;

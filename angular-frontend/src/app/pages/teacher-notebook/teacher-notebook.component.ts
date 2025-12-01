@@ -1,5 +1,6 @@
 import { Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { LanguageService } from '../../services/language.service';
+import { AuthService } from '../../services/auth.service';
 
 export type StickyColor = 'yellow' | 'pink' | 'blue' | 'green';
 
@@ -18,11 +19,14 @@ export interface StickyNote {
   styleUrls: ['./teacher-notebook.component.css']
 })
 export class TeacherNotebookComponent implements OnInit, AfterViewInit {
-  constructor(public languageService: LanguageService) {}
+  constructor(
+    public languageService: LanguageService,
+    private authService: AuthService
+  ) {}
   @ViewChild('board', { static: false }) boardElement!: ElementRef<HTMLDivElement>;
   notes: StickyNote[] = [];
   private zCounter = 1;
-  private storageKey = 'teacher-notebook-sticky-notes';
+  private baseStorageKey = 'teacher-notebook-sticky-notes';
   private activeNote: StickyNote | null = null;
   private dragOffsetX = 0;
   private dragOffsetY = 0;
@@ -145,9 +149,14 @@ export class TeacherNotebookComponent implements OnInit, AfterViewInit {
     return this.languageService.translate(key);
   }
 
+  private getStorageKey(): string {
+    const user = this.authService.getCurrentUser();
+    return user ? `${this.baseStorageKey}_${user.id}` : this.baseStorageKey;
+  }
+
   private loadFromStorage(): void {
     try {
-      const raw = localStorage.getItem(this.storageKey);
+      const raw = localStorage.getItem(this.getStorageKey());
       if (!raw) {
         this.notes = [];
         return;
@@ -164,7 +173,7 @@ export class TeacherNotebookComponent implements OnInit, AfterViewInit {
 
   private saveToStorage(): void {
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.notes));
+      localStorage.setItem(this.getStorageKey(), JSON.stringify(this.notes));
     } catch {
       // Ignore storage errors (e.g., privacy mode)
     }

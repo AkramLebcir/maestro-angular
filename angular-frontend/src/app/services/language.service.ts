@@ -1785,6 +1785,114 @@ export class LanguageService {
         'DE': 'Verhaltensberichte öffnen',
         'TR': 'Davranış raporlarını aç'
       },
+      'reports.certificatesPenalties': {
+        'AR': 'الشهادات والعقوبات',
+        'FR': 'Certificats et sanctions',
+        'EN': 'Certificates and Penalties',
+        'ES': 'Certificados y sanciones',
+        'IT': 'Certificati e sanzioni',
+        'DE': 'Zertifikate und Sanktionen',
+        'TR': 'Sertifikalar ve Cezalar'
+      },
+      'reports.certificatesPenaltiesDesc': {
+        'AR': 'مركز واحد لعرض شهادات التقدير والمخالفات السلوكية لكل قسم.',
+        'FR': 'Un centre unique pour afficher les certificats de mérite et les infractions comportementales pour chaque classe.',
+        'EN': 'A single center to view certificates of merit and behavioral violations for each class.',
+        'ES': 'Un centro único para ver certificados de mérito e infracciones de comportamiento para cada clase.',
+        'IT': 'Un unico centro per visualizzare certificati di merito e violazioni comportamentali per ogni classe.',
+        'DE': 'Ein einziges Zentrum zur Anzeige von Leistungszertifikaten und Verhaltensverstößen für jede Klasse.',
+        'TR': 'Her sınıf için başarı sertifikalarını ve davranış ihlallerini görüntülemek için tek bir merkez.'
+      },
+      'reports.certificates': {
+        'AR': 'الشهادات',
+        'FR': 'Certificats',
+        'EN': 'Certificates',
+        'ES': 'Certificados',
+        'IT': 'Certificati',
+        'DE': 'Zertifikate',
+        'TR': 'Sertifikalar'
+      },
+      'reports.certificatesDesc': {
+        'AR': 'عرض وتصدير شهادات التقدير لكل قسم بصيغة PDF.',
+        'FR': 'Afficher et exporter les certificats de mérite pour chaque classe en PDF.',
+        'EN': 'View and export certificates of merit for each class in PDF format.',
+        'ES': 'Ver y exportar certificados de mérito para cada clase en formato PDF.',
+        'IT': 'Visualizza ed esporta certificati di merito per ogni classe in formato PDF.',
+        'DE': 'Anzeigen und Exportieren von Leistungszertifikaten für jede Klasse im PDF-Format.',
+        'TR': 'Her sınıf için başarı sertifikalarını PDF formatında görüntüleyin ve dışa aktarın.'
+      },
+      'reports.penalties': {
+        'AR': 'العقوبات والتقارير',
+        'FR': 'Sanctions et rapports',
+        'EN': 'Penalties and Reports',
+        'ES': 'Sanciones e informes',
+        'IT': 'Sanzioni e rapporti',
+        'DE': 'Sanktionen und Berichte',
+        'TR': 'Cezalar ve Raporlar'
+      },
+      'reports.penaltiesDesc': {
+        'AR': 'عرض وتصدير المخالفات السلوكية والتقارير لكل قسم بصيغة PDF.',
+        'FR': 'Afficher et exporter les infractions comportementales et les rapports pour chaque classe en PDF.',
+        'EN': 'View and export behavioral violations and reports for each class in PDF format.',
+        'ES': 'Ver y exportar infracciones de comportamiento e informes para cada clase en formato PDF.',
+        'IT': 'Visualizza ed esporta violazioni comportamentali e rapporti per ogni classe in formato PDF.',
+        'DE': 'Anzeigen und Exportieren von Verhaltensverstößen und Berichten für jede Klasse im PDF-Format.',
+        'TR': 'Her sınıf için davranış ihlalleri ve raporları PDF formatında görüntüleyin ve dışa aktarın.'
+      },
+      'reports.openCertificatesPenalties': {
+        'AR': 'فتح الشهادات والعقوبات',
+        'FR': 'Ouvrir Certificats et sanctions',
+        'EN': 'Open Certificates and Penalties',
+        'ES': 'Abrir Certificados y sanciones',
+        'IT': 'Apri Certificati e sanzioni',
+        'DE': 'Zertifikate und Sanktionen öffnen',
+        'TR': 'Sertifikalar ve Cezalar\'ı aç'
+      },
+      'reports.exportCertificates': {
+        'AR': 'تصدير الشهادات PDF',
+        'FR': 'Exporter Certificats PDF',
+        'EN': 'Export Certificates PDF',
+        'ES': 'Exportar Certificados PDF',
+        'IT': 'Esporta Certificati PDF',
+        'DE': 'Zertifikate PDF exportieren',
+        'TR': 'Sertifikalar PDF Dışa Aktar'
+      },
+      'reports.exportPenalties': {
+        'AR': 'تصدير العقوبات PDF',
+        'FR': 'Exporter Sanctions PDF',
+        'EN': 'Export Penalties PDF',
+        'ES': 'Exportar Sanciones PDF',
+        'IT': 'Esporta Sanzioni PDF',
+        'DE': 'Sanktionen PDF exportieren',
+        'TR': 'Cezalar PDF Dışa Aktar'
+      },
+      'reports.exporting': {
+        'AR': 'جارٍ التصدير...',
+        'FR': 'Exportation en cours...',
+        'EN': 'Exporting...',
+        'ES': 'Exportando...',
+        'IT': 'Esportazione in corso...',
+        'DE': 'Wird exportiert...',
+        'TR': 'Dışa aktarılıyor...'
+      },
+      'reports.openExportCertificates': {
+        'AR': 'فتح وتصدير الشهادات PDF',
+        'FR': 'Ouvrir et exporter Certificats PDF',
+        'EN': 'Open and Export Certificates PDF',
+        'ES': 'Abrir y exportar Certificados PDF',
+        'IT': 'Apri ed esporta Certificati PDF',
+        'DE': 'Zertifikate PDF öffnen und exportieren',
+        'TR': 'Sertifikalar PDF Aç ve Dışa Aktar'
+      },
+      'reports.openExportPenalties': {
+        'AR': 'فتح وتصدير العقوبات PDF',
+        'FR': 'Ouvrir et exporter Sanctions PDF',
+        'EN': 'Open and Export Penalties PDF',
+        'ES': 'Abrir y exportar Sanciones PDF',
+        'IT': 'Apri ed esporta Sanzioni PDF',
+        'DE': 'Sanktionen PDF öffnen und exportieren',
+        'TR': 'Cezalar PDF Aç ve Dışa Aktar'
+      },
       'reports.gradeReports': {
         'AR': 'تقارير الدرجات',
         'FR': 'Rapports de notes',

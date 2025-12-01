@@ -109,6 +109,7 @@
                 (click)="sortStudents('lastName')">
                 اللقب <span class="text-xs">{{ getSortIcon('lastName') }}</span>
               </th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">تاريخ الميلاد</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
@@ -122,6 +123,8 @@
                 (click)="sortStudents('termAverage')">
                 معدل الفصل <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
               </th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التقديرات</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('ranking')">
@@ -143,6 +146,9 @@
               </td>
               <td class="border border-gray-300 p-2 text-gray-800">
                 {{ student.lastName }}
+              </td>
+              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+                {{ formatDateOfBirth(student.dateOfBirth) }}
               </td>
               <!-- تصحيح الدفتر -->
               <td class="border border-gray-300 p-2">
@@ -228,35 +234,49 @@
                   [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
+              <!-- التقديرات -->
+              <td class="border border-gray-300 p-2 text-center font-semibold">
+                {{ getGradeRating(student) }}
+              </td>
+              <!-- الإرشادات -->
+              <td class="border border-gray-300 p-2 text-gray-800 text-right" style="min-width: 200px;">
+                {{ getGuidance(student) }}
+              </td>
               <!-- الترتيب -->
               <td class="border border-gray-300 p-2 text-center">
                 {{ student.ranking || '-' }}
               </td>
             </tr>
             <tr *ngIf="students.length === 0">
-              <td colspan="17" class="border border-gray-300 p-8 text-center text-gray-500">
+              <td colspan="19" class="border border-gray-300 p-8 text-center text-gray-500">
                 {{ translate('gradebook.noStudents') }}
               </td>
             </tr>
           </tbody>
           <tfoot>
             <tr class="bg-gray-100 font-semibold">
-              <td colspan="15" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.classAverage') }}</td>
+              <td colspan="17" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.classAverage') }}</td>
               <td class="border border-gray-300 p-2 text-center">
                 {{ calculateClassAverage().toFixed(2) }}
               </td>
+              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-blue-50">
-              <td colspan="14" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
+              <td colspan="16" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
               <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
+              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-red-50">
-              <td colspan="14" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
+              <td colspan="16" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
               <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>
+              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 p-2"></td>
             </tr>
           </tfoot>
         </table>
@@ -265,8 +285,16 @@
 
     <!-- Grades View -->
     <div *ngIf="viewMode === 'grades' && selectedClass">
-      <div class="mb-4">
-        <h2 class="text-xl font-semibold text-gray-800 mb-4">نتائج الفصل</h2>
+      <div class="mb-4 flex justify-between items-center">
+        <h2 class="text-xl font-semibold text-gray-800">نتائج الفصل</h2>
+        <button 
+          (click)="exportGradesToPDF()"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>تصدير PDF</span>
+        </button>
       </div>
 
       <div class="overflow-x-auto">
@@ -289,6 +317,7 @@
                 (click)="sortStudents('lastName')">
                 اللقب <span class="text-xs">{{ getSortIcon('lastName') }}</span>
               </th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">تاريخ الميلاد</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
@@ -302,6 +331,8 @@
                 (click)="sortStudents('termAverage')">
                 معدل الفصل <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
               </th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">التقديرات</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('ranking')">
@@ -323,6 +354,9 @@
               </td>
               <td class="border border-gray-300 p-2 text-gray-800">
                 {{ student.lastName }}
+              </td>
+              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+                {{ formatDateOfBirth(student.dateOfBirth) }}
               </td>
               <td class="border border-gray-300 p-2 text-center">
                 {{ student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-' }}
@@ -354,6 +388,14 @@
                   [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
+              <!-- التقديرات -->
+              <td class="border border-gray-300 p-2 text-center font-semibold">
+                {{ getGradeRating(student) }}
+              </td>
+              <!-- الإرشادات -->
+              <td class="border border-gray-300 p-2 text-gray-800 text-right" style="min-width: 200px;">
+                {{ getGuidance(student) }}
+              </td>
               <td class="border border-gray-300 p-2 text-center">
                 {{ student.ranking || '-' }}
               </td>
@@ -361,7 +403,7 @@
           </tbody>
           <tfoot>
             <tr class="bg-gray-100 font-semibold">
-              <td colspan="12" class="border border-gray-300 p-2 text-right">معدل القسم:</td>
+              <td colspan="14" class="border border-gray-300 p-2 text-right">معدل القسم:</td>
               <td class="border border-gray-300 p-2 text-center">
                 {{ calculateClassAverage().toFixed(2) }}
               </td>
@@ -370,7 +412,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-blue-50">
-              <td colspan="13" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
+              <td colspan="15" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
               <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
@@ -379,7 +421,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-red-50">
-              <td colspan="13" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
+              <td colspan="15" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
               <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>

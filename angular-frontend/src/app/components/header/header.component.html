@@ -51,11 +51,23 @@
             <rect x="16" y="4" width="6" height="16" class="fill-red-600" />
           </svg>
 
-          <!-- EN (علم مبسط للاتحاد) -->
+          <!-- EN (Union Jack) -->
           <svg *ngSwitchCase="'EN'" class="w-6 h-6" viewBox="0 0 24 24">
-            <rect x="2" y="4" width="20" height="16" class="fill-blue-700" />
-            <path d="M2 8h20M2 16h20" class="stroke-white" stroke-width="2" />
-            <path d="M8 4v16M16 4v16" class="stroke-white" stroke-width="2" />
+            <!-- خلفية زرقاء -->
+            <rect x="2" y="4" width="20" height="16" fill="#012169" />
+            <!-- صليب أبيض مائل (St. Andrew's Cross) -->
+            <path d="M2 4 L22 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+            <!-- صليب أحمر عمودي وأفقي (St. George's Cross) مع حدود بيضاء -->
+            <rect x="9.5" y="4" width="5" height="16" fill="#FFFFFF" />
+            <rect x="2" y="9.5" width="20" height="5" fill="#FFFFFF" />
+            <rect x="10.5" y="4" width="3" height="16" fill="#C8102E" />
+            <rect x="2" y="10.5" width="20" height="3" fill="#C8102E" />
+            <!-- صليب مائل أحمر (St. Patrick's Cross) مع حدود بيضاء -->
+            <path d="M2 4 L22 20" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+            <path d="M2 4 L22 20" stroke="#C8102E" stroke-width="1.2" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#C8102E" stroke-width="1.2" stroke-linecap="round" />
           </svg>
 
           <!-- ES -->
@@ -150,11 +162,23 @@
           class="w-full px-3 py-1.5 flex items-center gap-2 hover:bg-gray-100 text-xs"
           (click)="selectLanguage('EN')"
         >
-          <!-- علم مبسط للإنجليزي (الاتحاد) -->
+          <!-- Union Jack -->
           <svg class="w-5 h-5" viewBox="0 0 24 24">
-            <rect x="2" y="4" width="20" height="16" class="fill-blue-700" />
-            <path d="M2 8h20M2 16h20" class="stroke-white" stroke-width="2" />
-            <path d="M8 4v16M16 4v16" class="stroke-white" stroke-width="2" />
+            <!-- خلفية زرقاء -->
+            <rect x="2" y="4" width="20" height="16" fill="#012169" />
+            <!-- صليب أبيض مائل (St. Andrew's Cross) -->
+            <path d="M2 4 L22 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" />
+            <!-- صليب أحمر عمودي وأفقي (St. George's Cross) مع حدود بيضاء -->
+            <rect x="9.5" y="4" width="5" height="16" fill="#FFFFFF" />
+            <rect x="2" y="9.5" width="20" height="5" fill="#FFFFFF" />
+            <rect x="10.5" y="4" width="3" height="16" fill="#C8102E" />
+            <rect x="2" y="10.5" width="20" height="3" fill="#C8102E" />
+            <!-- صليب مائل أحمر (St. Patrick's Cross) مع حدود بيضاء -->
+            <path d="M2 4 L22 20" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" />
+            <path d="M2 4 L22 20" stroke="#C8102E" stroke-width="1.2" stroke-linecap="round" />
+            <path d="M22 4 L2 20" stroke="#C8102E" stroke-width="1.2" stroke-linecap="round" />
           </svg>
           <span class="font-semibold">EN</span>
           <span class="text-[10px] text-gray-500">English</span>

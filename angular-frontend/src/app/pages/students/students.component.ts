@@ -415,7 +415,14 @@ export class StudentsComponent implements OnInit {
   formatDate(date: Date | string | undefined): string {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('ar-EG');
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    
+    if (this.languageService.getCurrentLanguage() === 'AR') {
+      return `${year}/${month}/${day}`;
+    }
+    return `${day}/${month}/${year}`;
   }
 
   // Excel Import

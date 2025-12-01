@@ -15,5 +15,18 @@
   }
 }
 
+/* Override button colors to blue in reports page */
+:host ::ng-deep .reports-page .btn-export-pdf,
+:host ::ng-deep .reports-page button.btn-export-pdf {
+  background-color: #4f46e5 !important;
+  border-color: #4f46e5 !important;
+}
+
+:host ::ng-deep .reports-page .btn-export-pdf:hover,
+:host ::ng-deep .reports-page button.btn-export-pdf:hover {
+  background-color: #4338ca !important;
+  border-color: #4338ca !important;
+}
+
 
 

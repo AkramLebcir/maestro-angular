@@ -60,7 +60,9 @@
       <button class="btn btn-primary" (click)="saveAndPrint()" [disabled]="isSubmitting">
         {{ isSubmitting ? 'جارٍ الحفظ...' : 'إصدار وحفظ التقرير' }}
       </button>
-      <!-- <button class="btn btn-secondary" (click)="previewPdf()">معاينة PDF</button> -->
+      <button class="btn btn-secondary btn-export-pdf" (click)="exportPenaltiesToPDF()" [disabled]="isExporting">
+        {{ isExporting ? 'يُجهّز PDF...' : 'تصدير PDF' }}
+      </button>
     </div>
 
     <div class="feedback" *ngIf="message || errorMessage">
