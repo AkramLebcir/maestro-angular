@@ -266,11 +266,34 @@ export class SeatingChartComponent implements OnInit {
         this.selectedStationsForPrint.clear();
         this.layoutDirty = false;
         this.loading = false;
+        this.errorMessage = '';
       },
       error: (error) => {
         console.error('Error loading seating layout:', error);
-        this.errorMessage = 'تعذر تحميل مخطط المقاعد';
+        let errorMsg = 'تعذر تحميل مخطط المقاعد';
+        
+        if (error.status === 0 || error.status === 504) {
+          errorMsg = 'لا يمكن الاتصال بالخادم. تأكد من أن الخادم يعمل.';
+        } else if (error.status === 401) {
+          errorMsg = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
+        } else if (error.status === 403) {
+          errorMsg = 'ليس لديك صلاحيات للوصول إلى مخطط المقاعد. يرجى الاتصال بالمسؤول لإضافة صلاحية "مخطط المقاعد" إلى حسابك.';
+        } else if (error.status === 404) {
+          errorMsg = 'لم يتم العثور على مخطط المقاعد لهذا القسم.';
+        } else if (error.status === 500) {
+          errorMsg = 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.';
+        } else if (error.error?.message) {
+          errorMsg = `خطأ: ${error.error.message}`;
+        } else if (error.message) {
+          errorMsg = `خطأ: ${error.message}`;
+        }
+        
+        this.errorMessage = errorMsg;
         this.loading = false;
+        this.workstations = [];
+        this.workstationSlots = [];
+        this.studentPool = [];
+        this.stats = null;
       },
     });
   }

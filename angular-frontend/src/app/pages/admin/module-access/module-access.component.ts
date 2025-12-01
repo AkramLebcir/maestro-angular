@@ -40,6 +40,10 @@ export class ModuleAccessComponent implements OnInit {
     { key: 'behavior-events', name: 'السلوك', description: 'تسجيل أحداث السلوك' },
     { key: 'labs', name: 'المختبرات', description: 'إدارة المختبرات' },
     { key: 'lab-management', name: 'إدارة المختبر', description: 'إدارة مخزون المختبر' },
+    { key: 'workstations', name: 'مخطط المقاعد', description: 'إدارة مخطط جلوس الطلاب في المخبر' },
+    { key: 'certificate-generator', name: 'الشهادات', description: 'إنشاء وإدارة الشهادات' },
+    { key: 'annual-planning', name: 'التخطيط السنوي', description: 'التخطيط السنوي للمنهاج' },
+    { key: 'notifications', name: 'الإشعارات', description: 'إدارة الإشعارات' },
   ];
 
   constructor(

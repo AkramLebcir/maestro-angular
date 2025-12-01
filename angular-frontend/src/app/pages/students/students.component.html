@@ -473,3 +473,114 @@
   </div>
 </div>
 
+<!-- Header Row Selection Modal -->
+<div 
+  *ngIf="showHeaderRowModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeHeaderRowModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-4xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">تحديد صف رؤوس الأعمدة</h3>
+      <button 
+        (click)="closeHeaderRowModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        <p class="text-sm text-gray-700 font-medium mb-2">
+          📋 تعليمات:
+        </p>
+        <ul class="text-sm text-gray-600 space-y-1 list-disc list-inside">
+          <li>راجع معاينة الصفوف لكل ورقة عمل أدناه</li>
+          <li>أدخل رقم الصف الذي يحتوي على رؤوس الأعمدة (مثل: 8 أو 9)</li>
+          <li>سيتم تجاهل الصفوف من 1 إلى (رقم الصف المحدد - 1) تلقائياً</li>
+          <li>الصف المحدد سيظهر بخلفية صفراء</li>
+        </ul>
+      </div>
+
+      <div *ngFor="let sheetData of pendingExcelData" class="border border-gray-200 rounded-lg p-4 space-y-4">
+        <h4 class="font-semibold text-gray-800">ورقة العمل: {{ sheetData.className }}</h4>
+        
+        <!-- Preview of first rows -->
+        <div class="overflow-x-auto max-h-96 overflow-y-auto">
+          <p class="text-xs text-gray-500 mb-2">
+            💡 الصف المحدد سيظهر بخلفية صفراء. الصف المكتشف تلقائياً بخلفية زرقاء.
+          </p>
+          <table class="w-full text-sm border-collapse border border-gray-300">
+            <thead class="sticky top-0 bg-gray-100 z-10">
+              <tr>
+                <th class="border border-gray-300 px-2 py-1 text-right font-semibold bg-gray-200">#</th>
+                <th *ngFor="let cell of getPreviewRows(sheetData.className, 1)[0]?.slice(0, 8) || []; let i = index" 
+                    class="border border-gray-300 px-2 py-1 text-right text-xs font-semibold bg-gray-200">
+                  {{ cell || ('عمود ' + (i + 1)) }}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of getPreviewRows(sheetData.className, 15); let rowIndex = index" 
+                  [class.bg-yellow-100]="selectedHeaderRow[sheetData.className] === rowIndex + 1"
+                  [class.bg-blue-100]="!selectedHeaderRow[sheetData.className] && detectedHeaderRow[sheetData.className] === rowIndex && detectedHeaderRow[sheetData.className] !== -1"
+                  [class.border-2]="selectedHeaderRow[sheetData.className] === rowIndex + 1 || (!selectedHeaderRow[sheetData.className] && detectedHeaderRow[sheetData.className] === rowIndex && detectedHeaderRow[sheetData.className] !== -1)"
+                  [class.border-yellow-400]="selectedHeaderRow[sheetData.className] === rowIndex + 1"
+                  [class.border-blue-400]="!selectedHeaderRow[sheetData.className] && detectedHeaderRow[sheetData.className] === rowIndex && detectedHeaderRow[sheetData.className] !== -1">
+                <td class="border border-gray-300 px-2 py-1 font-semibold bg-gray-50">{{ rowIndex + 1 }}</td>
+                <td *ngFor="let cell of row.slice(0, 8)" 
+                    class="border border-gray-300 px-2 py-1 text-right text-xs">
+                  {{ cell || '-' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Header row input -->
+        <div class="flex flex-wrap items-center gap-3">
+          <label class="text-sm font-medium text-gray-700">
+            الصف الذي يحتوي على رؤوس الأعمدة هو:
+          </label>
+          <input 
+            type="number"
+            [(ngModel)]="selectedHeaderRow[sheetData.className]"
+            [value]="selectedHeaderRow[sheetData.className] || (detectedHeaderRow[sheetData.className] !== -1 ? detectedHeaderRow[sheetData.className] + 1 : '')"
+            (input)="selectedHeaderRow[sheetData.className] = +$any($event.target).value"
+            min="1"
+            [max]="sheetData.rawData?.length || 100"
+            class="w-20 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="رقم الصف"
+            required>
+          <span class="text-sm text-gray-600">
+            <span class="font-medium">سيتم تجاهل الصفوف من 1 إلى</span> 
+            <span class="font-bold text-blue-600">{{ (selectedHeaderRow[sheetData.className] || (detectedHeaderRow[sheetData.className] !== -1 ? detectedHeaderRow[sheetData.className] + 1 : 1)) - 1 }}</span>
+            <span class="font-medium">تلقائياً</span>
+          </span>
+          <span *ngIf="detectedHeaderRow[sheetData.className] !== -1 && !selectedHeaderRow[sheetData.className]" 
+                class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded">
+            تم اكتشاف تلقائياً: {{ detectedHeaderRow[sheetData.className] + 1 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200">
+        <button 
+          (click)="closeHeaderRowModal()"
+          class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+        <button 
+          (click)="confirmHeaderRows()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          تأكيد والاستيراد
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

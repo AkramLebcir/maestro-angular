@@ -15,6 +15,7 @@ import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentResponseDto } from './dto/student-response.dto';
+import { BulkCreateStudentsDto } from './dto/bulk-create-students.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUser } from '../auth/interfaces/auth-user.interface';
 import { ModuleAccess } from '../auth/decorators/module-access.decorator';
@@ -69,6 +70,15 @@ export class StudentsController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
     return this.studentsService.remove(user.id, id);
+  }
+
+  @Post('bulk')
+  @HttpCode(HttpStatus.CREATED)
+  async bulkCreate(
+    @CurrentUser() user: AuthUser,
+    @Body() bulkCreateDto: BulkCreateStudentsDto,
+  ): Promise<{ success: StudentResponseDto[]; failed: Array<{ student: CreateStudentDto; error: string }> }> {
+    return this.studentsService.bulkCreate(user.id, bulkCreateDto);
   }
 }
 

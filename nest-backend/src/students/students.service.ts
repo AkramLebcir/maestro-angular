@@ -6,6 +6,7 @@ import { Class } from '../classes/class.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
 import { StudentResponseDto } from './dto/student-response.dto';
+import { BulkCreateStudentsDto } from './dto/bulk-create-students.dto';
 
 @Injectable()
 export class StudentsService {
@@ -163,6 +164,108 @@ export class StudentsService {
     }
 
     await this.studentRepository.remove(student);
+  }
+
+  async bulkCreate(
+    ownerId: number,
+    bulkCreateDto: BulkCreateStudentsDto,
+  ): Promise<{ success: StudentResponseDto[]; failed: Array<{ student: CreateStudentDto; error: string }> }> {
+    const success: StudentResponseDto[] = [];
+    const failed: Array<{ student: CreateStudentDto; error: string }> = [];
+
+    // Get all class IDs that need validation
+    const classIds = bulkCreateDto.students
+      .map((s) => s.classId)
+      .filter((id) => id !== undefined && id !== null) as number[];
+    const uniqueClassIds = [...new Set(classIds)];
+
+    // Validate all classes exist in one query
+    const validClasses = await this.classRepository.find({
+      where: uniqueClassIds.map((id) => ({ id, ownerId })),
+    });
+    const validClassIds = new Set(validClasses.map((c) => c.id));
+
+    // Prepare students for batch insert
+    const studentsToCreate: Partial<Student>[] = [];
+
+    for (const createStudentDto of bulkCreateDto.students) {
+      try {
+        // Validate required fields
+        if (!createStudentDto.firstName || !createStudentDto.lastName) {
+          failed.push({
+            student: createStudentDto,
+            error: 'الاسم واللقب مطلوبان',
+          });
+          continue;
+        }
+
+        // Validate class exists if provided
+        if (createStudentDto.classId !== undefined && createStudentDto.classId !== null) {
+          if (!validClassIds.has(createStudentDto.classId)) {
+            failed.push({
+              student: createStudentDto,
+              error: `Class with ID ${createStudentDto.classId} not found`,
+            });
+            continue;
+          }
+        }
+
+        // Convert dateOfBirth string to Date if provided
+        const { dateOfBirth, ...restDto } = createStudentDto;
+        const studentData: Partial<Student> = {
+          ...restDto,
+          ownerId,
+          ...(dateOfBirth && { dateOfBirth: new Date(dateOfBirth) }),
+        };
+
+        studentsToCreate.push(studentData);
+      } catch (error) {
+        failed.push({
+          student: createStudentDto,
+          error: error instanceof Error ? error.message : 'خطأ غير معروف',
+        });
+      }
+    }
+
+    // Batch insert all valid students
+    if (studentsToCreate.length > 0) {
+      try {
+        const createdStudents = await this.studentRepository.save(
+          studentsToCreate.map((data) => this.studentRepository.create(data)),
+        );
+
+        // Fetch with relations for response
+        const studentIds = createdStudents.map((s) => s.id);
+        const studentsWithRelations = await this.studentRepository.find({
+          where: studentIds.map((id) => ({ id, ownerId })),
+          relations: ['class'],
+        });
+
+        success.push(...studentsWithRelations.map((s) => this.mapToResponseDto(s)));
+      } catch (error) {
+        // If batch insert fails, try individual inserts
+        for (const studentData of studentsToCreate) {
+          try {
+            const student = this.studentRepository.create(studentData);
+            const savedStudent = await this.studentRepository.save(student);
+            const studentWithRelation = await this.studentRepository.findOne({
+              where: { id: savedStudent.id, ownerId },
+              relations: ['class'],
+            });
+            if (studentWithRelation) {
+              success.push(this.mapToResponseDto(studentWithRelation));
+            }
+          } catch (individualError) {
+            failed.push({
+              student: studentData as any,
+              error: individualError instanceof Error ? individualError.message : 'خطأ أثناء الحفظ',
+            });
+          }
+        }
+      }
+    }
+
+    return { success, failed };
   }
 
   private mapToResponseDto(student: Student): StudentResponseDto {

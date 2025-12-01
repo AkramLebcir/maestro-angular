@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { MODULE_ACCESS_KEY } from '../decorators/module-access.decorator';
 import { AuthUser } from '../interfaces/auth-user.interface';
@@ -22,7 +22,7 @@ export class ModuleAccessGuard implements CanActivate {
     const user: AuthUser | undefined = request.user;
 
     if (!user) {
-      return false;
+      throw new ForbiddenException('المستخدم غير مصرح له بالوصول');
     }
 
     // Admins have access to all modules
@@ -37,7 +37,33 @@ export class ModuleAccessGuard implements CanActivate {
     }
 
     // Check if user has access to the required module
-    return user.allowedModules.includes(requiredModule);
+    if (!user.allowedModules.includes(requiredModule)) {
+      const moduleNames: Record<string, string> = {
+        'workstations': 'مخطط المقاعد',
+        'students': 'التلاميذ',
+        'classes': 'الأقسام',
+        'attendance': 'الحضور',
+        'grades': 'الدرجات',
+        'topics': 'المواضيع',
+        'notebooks': 'الدفاتر',
+        'behavior-events': 'أحداث السلوك',
+        'certificate-generator': 'الشهادات',
+        'lab-management': 'إدارة المخبر',
+        'annual-planning': 'التخطيط السنوي',
+        'progress-tracking': 'تتبع التقدم',
+        'pedagogical-docs': 'الوثائق التربوية',
+        'timetable': 'الجدول الزمني',
+        'notifications': 'الإشعارات',
+        'labs': 'المخابر',
+      };
+      
+      const moduleName = moduleNames[requiredModule] || requiredModule;
+      throw new ForbiddenException(
+        `ليس لديك صلاحيات للوصول إلى ${moduleName}. يرجى الاتصال بالمسؤول لإضافة هذه الصلاحية.`
+      );
+    }
+
+    return true;
   }
 }
 

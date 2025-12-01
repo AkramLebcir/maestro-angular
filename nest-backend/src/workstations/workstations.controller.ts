@@ -34,11 +34,16 @@ export class WorkstationsController {
       group !== undefined && group !== null && group !== '' 
         ? Number(group) 
         : undefined;
-    return this.workstationsService.getLayout(
-      user.id,
-      classId,
-      parsedGroup,
-    );
+    try {
+      return await this.workstationsService.getLayout(
+        user.id,
+        classId,
+        parsedGroup,
+      );
+    } catch (error) {
+      console.error('Error in getLayout:', error);
+      throw error;
+    }
   }
 
   @Post('layout')

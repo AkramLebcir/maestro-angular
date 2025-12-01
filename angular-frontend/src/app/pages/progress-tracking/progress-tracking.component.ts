@@ -1,5 +1,6 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { AuthService } from '../../services/auth.service';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 
@@ -70,11 +71,16 @@ export class ProgressTrackingComponent implements OnInit {
   // مرجع لعنصر التقرير الذي سيتم تصديره إلى PDF
   @ViewChild('reportContainer') reportContainerRef!: ElementRef<HTMLDivElement>;
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
-    // تحميل بيانات الأستاذ من البطاقة الفنية المخزنة في localStorage
-    const stored = localStorage.getItem('teacherCard');
+    // تحميل بيانات الأستاذ من البطاقة الفنية المخزنة في localStorage (خاصة بالمستخدم الحالي)
+    const user = this.authService.getCurrentUser();
+    const storageKey = user ? `teacherCard_${user.id}` : 'teacherCard';
+    const stored = localStorage.getItem(storageKey);
     if (stored) {
       try {
         const card = JSON.parse(stored);

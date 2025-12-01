@@ -388,35 +388,51 @@ export class WorkstationsService {
   private buildDefaultCoordinates(total: number) {
     const coords: { x: number; y: number; zone: string }[] = [];
 
-    const topCount = Math.min(total, 5);
-    const topSpacing = topCount > 1 ? 66 / (topCount - 1) : 0;
-    for (let i = 0; i < topCount; i++) {
+    // شكل حرف U: القاعدة في الأسفل، والجانبان يمتدان للأعلى
+    // توزيع متوازن: الجانبان متساويان، والقاعدة في المنتصف
+    
+    const verticalSpacing = 15; // المسافة العمودية بين الحواسيب في الجانبين
+    const leftX = 15; // موضع الجانب الأيسر
+    const rightX = 85; // موضع الجانب الأيمن
+    const sideStartY = 12; // بداية الجانبين من الأعلى
+    
+    // حساب عدد الحواسيب لكل جانب والقاعدة
+    // مثال: 15 حاسوب = 5 لكل جانب + 5 في القاعدة
+    // مثال: 20 حاسوب = 7 لكل جانب + 6 في القاعدة
+    const sideCount = Math.floor((total - 3) / 2); // عدد الحواسيب لكل جانب
+    const bottomCount = total - (sideCount * 2); // عدد الحواسيب في القاعدة السفلية
+    
+    // الجانب الأيسر - من الأعلى للأسفل
+    for (let i = 0; i < sideCount; i++) {
       coords.push({
-        x: Number((17 + i * topSpacing).toFixed(2)),
-        y: 12,
-        zone: 'top',
-      });
-    }
-
-    let remaining = total - topCount;
-    let step = 0;
-    const verticalSpacing = 18;
-    while (remaining > 0) {
-      coords.push({
-        x: 24,
-        y: Number((22 + step * verticalSpacing).toFixed(2)),
+        x: leftX,
+        y: Number((sideStartY + i * verticalSpacing).toFixed(2)),
         zone: 'left',
       });
-      remaining--;
-      if (remaining > 0) {
+    }
+    
+    // الجانب الأيمن - من الأعلى للأسفل
+    for (let i = 0; i < sideCount; i++) {
+      coords.push({
+        x: rightX,
+        y: Number((sideStartY + i * verticalSpacing).toFixed(2)),
+        zone: 'right',
+      });
+    }
+    
+    // القاعدة السفلية - في الأسفل (في المنتصف)
+    if (bottomCount > 0) {
+      const bottomY = sideStartY + (sideCount - 1) * verticalSpacing + 2; // أسفل الجانبين قليلاً
+      const bottomSpacing = bottomCount > 1 ? 70 / (bottomCount - 1) : 0;
+      const bottomStartX = 15; // بداية القاعدة من اليسار
+      
+      for (let i = 0; i < bottomCount; i++) {
         coords.push({
-          x: 76,
-          y: Number((22 + step * verticalSpacing).toFixed(2)),
-          zone: 'right',
+          x: Number((bottomStartX + i * bottomSpacing).toFixed(2)),
+          y: Number(bottomY.toFixed(2)),
+          zone: 'bottom',
         });
-        remaining--;
       }
-      step++;
     }
 
     return coords;
