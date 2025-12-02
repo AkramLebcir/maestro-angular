@@ -2,6 +2,7 @@ import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 
 interface Topic {
   id: number;
@@ -106,7 +107,10 @@ export class AnnualDistributionComponent implements OnInit {
   loading = false;
   errorMessage = '';
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    private languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.initYears();
@@ -276,6 +280,10 @@ export class AnnualDistributionComponent implements OnInit {
 
     rows.sort((a, b) => a.sortDate.localeCompare(b.sortDate));
     this.timelineRows = rows;
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 
   onTopicTitleChange(): void {

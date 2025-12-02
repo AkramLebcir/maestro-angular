@@ -121,22 +121,22 @@
                 (click)="sortStudents('lastName')">
                 اللقب <span class="text-xs">{{ getSortIcon('lastName') }}</span>
               </th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">تاريخ الميلاد</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">السلوك (5)</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التقييم المستمر</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التعبير الشفهي/العمل العملي</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الفرض</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الاختبار</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.birthDate') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.notebookCorrection') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.homework') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.attendance5') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.behavior5') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.continuousAssessment') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.assignment') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.test') }}</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('termAverage')">
                 معدل الفصل <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
               </th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التقديرات</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.ratings') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.guidance') }}</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('ranking')">
@@ -831,7 +831,7 @@
 
     <div class="space-y-4">
       <p class="text-sm text-gray-600">
-        قم باختيار ملف Excel يحتوي على علامات التلاميذ. سيتم إضافة الملاحظات (obs) والإرشادات (cons) تلقائياً بناءً على المعدل.
+        {{ translate('gradebook.excelImportDescription') }}
       </p>
 
       <div class="grid grid-cols-2 gap-4">

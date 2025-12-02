@@ -1059,6 +1059,15 @@ export class LanguageService {
         'DE': 'Organisator:',
         'TR': 'Organizatör:'
       },
+      'trainingInspection.organizerShort': {
+        'AR': 'الجهة:',
+        'FR': 'Organisateur :',
+        'EN': 'Organizer:',
+        'ES': 'Organizador:',
+        'IT': 'Organizzatore:',
+        'DE': 'Organisator:',
+        'TR': 'Organizatör:'
+      },
       'trainingInspection.location': {
         'AR': 'مكان التكوين :',
         'FR': 'Lieu de formation :',
@@ -1067,6 +1076,15 @@ export class LanguageService {
         'IT': 'Luogo di formazione:',
         'DE': 'Ausbildungsort:',
         'TR': 'Eğitim yeri:'
+      },
+      'trainingInspection.locationShort': {
+        'AR': 'المكان:',
+        'FR': 'Lieu :',
+        'EN': 'Location:',
+        'ES': 'Lugar:',
+        'IT': 'Luogo:',
+        'DE': 'Ort:',
+        'TR': 'Yer:'
       },
       'trainingInspection.instructions': {
         'AR': 'توجيهات / توصيات / تعليمات :',
@@ -1077,6 +1095,15 @@ export class LanguageService {
         'DE': 'Richtlinien / Empfehlungen / Anweisungen:',
         'TR': 'Yönergeler / Öneriler / Talimatlar:'
       },
+      'trainingInspection.notesLabel': {
+        'AR': 'ملاحظات:',
+        'FR': 'Remarques :',
+        'EN': 'Notes:',
+        'ES': 'Notas:',
+        'IT': 'Note:',
+        'DE': 'Bemerkungen:',
+        'TR': 'Notlar:'
+      },
       'trainingInspection.trainingFile': {
         'AR': 'ملف التكوين :',
         'FR': 'Fichier de formation :',
@@ -1085,6 +1112,15 @@ export class LanguageService {
         'IT': 'File di formazione:',
         'DE': 'Ausbildungsdatei:',
         'TR': 'Eğitim dosyası:'
+      },
+      'trainingInspection.uploadedFile': {
+        'AR': 'ملف مرفوع:',
+        'FR': 'Fichier téléchargé :',
+        'EN': 'Uploaded file:',
+        'ES': 'Archivo cargado:',
+        'IT': 'File caricato:',
+        'DE': 'Hochgeladene Datei:',
+        'TR': 'Yüklenen dosya:'
       },
       'trainingInspection.savedTrainingLog': {
         'AR': 'سجل التكوين المحفوظ',
@@ -1140,6 +1176,42 @@ export class LanguageService {
         'DE': 'Inspektorenbesuchsbericht',
         'TR': 'Müfettiş ziyaretleri raporu'
       },
+      'trainingInspection.noInspections': {
+        'AR': 'لا توجد زيارات مسجلة بعد.',
+        'FR': 'Aucune visite enregistrée pour le moment.',
+        'EN': 'No visits recorded yet.',
+        'ES': 'No hay visitas registradas todavía.',
+        'IT': 'Nessuna visita registrata finora.',
+        'DE': 'Noch keine Besuche aufgezeichnet.',
+        'TR': 'Henüz ziyaret kaydı yok.'
+      },
+      'trainingInspection.inspectorNotes': {
+        'AR': 'ملاحظات المفتش :',
+        'FR': 'Remarques de l\'inspecteur :',
+        'EN': 'Inspector notes:',
+        'ES': 'Notas del inspector:',
+        'IT': 'Note dell\'ispettore:',
+        'DE': 'Anmerkungen des Inspektors:',
+        'TR': 'Müfettiş notları:'
+      },
+      'trainingInspection.recommendations': {
+        'AR': 'توجيهات / توصيات :',
+        'FR': 'Orientations / Recommandations :',
+        'EN': 'Guidelines / Recommendations:',
+        'ES': 'Orientaciones / Recomendaciones:',
+        'IT': 'Linee guida / Raccomandazioni:',
+        'DE': 'Richtlinien / Empfehlungen:',
+        'TR': 'Yönergeler / Öneriler:'
+      },
+      'trainingInspection.saveVisit': {
+        'AR': 'حفظ زيارة المفتش',
+        'FR': 'Enregistrer la visite de l\'inspecteur',
+        'EN': 'Save inspector visit',
+        'ES': 'Guardar visita del inspector',
+        'IT': 'Salva visita dell\'ispettore',
+        'DE': 'Inspektionsbesuch speichern',
+        'TR': 'Müfettiş ziyaretini kaydet'
+      },
       'trainingInspection.notesNotebook': {
         'AR': 'دفتر الملاحظات',
         'FR': 'Carnet de notes',
@@ -1158,6 +1230,15 @@ export class LanguageService {
         'DE': 'Tägliches Notizbuchbericht',
         'TR': 'Günlük not defteri raporu'
       },
+      'trainingInspection.noDailyNotes': {
+        'AR': 'لم تتم إضافة أي ملاحظة بعد.',
+        'FR': 'Aucune note ajoutée pour le moment.',
+        'EN': 'No notes added yet.',
+        'ES': 'Aún no se han añadido notas.',
+        'IT': 'Nessuna nota aggiunta finora.',
+        'DE': 'Noch keine Notizen hinzugefügt.',
+        'TR': 'Henüz not eklenmedi.'
+      },
       'trainingInspection.seminarTitle': {
         'AR': 'عنوان الندوة / الموضوع :',
         'FR': 'Titre du séminaire / Sujet :',
@@ -1166,6 +1247,87 @@ export class LanguageService {
         'IT': 'Titolo del seminario / Argomento:',
         'DE': 'Seminartitel / Thema:',
         'TR': 'Seminer başlığı / Konu:'
+      },
+      'trainingInspection.seminarStartDate': {
+        'AR': 'تاريخ البداية :',
+        'FR': 'Date de début :',
+        'EN': 'Start date:',
+        'ES': 'Fecha de inicio:',
+        'IT': 'Data di inizio:',
+        'DE': 'Anfangsdatum:',
+        'TR': 'Başlangıç tarihi:'
+      },
+      'trainingInspection.seminarEndDate': {
+        'AR': 'تاريخ النهاية :',
+        'FR': 'Date de fin :',
+        'EN': 'End date:',
+        'ES': 'Fecha de fin:',
+        'IT': 'Data di fine:',
+        'DE': 'Enddatum:',
+        'TR': 'Bitiş tarihi:'
+      },
+      'trainingInspection.seminarDuration': {
+        'AR': 'المدة الإجمالية :',
+        'FR': 'Durée totale :',
+        'EN': 'Total duration:',
+        'ES': 'Duración total:',
+        'IT': 'Durata totale:',
+        'DE': 'Gesamtdauer:',
+        'TR': 'Toplam süre:'
+      },
+      'trainingInspection.seminarDurationPlaceholder': {
+        'AR': 'مثال: 3 أيام، 12 ساعة...',
+        'FR': 'Ex : 3 jours, 12 heures...',
+        'EN': 'Example: 3 days, 12 hours...',
+        'ES': 'Ejemplo: 3 días, 12 horas...',
+        'IT': 'Esempio: 3 giorni, 12 ore...',
+        'DE': 'Beispiel: 3 Tage, 12 Stunden...',
+        'TR': 'Örnek: 3 gün, 12 saat...'
+      },
+      'trainingInspection.seminarLocation': {
+        'AR': 'مكان الندوة :',
+        'FR': 'Lieu du séminaire :',
+        'EN': 'Seminar location:',
+        'ES': 'Lugar del seminario:',
+        'IT': 'Luogo del seminario:',
+        'DE': 'Seminarort:',
+        'TR': 'Seminer yeri:'
+      },
+      'trainingInspection.seminarTrainer': {
+        'AR': 'المؤطر :',
+        'FR': 'Formateur :',
+        'EN': 'Trainer:',
+        'ES': 'Formador:',
+        'IT': 'Formatore:',
+        'DE': 'Trainer:',
+        'TR': 'Eğitmen:'
+      },
+      'trainingInspection.seminarSummary': {
+        'AR': 'ملخص شخصي للمحتوى :',
+        'FR': 'Résumé personnel du contenu :',
+        'EN': 'Personal summary of the content:',
+        'ES': 'Resumen personal del contenido:',
+        'IT': 'Riassunto personale del contenuto:',
+        'DE': 'Persönliche Zusammenfassung des Inhalts:',
+        'TR': 'İçeriğin kişisel özeti:'
+      },
+      'trainingInspection.seminarAttachments': {
+        'AR': 'رفع الملحقات :',
+        'FR': 'Téléversement des pièces jointes :',
+        'EN': 'Upload attachments:',
+        'ES': 'Subir anexos:',
+        'IT': 'Carica allegati:',
+        'DE': 'Anhänge hochladen:',
+        'TR': 'Ekleri yükle:'
+      },
+      'trainingInspection.organizerLabel': {
+        'AR': 'الجهة المنظمة:',
+        'FR': 'Organisateur :',
+        'EN': 'Organizer:',
+        'ES': 'Organizador:',
+        'IT': 'Organizzatore:',
+        'DE': 'Organisator:',
+        'TR': 'Organizatör:'
       },
       'trainingInspection.seminarReport': {
         'AR': 'تقرير الندوات التربوية',
@@ -1176,6 +1338,15 @@ export class LanguageService {
         'DE': 'Bildungsseminarebericht',
         'TR': 'Eğitim seminerleri raporu'
       },
+      'trainingInspection.noSeminars': {
+        'AR': 'لا توجد ندوات مسجلة بعد.',
+        'FR': 'Aucun séminaire enregistré برای le moment.',
+        'EN': 'No seminars recorded yet.',
+        'ES': 'No hay seminarios registrados todavía.',
+        'IT': 'Nessun seminario registrato finora.',
+        'DE': 'Noch keine Seminare aufgezeichnet.',
+        'TR': 'Henüz seminer kaydı yok.'
+      },
       'trainingInspection.classLevel': {
         'AR': 'القسم والمستوى :',
         'FR': 'Classe et niveau :',
@@ -1185,6 +1356,15 @@ export class LanguageService {
         'DE': 'Klasse und Niveau:',
         'TR': 'Sınıf ve seviye:'
       },
+      'trainingInspection.classLevelPlaceholder': {
+        'AR': 'مثال: 3 متوسط - أ',
+        'FR': 'Ex : 3 moyenne - A',
+        'EN': 'Example: 3rd middle - A',
+        'ES': 'Ej.: 3 medio - A',
+        'IT': 'Es.: 3 media - A',
+        'DE': 'Beispiel: 3. Mittelstufe - A',
+        'TR': 'Ör: 3 orta - A'
+      },
       'trainingInspection.pedagogicalReport': {
         'AR': 'تقرير الزيارات التربوية',
         'FR': 'Rapport des visites pédagogiques',
@@ -1193,6 +1373,96 @@ export class LanguageService {
         'IT': 'Rapporto visite pedagogiche',
         'DE': 'Pädagogische Besuchsbericht',
         'TR': 'Pedagojik ziyaretler raporu'
+      },
+      'trainingInspection.visitDate': {
+        'AR': 'تاريخ الزيارة :',
+        'FR': 'Date de la visite :',
+        'EN': 'Visit date:',
+        'ES': 'Fecha de la visita:',
+        'IT': 'Data della visita:',
+        'DE': 'Besuchsdatum:',
+        'TR': 'Ziyaret tarihi:'
+      },
+      'trainingInspection.visitDateTime': {
+        'AR': 'تاريخ ووقت الزيارة :',
+        'FR': 'Date et heure de la visite :',
+        'EN': 'Visit date and time:',
+        'ES': 'Fecha y hora de la visita:',
+        'IT': 'Data e ora della visita:',
+        'DE': 'Datum und Uhrzeit des Besuchs:',
+        'TR': 'Ziyaret tarih ve saati:'
+      },
+      'trainingInspection.noteDate': {
+        'AR': 'تاريخ الملاحظة :',
+        'FR': 'Date de la note :',
+        'EN': 'Note date:',
+        'ES': 'Fecha de la nota:',
+        'IT': 'Data della nota:',
+        'DE': 'Notizdatum:',
+        'TR': 'Not tarihi:'
+      },
+      'trainingInspection.noteContent': {
+        'AR': 'محتوى الملاحظة :',
+        'FR': 'Contenu de la note :',
+        'EN': 'Note content:',
+        'ES': 'Contenido de la nota:',
+        'IT': 'Contenuto della nota:',
+        'DE': 'Inhalt der Notiz:',
+        'TR': 'Not içeriği:'
+      },
+      'trainingInspection.notePlaceholder': {
+        'AR': 'سجل ملاحظاتك حول سير الدروس، الصعوبات، الأحداث المهمة...',
+        'FR': 'Consignez vos remarques sur le déroulement des cours, les difficultés, les événements importants...',
+        'EN': 'Record your notes about lesson progress, difficulties, important events...',
+        'ES': 'Registre sus notas sobre el desarrollo de las clases, dificultades, acontecimientos importantes...',
+        'IT': 'Annota le tue osservazioni sull\'andamento delle lezioni, difficoltà, eventi importanti...',
+        'DE': 'Notieren Sie Ihre Beobachtungen zum Unterrichtsverlauf, Schwierigkeiten, wichtigen Ereignissen...',
+        'TR': 'Derslerin gidişatı, zorluklar, önemli olaylar hakkında notlarınızı kaydedin...'
+      },
+      'trainingInspection.saveNote': {
+        'AR': 'حفظ الملاحظة',
+        'FR': 'Enregistrer la note',
+        'EN': 'Save note',
+        'ES': 'Guardar nota',
+        'IT': 'Salva nota',
+        'DE': 'Notiz speichern',
+        'TR': 'Notu kaydet'
+      },
+      'trainingInspection.saveSeminar': {
+        'AR': 'حفظ الندوة',
+        'FR': 'Enregistrer le séminaire',
+        'EN': 'Save seminar',
+        'ES': 'Guardar seminario',
+        'IT': 'Salva seminario',
+        'DE': 'Seminar speichern',
+        'TR': 'Semineri kaydet'
+      },
+      'trainingInspection.savePedagogicalVisit': {
+        'AR': 'حفظ الزيارة',
+        'FR': 'Enregistrer la visite',
+        'EN': 'Save visit',
+        'ES': 'Guardar visita',
+        'IT': 'Salva visita',
+        'DE': 'Besuch speichern',
+        'TR': 'Ziyareti kaydet'
+      },
+      'trainingInspection.pedagogicalNotes': {
+        'AR': 'ملخص الملاحظات والتوجيهات :',
+        'FR': 'Résumé des remarques et orientations :',
+        'EN': 'Summary of notes and guidance:',
+        'ES': 'Resumen de notas y orientaciones:',
+        'IT': 'Riepilogo delle osservazioni e delle indicazioni:',
+        'DE': 'Zusammenfassung der Notizen und Anweisungen:',
+        'TR': 'Not ve yönergelerin özeti:'
+      },
+      'trainingInspection.pedagogicalFollowUp': {
+        'AR': 'الإجراءات المتخذة للمتابعة :',
+        'FR': 'Mesures prises pour le suivi :',
+        'EN': 'Follow-up actions:',
+        'ES': 'Acciones de seguimiento:',
+        'IT': 'Azioni di follow-up:',
+        'DE': 'Nachverfolgungsmaßnahmen:',
+        'TR': 'Takip için alınan önlemler:'
       },
       'trainingInspection.visitor': {
         'AR': 'الزائر',
@@ -2713,6 +2983,15 @@ export class LanguageService {
         'IT': 'Nessun documento corrisponde alle opzioni di filtro attuali.',
         'DE': 'Keine Dokumente entsprechen den aktuellen Filteroptionen.',
         'TR': 'Mevcut filtre seçenekleriyle eşleşen belge yok.'
+      },
+      'pedagogicalDocs.openAsBook': {
+        'AR': 'فتح ككتاب',
+        'FR': 'Ouvrir comme livre',
+        'EN': 'Open as book',
+        'ES': 'Abrir como libro',
+        'IT': 'Apri come libro',
+        'DE': 'Als Buch öffnen',
+        'TR': 'Kitap olarak aç'
       },
 
       // Dashboard additional
@@ -8190,6 +8469,321 @@ export class LanguageService {
         'DE': 'Jährliche Verteilungsverwaltung',
         'TR': 'Yıllık Dağıtım Yönetimi'
       },
+      'annualDistribution.schoolYear': {
+        'AR': 'السنة الدراسية',
+        'FR': 'Année scolaire',
+        'EN': 'School year',
+        'ES': 'Año escolar',
+        'IT': 'Anno scolastico',
+        'DE': 'Schuljahr',
+        'TR': 'Okul yılı'
+      },
+      'annualDistribution.level': {
+        'AR': 'المستوى',
+        'FR': 'Niveau',
+        'EN': 'Level',
+        'ES': 'Niveau',
+        'IT': 'Livello',
+        'DE': 'Niveau',
+        'TR': 'Seviye'
+      },
+      'annualDistribution.track': {
+        'AR': 'الشعبة / الجذع',
+        'FR': 'Filière / Tronc commun',
+        'EN': 'Track / Common core',
+        'ES': 'Rama / Tronco común',
+        'IT': 'Indirizzo / Tronco comune',
+        'DE': 'Zweig / Gemeinsamer Kern',
+        'TR': 'Alan / Ortak gövde'
+      },
+      'annualDistribution.tabHolidays': {
+        'AR': 'العطل والامتحانات',
+        'FR': 'Vacances et examens',
+        'EN': 'Holidays and exams',
+        'ES': 'Vacaciones y exámenes',
+        'IT': 'Vacanze ed esami',
+        'DE': 'Ferien und Prüfungen',
+        'TR': 'Tatiller ve sınavlar'
+      },
+      'annualDistribution.tabDistribution': {
+        'AR': 'التوزيع السنوي',
+        'FR': 'Répartition annuelle',
+        'EN': 'Annual distribution',
+        'ES': 'Distribución anual',
+        'IT': 'Distribuzione annuale',
+        'DE': 'Jährliche Verteilung',
+        'TR': 'Yıllık dağıtım'
+      },
+      'annualDistribution.loading': {
+        'AR': 'جاري التحميل...',
+        'FR': 'Chargement...',
+        'EN': 'Loading...',
+        'ES': 'Cargando...',
+        'IT': 'Caricamento...',
+        'DE': 'Laden...',
+        'TR': 'Yükleniyor...'
+      },
+      'annualDistribution.addHolidayTitle': {
+        'AR': 'إضافة عطلة / امتحان',
+        'FR': 'Ajouter une vacance / un examen',
+        'EN': 'Add holiday / exam',
+        'ES': 'Agregar vacación / examen',
+        'IT': 'Aggiungi vacanza / esame',
+        'DE': 'Ferien / Prüfung hinzufügen',
+        'TR': 'Tatil / sınav ekle'
+      },
+      'annualDistribution.holidayName': {
+        'AR': 'اسم العطلة / الامتحان',
+        'FR': 'Nom de la vacance / de l\'examen',
+        'EN': 'Holiday / exam name',
+        'ES': 'Nombre de la vacación / examen',
+        'IT': 'Nome della vacanza / dell\'esame',
+        'DE': 'Name der Ferien / Prüfung',
+        'TR': 'Tatil / sınav adı'
+      },
+      'annualDistribution.holidayNamePlaceholder': {
+        'AR': 'الاسم (مثال: عطلة الخريف)',
+        'FR': 'Nom (ex: Vacances d\'automne)',
+        'EN': 'Name (e.g. Autumn holiday)',
+        'ES': 'Nombre (ej.: Vacaciones de otoño)',
+        'IT': 'Nome (es. Vacanze autunnali)',
+        'DE': 'Name (z.B. Herbstferien)',
+        'TR': 'Ad (ör. Sonbahar tatili)'
+      },
+      'annualDistribution.holidayType': {
+        'AR': 'النوع',
+        'FR': 'Type',
+        'EN': 'Type',
+        'ES': 'Tipo',
+        'IT': 'Tipo',
+        'DE': 'Typ',
+        'TR': 'Tür'
+      },
+      'annualDistribution.typeHoliday': {
+        'AR': 'عطلة',
+        'FR': 'Vacance',
+        'EN': 'Holiday',
+        'ES': 'Vacación',
+        'IT': 'Vacanza',
+        'DE': 'Ferien',
+        'TR': 'Tatil'
+      },
+      'annualDistribution.typeExam': {
+        'AR': 'امتحان',
+        'FR': 'Examen',
+        'EN': 'Exam',
+        'ES': 'Examen',
+        'IT': 'Esame',
+        'DE': 'Prüfung',
+        'TR': 'Sınav'
+      },
+      'annualDistribution.typeReligious': {
+        'AR': 'عيد ديني',
+        'FR': 'Fête religieuse',
+        'EN': 'Religious holiday',
+        'ES': 'Fiesta religiosa',
+        'IT': 'Festa religiosa',
+        'DE': 'Religiöses Fest',
+        'TR': 'Dini bayram'
+      },
+      'annualDistribution.typeNational': {
+        'AR': 'عيد وطني',
+        'FR': 'Fête nationale',
+        'EN': 'National holiday',
+        'ES': 'Fiesta nacional',
+        'IT': 'Festa nazionale',
+        'DE': 'Nationalfeiertag',
+        'TR': 'Ulusal bayram'
+      },
+      'annualDistribution.startDate': {
+        'AR': 'تاريخ البداية',
+        'FR': 'Date de début',
+        'EN': 'Start date',
+        'ES': 'Fecha de inicio',
+        'IT': 'Data di inizio',
+        'DE': 'Startdatum',
+        'TR': 'Başlangıç tarihi'
+      },
+      'annualDistribution.endDate': {
+        'AR': 'تاريخ النهاية',
+        'FR': 'Date de fin',
+        'EN': 'End date',
+        'ES': 'Fecha de fin',
+        'IT': 'Data di fine',
+        'DE': 'Enddatum',
+        'TR': 'Bitiş tarihi'
+      },
+      'annualDistribution.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Remarques',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Bemerkungen',
+        'TR': 'Notlar'
+      },
+      'annualDistribution.notesPlaceholder': {
+        'AR': 'ملاحظات',
+        'FR': 'Remarques',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Bemerkungen',
+        'TR': 'Notlar'
+      },
+      'annualDistribution.saveHoliday': {
+        'AR': 'حفظ العطلة',
+        'FR': 'Enregistrer la vacance',
+        'EN': 'Save holiday',
+        'ES': 'Guardar vacación',
+        'IT': 'Salva vacanza',
+        'DE': 'Ferien speichern',
+        'TR': 'Tatili kaydet'
+      },
+      'annualDistribution.holidaysListForYear': {
+        'AR': 'قائمة العطل والامتحانات للسنة',
+        'FR': 'Liste des vacances et examens pour l\'année',
+        'EN': 'List of holidays and exams for year',
+        'ES': 'Lista de vacaciones y exámenes para el año',
+        'IT': 'Elenco vacanze ed esami per l\'anno',
+        'DE': 'Liste der Ferien und Prüfungen für das Jahr',
+        'TR': 'Yıl için tatil ve sınav listesi'
+      },
+      'annualDistribution.name': {
+        'AR': 'الاسم',
+        'FR': 'Nom',
+        'EN': 'Name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Name',
+        'TR': 'Ad'
+      },
+      'annualDistribution.type': {
+        'AR': 'النوع',
+        'FR': 'Type',
+        'EN': 'Type',
+        'ES': 'Tipo',
+        'IT': 'Tipo',
+        'DE': 'Typ',
+        'TR': 'Tür'
+      },
+      'annualDistribution.start': {
+        'AR': 'بداية',
+        'FR': 'Début',
+        'EN': 'Start',
+        'ES': 'Inicio',
+        'IT': 'Inizio',
+        'DE': 'Beginn',
+        'TR': 'Başlangıç'
+      },
+      'annualDistribution.end': {
+        'AR': 'نهاية',
+        'FR': 'Fin',
+        'EN': 'End',
+        'ES': 'Fin',
+        'IT': 'Fine',
+        'DE': 'Ende',
+        'TR': 'Bitiş'
+      },
+      'annualDistribution.actions': {
+        'AR': 'إجراءات',
+        'FR': 'Actions',
+        'EN': 'Actions',
+        'ES': 'Acciones',
+        'IT': 'Azioni',
+        'DE': 'Aktionen',
+        'TR': 'İşlemler'
+      },
+      'annualDistribution.delete': {
+        'AR': 'حذف',
+        'FR': 'Supprimer',
+        'EN': 'Delete',
+        'ES': 'Eliminar',
+        'IT': 'Elimina',
+        'DE': 'Löschen',
+        'TR': 'Sil'
+      },
+      'annualDistribution.noPeriodsForYear': {
+        'AR': 'لا توجد فترات مسجلة لهذه السنة بعد.',
+        'FR': 'Aucune période enregistrée pour cette année pour le moment.',
+        'EN': 'No periods recorded for this year yet.',
+        'ES': 'Todavía no hay períodos registrados para este año.',
+        'IT': 'Nessun periodo registrato per quest\'anno.',
+        'DE': 'Für dieses Jahr wurden noch keine Zeiträume erfasst.',
+        'TR': 'Bu yıl için henüz dönem kaydedilmedi.'
+      },
+      'annualDistribution.term': {
+        'AR': 'الفصل',
+        'FR': 'Trimestre',
+        'EN': 'Term',
+        'ES': 'Trimestre',
+        'IT': 'Trimestre',
+        'DE': 'Trimester',
+        'TR': 'Dönem'
+      },
+      'annualDistribution.termPlaceholder': {
+        'AR': 'الفصل (1-3)',
+        'FR': 'Trimestre (1-3)',
+        'EN': 'Term (1-3)',
+        'ES': 'Trimestre (1-3)',
+        'IT': 'Trimestre (1-3)',
+        'DE': 'Trimester (1-3)',
+        'TR': 'Dönem (1-3)'
+      },
+      'annualDistribution.weekNumber': {
+        'AR': 'رقم الأسبوع',
+        'FR': 'Numéro de semaine',
+        'EN': 'Week number',
+        'ES': 'Número de semana',
+        'IT': 'Numero della settimana',
+        'DE': 'Wochennummer',
+        'TR': 'Hafta numarası'
+      },
+      'annualDistribution.weekNumberPlaceholder': {
+        'AR': 'رقم الأسبوع',
+        'FR': 'Numéro de semaine',
+        'EN': 'Week number',
+        'ES': 'Número de semana',
+        'IT': 'Numero della settimana',
+        'DE': 'Wochennummer',
+        'TR': 'Hafta numarası'
+      },
+      'annualDistribution.yearStartDate': {
+        'AR': 'تاريخ بداية السنة الدراسية',
+        'FR': 'Date de début de l\'année scolaire',
+        'EN': 'School year start date',
+        'ES': 'Fecha de inicio del año escolar',
+        'IT': 'Data di inizio dell\'anno scolastico',
+        'DE': 'Beginn des Schuljahres',
+        'TR': 'Okul yılının başlangıç tarihi'
+      },
+      'annualDistribution.subtitle': {
+        'AR': 'اسم الوحدة / النشاط (العنوان الفرعي)',
+        'FR': 'Nom de l\'unité / activité (sous-titre)',
+        'EN': 'Unit / activity name (subtitle)',
+        'ES': 'Nombre de la unidad / actividad (subtítulo)',
+        'IT': 'Nome unità / attività (sottotitolo)',
+        'DE': 'Name der Einheit / Aktivität (Untertitel)',
+        'TR': 'Ünite / etkinlik adı (alt başlık)'
+      },
+      'annualDistribution.selectSubtitle': {
+        'AR': 'اختر العنوان الفرعي',
+        'FR': 'Sélectionner le sous-titre',
+        'EN': 'Select subtitle',
+        'ES': 'Seleccionar subtítulo',
+        'IT': 'Seleziona sottotitolo',
+        'DE': 'Untertitel auswählen',
+        'TR': 'Alt başlık seç'
+      },
+      'annualDistribution.saveRow': {
+        'AR': 'حفظ السطر',
+        'FR': 'Enregistrer la ligne',
+        'EN': 'Save row',
+        'ES': 'Guardar fila',
+        'IT': 'Salva riga',
+        'DE': 'Zeile speichern',
+        'TR': 'Satırı kaydet'
+      },
       'annualDistribution.addRow': {
         'AR': 'إضافة سطر في التوزيع السنوي',
         'FR': 'Ajouter une ligne dans la répartition annuelle',
@@ -8246,6 +8840,60 @@ export class LanguageService {
         'DE': 'Fortschrittsverfolgung des Informatikprogramms',
         'TR': 'Bilgisayar bilimi programı ilerleme takibi'
       },
+      'progressTracking.refreshData': {
+        'AR': 'تحديث البيانات',
+        'FR': 'Actualiser les données',
+        'EN': 'Refresh data',
+        'ES': 'Actualizar datos',
+        'IT': 'Aggiorna dati',
+        'DE': 'Daten aktualisieren',
+        'TR': 'Verileri yenile'
+      },
+      'progressTracking.exportPdf': {
+        'AR': 'تصدير إلى PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export to PDF',
+        'ES': 'Exportar a PDF',
+        'IT': 'Esporta in PDF',
+        'DE': 'Als PDF exportieren',
+        'TR': 'PDF\'e aktar'
+      },
+      'progressTracking.untilDate': {
+        'AR': 'إلى غاية يوم:',
+        'FR': 'Jusqu\'au :',
+        'EN': 'Up to:',
+        'ES': 'Hasta el:',
+        'IT': 'Fino al:',
+        'DE': 'Bis zum:',
+        'TR': 'Şu tarihe kadar:'
+      },
+      'progressTracking.weekNumber': {
+        'AR': 'الأسبوع رقم',
+        'FR': 'Semaine n°',
+        'EN': 'Week no.',
+        'ES': 'Semana n.º',
+        'IT': 'Settimana n.',
+        'DE': 'Woche Nr.',
+        'TR': 'Hafta no.'
+      },
+      'progressTracking.expectedLesson': {
+        'AR': 'الدرس المتوقع رقم',
+        'FR': 'Leçon prévue n°',
+        'EN': 'Expected lesson no.',
+        'ES': 'Lección prevista n.º',
+        'IT': 'Lezione prevista n.',
+        'DE': 'Erwartete Lektion Nr.',
+        'TR': 'Beklenen ders no.'
+      },
+      'progressTracking.loading': {
+        'AR': 'جاري تحميل البيانات...',
+        'FR': 'Chargement des données...',
+        'EN': 'Loading data...',
+        'ES': 'Cargando datos...',
+        'IT': 'Caricamento dati...',
+        'DE': 'Daten werden geladen...',
+        'TR': 'Veriler yükleniyor...'
+      },
       'progressTracking.teacher': {
         'AR': 'الأستاذ',
         'FR': 'Professeur',
@@ -8255,6 +8903,15 @@ export class LanguageService {
         'DE': 'Lehrer',
         'TR': 'Öğretmen'
       },
+      'progressTracking.levelAndTrack': {
+        'AR': 'المستوى والشعبة',
+        'FR': 'Niveau et filière',
+        'EN': 'Level and track',
+        'ES': 'Nivel y rama',
+        'IT': 'Livello e indirizzo',
+        'DE': 'Niveau und Zweig',
+        'TR': 'Seviye ve alan'
+      },
       'progressTracking.class': {
         'AR': 'القسم',
         'FR': 'Classe',
@@ -8263,6 +8920,78 @@ export class LanguageService {
         'IT': 'Classe',
         'DE': 'Klasse',
         'TR': 'Sınıf'
+      },
+      'progressTracking.lastLesson': {
+        'AR': 'آخر درس',
+        'FR': 'Dernière leçon',
+        'EN': 'Last lesson',
+        'ES': 'Última lección',
+        'IT': 'Ultima lezione',
+        'DE': 'Letzte Lektion',
+        'TR': 'Son ders'
+      },
+      'progressTracking.progressPercentage': {
+        'AR': '% نسبة التقدم',
+        'FR': '% Taux d\'avancement',
+        'EN': '% Progress rate',
+        'ES': '% Tasa de progreso',
+        'IT': '% Tasso di progresso',
+        'DE': '% Fortschrittsrate',
+        'TR': '% İlerleme oranı'
+      },
+      'progressTracking.delayWeeks': {
+        'AR': 'عدد أسابيع التأخر (+/-)',
+        'FR': 'Nombre de semaines de retard (+/-)',
+        'EN': 'Number of delay weeks (+/-)',
+        'ES': 'Número de semanas de retraso (+/-)',
+        'IT': 'Numero di settimane di ritardo (+/-)',
+        'DE': 'Anzahl der Verzugswochen (+/-)',
+        'TR': 'Gecikme haftası sayısı (+/-)'
+      },
+      'progressTracking.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Remarques',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Bemerkungen',
+        'TR': 'Notlar'
+      },
+      'progressTracking.delayedClassesTitle': {
+        'AR': 'الأقسام المتأخرة (delay < 0)',
+        'FR': 'Classes en retard (delay < 0)',
+        'EN': 'Delayed classes (delay < 0)',
+        'ES': 'Clases retrasadas (delay < 0)',
+        'IT': 'Classi in ritardo (delay < 0)',
+        'DE': 'Verspätete Klassen (delay < 0)',
+        'TR': 'Geciken sınıflar (delay < 0)'
+      },
+      'progressTracking.noDelayedClasses': {
+        'AR': 'لا توجد أقسام متأخرة.',
+        'FR': 'Aucune classe en retard.',
+        'EN': 'No delayed classes.',
+        'ES': 'No hay clases retrasadas.',
+        'IT': 'Nessuna classe in ritardo.',
+        'DE': 'Keine verspäteten Klassen.',
+        'TR': 'Geciken sınıf yok.'
+      },
+      'progressTracking.advancedClassesTitle': {
+        'AR': 'الأقسام المتقدمة (delay > 0)',
+        'FR': 'Classes en avance (delay > 0)',
+        'EN': 'Advanced classes (delay > 0)',
+        'ES': 'Clases adelantadas (delay > 0)',
+        'IT': 'Classi in anticipo (delay > 0)',
+        'DE': 'Fortgeschrittene Klassen (delay > 0)',
+        'TR': 'İleride olan sınıflar (delay > 0)'
+      },
+      'progressTracking.noAdvancedClasses': {
+        'AR': 'لا توجد أقسام متقدمة.',
+        'FR': 'Aucune classe en avance.',
+        'EN': 'No advanced classes.',
+        'ES': 'No hay clases adelantadas.',
+        'IT': 'Nessuna classe in anticipo.',
+        'DE': 'Keine fortgeschrittenen Klassen.',
+        'TR': 'İleride olan sınıf yok.'
       },
 
       // Teacher Card
@@ -9524,6 +10253,450 @@ export class LanguageService {
         'IT': 'Foto utente',
         'DE': 'Benutzerfoto',
         'TR': 'Kullanıcı fotoğrafı'
+      },
+      // Admin
+      'admin.description': {
+        'AR': 'إدارة المستخدمين والصلاحيات والنظام',
+        'FR': 'Gérer les utilisateurs, les autorisations et le système',
+        'EN': 'Manage users, permissions and system settings',
+        'ES': 'Gestionar usuarios, permisos y la configuración del sistema',
+        'IT': 'Gestire utenti, permessi e impostazioni di sistema',
+        'DE': 'Benutzer, Berechtigungen und Systemeinstellungen verwalten',
+        'TR': 'Kullanıcıları, izinleri ve sistem ayarlarını yönetin'
+      },
+      'admin.tabs.users': {
+        'AR': 'إدارة المستخدمين',
+        'FR': 'Gestion des utilisateurs',
+        'EN': 'User management',
+        'ES': 'Gestión de usuarios',
+        'IT': 'Gestione utenti',
+        'DE': 'Benutzerverwaltung',
+        'TR': 'Kullanıcı yönetimi'
+      },
+      'admin.tabs.modules': {
+        'AR': 'إدارة الصلاحيات',
+        'FR': 'Gestion des modules et autorisations',
+        'EN': 'Module permissions',
+        'ES': 'Permisos de módulos',
+        'IT': 'Permessi dei moduli',
+        'DE': 'Modulberechtigungen',
+        'TR': 'Modül yetkileri'
+      },
+      'admin.tabs.monitoring': {
+        'AR': 'المتابعة والإشراف',
+        'FR': 'Suivi et supervision',
+        'EN': 'Monitoring & supervision',
+        'ES': 'Seguimiento y supervisión',
+        'IT': 'Monitoraggio e supervisione',
+        'DE': 'Überwachung & Aufsicht',
+        'TR': 'İzleme ve denetim'
+      },
+      'admin.tabs.subscriptions': {
+        'AR': 'إدارة الاشتراكات',
+        'FR': 'Gestion des abonnements',
+        'EN': 'Subscription management',
+        'ES': 'Gestión de suscripciones',
+        'IT': 'Gestione abbonamenti',
+        'DE': 'Abonnementverwaltung',
+        'TR': 'Abonelik yönetimi'
+      },
+      // Module access
+      'moduleAccess.title': {
+        'AR': 'إدارة صلاحيات الوحدات',
+        'FR': 'Gestion des autorisations des modules',
+        'EN': 'Module permissions management',
+        'ES': 'Gestión de permisos de módulos',
+        'IT': 'Gestione dei permessi dei moduli',
+        'DE': 'Verwaltung der Modulberechtigungen',
+        'TR': 'Modül yetkilerini yönetme'
+      },
+      'moduleAccess.selectTeacher': {
+        'AR': 'اختر الأستاذ',
+        'FR': 'Sélectionner l\'enseignant',
+        'EN': 'Select teacher',
+        'ES': 'Seleccionar profesor',
+        'IT': 'Seleziona insegnante',
+        'DE': 'Lehrer auswählen',
+        'TR': 'Öğretmen seç'
+      },
+      'moduleAccess.enabledModulesCount': {
+        'AR': 'وحدة مفعلة',
+        'FR': 'modules activés',
+        'EN': 'enabled modules',
+        'ES': 'módulos activados',
+        'IT': 'moduli abilitati',
+        'DE': 'aktivierte Module',
+        'TR': 'etkin modül'
+      },
+      'moduleAccess.noTeachers': {
+        'AR': 'لا يوجد أساتذة',
+        'FR': 'Aucun enseignant',
+        'EN': 'No teachers found',
+        'ES': 'No se encontraron profesores',
+        'IT': 'Nessun insegnante trovato',
+        'DE': 'Keine Lehrer gefunden',
+        'TR': 'Öğretmen bulunamadı'
+      },
+      'moduleAccess.permissionsFor': {
+        'AR': 'صلاحيات',
+        'FR': 'Autorisations pour',
+        'EN': 'Permissions for',
+        'ES': 'Permisos para',
+        'IT': 'Permessi per',
+        'DE': 'Berechtigungen für',
+        'TR': 'Yetkiler:'
+      },
+      'moduleAccess.enableAll': {
+        'AR': 'تفعيل الكل',
+        'FR': 'Tout activer',
+        'EN': 'Enable all',
+        'ES': 'Activar todo',
+        'IT': 'Abilita tutto',
+        'DE': 'Alles aktivieren',
+        'TR': 'Hepsini etkinleştir'
+      },
+      'moduleAccess.disableAll': {
+        'AR': 'إلغاء الكل',
+        'FR': 'Tout désactiver',
+        'EN': 'Disable all',
+        'ES': 'Desactivar todo',
+        'IT': 'Disabilita tutto',
+        'DE': 'Alles deaktivieren',
+        'TR': 'Hepsini devre dışı bırak'
+      },
+      'moduleAccess.selectTeacherHint': {
+        'AR': 'الرجاء اختيار أستاذ من القائمة لعرض وتعديل صلاحياته',
+        'FR': 'Veuillez sélectionner un enseignant dans la liste pour afficher et modifier ses autorisations.',
+        'EN': 'Please select a teacher from the list to view and edit their permissions.',
+        'ES': 'Seleccione un profesor de la lista para ver y editar sus permisos.',
+        'IT': 'Seleziona un insegnante dall\'elenco per visualizzare e modificare i suoi permessi.',
+        'DE': 'Bitte wählen Sie einen Lehrer aus der Liste, um seine Berechtigungen anzuzeigen und zu bearbeiten.',
+        'TR': 'Yetkilerini görüntülemek ve düzenlemek için lütfen listeden bir öğretmen seçin.'
+      },
+      // Module access - module labels (per key)
+      'moduleAccess.module.classes.name': {
+        'AR': 'الأقسام',
+        'FR': 'Classes',
+        'EN': 'Classes',
+        'ES': 'Clases',
+        'IT': 'Classi',
+        'DE': 'Klassen',
+        'TR': 'Sınıflar'
+      },
+      'moduleAccess.module.classes.description': {
+        'AR': 'إدارة الأقسام والصفوف',
+        'FR': 'Gérer les classes et les niveaux',
+        'EN': 'Manage classes and grades',
+        'ES': 'Gestionar clases y niveles',
+        'IT': 'Gestire classi e livelli',
+        'DE': 'Klassen und Stufen verwalten',
+        'TR': 'Sınıf ve seviyeleri yönet'
+      },
+      'moduleAccess.module.students.name': {
+        'AR': 'الطلاب',
+        'FR': 'Élèves',
+        'EN': 'Students',
+        'ES': 'Estudiantes',
+        'IT': 'Studenti',
+        'DE': 'Schüler',
+        'TR': 'Öğrenciler'
+      },
+      'moduleAccess.module.students.description': {
+        'AR': 'إدارة بيانات الطلاب',
+        'FR': 'Gérer les informations des élèves',
+        'EN': 'Manage student data',
+        'ES': 'Gestionar datos de estudiantes',
+        'IT': 'Gestire i dati degli studenti',
+        'DE': 'Schülere Daten verwalten',
+        'TR': 'Öğrenci verilerini yönet'
+      },
+      'moduleAccess.module.attendance.name': {
+        'AR': 'الحضور والغياب',
+        'FR': 'Présence et absences',
+        'EN': 'Attendance',
+        'ES': 'Asistencia',
+        'IT': 'Presenze',
+        'DE': 'Anwesenheit',
+        'TR': 'Devam'
+      },
+      'moduleAccess.module.attendance.description': {
+        'AR': 'تسجيل حضور الطلاب',
+        'FR': 'Enregistrer la présence des élèves',
+        'EN': 'Record student attendance',
+        'ES': 'Registrar la asistencia de los estudiantes',
+        'IT': 'Registrare la presenza degli studenti',
+        'DE': 'Anwesenheit der Schüler erfassen',
+        'TR': 'Öğrenci yoklamasını kaydet'
+      },
+      'moduleAccess.module.grades.name': {
+        'AR': 'الدرجات',
+        'FR': 'Notes',
+        'EN': 'Grades',
+        'ES': 'Calificaciones',
+        'IT': 'Voti',
+        'DE': 'Noten',
+        'TR': 'Notlar'
+      },
+      'moduleAccess.module.grades.description': {
+        'AR': 'تسجيل وتتبع درجات الطلاب',
+        'FR': 'Enregistrer et suivre les notes des élèves',
+        'EN': 'Record and track student grades',
+        'ES': 'Registrar y seguir las calificaciones',
+        'IT': 'Registrare e monitorare i voti degli studenti',
+        'DE': 'Noten der Schüler erfassen und verfolgen',
+        'TR': 'Öğrenci notlarını kaydet ve takip et'
+      },
+      'moduleAccess.module.notebooks.name': {
+        'AR': 'المذكرات',
+        'FR': 'Cahiers',
+        'EN': 'Notebooks',
+        'ES': 'Cuadernos',
+        'IT': 'Quaderni',
+        'DE': 'Hefte',
+        'TR': 'Defterler'
+      },
+      'moduleAccess.module.notebooks.description': {
+        'AR': 'مذكرات الأستاذ',
+        'FR': 'Cahiers de l\'enseignant',
+        'EN': 'Teacher notebooks',
+        'ES': 'Cuadernos del profesor',
+        'IT': 'Quaderni dell\'insegnante',
+        'DE': 'Lehrerhefte',
+        'TR': 'Öğretmen defterleri'
+      },
+      'moduleAccess.module.topics.name': {
+        'AR': 'المواضيع',
+        'FR': 'Sujets',
+        'EN': 'Topics',
+        'ES': 'Temas',
+        'IT': 'Argomenti',
+        'DE': 'Themen',
+        'TR': 'Konular'
+      },
+      'moduleAccess.module.topics.description': {
+        'AR': 'إدارة مواضيع الدروس',
+        'FR': 'Gérer les sujets des leçons',
+        'EN': 'Manage lesson topics',
+        'ES': 'Gestionar temas de lecciones',
+        'IT': 'Gestire gli argomenti delle lezioni',
+        'DE': 'Unterrichtsthemen verwalten',
+        'TR': 'Ders konularını yönet'
+      },
+      'moduleAccess.module.timetable.name': {
+        'AR': 'جدول الأوقات',
+        'FR': 'Emploi du temps',
+        'EN': 'Timetable',
+        'ES': 'Horario',
+        'IT': 'Orario',
+        'DE': 'Stundenplan',
+        'TR': 'Ders programı'
+      },
+      'moduleAccess.module.timetable.description': {
+        'AR': 'تنظيم الجدول الدراسي',
+        'FR': 'Organiser l\'emploi du temps scolaire',
+        'EN': 'Organise the school timetable',
+        'ES': 'Organizar el horario escolar',
+        'IT': 'Organizzare l\'orario scolastico',
+        'DE': 'Stundenplan der Schule organisieren',
+        'TR': 'Okul ders programını düzenle'
+      },
+      'moduleAccess.module.progress-tracking.name': {
+        'AR': 'تتبع التقدم',
+        'FR': 'Suivi des progrès',
+        'EN': 'Progress tracking',
+        'ES': 'Seguimiento del progreso',
+        'IT': 'Monitoraggio dei progressi',
+        'DE': 'Fortschrittsverfolgung',
+        'TR': 'İlerleme takibi'
+      },
+      'moduleAccess.module.progress-tracking.description': {
+        'AR': 'متابعة تقدم المنهاج',
+        'FR': 'Suivre l\'avancement du programme',
+        'EN': 'Track curriculum progress',
+        'ES': 'Seguir el progreso del plan de estudios',
+        'IT': 'Monitorare l\'avanzamento del programma',
+        'DE': 'Fortschritt des Lehrplans verfolgen',
+        'TR': 'Müfredat ilerlemesini takip et'
+      },
+      'moduleAccess.module.pedagogical-docs.name': {
+        'AR': 'الوثائق التربوية',
+        'FR': 'Documents pédagogiques',
+        'EN': 'Pedagogical documents',
+        'ES': 'Documentos pedagógicos',
+        'IT': 'Documenti pedagogici',
+        'DE': 'Pädagogische Dokumente',
+        'TR': 'Pedagojik belgeler'
+      },
+      'moduleAccess.module.pedagogical-docs.description': {
+        'AR': 'إدارة الوثائق التعليمية',
+        'FR': 'Gérer les documents pédagogiques',
+        'EN': 'Manage pedagogical documents',
+        'ES': 'Gestionar documentos pedagógicos',
+        'IT': 'Gestire documenti pedagogici',
+        'DE': 'Pädagogische Dokumente verwalten',
+        'TR': 'Pedagojik belgeleri yönet'
+      },
+      'moduleAccess.module.training-inspection.name': {
+        'AR': 'التفتيش التربوي',
+        'FR': 'Formation & inspection',
+        'EN': 'Training & inspection',
+        'ES': 'Formación e inspección',
+        'IT': 'Formazione e ispezione',
+        'DE': 'Ausbildung & Inspektion',
+        'TR': 'Eğitim ve denetim'
+      },
+      'moduleAccess.module.training-inspection.description': {
+        'AR': 'سجل التفتيش',
+        'FR': 'Registre des inspections',
+        'EN': 'Inspection log',
+        'ES': 'Registro de inspecciones',
+        'IT': 'Registro delle ispezioni',
+        'DE': 'Inspektionsprotokoll',
+        'TR': 'Denetim kaydı'
+      },
+      'moduleAccess.module.annual-distribution.name': {
+        'AR': 'التوزيع السنوي',
+        'FR': 'Répartition annuelle',
+        'EN': 'Annual distribution',
+        'ES': 'Distribución anual',
+        'IT': 'Distribuzione annuale',
+        'DE': 'Jährliche Verteilung',
+        'TR': 'Yıllık dağıtım'
+      },
+      'moduleAccess.module.annual-distribution.description': {
+        'AR': 'توزيع المنهاج السنوي',
+        'FR': 'Répartition annuelle du programme',
+        'EN': 'Annual curriculum distribution',
+        'ES': 'Distribución anual del plan de estudios',
+        'IT': 'Distribuzione annuale del programma',
+        'DE': 'Jährliche Verteilung des Lehrplans',
+        'TR': 'Yıllık müfredat dağılımı'
+      },
+      'moduleAccess.module.behavior-events.name': {
+        'AR': 'السلوك',
+        'FR': 'Comportement',
+        'EN': 'Behavior',
+        'ES': 'Comportamiento',
+        'IT': 'Comportamento',
+        'DE': 'Verhalten',
+        'TR': 'Davranış'
+      },
+      'moduleAccess.module.behavior-events.description': {
+        'AR': 'تسجيل أحداث السلوك',
+        'FR': 'Enregistrer les événements de comportement',
+        'EN': 'Record behavior events',
+        'ES': 'Registrar eventos de comportamiento',
+        'IT': 'Registrare eventi comportamentali',
+        'DE': 'Verhaltensereignisse erfassen',
+        'TR': 'Davranış olaylarını kaydet'
+      },
+      'moduleAccess.module.labs.name': {
+        'AR': 'المختبرات',
+        'FR': 'Laboratoires',
+        'EN': 'Labs',
+        'ES': 'Laboratorios',
+        'IT': 'Laboratori',
+        'DE': 'Labore',
+        'TR': 'Laboratuvarlar'
+      },
+      'moduleAccess.module.labs.description': {
+        'AR': 'إدارة المختبرات',
+        'FR': 'Gérer les laboratoires',
+        'EN': 'Manage labs',
+        'ES': 'Gestionar laboratorios',
+        'IT': 'Gestire i laboratori',
+        'DE': 'Labore verwalten',
+        'TR': 'Laboratuvarları yönet'
+      },
+      'moduleAccess.module.lab-management.name': {
+        'AR': 'إدارة المختبر',
+        'FR': 'Gestion du stock du laboratoire',
+        'EN': 'Lab inventory management',
+        'ES': 'Gestión de inventario del laboratorio',
+        'IT': 'Gestione inventario del laboratorio',
+        'DE': 'Laborinventarverwaltung',
+        'TR': 'Labor envanter yönetimi'
+      },
+      'moduleAccess.module.lab-management.description': {
+        'AR': 'إدارة مخزون المختبر',
+        'FR': 'Gérer le stock du laboratoire',
+        'EN': 'Manage lab inventory',
+        'ES': 'Gestionar el inventario del laboratorio',
+        'IT': 'Gestire l\'inventario del laboratorio',
+        'DE': 'Laborinventar verwalten',
+        'TR': 'Labor envanterini yönet'
+      },
+      'moduleAccess.module.workstations.name': {
+        'AR': 'مخطط المقاعد',
+        'FR': 'Plan de placement',
+        'EN': 'Seating chart',
+        'ES': 'Plano de asientos',
+        'IT': 'Schema dei posti',
+        'DE': 'Sitzplan',
+        'TR': 'Oturma planı'
+      },
+      'moduleAccess.module.workstations.description': {
+        'AR': 'إدارة مخطط جلوس الطلاب في المخبر',
+        'FR': 'Gérer le plan de placement des élèves dans le laboratoire',
+        'EN': 'Manage student seating in the lab',
+        'ES': 'Gestionar la distribución de asientos de los estudiantes en el laboratorio',
+        'IT': 'Gestire la disposizione dei posti degli studenti in laboratorio',
+        'DE': 'Sitzordnung der Schüler im Labor verwalten',
+        'TR': 'Laboratuvarda öğrenci oturma düzenini yönet'
+      },
+      'moduleAccess.module.certificate-generator.name': {
+        'AR': 'الشهادات',
+        'FR': 'Certificats',
+        'EN': 'Certificates',
+        'ES': 'Certificados',
+        'IT': 'Certificati',
+        'DE': 'Zertifikate',
+        'TR': 'Sertifikalar'
+      },
+      'moduleAccess.module.certificate-generator.description': {
+        'AR': 'إنشاء وإدارة الشهادات',
+        'FR': 'Créer et gérer les certificats',
+        'EN': 'Create and manage certificates',
+        'ES': 'Crear y gestionar certificados',
+        'IT': 'Creare e gestire certificati',
+        'DE': 'Zertifikate erstellen und verwalten',
+        'TR': 'Sertifikalar oluştur ve yönet'
+      },
+      'moduleAccess.module.annual-planning.name': {
+        'AR': 'التخطيط السنوي',
+        'FR': 'Planification annuelle',
+        'EN': 'Annual planning',
+        'ES': 'Planificación anual',
+        'IT': 'Pianificazione annuale',
+        'DE': 'Jahresplanung',
+        'TR': 'Yıllık planlama'
+      },
+      'moduleAccess.module.annual-planning.description': {
+        'AR': 'التخطيط السنوي للمنهاج',
+        'FR': 'Planification annuelle du programme',
+        'EN': 'Annual curriculum planning',
+        'ES': 'Planificación anual del plan de estudios',
+        'IT': 'Pianificazione annuale del curriculum',
+        'DE': 'Jährliche Lehrplanplanung',
+        'TR': 'Yıllık müfredat planlaması'
+      },
+      'moduleAccess.module.notifications.name': {
+        'AR': 'الإشعارات',
+        'FR': 'Notifications',
+        'EN': 'Notifications',
+        'ES': 'Notificaciones',
+        'IT': 'Notifiche',
+        'DE': 'Benachrichtigungen',
+        'TR': 'Bildirimler'
+      },
+      'moduleAccess.module.notifications.description': {
+        'AR': 'إدارة الإشعارات',
+        'FR': 'Gérer les notifications',
+        'EN': 'Manage notifications',
+        'ES': 'Gestionar notificaciones',
+        'IT': 'Gestire le notifiche',
+        'DE': 'Benachrichtigungen verwalten',
+        'TR': 'Bildirimleri yönet'
       },
       'header.priorityUrgent': {
         'AR': 'عاجل',

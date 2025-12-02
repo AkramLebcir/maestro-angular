@@ -3,6 +3,7 @@ import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { LanguageService } from '../../services/language.service';
 
 interface ProgressItem {
   teacherId?: number;
@@ -73,7 +74,8 @@ export class ProgressTrackingComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    private languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -189,6 +191,10 @@ export class ProgressTrackingComponent implements OnInit {
 
   toArabicLevel(level: string): string {
     return this.levelMap[level] || level;
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 
   async downloadPdf(): Promise<void> {

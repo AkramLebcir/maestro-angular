@@ -35,11 +35,11 @@ export class PedagogicalDocsComponent implements OnInit {
     '3AS',
   ];
 
-  types: { value: PedagogicalDocument['type']; label: string }[] = [
-    { value: 'lesson_plan', label: 'مذكرة يومية' },
-    { value: 'progression', label: 'تدرّج سنوي' },
-    { value: 'curriculum', label: 'المنهاج الرسمي' },
-    { value: 'textbook', label: 'كتاب مدرسي' },
+  types: { value: PedagogicalDocument['type']; labelKey: string }[] = [
+    { value: 'lesson_plan', labelKey: 'pedagogicalDocs.dailyNote' },
+    { value: 'progression', labelKey: 'pedagogicalDocs.annualProgression' },
+    { value: 'curriculum', labelKey: 'pedagogicalDocs.curriculum' },
+    { value: 'textbook', labelKey: 'pedagogicalDocs.textbook' },
   ];
 
   selectedLevelFilter: string | 'all' = 'all';

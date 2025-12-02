@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../services/api.service';
 import { AuthService, User } from '../../../services/auth.service';
+import { LanguageService } from '../../../services/language.service';
 
 export interface Module {
   key: string;
@@ -48,7 +49,8 @@ export class ModuleAccessComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -127,6 +129,10 @@ export class ModuleAccessComponent implements OnInit {
   private clearMessages(): void {
     this.errorMessage = '';
     this.successMessage = '';
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 }
 

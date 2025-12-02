@@ -5,13 +5,13 @@
       class="px-4 py-2 rounded-md bg-blue-600 text-white text-sm hover:bg-blue-700"
       (click)="loadData()"
     >
-      تحديث البيانات
+      {{ translate('progressTracking.refreshData') }}
     </button>
     <button
       class="px-4 py-2 rounded-md bg-emerald-600 text-white text-sm hover:bg-emerald-700 btn-export-pdf"
       (click)="downloadPdf()"
     >
-      تصدير إلى PDF
+      {{ translate('progressTracking.exportPdf') }}
     </button>
   </div>
 
@@ -20,19 +20,19 @@
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-xl font-bold text-gray-800">
-          متابعة إنجاز برنامج مادة الإعلام الآلي
+          {{ translate('progressTracking.title') }}
         </h1>
         <p class="text-sm text-gray-500 mt-1" *ngIf="overview">
-          إلى غاية يوم:
+          {{ translate('progressTracking.untilDate') }}
           <span class="font-semibold">{{ overview.currentDate }}</span>
-          (الأسبوع رقم {{ overview.currentWeek }} / الدرس المتوقع رقم
-          {{ overview.expectedLesson }})
+          ({{ translate('progressTracking.weekNumber') }} {{ overview.currentWeek }}
+          / {{ translate('progressTracking.expectedLesson') }} {{ overview.expectedLesson }})
         </p>
       </div>
     </div>
 
     <div *ngIf="loading" class="text-center text-gray-500 text-sm">
-      جاري تحميل البيانات...
+      {{ translate('progressTracking.loading') }}
     </div>
 
     <div *ngIf="error" class="text-center text-red-600 text-sm">
@@ -45,13 +45,13 @@
       <table class="min-w-full border border-gray-200 text-sm">
         <thead class="bg-gray-50">
           <tr>
-            <th class="border border-gray-200 px-2 py-2 text-center">الأستاذ</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">المستوى والشعبة</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">القسم</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">آخر درس</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">% نسبة التقدم</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">عدد أسابيع التأخر (+/-)</th>
-            <th class="border border-gray-200 px-2 py-2 text-center">ملاحظات</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.teacher') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.levelAndTrack') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.class') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.lastLesson') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.progressPercentage') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.delayWeeks') }}</th>
+            <th class="border border-gray-200 px-2 py-2 text-center">{{ translate('progressTracking.notes') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -108,10 +108,10 @@
       <!-- المتأخرة -->
       <div class="bg-white shadow rounded-lg p-4">
         <h2 class="text-sm font-semibold text-red-600 mb-2">
-          الأقسام المتأخرة (delay &lt; 0)
+          {{ translate('progressTracking.delayedClassesTitle') }}
         </h2>
         <div *ngIf="overview.delayed.length === 0" class="text-xs text-gray-500">
-          لا توجد أقسام متأخرة.
+          {{ translate('progressTracking.noDelayedClasses') }}
         </div>
         <ul *ngIf="overview.delayed.length > 0" class="space-y-1 text-xs">
           <li
@@ -132,10 +132,10 @@
       <!-- المتقدمة -->
       <div class="bg-white shadow rounded-lg p-4">
         <h2 class="text-sm font-semibold text-green-600 mb-2">
-          الأقسام المتقدمة (delay &gt; 0)
+          {{ translate('progressTracking.advancedClassesTitle') }}
         </h2>
         <div *ngIf="overview.advanced.length === 0" class="text-xs text-gray-500">
-          لا توجد أقسام متقدمة.
+          {{ translate('progressTracking.noAdvancedClasses') }}
         </div>
         <ul *ngIf="overview.advanced.length > 0" class="space-y-1 text-xs">
           <li

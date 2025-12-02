@@ -2,8 +2,12 @@
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">لوحة تحكم المسؤول</h1>
-      <p class="text-gray-600 mt-2">إدارة المستخدمين والصلاحيات والنظام</p>
+      <h1 class="text-3xl font-bold text-gray-800">
+        {{ translate('header.adminPanel') }}
+      </h1>
+      <p class="text-gray-600 mt-2">
+        {{ translate('admin.description') }}
+      </p>
     </div>
 
     <!-- Tabs -->
@@ -17,7 +21,7 @@
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="px-6 py-4 border-b-2 transition-colors"
           >
-            إدارة المستخدمين
+            {{ translate('admin.tabs.users') }}
           </button>
           <button
             (click)="setActiveTab('modules')"
@@ -26,7 +30,7 @@
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="px-6 py-4 border-b-2 transition-colors"
           >
-            إدارة الصلاحيات
+            {{ translate('admin.tabs.modules') }}
           </button>
           <button
             (click)="setActiveTab('monitoring')"
@@ -35,7 +39,7 @@
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="px-6 py-4 border-b-2 transition-colors"
           >
-            المتابعة والإشراف
+            {{ translate('admin.tabs.monitoring') }}
           </button>
           <button
             (click)="setActiveTab('subscriptions')"
@@ -44,7 +48,7 @@
               : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
             class="px-6 py-4 border-b-2 transition-colors"
           >
-            إدارة الاشتراكات
+            {{ translate('admin.tabs.subscriptions') }}
           </button>
         </nav>
       </div>

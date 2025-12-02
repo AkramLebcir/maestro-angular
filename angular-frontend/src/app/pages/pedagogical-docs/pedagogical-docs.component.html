@@ -45,7 +45,7 @@
         >
           <option value="">{{ translate('pedagogicalDocs.selectType') }}</option>
           <option *ngFor="let t of types" [ngValue]="t.value">
-            {{ t.label }}
+            {{ translate(t.labelKey) }}
           </option>
         </select>
       </div>
@@ -100,26 +100,27 @@
       </select>
     </div>
     <div class="flex flex-col">
-      <label class="text-xs text-gray-500 mb-1">تصفية حسب النوع</label>
+      <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.filterByType') }}</label>
       <select
         [(ngModel)]="selectedTypeFilter"
         (change)="loadDocs()"
         class="border rounded px-2 py-1"
       >
-        <option [ngValue]="'all'">جميع الأنواع</option>
+        <option [ngValue]="'all'">{{ translate('pedagogicalDocs.allTypes') }}</option>
         <option *ngFor="let t of types" [ngValue]="t.value">
-          {{ t.label }}
+          {{ translate(t.labelKey) }}
         </option>
       </select>
     </div>
     <div class="flex-1"></div>
     <div class="text-xs text-gray-500">
-      عدد الوثائق: <span class="font-semibold text-gray-700">{{ docs.length }}</span>
+      {{ translate('pedagogicalDocs.documentsCount') }}
+      <span class="font-semibold text-gray-700">{{ docs.length }}</span>
     </div>
   </section>
 
   <div *ngIf="loading" class="text-sm text-gray-500">
-    جاري تحميل الوثائق...
+    {{ translate('pedagogicalDocs.loading') }}
   </div>
 
   <!-- Documents grid as flipbook-like cards -->
@@ -133,10 +134,15 @@
         <div class="absolute inset-0 flex items-center justify-center text-white">
           <div class="text-center">
             <div class="text-xs opacity-80 mb-1">
-              {{ doc.type === 'lesson_plan' ? 'مذكرة يومية'
-                   : doc.type === 'progression' ? 'تدرج سنوي'
-                   : doc.type === 'curriculum' ? 'منهاج رسمي'
-                   : 'كتاب مدرسي' }}
+              {{
+                doc.type === 'lesson_plan'
+                  ? translate('pedagogicalDocs.dailyNote')
+                  : doc.type === 'progression'
+                    ? translate('pedagogicalDocs.annualProgression')
+                    : doc.type === 'curriculum'
+                      ? translate('pedagogicalDocs.curriculum')
+                      : translate('pedagogicalDocs.textbook')
+              }}
             </div>
             <div class="text-lg font-bold line-clamp-2 px-4">
               {{ doc.title }}
@@ -166,14 +172,14 @@
           <button
             class="text-xs text-indigo-600 hover:text-indigo-800 font-semibold"
           >
-            فتح ككتاب
+            {{ translate('pedagogicalDocs.openAsBook') }}
           </button>
         </div>
       </div>
     </div>
 
     <div *ngIf="!loading && docs.length === 0" class="col-span-full text-center text-gray-400 text-sm py-6">
-      لا توجد وثائق مطابقة لخيارات التصفية الحالية.
+      {{ translate('pedagogicalDocs.noMatchingDocs') }}
     </div>
   </section>
 

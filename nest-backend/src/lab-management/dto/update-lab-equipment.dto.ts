@@ -6,3 +6,4 @@ export class UpdateLabEquipmentDto extends PartialType(CreateLabEquipmentDto) {}
 
 
 
+

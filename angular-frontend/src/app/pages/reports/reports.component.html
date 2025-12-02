@@ -1,10 +1,12 @@
 <div class="flex-1 p-6 reports-page">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('reports.title') }}</h1>
-      <p class="text-sm text-gray-500">
-        {{ translate('reports.description') }}
-      </p>
+      <div>
+        <h1 class="text-3xl font-bold text-gray-800">{{ translate('reports.title') }}</h1>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ translate('reports.description') }}
+        </p>
+      </div>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -64,10 +66,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            أجهزة معمل الحاسب الآلي
+            {{ translate('reports.labEquipment') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير بأجهزة معمل الحاسب وعدد الأجهزة العاملة والمعطلة.
+            {{ translate('reports.labEquipmentDesc') }}
           </p>
         </div>
         <button
@@ -82,10 +84,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            برامج حواسيب معمل الحاسب الآلي
+            {{ translate('reports.labSoftware') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير ببرامج الحواسيب المثبتة في معمل الحاسب.
+            {{ translate('reports.labSoftwareDesc') }}
           </p>
         </div>
         <button
@@ -100,10 +102,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            أثاث معمل الحاسب الآلي
+            {{ translate('reports.labFurniture') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير بأثاث معمل الحاسب وحالته.
+            {{ translate('reports.labFurnitureDesc') }}
           </p>
         </div>
         <button
@@ -118,10 +120,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            أرقام جرد أجهزة وأثاث المعمل
+            {{ translate('reports.inventory') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير شامل بأرقام الجرد الخاصة بأجهزة وأثاث المعمل.
+            {{ translate('reports.inventoryDesc') }}
           </p>
         </div>
         <button
@@ -136,10 +138,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            فحص المكوّنات المادية والبرمجية
+            {{ translate('reports.deviceStatus') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير بحالة المكوّنات المادية والبرمجية لكل جهاز في المعمل.
+            {{ translate('reports.deviceStatusDesc') }}
           </p>
         </div>
         <button
@@ -154,10 +156,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            نظافة معمل الحاسب الآلي
+            {{ translate('reports.labMaintenance') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير دوري عن نظافة معمل الحاسب وحالة التمديدات.
+            {{ translate('reports.labMaintenanceDesc') }}
           </p>
         </div>
         <button
@@ -172,10 +174,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            مخططات المقاعد
+            {{ translate('reports.seatingCharts') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            طباعة مخططات مقاعد التلاميذ في قاعة القسم أو المخبر.
+            {{ translate('reports.seatingChartsDesc') }}
           </p>
         </div>
         <button
@@ -190,10 +192,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            قائمة التلاميذ
+            {{ translate('reports.students') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقارير وقوائم التلاميذ حسب الأقسام والمجموعات.
+            {{ translate('reports.studentsDesc') }}
           </p>
         </div>
         <button
@@ -208,10 +210,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            جدول الأوقات
+            {{ translate('reports.timetable') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            طباعة جدول الأوقات الأسبوعي بصيغة PDF.
+            {{ translate('reports.timetableDesc') }}
           </p>
         </div>
         <button
@@ -226,10 +228,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقارير الدفاتر
+            {{ translate('reports.notebooks') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            طباعة تقارير مفصلة للدفاتر المختارة.
+            {{ translate('reports.notebooksDesc') }}
           </p>
         </div>
         <button
@@ -244,10 +246,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير الغيابات
+            {{ translate('reports.attendanceReport') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير الغيابات حسب الأقسام مع إمكانية التصدير إلى PDF.
+            {{ translate('reports.attendanceReportDesc') }}
           </p>
         </div>
         <button
@@ -262,10 +264,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقارير السلوك
+            {{ translate('reports.behaviorReports') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقارير السلوك الفردية وتقارير القسم.
+            {{ translate('reports.behaviorReportsDesc') }}
           </p>
         </div>
         <button
@@ -316,10 +318,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            سجل الدرجات والإحصائيات
+            {{ translate('reports.gradeReports') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقارير الدرجات وإحصائيات النتائج لكل قسم.
+            {{ translate('reports.gradeReportsDesc') }}
           </p>
         </div>
         <button
@@ -334,10 +336,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            التوزيع السنوي
+            {{ translate('reports.annualDistribution') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقارير التوزيع السنوي للمحتويات التعليمية.
+            {{ translate('reports.annualDistributionDesc') }}
           </p>
         </div>
         <button
@@ -352,10 +354,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير تتبع التقدم
+            {{ translate('reports.progressReport') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            تقرير تفصيلي لمستوى تقدّم الأقسام حسب الدروس المتوقعة والمنجزة.
+            {{ translate('reports.progressReportDesc') }}
           </p>
         </div>
         <button
@@ -370,10 +372,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            بطاقة معلومات الأستاذ
+            {{ translate('reports.teacherCard') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            إدخال وحفظ بيانات الأستاذ وطباعة البطاقة الفنية بصيغة PDF.
+            {{ translate('reports.teacherCardDesc') }}
           </p>
         </div>
         <button
@@ -388,10 +390,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير سجل التكوين
+            {{ translate('reports.trainingLog') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            عرض وتصدير سجل التكوين الخاص بالأستاذ بصيغة PDF.
+            {{ translate('reports.trainingLogDesc') }}
           </p>
         </div>
         <button
@@ -405,10 +407,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير زيارات المفتش
+            {{ translate('reports.inspectorVisits') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            عرض وتصدير سجل زيارات المفتش الخاصة بالأستاذ بصيغة PDF.
+            {{ translate('reports.inspectorVisitsDesc') }}
           </p>
         </div>
         <button
@@ -422,10 +424,10 @@
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            تقرير دفتر الملاحظات اليومية
+            {{ translate('reports.dailyNotes') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            عرض وتصدير دفتر الملاحظات اليومية للأستاذ بصيغة PDF.
+            {{ translate('reports.dailyNotesDesc') }}
           </p>
         </div>
         <button

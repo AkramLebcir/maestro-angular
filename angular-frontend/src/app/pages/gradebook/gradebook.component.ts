@@ -1760,8 +1760,23 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     
      // Headers
      excelData.push([
-       '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تاريخ الميلاد', 'تصحيح الدفتر (5)', 'الواجب (5)', 'الحضور (5)', 'السلوك (5)',
-       'التقييم المستمر', 'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'المعدل', 'التقديرات', 'الإرشادات', 'الترتيب'
+       '#',
+       this.translate('gradebook.idNumberOrCode'),
+       this.translate('gradebook.firstName'),
+       this.translate('gradebook.lastName'),
+       this.translate('gradebook.birthDate'),
+       `${this.translate('gradebook.notebookCorrection')} (5)`,
+       `${this.translate('gradebook.homework')} (5)`,
+       `${this.translate('gradebook.attendance5')}`,
+       `${this.translate('gradebook.behavior5')}`,
+       this.translate('gradebook.continuousAssessment'),
+       this.translate('gradebook.oralExpression'),
+       this.translate('gradebook.assignment'),
+       this.translate('gradebook.test'),
+       this.translate('gradebook.termAverage'),
+       this.translate('gradebook.ratings'),
+       this.translate('gradebook.guidance'),
+       this.translate('gradebook.ranking')
      ]);
 
      // Data rows
@@ -2747,7 +2762,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         headers.push(...gradeHeaders);
         
         // Add calculated columns
-        headers.push('المعدل', 'الملاحظات (obs)', 'الإرشادات (cons)');
+        headers.push(
+          this.translate('gradebook.termAverage'),
+          this.translate('gradebook.notes'),
+          this.translate('gradebook.guidanceCons')
+        );
         
         const excelData: any[] = [headers];
 
@@ -2809,7 +2828,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
       const gradeHeaders = Array.from(allColumnHeaders);
       headers.push(...gradeHeaders);
-      headers.push('المعدل', 'الملاحظات (obs)', 'الإرشادات (cons)');
+      headers.push(
+        this.translate('gradebook.termAverage'),
+        this.translate('gradebook.notes'),
+        this.translate('gradebook.guidanceCons')
+      );
       
       const excelData: any[] = [headers];
 
