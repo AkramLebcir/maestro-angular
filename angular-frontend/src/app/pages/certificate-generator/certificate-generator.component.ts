@@ -8,6 +8,7 @@ import {
 import { ApiService } from '../../services/api.service';
 import { CertificateService, CertificateTemplate } from '../../services/certificate.service';
 import { AuthService } from '../../services/auth.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -58,7 +59,12 @@ export class CertificateGeneratorComponent implements OnInit {
     private certificateService: CertificateService,
     private apiService: ApiService,
     private authService: AuthService,
+    public languageService: LanguageService,
   ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     this.signatureName = this.authService
@@ -87,7 +93,7 @@ export class CertificateGeneratorComponent implements OnInit {
         this.updateStudents();
       },
       error: () => {
-        this.errorMessage = 'تعذر تحميل الأقسام';
+        this.errorMessage = this.translate('common.error') + ': ' + this.translate('certificate.class');
       },
     });
   }
@@ -101,7 +107,7 @@ export class CertificateGeneratorComponent implements OnInit {
         }
       },
       error: () => {
-        this.errorMessage = 'تعذر تحميل قوالب الشهادات';
+        this.errorMessage = this.translate('common.error') + ': ' + this.translate('certificate.title');
       },
     });
   }
@@ -126,7 +132,7 @@ export class CertificateGeneratorComponent implements OnInit {
           this.isLoadingStudents = false;
         },
         error: () => {
-          this.errorMessage = 'تعذر تحميل التلاميذ';
+          this.errorMessage = this.translate('common.error') + ': ' + this.translate('certificate.student');
           this.isLoadingStudents = false;
         },
       });
@@ -147,7 +153,7 @@ export class CertificateGeneratorComponent implements OnInit {
 
   private replaceStudentPlaceholder(text: string): string {
     const student = this.students.find((item) => item.id === this.selectedStudentId);
-    const fullName = student ? `${student.firstName} ${student.lastName ?? ''}`.trim() : 'اسم التلميذ';
+    const fullName = student ? `${student.firstName} ${student.lastName ?? ''}`.trim() : this.translate('certificate.student');
     return text.replace(/{{student}}/g, fullName);
   }
 
@@ -163,7 +169,7 @@ export class CertificateGeneratorComponent implements OnInit {
 
   issueCertificate(): void {
     if (!this.selectedStudentId || !this.selectedTemplateId) {
-      this.errorMessage = 'اختر التلميذ والقالب أولاً';
+      this.errorMessage = this.translate('common.select') + ' ' + this.translate('certificate.student') + ' ' + this.translate('common.and') + ' ' + this.translate('common.template');
       return;
     }
     this.isSubmitting = true;
@@ -177,16 +183,16 @@ export class CertificateGeneratorComponent implements OnInit {
       reason: this.reason,
       issueDate: this.issueDate,
       academicYear: this.academicYear,
-      signatureName: this.signatureName || 'توقيع الأستاذ',
+      signatureName: this.signatureName || this.translate('certificate.signature'),
     };
 
     this.certificateService.issueCertificate(payload).subscribe({
       next: () => {
-        this.message = 'تم إصدار الشهادة بنجاح';
+        this.message = this.translate('certificate.success');
         this.isSubmitting = false;
       },
       error: () => {
-        this.errorMessage = 'تعذر إصدار الشهادة، أعد المحاولة';
+        this.errorMessage = this.translate('certificate.error');
         this.isSubmitting = false;
       },
     });
@@ -246,7 +252,7 @@ export class CertificateGeneratorComponent implements OnInit {
 
     } catch (err) {
       console.error('PDF Export Error:', err);
-      this.errorMessage = 'تعذر تصدير PDF';
+      this.errorMessage = this.translate('certificate.exportError');
     } finally {
       // Clean up clone
       if (document.body.contains(clone)) {

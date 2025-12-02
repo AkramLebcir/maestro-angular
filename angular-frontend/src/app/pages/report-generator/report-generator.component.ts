@@ -1,6 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -38,7 +39,7 @@ export class ReportGeneratorComponent implements OnInit {
   
   teacherName = '';
   reportDate = new Date();
-  schoolName = 'اسم المؤسسة هنا'; // Default placeholder
+  schoolName = 'اسم المؤسسة هنا'; // Default placeholder - will be loaded from teacher card
   
   isSubmitting = false;
   isExporting = false;
@@ -76,8 +77,13 @@ export class ReportGeneratorComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    private authService: AuthService
+    private authService: AuthService,
+    public languageService: LanguageService
   ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     const user = this.authService.getCurrentUser();
@@ -102,7 +108,7 @@ export class ReportGeneratorComponent implements OnInit {
   loadClasses() {
     this.apiService.get<ClassOption[]>('/classes').subscribe({
       next: (data) => this.classes = data,
-      error: () => this.errorMessage = 'فشل تحميل الأقسام'
+      error: () => this.errorMessage = this.translate('common.error') + ': ' + this.translate('report.class')
     });
   }
 
@@ -113,7 +119,7 @@ export class ReportGeneratorComponent implements OnInit {
         this.students = data;
         this.selectedStudentId = undefined;
       },
-      error: () => this.errorMessage = 'فشل تحميل قائمة التلاميذ'
+      error: () => this.errorMessage = this.translate('common.error') + ': ' + this.translate('report.student')
     });
   }
 
@@ -137,7 +143,7 @@ export class ReportGeneratorComponent implements OnInit {
     }
 
     const student = this.students.find(s => s.id == this.selectedStudentId);
-    const studentName = student ? `${student.firstName} ${student.lastName}` : 'التلميذ';
+    const studentName = student ? `${student.firstName} ${student.lastName}` : this.translate('report.student');
 
     let template = '';
 
@@ -165,11 +171,11 @@ export class ReportGeneratorComponent implements OnInit {
 
   getReportTitle(): string {
     switch (this.reportType) {
-      case 'ACADEMIC': return 'تقرير تقييم أكاديمي';
-      case 'BEHAVIORAL': return 'تقرير سلوكي';
-      case 'CHEATING': return 'تقرير مخالفة (غش)';
-      case 'FOLLOW_UP': return 'تقرير متابعة تربوية';
-      default: return 'تقرير';
+      case 'ACADEMIC': return this.translate('report.titleAcademic');
+      case 'BEHAVIORAL': return this.translate('report.titleBehavioral');
+      case 'CHEATING': return this.translate('report.titleCheating');
+      case 'FOLLOW_UP': return this.translate('report.titleFollowUp');
+      default: return this.translate('report.setup');
     }
   }
 
@@ -183,7 +189,7 @@ export class ReportGeneratorComponent implements OnInit {
 
   async saveAndPrint() {
     if (!this.selectedStudentId || !this.generatedContent) {
-      this.errorMessage = 'يرجى إكمال جميع البيانات المطلوبة';
+      this.errorMessage = this.translate('common.required');
       return;
     }
 
@@ -198,18 +204,18 @@ export class ReportGeneratorComponent implements OnInit {
       date: this.reportDate,
       type: this.reportType,
       reason: this.reportReason,
-      description: this.generatedContent + (this.additionalDetails ? `\n\nتفاصيل إضافية: ${this.additionalDetails}` : ''),
+      description: this.generatedContent + (this.additionalDetails ? `\n\n${this.translate('report.additionalNotes')}: ${this.additionalDetails}` : ''),
       recommendations: this.recommendations
     };
 
     this.apiService.post('/behavior-events/report', payload).subscribe({
       next: async () => {
-        this.message = 'تم حفظ التقرير بنجاح';
+        this.message = this.translate('report.success');
         await this.generatePdf();
         this.isSubmitting = false;
       },
       error: () => {
-        this.errorMessage = 'حدث خطأ أثناء حفظ التقرير';
+        this.errorMessage = this.translate('report.error');
         this.isSubmitting = false;
       }
     });
@@ -236,12 +242,12 @@ export class ReportGeneratorComponent implements OnInit {
 
   async exportPenaltiesToPDF(): Promise<void> {
     if (!this.selectedStudentId || !this.reportPreview?.nativeElement) {
-      this.errorMessage = 'يرجى اختيار التلميذ أولاً';
+      this.errorMessage = this.translate('common.select') + ' ' + this.translate('report.student');
       return;
     }
 
     if (!this.generatedContent) {
-      this.errorMessage = 'يرجى ملء محتوى التقرير أولاً';
+      this.errorMessage = this.translate('report.content') + ' ' + this.translate('common.required');
       return;
     }
 
@@ -252,7 +258,7 @@ export class ReportGeneratorComponent implements OnInit {
       await this.generatePdf();
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      this.errorMessage = 'حدث خطأ أثناء تصدير PDF';
+      this.errorMessage = this.translate('certificate.exportError');
     } finally {
       this.isExporting = false;
     }

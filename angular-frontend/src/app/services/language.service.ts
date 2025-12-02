@@ -459,6 +459,42 @@ export class LanguageService {
         'DE': 'Nein',
         'TR': 'Hayır'
       },
+      'common.required': {
+        'AR': 'مطلوب',
+        'FR': 'Requis',
+        'EN': 'Required',
+        'ES': 'Requerido',
+        'IT': 'Richiesto',
+        'DE': 'Erforderlich',
+        'TR': 'Gerekli'
+      },
+      'common.error': {
+        'AR': 'خطأ',
+        'FR': 'Erreur',
+        'EN': 'Error',
+        'ES': 'Error',
+        'IT': 'Errore',
+        'DE': 'Fehler',
+        'TR': 'Hata'
+      },
+      'common.and': {
+        'AR': 'و',
+        'FR': 'et',
+        'EN': 'and',
+        'ES': 'y',
+        'IT': 'e',
+        'DE': 'und',
+        'TR': 've'
+      },
+      'common.template': {
+        'AR': 'القالب',
+        'FR': 'Modèle',
+        'EN': 'Template',
+        'ES': 'Plantilla',
+        'IT': 'Modello',
+        'DE': 'Vorlage',
+        'TR': 'Şablon'
+      },
 
       // Dashboard
       'dashboard.title': {
@@ -4350,6 +4386,716 @@ export class LanguageService {
         'IT': 'Stampa scheda',
         'DE': 'Karte drucken',
         'TR': 'Kartı yazdır'
+      },
+
+      // Certificate Generator
+      'certificate.title': {
+        'AR': 'إصدار شهادات التقدير',
+        'FR': 'Émission de certificats de mérite',
+        'EN': 'Issue Certificates of Merit',
+        'ES': 'Emitir certificados de mérito',
+        'IT': 'Emettere certificati di merito',
+        'DE': 'Verdienstzertifikate ausstellen',
+        'TR': 'Başarı Sertifikaları Düzenle'
+      },
+      'certificate.description': {
+        'AR': 'اختر التلميذ والقالب وعدّل النص ثم حمّل الشهادة كهاتف PDF.',
+        'FR': 'Sélectionnez l\'élève et le modèle, modifiez le texte puis téléchargez le certificat en PDF.',
+        'EN': 'Select the student and template, edit the text, then download the certificate as PDF.',
+        'ES': 'Seleccione el estudiante y la plantilla, edite el texto y luego descargue el certificado como PDF.',
+        'IT': 'Seleziona lo studente e il modello, modifica il testo, poi scarica il certificato come PDF.',
+        'DE': 'Wählen Sie den Schüler und die Vorlage aus, bearbeiten Sie den Text und laden Sie dann das Zertifikat als PDF herunter.',
+        'TR': 'Öğrenciyi ve şablonu seçin, metni düzenleyin, ardından sertifikayı PDF olarak indirin.'
+      },
+      'certificate.class': {
+        'AR': 'القسم',
+        'FR': 'Classe',
+        'EN': 'Class',
+        'ES': 'Clase',
+        'IT': 'Classe',
+        'DE': 'Klasse',
+        'TR': 'Sınıf'
+      },
+      'certificate.student': {
+        'AR': 'التلميذ',
+        'FR': 'Élève',
+        'EN': 'Student',
+        'ES': 'Estudiante',
+        'IT': 'Studente',
+        'DE': 'Schüler',
+        'TR': 'Öğrenci'
+      },
+      'certificate.loading': {
+        'AR': 'جار التحميل...',
+        'FR': 'Chargement...',
+        'EN': 'Loading...',
+        'ES': 'Cargando...',
+        'IT': 'Caricamento...',
+        'DE': 'Wird geladen...',
+        'TR': 'Yükleniyor...'
+      },
+      'certificate.mainText': {
+        'AR': 'النص الرئيسي للشهادة',
+        'FR': 'Texte principal du certificat',
+        'EN': 'Certificate main text',
+        'ES': 'Texto principal del certificado',
+        'IT': 'Testo principale del certificato',
+        'DE': 'Haupttext des Zertifikats',
+        'TR': 'Sertifika ana metni'
+      },
+      'certificate.reason': {
+        'AR': 'سبب التقدير',
+        'FR': 'Raison de la distinction',
+        'EN': 'Reason for recognition',
+        'ES': 'Razón del reconocimiento',
+        'IT': 'Motivo del riconoscimento',
+        'DE': 'Grund für die Anerkennung',
+        'TR': 'Tanınma nedeni'
+      },
+      'certificate.issueDate': {
+        'AR': 'تاريخ الإصدار',
+        'FR': 'Date d\'émission',
+        'EN': 'Issue date',
+        'ES': 'Fecha de emisión',
+        'IT': 'Data di emissione',
+        'DE': 'Ausstellungsdatum',
+        'TR': 'Düzenleme tarihi'
+      },
+      'certificate.academicYear': {
+        'AR': 'السنة الدراسية',
+        'FR': 'Année scolaire',
+        'EN': 'Academic year',
+        'ES': 'Año académico',
+        'IT': 'Anno accademico',
+        'DE': 'Schuljahr',
+        'TR': 'Akademik yıl'
+      },
+      'certificate.signature': {
+        'AR': 'توقيع الأستاذ',
+        'FR': 'Signature du professeur',
+        'EN': 'Teacher signature',
+        'ES': 'Firma del profesor',
+        'IT': 'Firma dell\'insegnante',
+        'DE': 'Unterschrift des Lehrers',
+        'TR': 'Öğretmen imzası'
+      },
+      'certificate.issuing': {
+        'AR': 'جارٍ الإصدار...',
+        'FR': 'Émission en cours...',
+        'EN': 'Issuing...',
+        'ES': 'Emitiendo...',
+        'IT': 'Emissione in corso...',
+        'DE': 'Wird ausgestellt...',
+        'TR': 'Düzenleniyor...'
+      },
+      'certificate.issue': {
+        'AR': 'إصدار الشهادة',
+        'FR': 'Émettre le certificat',
+        'EN': 'Issue certificate',
+        'ES': 'Emitir certificado',
+        'IT': 'Emettere certificato',
+        'DE': 'Zertifikat ausstellen',
+        'TR': 'Sertifika düzenle'
+      },
+      'certificate.exporting': {
+        'AR': 'يُجهّز PDF...',
+        'FR': 'Préparation du PDF...',
+        'EN': 'Preparing PDF...',
+        'ES': 'Preparando PDF...',
+        'IT': 'Preparazione PDF...',
+        'DE': 'PDF wird vorbereitet...',
+        'TR': 'PDF hazırlanıyor...'
+      },
+      'certificate.export': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'certificate.preview': {
+        'AR': 'معاينة الشهادة',
+        'FR': 'Aperçu du certificat',
+        'EN': 'Certificate preview',
+        'ES': 'Vista previa del certificado',
+        'IT': 'Anteprima certificato',
+        'DE': 'Zertifikat-Vorschau',
+        'TR': 'Sertifika önizleme'
+      },
+      'certificate.certificateTitle': {
+        'AR': 'شهادة تقدير',
+        'FR': 'Certificat de mérite',
+        'EN': 'Certificate of Merit',
+        'ES': 'Certificado de mérito',
+        'IT': 'Certificato di merito',
+        'DE': 'Verdienstzertifikat',
+        'TR': 'Başarı Sertifikası'
+      },
+      'certificate.awardedTo': {
+        'AR': 'تُمنح هذه الشهادة إلى الطالب(ة)',
+        'FR': 'Ce certificat est décerné à l\'élève',
+        'EN': 'This certificate is awarded to the student',
+        'ES': 'Este certificado se otorga al estudiante',
+        'IT': 'Questo certificato è assegnato allo studente',
+        'DE': 'Dieses Zertifikat wird dem Schüler verliehen',
+        'TR': 'Bu sertifika öğrenciye verilir'
+      },
+      'certificate.inRecognition': {
+        'AR': 'وذلك تقديراً:',
+        'FR': 'En reconnaissance de:',
+        'EN': 'In recognition of:',
+        'ES': 'En reconocimiento de:',
+        'IT': 'In riconoscimento di:',
+        'DE': 'In Anerkennung von:',
+        'TR': 'Tanınma nedeniyle:'
+      },
+      'certificate.excellence': {
+        'AR': 'تميز',
+        'FR': 'Excellence',
+        'EN': 'Excellence',
+        'ES': 'Excelencia',
+        'IT': 'Eccellenza',
+        'DE': 'Exzellenz',
+        'TR': 'Mükemmellik'
+      },
+      'certificate.success': {
+        'AR': 'تم إصدار الشهادة بنجاح',
+        'FR': 'Certificat émis avec succès',
+        'EN': 'Certificate issued successfully',
+        'ES': 'Certificado emitido con éxito',
+        'IT': 'Certificato emesso con successo',
+        'DE': 'Zertifikat erfolgreich ausgestellt',
+        'TR': 'Sertifika başarıyla düzenlendi'
+      },
+      'certificate.error': {
+        'AR': 'تعذر إصدار الشهادة، أعد المحاولة',
+        'FR': 'Impossible d\'émettre le certificat, réessayez',
+        'EN': 'Failed to issue certificate, please try again',
+        'ES': 'Error al emitir certificado, por favor intente de nuevo',
+        'IT': 'Impossibile emettere certificato, riprova',
+        'DE': 'Zertifikat konnte nicht ausgestellt werden, bitte versuchen Sie es erneut',
+        'TR': 'Sertifika düzenlenemedi, lütfen tekrar deneyin'
+      },
+      'certificate.exportError': {
+        'AR': 'تعذر تصدير PDF',
+        'FR': 'Impossible d\'exporter le PDF',
+        'EN': 'Failed to export PDF',
+        'ES': 'Error al exportar PDF',
+        'IT': 'Impossibile esportare PDF',
+        'DE': 'PDF konnte nicht exportiert werden',
+        'TR': 'PDF dışa aktarılamadı'
+      },
+
+      // Report Generator
+      'report.setup': {
+        'AR': 'إعداد التقرير',
+        'FR': 'Configuration du rapport',
+        'EN': 'Report setup',
+        'ES': 'Configuración del informe',
+        'IT': 'Configurazione rapporto',
+        'DE': 'Bericht einrichten',
+        'TR': 'Rapor ayarları'
+      },
+      'report.selectClass': {
+        'AR': 'اختر القسم',
+        'FR': 'Sélectionner la classe',
+        'EN': 'Select class',
+        'ES': 'Seleccionar clase',
+        'IT': 'Seleziona classe',
+        'DE': 'Klasse auswählen',
+        'TR': 'Sınıf seç'
+      },
+      'report.selectStudent': {
+        'AR': 'اختر التلميذ',
+        'FR': 'Sélectionner l\'élève',
+        'EN': 'Select student',
+        'ES': 'Seleccionar estudiante',
+        'IT': 'Seleziona studente',
+        'DE': 'Schüler auswählen',
+        'TR': 'Öğrenci seç'
+      },
+      'report.type': {
+        'AR': 'نوع التقرير',
+        'FR': 'Type de rapport',
+        'EN': 'Report type',
+        'ES': 'Tipo de informe',
+        'IT': 'Tipo di rapporto',
+        'DE': 'Berichtstyp',
+        'TR': 'Rapor türü'
+      },
+      'report.typeAcademic': {
+        'AR': 'تقرير أكاديمي',
+        'FR': 'Rapport académique',
+        'EN': 'Academic report',
+        'ES': 'Informe académico',
+        'IT': 'Rapporto accademico',
+        'DE': 'Akademischer Bericht',
+        'TR': 'Akademik rapor'
+      },
+      'report.typeBehavioral': {
+        'AR': 'تقرير سلوكي',
+        'FR': 'Rapport comportemental',
+        'EN': 'Behavioral report',
+        'ES': 'Informe de comportamiento',
+        'IT': 'Rapporto comportamentale',
+        'DE': 'Verhaltensbericht',
+        'TR': 'Davranış raporu'
+      },
+      'report.typeFollowUp': {
+        'AR': 'تقرير متابعة خاص',
+        'FR': 'Rapport de suivi spécial',
+        'EN': 'Special follow-up report',
+        'ES': 'Informe de seguimiento especial',
+        'IT': 'Rapporto di follow-up speciale',
+        'DE': 'Besonderer Nachfolgebericht',
+        'TR': 'Özel takip raporu'
+      },
+      'report.typeCheating': {
+        'AR': 'تقرير غش',
+        'FR': 'Rapport de tricherie',
+        'EN': 'Cheating report',
+        'ES': 'Informe de trampa',
+        'IT': 'Rapporto di imbroglio',
+        'DE': 'Betrugsbericht',
+        'TR': 'Kopya raporu'
+      },
+      'report.reason': {
+        'AR': 'سبب التقرير',
+        'FR': 'Raison du rapport',
+        'EN': 'Report reason',
+        'ES': 'Razón del informe',
+        'IT': 'Motivo del rapporto',
+        'DE': 'Berichtsgrund',
+        'TR': 'Rapor nedeni'
+      },
+      'report.selectReason': {
+        'AR': 'اختر السبب',
+        'FR': 'Sélectionner la raison',
+        'EN': 'Select reason',
+        'ES': 'Seleccionar razón',
+        'IT': 'Seleziona motivo',
+        'DE': 'Grund auswählen',
+        'TR': 'Neden seç'
+      },
+      'report.content': {
+        'AR': 'نص التقرير (يتم توليده تلقائياً ويمكن تعديله)',
+        'FR': 'Contenu du rapport (généré automatiquement et modifiable)',
+        'EN': 'Report content (auto-generated and editable)',
+        'ES': 'Contenido del informe (generado automáticamente y editable)',
+        'IT': 'Contenuto rapporto (generato automaticamente e modificabile)',
+        'DE': 'Berichtsinhalt (automatisch generiert und bearbeitbar)',
+        'TR': 'Rapor içeriği (otomatik oluşturulur ve düzenlenebilir)'
+      },
+      'report.additionalDetails': {
+        'AR': 'وصف وتفاصيل إضافية',
+        'FR': 'Description et détails supplémentaires',
+        'EN': 'Additional description and details',
+        'ES': 'Descripción y detalles adicionales',
+        'IT': 'Descrizione e dettagli aggiuntivi',
+        'DE': 'Zusätzliche Beschreibung und Details',
+        'TR': 'Ek açıklama ve detaylar'
+      },
+      'report.additionalDetailsPlaceholder': {
+        'AR': 'أضف ملاحظات شخصية أو أمثلة محددة...',
+        'FR': 'Ajoutez des notes personnelles ou des exemples spécifiques...',
+        'EN': 'Add personal notes or specific examples...',
+        'ES': 'Agregue notas personales o ejemplos específicos...',
+        'IT': 'Aggiungi note personali o esempi specifici...',
+        'DE': 'Persönliche Notizen oder spezifische Beispiele hinzufügen...',
+        'TR': 'Kişisel notlar veya belirli örnekler ekleyin...'
+      },
+      'report.recommendations': {
+        'AR': 'التوصيات والإجراءات المقترحة',
+        'FR': 'Recommandations et mesures proposées',
+        'EN': 'Recommendations and proposed actions',
+        'ES': 'Recomendaciones y acciones propuestas',
+        'IT': 'Raccomandazioni e azioni proposte',
+        'DE': 'Empfehlungen und vorgeschlagene Maßnahmen',
+        'TR': 'Öneriler ve önerilen eylemler'
+      },
+      'report.recommendationsPlaceholder': {
+        'AR': 'اكتب التوصيات الموجهة للتلميذ أو الولي...',
+        'FR': 'Écrivez les recommandations adressées à l\'élève ou au tuteur...',
+        'EN': 'Write recommendations addressed to the student or parent...',
+        'ES': 'Escriba recomendaciones dirigidas al estudiante o padre...',
+        'IT': 'Scrivi raccomandazioni rivolte allo studente o al genitore...',
+        'DE': 'Schreiben Sie Empfehlungen an den Schüler oder Elternteil...',
+        'TR': 'Öğrenciye veya veliye yönelik öneriler yazın...'
+      },
+      'report.saving': {
+        'AR': 'جارٍ الحفظ...',
+        'FR': 'Enregistrement en cours...',
+        'EN': 'Saving...',
+        'ES': 'Guardando...',
+        'IT': 'Salvataggio in corso...',
+        'DE': 'Wird gespeichert...',
+        'TR': 'Kaydediliyor...'
+      },
+      'report.saveAndIssue': {
+        'AR': 'إصدار وحفظ التقرير',
+        'FR': 'Émettre et enregistrer le rapport',
+        'EN': 'Issue and save report',
+        'ES': 'Emitir y guardar informe',
+        'IT': 'Emettere e salvare rapporto',
+        'DE': 'Bericht ausstellen und speichern',
+        'TR': 'Raporu düzenle ve kaydet'
+      },
+      'report.preview': {
+        'AR': 'معاينة التقرير',
+        'FR': 'Aperçu du rapport',
+        'EN': 'Report preview',
+        'ES': 'Vista previa del informe',
+        'IT': 'Anteprima rapporto',
+        'DE': 'Bericht-Vorschau',
+        'TR': 'Rapor önizleme'
+      },
+      'report.republic': {
+        'AR': 'الجمهورية الجزائرية الديمقراطية الشعبية',
+        'FR': 'République Algérienne Démocratique et Populaire',
+        'EN': 'People\'s Democratic Republic of Algeria',
+        'ES': 'República Argelina Democrática y Popular',
+        'IT': 'Repubblica Algerina Democratica e Popolare',
+        'DE': 'Demokratische Volksrepublik Algerien',
+        'TR': 'Cezayir Demokratik Halk Cumhuriyeti'
+      },
+      'report.ministry': {
+        'AR': 'وزارة التربية الوطنية',
+        'FR': 'Ministère de l\'Éducation Nationale',
+        'EN': 'Ministry of National Education',
+        'ES': 'Ministerio de Educación Nacional',
+        'IT': 'Ministero dell\'Educazione Nazionale',
+        'DE': 'Ministerium für Nationale Bildung',
+        'TR': 'Milli Eğitim Bakanlığı'
+      },
+      'report.school': {
+        'AR': 'المؤسسة:',
+        'FR': 'Établissement:',
+        'EN': 'School:',
+        'ES': 'Escuela:',
+        'IT': 'Scuola:',
+        'DE': 'Schule:',
+        'TR': 'Okul:'
+      },
+      'report.studentName': {
+        'AR': 'اسم التلميذ:',
+        'FR': 'Nom de l\'élève:',
+        'EN': 'Student name:',
+        'ES': 'Nombre del estudiante:',
+        'IT': 'Nome studente:',
+        'DE': 'Schülername:',
+        'TR': 'Öğrenci adı:'
+      },
+      'report.class': {
+        'AR': 'القسم:',
+        'FR': 'Classe:',
+        'EN': 'Class:',
+        'ES': 'Clase:',
+        'IT': 'Classe:',
+        'DE': 'Klasse:',
+        'TR': 'Sınıf:'
+      },
+      'report.teacher': {
+        'AR': 'الأستاذ:',
+        'FR': 'Professeur:',
+        'EN': 'Teacher:',
+        'ES': 'Profesor:',
+        'IT': 'Insegnante:',
+        'DE': 'Lehrer:',
+        'TR': 'Öğretmen:'
+      },
+      'report.date': {
+        'AR': 'التاريخ:',
+        'FR': 'Date:',
+        'EN': 'Date:',
+        'ES': 'Fecha:',
+        'IT': 'Data:',
+        'DE': 'Datum:',
+        'TR': 'Tarih:'
+      },
+      'report.additionalNotes': {
+        'AR': 'ملاحظات إضافية:',
+        'FR': 'Notes supplémentaires:',
+        'EN': 'Additional notes:',
+        'ES': 'Notas adicionales:',
+        'IT': 'Note aggiuntive:',
+        'DE': 'Zusätzliche Notizen:',
+        'TR': 'Ek notlar:'
+      },
+      'report.recommendationsTitle': {
+        'AR': 'التوصيات والإجراءات:',
+        'FR': 'Recommandations et mesures:',
+        'EN': 'Recommendations and actions:',
+        'ES': 'Recomendaciones y acciones:',
+        'IT': 'Raccomandazioni e azioni:',
+        'DE': 'Empfehlungen und Maßnahmen:',
+        'TR': 'Öneriler ve eylemler:'
+      },
+      'report.teacherSignature': {
+        'AR': 'توقيع الأستاذ',
+        'FR': 'Signature du professeur',
+        'EN': 'Teacher signature',
+        'ES': 'Firma del profesor',
+        'IT': 'Firma dell\'insegnante',
+        'DE': 'Unterschrift des Lehrers',
+        'TR': 'Öğretmen imzası'
+      },
+      'report.parentSignature': {
+        'AR': 'توقيع الولي / الإدارة',
+        'FR': 'Signature du tuteur / Administration',
+        'EN': 'Parent / Administration signature',
+        'ES': 'Firma del padre / Administración',
+        'IT': 'Firma genitore / Amministrazione',
+        'DE': 'Unterschrift Elternteil / Verwaltung',
+        'TR': 'Veli / Yönetim imzası'
+      },
+      'report.titleAcademic': {
+        'AR': 'تقرير تقييم أكاديمي',
+        'FR': 'Rapport d\'évaluation académique',
+        'EN': 'Academic evaluation report',
+        'ES': 'Informe de evaluación académica',
+        'IT': 'Rapporto di valutazione accademica',
+        'DE': 'Akademischer Bewertungsbericht',
+        'TR': 'Akademik değerlendirme raporu'
+      },
+      'report.titleBehavioral': {
+        'AR': 'تقرير سلوكي',
+        'FR': 'Rapport comportemental',
+        'EN': 'Behavioral report',
+        'ES': 'Informe de comportamiento',
+        'IT': 'Rapporto comportamentale',
+        'DE': 'Verhaltensbericht',
+        'TR': 'Davranış raporu'
+      },
+      'report.titleCheating': {
+        'AR': 'تقرير مخالفة (غش)',
+        'FR': 'Rapport d\'infraction (tricherie)',
+        'EN': 'Violation report (cheating)',
+        'ES': 'Informe de infracción (trampa)',
+        'IT': 'Rapporto di violazione (imbroglio)',
+        'DE': 'Verstoßbericht (Betrug)',
+        'TR': 'İhlal raporu (kopya)'
+      },
+      'report.titleFollowUp': {
+        'AR': 'تقرير متابعة تربوية',
+        'FR': 'Rapport de suivi pédagogique',
+        'EN': 'Educational follow-up report',
+        'ES': 'Informe de seguimiento educativo',
+        'IT': 'Rapporto di follow-up educativo',
+        'DE': 'Pädagogischer Nachfolgebericht',
+        'TR': 'Eğitim takip raporu'
+      },
+      'report.success': {
+        'AR': 'تم حفظ التقرير بنجاح',
+        'FR': 'Rapport enregistré avec succès',
+        'EN': 'Report saved successfully',
+        'ES': 'Informe guardado con éxito',
+        'IT': 'Rapporto salvato con successo',
+        'DE': 'Bericht erfolgreich gespeichert',
+        'TR': 'Rapor başarıyla kaydedildi'
+      },
+      'report.error': {
+        'AR': 'حدث خطأ أثناء حفظ التقرير',
+        'FR': 'Erreur lors de l\'enregistrement du rapport',
+        'EN': 'Error saving report',
+        'ES': 'Error al guardar informe',
+        'IT': 'Errore nel salvare il rapporto',
+        'DE': 'Fehler beim Speichern des Berichts',
+        'TR': 'Rapor kaydedilirken hata oluştu'
+      },
+
+      // Login
+      'login.title': {
+        'AR': 'نظام إدارة التدريس',
+        'FR': 'Système de gestion pédagogique',
+        'EN': 'Teaching Management System',
+        'ES': 'Sistema de gestión de enseñanza',
+        'IT': 'Sistema di gestione didattica',
+        'DE': 'Lehrverwaltungssystem',
+        'TR': 'Öğretim Yönetim Sistemi'
+      },
+      'login.subtitle': {
+        'AR': 'تسجيل الدخول إلى حسابك',
+        'FR': 'Connectez-vous à votre compte',
+        'EN': 'Sign in to your account',
+        'ES': 'Inicie sesión en su cuenta',
+        'IT': 'Accedi al tuo account',
+        'DE': 'Melden Sie sich in Ihrem Konto an',
+        'TR': 'Hesabınıza giriş yapın'
+      },
+      'login.username': {
+        'AR': 'اسم المستخدم أو البريد الإلكتروني',
+        'FR': 'Nom d\'utilisateur ou e-mail',
+        'EN': 'Username or email',
+        'ES': 'Nombre de usuario o correo electrónico',
+        'IT': 'Nome utente o email',
+        'DE': 'Benutzername oder E-Mail',
+        'TR': 'Kullanıcı adı veya e-posta'
+      },
+      'login.usernamePlaceholder': {
+        'AR': 'أدخل اسم المستخدم أو البريد الإلكتروني',
+        'FR': 'Entrez le nom d\'utilisateur ou l\'e-mail',
+        'EN': 'Enter username or email',
+        'ES': 'Ingrese nombre de usuario o correo electrónico',
+        'IT': 'Inserisci nome utente o email',
+        'DE': 'Benutzername oder E-Mail eingeben',
+        'TR': 'Kullanıcı adı veya e-posta girin'
+      },
+      'login.password': {
+        'AR': 'كلمة المرور',
+        'FR': 'Mot de passe',
+        'EN': 'Password',
+        'ES': 'Contraseña',
+        'IT': 'Password',
+        'DE': 'Passwort',
+        'TR': 'Şifre'
+      },
+      'login.passwordPlaceholder': {
+        'AR': 'أدخل كلمة المرور',
+        'FR': 'Entrez le mot de passe',
+        'EN': 'Enter password',
+        'ES': 'Ingrese la contraseña',
+        'IT': 'Inserisci password',
+        'DE': 'Passwort eingeben',
+        'TR': 'Şifreyi girin'
+      },
+      'login.submit': {
+        'AR': 'تسجيل الدخول',
+        'FR': 'Se connecter',
+        'EN': 'Sign in',
+        'ES': 'Iniciar sesión',
+        'IT': 'Accedi',
+        'DE': 'Anmelden',
+        'TR': 'Giriş yap'
+      },
+      'login.loading': {
+        'AR': 'جاري تسجيل الدخول...',
+        'FR': 'Connexion en cours...',
+        'EN': 'Signing in...',
+        'ES': 'Iniciando sesión...',
+        'IT': 'Accesso in corso...',
+        'DE': 'Wird angemeldet...',
+        'TR': 'Giriş yapılıyor...'
+      },
+      'login.footer': {
+        'AR': '© 2024 نظام إدارة التدريس. جميع الحقوق محفوظة.',
+        'FR': '© 2024 Système de gestion pédagogique. Tous droits réservés.',
+        'EN': '© 2024 Teaching Management System. All rights reserved.',
+        'ES': '© 2024 Sistema de gestión de enseñanza. Todos los derechos reservados.',
+        'IT': '© 2024 Sistema di gestione didattica. Tutti i diritti riservati.',
+        'DE': '© 2024 Lehrverwaltungssystem. Alle Rechte vorbehalten.',
+        'TR': '© 2024 Öğretim Yönetim Sistemi. Tüm hakları saklıdır.'
+      },
+      'login.error': {
+        'AR': 'خطأ في تسجيل الدخول. الرجاء التحقق من البيانات المدخلة.',
+        'FR': 'Erreur de connexion. Veuillez vérifier les données saisies.',
+        'EN': 'Login error. Please check the entered data.',
+        'ES': 'Error de inicio de sesión. Por favor verifique los datos ingresados.',
+        'IT': 'Errore di accesso. Si prega di verificare i dati inseriti.',
+        'DE': 'Anmeldefehler. Bitte überprüfen Sie die eingegebenen Daten.',
+        'TR': 'Giriş hatası. Lütfen girilen verileri kontrol edin.'
+      },
+
+      // Header additional translations
+      'header.notificationsTitle': {
+        'AR': 'الإشعارات',
+        'FR': 'Notifications',
+        'EN': 'Notifications',
+        'ES': 'Notificaciones',
+        'IT': 'Notifiche',
+        'DE': 'Benachrichtigungen',
+        'TR': 'Bildirimler'
+      },
+      'header.refreshNotifications': {
+        'AR': 'تحديث الإشعارات',
+        'FR': 'Actualiser les notifications',
+        'EN': 'Refresh notifications',
+        'ES': 'Actualizar notificaciones',
+        'IT': 'Aggiorna notifiche',
+        'DE': 'Benachrichtigungen aktualisieren',
+        'TR': 'Bildirimleri yenile'
+      },
+      'header.adminPanel': {
+        'AR': 'لوحة التحكم',
+        'FR': 'Panneau d\'administration',
+        'EN': 'Admin panel',
+        'ES': 'Panel de administración',
+        'IT': 'Pannello amministratore',
+        'DE': 'Administrationspanel',
+        'TR': 'Yönetici paneli'
+      },
+      'header.logout': {
+        'AR': 'تسجيل الخروج',
+        'FR': 'Se déconnecter',
+        'EN': 'Logout',
+        'ES': 'Cerrar sesión',
+        'IT': 'Esci',
+        'DE': 'Abmelden',
+        'TR': 'Çıkış yap'
+      },
+      'header.roleAdmin': {
+        'AR': 'مسؤول',
+        'FR': 'Administrateur',
+        'EN': 'Admin',
+        'ES': 'Administrador',
+        'IT': 'Amministratore',
+        'DE': 'Administrator',
+        'TR': 'Yönetici'
+      },
+      'header.roleTeacher': {
+        'AR': 'أستاذ',
+        'FR': 'Professeur',
+        'EN': 'Teacher',
+        'ES': 'Profesor',
+        'IT': 'Insegnante',
+        'DE': 'Lehrer',
+        'TR': 'Öğretmen'
+      },
+      'header.userPhoto': {
+        'AR': 'صورة المستخدم',
+        'FR': 'Photo de l\'utilisateur',
+        'EN': 'User photo',
+        'ES': 'Foto del usuario',
+        'IT': 'Foto utente',
+        'DE': 'Benutzerfoto',
+        'TR': 'Kullanıcı fotoğrafı'
+      },
+      'header.priorityUrgent': {
+        'AR': 'عاجل',
+        'FR': 'Urgent',
+        'EN': 'Urgent',
+        'ES': 'Urgente',
+        'IT': 'Urgente',
+        'DE': 'Dringend',
+        'TR': 'Acil'
+      },
+      'header.priorityHigh': {
+        'AR': 'عالي',
+        'FR': 'Élevé',
+        'EN': 'High',
+        'ES': 'Alto',
+        'IT': 'Alto',
+        'DE': 'Hoch',
+        'TR': 'Yüksek'
+      },
+      'header.priorityMedium': {
+        'AR': 'متوسط',
+        'FR': 'Moyen',
+        'EN': 'Medium',
+        'ES': 'Medio',
+        'IT': 'Medio',
+        'DE': 'Mittel',
+        'TR': 'Orta'
+      },
+      'header.priorityLow': {
+        'AR': 'منخفض',
+        'FR': 'Faible',
+        'EN': 'Low',
+        'ES': 'Bajo',
+        'IT': 'Basso',
+        'DE': 'Niedrig',
+        'TR': 'Düşük'
       }
     };
   }

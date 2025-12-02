@@ -103,13 +103,37 @@ export class ProgressTrackingComponent implements OnInit {
       .get<SubjectProgressResponse>(`/progress-tracking/subject/${this.subjectId}`)
       .subscribe({
         next: (res) => {
-          this.overview = res;
-          this.tableRows = this.buildRowspanTable(res.items);
-          this.loading = false;
+          if (res && res.items) {
+            this.overview = res;
+            this.tableRows = this.buildRowspanTable(res.items);
+            this.loading = false;
+          } else {
+            this.error = 'البيانات المستلمة غير صحيحة';
+            this.loading = false;
+          }
         },
         error: (err) => {
-          console.error(err);
-          this.error = 'خطأ في جلب بيانات التقدم';
+          console.error('Error loading progress data:', err);
+          // عرض رسالة خطأ أكثر تفصيلاً
+          let errorMessage = 'خطأ في جلب بيانات التقدم';
+          
+          if (err?.error?.message) {
+            errorMessage += `: ${err.error.message}`;
+          } else if (err?.message) {
+            errorMessage += `: ${err.message}`;
+          } else if (err?.status === 401) {
+            errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى';
+          } else if (err?.status === 403) {
+            errorMessage = 'ليس لديك صلاحية للوصول إلى هذه البيانات';
+          } else if (err?.status === 404) {
+            errorMessage = 'لم يتم العثور على البيانات المطلوبة';
+          } else if (err?.status === 500) {
+            errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
+          } else if (err?.status === 0) {
+            errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من الاتصال بالإنترنت';
+          }
+          
+          this.error = errorMessage;
           this.loading = false;
         },
       });

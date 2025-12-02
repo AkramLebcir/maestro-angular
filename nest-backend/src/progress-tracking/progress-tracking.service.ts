@@ -68,44 +68,57 @@ export class ProgressTrackingService {
     subjectId: number,
     opts?: { date?: string },
   ): Promise<SubjectProgressDto> {
-    // يمكن لاحقاً استخدام subjectId فعلياً لربطه بجدول المواد، حالياً نستخدمه كـ وسم فقط
-    let subject = await this.subjectRepo.findOne({ where: { id: subjectId, ownerId } });
-    if (!subject) {
-      subject = this.subjectRepo.create({
-        nameAr: `مادة #${subjectId}`,
-        level: '',
-        totalLessons: 16, // قيمة افتراضية معقولة
-        ownerId,
+    try {
+      // يمكن لاحقاً استخدام subjectId فعلياً لربطه بجدول المواد، حالياً نستخدمه كـ وسم فقط
+      let subject = await this.subjectRepo.findOne({ where: { id: subjectId, ownerId } });
+      if (!subject) {
+        subject = this.subjectRepo.create({
+          nameAr: `مادة #${subjectId}`,
+          level: '',
+          totalLessons: 16, // قيمة افتراضية معقولة
+          ownerId,
+        });
+      }
+
+      // نأتي بجميع الأقسام الخاصة بالمستخدم (يمكن تصفيتها لاحقاً حسب المستوى/الشعبة)
+      const classes = await this.classRepo.find({
+        where: { ownerId },
+        order: { level: 'ASC', name: 'ASC' },
       });
-    }
 
-    // نأتي بجميع الأقسام الخاصة بالمستخدم (يمكن تصفيتها لاحقاً حسب المستوى/الشعبة)
-    const classes = await this.classRepo.find({
-      where: { ownerId },
-      order: { level: 'ASC', name: 'ASC' },
-    });
+      const classIds = classes.map((c) => c.id);
 
-    const classIds = classes.map((c) => c.id);
+      // تقدم مسجل يدوياً إن وجد
+      const progressRows =
+        classIds.length > 0
+          ? await this.progressRepo.find({
+              where: { classId: In(classIds), ownerId },
+            })
+          : [];
 
-    // تقدم مسجل يدوياً إن وجد
-    const progressRows =
-      classIds.length > 0
-        ? await this.progressRepo.find({
-            where: { classId: In(classIds), ownerId },
-          })
-        : [];
+      // استخراج آخر درس من دفاتر الأستاذ (notebooks/course_entries)
+      const lastLessonByClass = await this.getLastLessonFromNotebooks(ownerId, classIds);
 
-    // استخراج آخر درس من دفاتر الأستاذ (notebooks/course_entries)
-    const lastLessonByClass = await this.getLastLessonFromNotebooks(ownerId, classIds);
+      const today = opts?.date ? new Date(opts.date) : new Date();
+      const currentDateStr = today.toISOString().slice(0, 10);
 
-    const today = opts?.date ? new Date(opts.date) : new Date();
-    const currentDateStr = today.toISOString().slice(0, 10);
-
-    const { currentWeek, expectedLesson } = await this.computeExpectedLesson(
-      ownerId,
-      subjectId,
-      today,
-    );
+      let currentWeek = 1;
+      let expectedLesson = 0;
+      
+      try {
+        const computed = await this.computeExpectedLesson(
+          ownerId,
+          subjectId,
+          today,
+        );
+        currentWeek = computed.currentWeek;
+        expectedLesson = computed.expectedLesson;
+      } catch (computeError) {
+        console.error('Error computing expected lesson:', computeError);
+        // استخدام قيم افتراضية في حالة الخطأ
+        currentWeek = 1;
+        expectedLesson = 0;
+      }
 
     const items: ProgressItemDto[] = classes.map((cls) => {
       const progress = progressRows.find((p) => p.classId === cls.id);
@@ -143,21 +156,25 @@ export class ProgressTrackingService {
       };
     });
 
-    const delayed = items.filter((i) => i.status === 'delay');
-    const advanced = items.filter((i) => i.status === 'advance');
+      const delayed = items.filter((i) => i.status === 'delay');
+      const advanced = items.filter((i) => i.status === 'advance');
 
-    return {
-      subjectId: subject.id,
-      subjectNameAr: subject.nameAr,
-      level: subject.level,
-      totalLessons: subject.totalLessons,
-      currentDate: currentDateStr,
-      currentWeek,
-      expectedLesson,
-      items,
-      delayed,
-      advanced,
-    };
+      return {
+        subjectId: subject.id,
+        subjectNameAr: subject.nameAr,
+        level: subject.level,
+        totalLessons: subject.totalLessons,
+        currentDate: currentDateStr,
+        currentWeek,
+        expectedLesson,
+        items,
+        delayed,
+        advanced,
+      };
+    } catch (error) {
+      console.error('Error in getSubjectProgress:', error);
+      throw new Error(`فشل في جلب بيانات التقدم: ${error instanceof Error ? error.message : 'خطأ غير معروف'}`);
+    }
   }
 
   /**

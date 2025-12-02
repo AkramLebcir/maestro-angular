@@ -1,28 +1,28 @@
 <div class="certificate-page" [class.embed-mode]="embedMode">
   <header class="certificate-header" *ngIf="!embedMode">
     <div>
-      <h1>إصدار شهادات التقدير</h1>
-      <p>اختر التلميذ والقالب وعدّل النص ثم حمّل الشهادة كهاتف PDF.</p>
+      <h1>{{ translate('certificate.title') }}</h1>
+      <p>{{ translate('certificate.description') }}</p>
     </div>
   </header>
 
   <section class="certificate-builder">
     <div class="card form-card">
       <div class="form-group">
-        <label>القسم</label>
+        <label>{{ translate('certificate.class') }}</label>
         <select [(ngModel)]="selectedClassId" (ngModelChange)="updateStudents()">
           <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>التلميذ</label>
+        <label>{{ translate('certificate.student') }}</label>
         <select [(ngModel)]="selectedStudentId">
           <option *ngFor="let student of students" [value]="student.id">
             {{ student.firstName }} {{ student.lastName ?? '' }}
           </option>
         </select>
-        <small *ngIf="isLoadingStudents">جار التحميل...</small>
+        <small *ngIf="isLoadingStudents">{{ translate('certificate.loading') }}</small>
       </div>
 
       <div class="templates-section">
@@ -44,37 +44,37 @@
       </div>
 
       <div class="form-group">
-        <label>النص الرئيسي للشهادة</label>
+        <label>{{ translate('certificate.mainText') }}</label>
         <textarea [(ngModel)]="mainText" rows="3"></textarea>
       </div>
 
       <div class="form-group">
-        <label>سبب التقدير</label>
+        <label>{{ translate('certificate.reason') }}</label>
         <textarea [(ngModel)]="reason" rows="2"></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>تاريخ الإصدار</label>
+          <label>{{ translate('certificate.issueDate') }}</label>
           <input type="date" [(ngModel)]="issueDate" />
         </div>
         <div class="form-group">
-          <label>السنة الدراسية</label>
+          <label>{{ translate('certificate.academicYear') }}</label>
           <input type="text" [(ngModel)]="academicYear" />
         </div>
       </div>
 
       <div class="form-group">
-        <label>توقيع الأستاذ</label>
+        <label>{{ translate('certificate.signature') }}</label>
         <input type="text" [(ngModel)]="signatureName" />
       </div>
 
       <div class="actions">
         <button (click)="issueCertificate()" [disabled]="isSubmitting">
-          {{ isSubmitting ? 'جارٍ الإصدار...' : 'إصدار الشهادة' }}
+          {{ isSubmitting ? translate('certificate.issuing') : translate('certificate.issue') }}
         </button>
         <button class="secondary btn-export-pdf" (click)="downloadPdf()" [disabled]="isExporting">
-          {{ isExporting ? 'يُجهّز PDF...' : 'تصدير PDF' }}
+          {{ isExporting ? translate('certificate.exporting') : translate('certificate.export') }}
         </button>
       </div>
 
@@ -85,7 +85,7 @@
     </div>
 
     <div class="card preview-card">
-      <div class="preview-label">معاينة الشهادة</div>
+      <div class="preview-label">{{ translate('certificate.preview') }}</div>
       <div class="certificate-preview" #certificatePreview>
         <div class="certificate-border" [ngClass]="getSelectedTheme()">
           <div class="certificate-inner-border">
@@ -100,34 +100,34 @@
             </div>
             
             <div class="certificate-content">
-              <h1 class="cert-title">شهادة تقدير</h1>
-              <div class="cert-subtitle">تُمنح هذه الشهادة إلى الطالب(ة)</div>
+              <h1 class="cert-title">{{ translate('certificate.certificateTitle') }}</h1>
+              <div class="cert-subtitle">{{ translate('certificate.awardedTo') }}</div>
               
               <h2 class="student-name">{{ selectedStudent?.firstName }} {{ selectedStudent?.lastName }}</h2>
               
               <p class="main-text">{{ mainText }}</p>
               
               <div class="reason-section">
-                <span class="reason-label">وذلك تقديراً:</span>
+                <span class="reason-label">{{ translate('certificate.inRecognition') }}</span>
                 <p class="reason-text">{{ reason }}</p>
               </div>
 
               <div class="cert-footer">
                 <div class="date-section">
-                  <div class="meta-label">تاريخ الإصدار</div>
+                  <div class="meta-label">{{ translate('certificate.issueDate') }}</div>
                   <div class="meta-value">{{ issueDate }}</div>
-                  <div class="meta-sub">السنة الدراسية: {{ academicYear }}</div>
+                  <div class="meta-sub">{{ translate('certificate.academicYear') }}: {{ academicYear }}</div>
                 </div>
                 
                 <div class="seal-container">
                   <div class="seal">
-                    <span>تميز</span>
+                    <span>{{ translate('certificate.excellence') }}</span>
                   </div>
                 </div>
 
                 <div class="signature-section">
-                  <div class="signature-line">{{ signatureName || 'توقيع الأستاذ' }}</div>
-                  <div class="signature-label">توقيع الأستاذ</div>
+                  <div class="signature-line">{{ signatureName || translate('certificate.signature') }}</div>
+                  <div class="signature-label">{{ translate('certificate.signature') }}</div>
                 </div>
               </div>
             </div>

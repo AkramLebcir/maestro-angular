@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { LanguageService } from '../../services/language.service';
 
 @Component({
   selector: 'app-login',
@@ -15,8 +16,13 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public languageService: LanguageService
   ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     // Redirect if already logged in
@@ -27,9 +33,29 @@ export class LoginComponent implements OnInit {
 
   onSubmit(): void {
     if (!this.identifier || !this.password) {
-      this.errorMessage = 'الرجاء إدخال اسم المستخدم/البريد الإلكتروني وكلمة المرور';
+      this.errorMessage = this.translate('login.username') + ' / ' + this.translate('login.password') + ' ' + this.translate('common.required');
       return;
     }
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService.login(this.identifier, this.password).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        // Redirect based on role
+        if (response.user.role === 'admin') {
+          this.router.navigate(['/admin']);
+        } else {
+          this.router.navigate(['/dashboard']);
+        }
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.errorMessage = error?.error?.message || this.translate('login.error');
+      }
+    });
+  }
 
     this.isLoading = true;
     this.errorMessage = '';
