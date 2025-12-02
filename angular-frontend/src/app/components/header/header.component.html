@@ -267,7 +267,8 @@
       <!-- Notifications Panel -->
       <div *ngIf="showNotificationsPanel"
            #notificationsPanel
-           class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+           class="absolute mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden"
+           [ngClass]="currentLanguageCode === 'AR' ? 'left-0' : 'right-0'">
         <div class="p-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-800">{{ translate('notifications.title') }}</h3>
@@ -362,7 +363,8 @@
       <!-- User Menu Dropdown -->
       <div
         *ngIf="isUserMenuOpen"
-        class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
+        class="absolute mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
+        [ngClass]="currentLanguageCode === 'AR' ? 'left-0' : 'right-0'"
       >
         <div class="px-4 py-2 border-b border-gray-200">
           <div class="text-sm font-semibold text-gray-900">{{ teacherName }}</div>

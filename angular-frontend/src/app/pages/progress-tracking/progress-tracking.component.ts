@@ -58,6 +58,9 @@ export class ProgressTrackingComponent implements OnInit {
   // اسم الأستاذ (الاسم + اللقب) من البطاقة الفنية المخزنة محلياً
   teacherFullName = '';
 
+  // اسم مادة التدريس من البطاقة الفنية (teachingSubject)
+  teachingSubject = '';
+
   // خريطة لتحويل مستويات enum إلى عبارات عربية
   private levelMap: Record<string, string> = {
     '1st_year_middle': 'السنة الأولى متوسط',
@@ -89,8 +92,10 @@ export class ProgressTrackingComponent implements OnInit {
         const first = card.firstName || '';
         const last = card.lastName || '';
         this.teacherFullName = `${first} ${last}`.trim();
+        this.teachingSubject = card.teachingSubject || '';
       } catch {
         this.teacherFullName = '';
+        this.teachingSubject = '';
       }
     }
 
@@ -194,6 +199,10 @@ export class ProgressTrackingComponent implements OnInit {
   }
 
   translate(key: string): string {
+    // تمرير اسم مادة التدريس لاستبدال {{subjectName}} في عنوان المتابعة
+    if (key === 'progressTracking.title' && this.teachingSubject) {
+      return this.languageService.translate(key, { subjectName: this.teachingSubject });
+    }
     return this.languageService.translate(key);
   }
 

@@ -8923,13 +8923,13 @@ export class LanguageService {
 
       // Progress Tracking
       'progressTracking.title': {
-        'AR': 'متابعة إنجاز برنامج مادة الإعلام الآلي',
-        'FR': 'Suivi de l\'accomplissement du programme de la matière informatique',
-        'EN': 'Progress tracking of computer science program',
-        'ES': 'Seguimiento del progreso del programa de informática',
-        'IT': 'Monitoraggio progressi programma informatica',
-        'DE': 'Fortschrittsverfolgung des Informatikprogramms',
-        'TR': 'Bilgisayar bilimi programı ilerleme takibi'
+        'AR': 'متابعة إنجاز برنامج مادة "{{subjectName}}"',
+        'FR': 'Suivi de l\'accomplissement du programme de la matière "{{subjectName}}"',
+        'EN': 'Progress tracking of "{{subjectName}}" program',
+        'ES': 'Seguimiento del progreso del programa de "{{subjectName}}"',
+        'IT': 'Monitoraggio dei progressi del programma di "{{subjectName}}"',
+        'DE': 'Fortschrittsverfolgung des Programms "{{subjectName}}"',
+        'TR': '"{{subjectName}}" programı ilerleme takibi'
       },
       'progressTracking.refreshData': {
         'AR': 'تحديث البيانات',

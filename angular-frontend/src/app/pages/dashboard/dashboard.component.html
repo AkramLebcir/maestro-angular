@@ -84,7 +84,7 @@
   <!-- First row: Attendance + Behavior + (Grade Counts + Lab Status) + Grade Distribution -->
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-1.5 mb-3">
     <!-- Attendance donut -->
-    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col h-full">
       <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.attendance') }}</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
@@ -104,7 +104,7 @@
     </div>
 
     <!-- Behavior -->
-    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+    <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col h-full">
       <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.behavior') }}</h2>
       <div class="flex-1 flex items-center justify-center">
         <canvas
@@ -127,9 +127,9 @@
     </div>
 
     <!-- Grade counts + Lab status stacked vertically in same column -->
-    <div class="flex flex-col gap-2.5">
+    <div class="flex flex-col gap-2.5 h-full">
       <!-- Grade counts -->
-      <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col">
+      <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col flex-1">
         <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.gradeCountsTitle') }}</h2>
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div class="flex items-center justify-between border-b border-gray-100 pb-1">
@@ -163,7 +163,7 @@
       </div>
 
       <!-- Lab status card (حالة المخبر) -->
-      <div class="bg-white rounded-lg shadow-md p-2.5">
+      <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col flex-1">
         <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.labStatus') }}</h2>
 
         <!-- أجهزة تعمل -->
@@ -216,7 +216,7 @@
       </div>
 
       <!-- Program progress card (تقدّم إنجاز البرنامج) -->
-      <div class="bg-white rounded-lg shadow-md p-2.5">
+      <div class="bg-white rounded-lg shadow-md p-2.5 flex flex-col flex-1">
         <h2 class="text-sm font-semibold text-gray-800 mb-2">{{ translate('dashboard.programProgress') }}</h2>
 
         <!-- حالة التحميل -->

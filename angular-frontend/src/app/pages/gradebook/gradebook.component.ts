@@ -3241,28 +3241,40 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       // Clean up
       document.body.removeChild(exportContainer);
 
-      // Create PDF
-      const imgWidth = 210; // A4 width in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Create PDF (مع دعم حقيقي لتعدد الصفحات بدون قص أسفل المحتوى)
       const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const pageHeight = 297; // A4 height in mm
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
       const margin = 10;
-      const availableHeight = pageHeight - (2 * margin);
-      
-      let finalHeight = imgHeight;
-      let position = 0;
+      const availableWidth = pageWidth - 2 * margin;
+      const availableHeight = pageHeight - 2 * margin;
 
-      // Add first page
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, imgWidth - (2 * margin), finalHeight);
-      
-      // Add additional pages if needed
-      let heightLeft = finalHeight - availableHeight;
-      while (heightLeft > 0) {
-        position = -availableHeight;
-        pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, imgWidth - (2 * margin), finalHeight);
-        heightLeft -= availableHeight;
+      const imgWidth = availableWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let remainingHeight = imgHeight;
+      let yOffset = margin;
+
+      const imgData = canvas.toDataURL('image/png');
+
+      // الصفحة الأولى + الصفحات التالية إن لزم
+      while (remainingHeight > 0) {
+        const renderHeight = Math.min(availableHeight, remainingHeight);
+
+        pdf.addImage(
+          imgData,
+          'PNG',
+          margin,
+          yOffset,
+          imgWidth,
+          imgHeight
+        );
+
+        remainingHeight -= availableHeight;
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          yOffset = margin;
+        }
       }
 
       const fileName = `تحليل_بيانات_Excel_${new Date().toISOString().split('T')[0]}.pdf`;
