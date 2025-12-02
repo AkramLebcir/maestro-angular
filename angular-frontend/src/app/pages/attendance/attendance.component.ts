@@ -387,6 +387,32 @@ export class AttendanceComponent implements OnInit {
   }
 
   getAttendanceSummary(): AttendanceSummary {
+    // في العرض اليومي: نحسب الملخص حسب حالة كل تلميذ لليوم المحدد فقط
+    if (!this.showWeeklyView) {
+      const summary: AttendanceSummary = {
+        present: 0,
+        absent: 0,
+        late: 0,
+        excused: 0,
+        left_early: 0,
+        unrecorded: 0,
+        total: this.students.length
+      };
+
+      this.students.forEach(student => {
+        const status = student.attendanceStatus || 'unrecorded';
+        if (status === 'present') summary.present++;
+        else if (status === 'absent') summary.absent++;
+        else if (status === 'late') summary.late++;
+        else if (status === 'excused') summary.excused++;
+        else if (status === 'left_early') summary.left_early++;
+        else summary.unrecorded++;
+      });
+
+      return summary;
+    }
+
+    // في العرض الأسبوعي: نحسب الملخص على مستوى الأسبوع كاملاً
     const summary: AttendanceSummary = {
       present: 0,
       absent: 0,
@@ -394,18 +420,38 @@ export class AttendanceComponent implements OnInit {
       excused: 0,
       left_early: 0,
       unrecorded: 0,
-      total: this.students.length
+      total: this.students.length * this.weekDays.length
     };
 
-    this.students.forEach(student => {
-      const status = student.attendanceStatus || 'unrecorded';
-      if (status === 'present') summary.present++;
-      else if (status === 'absent') summary.absent++;
-      else if (status === 'late') summary.late++;
-      else if (status === 'excused') summary.excused++;
-      else if (status === 'left_early') summary.left_early++;
-      else summary.unrecorded++;
+    if (!this.selectedClass || this.attendanceRecords.length === 0 || this.weekDays.length === 0) {
+      summary.unrecorded = summary.total;
+      return summary;
+    }
+
+    const weekDates = new Set(this.weekDays.map(d => this.formatDateForAPI(d)));
+
+    this.attendanceRecords.forEach(record => {
+      if (record.classId !== this.selectedClass!.id) {
+        return;
+      }
+      if (!weekDates.has(record.date)) {
+        return;
+      }
+
+      if (record.status === 'present') summary.present++;
+      else if (record.status === 'absent') summary.absent++;
+      else if (record.status === 'late') summary.late++;
+      else if (record.status === 'excused') summary.excused++;
+      else if (record.status === 'left_early') summary.left_early++;
     });
+
+    const recorded =
+      summary.present +
+      summary.absent +
+      summary.late +
+      summary.excused +
+      summary.left_early;
+    summary.unrecorded = Math.max(0, summary.total - recorded);
 
     return summary;
   }
@@ -622,6 +668,35 @@ export class AttendanceComponent implements OnInit {
       r.date === dateStr
     );
     return record ? record.status : 'unrecorded';
+  }
+
+  /**
+   * تحديث محلي فوري لسجل الحضور في العرض الأسبوعي
+   * حتى ينعكس التغيير مباشرة في العداد بدون انتظار استجابة الـ API
+   */
+  private updateWeeklyAttendanceLocally(studentId: number, date: Date, status: AttendanceStatus): void {
+    if (!this.selectedClass) {
+      return;
+    }
+
+    const dateStr = this.formatDateForAPI(date);
+    const existing = this.attendanceRecords.find(
+      r => r.studentId === studentId && r.date === dateStr && r.classId === this.selectedClass!.id
+    );
+
+    if (existing) {
+      existing.status = status;
+    } else {
+      this.attendanceRecords.push({
+        id: 0, // سيتم استبداله بالقيمة الصحيحة عند إعادة التحميل من API
+        studentId,
+        classId: this.selectedClass.id,
+        date: dateStr,
+        status,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      } as AttendanceRecord);
+    }
   }
 
   getClassStatisticsArray(): Array<{ className: string; present: number; absent: number; late: number; excused: number; leftEarly: number; total: number }> {
@@ -847,6 +922,8 @@ export class AttendanceComponent implements OnInit {
     if (target && target.value) {
       this.selectedDate = day;
       const status = target.value as AttendanceStatus;
+      // تحديث محلي فوري لسجلات الأسبوع ليتحدّث العداد مباشرة
+      this.updateWeeklyAttendanceLocally(student.id, day, status);
       this.recordAttendance(student, status);
     }
   }

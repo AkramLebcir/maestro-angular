@@ -184,6 +184,42 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * ترجمة عنوان الإشعار حسب نوعه، مع الاحتفاظ بالقيمة الأصلية كاحتياط
+   */
+  getNotificationTitle(notification: Notification): string {
+    switch (notification.type) {
+      case 'upcoming_holiday':
+        return this.translate('notifications.type.upcomingHoliday.title');
+      case 'upcoming_assessment':
+        return this.translate('notifications.type.upcomingAssessment.title');
+      case 'incomplete_task':
+        return this.translate('notifications.type.incompleteTask.title');
+      case 'subscription_expiring':
+        return this.translate('notifications.type.subscriptionExpiring.title');
+      default:
+        return notification.title;
+    }
+  }
+
+  /**
+   * ترجمة نص الإشعار حسب نوعه، مع الاحتفاظ بالنص الأصلي كاحتياط
+   */
+  getNotificationMessage(notification: Notification): string {
+    switch (notification.type) {
+      case 'upcoming_holiday':
+        return this.translate('notifications.type.upcomingHoliday.message');
+      case 'upcoming_assessment':
+        return this.translate('notifications.type.upcomingAssessment.message');
+      case 'incomplete_task':
+        return this.translate('notifications.type.incompleteTask.message');
+      case 'subscription_expiring':
+        return this.translate('notifications.type.subscriptionExpiring.message');
+      default:
+        return notification.message;
+    }
+  }
+
+  /**
    * وضع علامة قراءة على جميع الإشعارات
    */
   markAllNotificationsAsRead(): void {

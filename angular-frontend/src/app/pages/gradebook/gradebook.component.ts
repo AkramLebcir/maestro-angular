@@ -1862,7 +1862,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       title.style.marginBottom = '20px';
       title.style.color = '#111827';
       
-      // Add class name and date
+      // Add class name and date (translated)
       const info = document.createElement('div');
       info.style.textAlign = 'right';
       info.style.marginBottom = '20px';
@@ -1970,9 +1970,20 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       info.style.fontSize = '14px';
       info.style.color = '#6b7280';
       
-      const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
-      const termInfo = `الفصل: ${this.selectedTerm === 1 ? 'الأول' : this.selectedTerm === 2 ? 'الثاني' : 'الثالث'}`;
-      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      const classLabel = this.translate('gradebook.class');
+      const termLabel = this.translate('gradebook.term');
+      const dateLabel = this.translate('gradebook.date');
+      const termText =
+        this.selectedTerm === 1
+          ? this.translate('gradebook.term1')
+          : this.selectedTerm === 2
+            ? this.translate('gradebook.term2')
+            : this.translate('gradebook.term3');
+
+      const classInfo = this.selectedClass ? `${classLabel}: ${this.selectedClass.name}` : '';
+      const dateLocale = document.documentElement.lang || 'ar';
+      const dateInfo = `${dateLabel}: ${new Date().toLocaleDateString(dateLocale)}`;
+      const termInfo = `${termLabel}: ${termText}`;
       info.innerHTML = `${classInfo} | ${termInfo}<br>${dateInfo}`;
       
       exportContainer.appendChild(title);
@@ -1992,10 +2003,23 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       headerRow.style.color = '#ffffff';
       
       const headers = [
-        '#', 'رقم الهوية أو الكود', 'الاسم', 'اللقب', 'تاريخ الميلاد',
-        'تصحيح الدفتر', 'الواجب', 'الحضور', 'السلوك', 'التقييم المستمر',
-        'التعبير الشفهي/العمل العملي', 'الفرض', 'الاختبار', 'معدل الفصل',
-        'التقديرات', 'الإرشادات', 'الترتيب'
+        '#',
+        this.translate('gradebook.idNumberOrCode'),
+        this.translate('gradebook.firstName'),
+        this.translate('gradebook.lastName'),
+        this.translate('gradebook.birthDate'),
+        this.translate('gradebook.notebookCorrection'),
+        this.translate('gradebook.homework'),
+        this.translate('gradebook.attendance5'),
+        this.translate('gradebook.behavior5'),
+        this.translate('gradebook.continuousAssessment'),
+        this.translate('gradebook.oralExpression'),
+        this.translate('gradebook.assignment'),
+        this.translate('gradebook.test'),
+        this.translate('gradebook.termAverage'),
+        this.translate('gradebook.ratings'),
+        this.translate('gradebook.guidance'),
+        this.translate('gradebook.ranking')
       ];
       
       headers.forEach(headerText => {
@@ -2071,7 +2095,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       footerRow1.style.backgroundColor = '#f3f4f6';
       footerRow1.style.fontWeight = 'bold';
       const footerCell1 = document.createElement('td');
-      footerCell1.textContent = 'معدل القسم:';
+      footerCell1.textContent = this.translate('gradebook.classAverage');
       footerCell1.colSpan = 16;
       footerCell1.style.textAlign = 'right';
       footerCell1.style.padding = '6px';
@@ -2088,7 +2112,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       const footerRow2 = document.createElement('tr');
       footerRow2.style.backgroundColor = '#dbeafe';
       const footerCell2 = document.createElement('td');
-      footerCell2.textContent = `عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):`;
+      footerCell2.textContent = this.translate('gradebook.studentsWithAverage10InTerm');
       footerCell2.colSpan = 16;
       footerCell2.style.textAlign = 'right';
       footerCell2.style.padding = '6px';
@@ -2107,7 +2131,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       const footerRow3 = document.createElement('tr');
       footerRow3.style.backgroundColor = '#fee2e2';
       const footerCell3 = document.createElement('td');
-      footerCell3.textContent = `عدد التلاميذ بمعدل < 10 (في الفصل المحدد):`;
+      footerCell3.textContent = this.translate('gradebook.studentsWithAverageBelow10InTerm');
       footerCell3.colSpan = 16;
       footerCell3.style.textAlign = 'right';
       footerCell3.style.padding = '6px';
@@ -2177,11 +2201,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         heightLeft -= availableHeight;
       }
 
-      const fileName = `نتائج_الفصل_${this.selectedClass.name}_الفصل_${this.selectedTerm === 1 ? 'الأول' : this.selectedTerm === 2 ? 'الثاني' : 'الثالث'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `${this.translate('gradebook.pdfFilePrefix')}_${this.selectedClass.name}_${this.selectedTerm}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting grades to PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF');
+      alert(this.translate('gradebook.exportPdfError'));
     }
   }
 

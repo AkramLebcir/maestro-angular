@@ -109,17 +109,17 @@
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('idNumber')">
-                رقم الهوية أو الكود <span class="text-xs">{{ getSortIcon('idNumber') }}</span>
+                {{ translate('gradebook.idNumberOrCode') }} <span class="text-xs">{{ getSortIcon('idNumber') }}</span>
               </th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('firstName')">
-                الاسم <span class="text-xs">{{ getSortIcon('firstName') }}</span>
+                {{ translate('gradebook.firstName') }} <span class="text-xs">{{ getSortIcon('firstName') }}</span>
               </th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('lastName')">
-                اللقب <span class="text-xs">{{ getSortIcon('lastName') }}</span>
+                {{ translate('gradebook.lastName') }} <span class="text-xs">{{ getSortIcon('lastName') }}</span>
               </th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.birthDate') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.notebookCorrection') }}</th>
@@ -133,14 +133,14 @@
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('termAverage')">
-                معدل الفصل <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
+                {{ translate('gradebook.termAverage') }} <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
               </th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.ratings') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.guidance') }}</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('ranking')">
-                الترتيب <span class="text-xs">{{ getSortIcon('ranking') }}</span>
+                {{ translate('gradebook.ranking') }} <span class="text-xs">{{ getSortIcon('ranking') }}</span>
               </th>
             </tr>
           </thead>

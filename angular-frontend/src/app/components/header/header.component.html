@@ -267,7 +267,7 @@
       <!-- Notifications Panel -->
       <div *ngIf="showNotificationsPanel"
            #notificationsPanel
-           class="absolute left-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
+           class="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-lg border border-gray-200 z-50 max-h-96 overflow-hidden">
         <div class="p-4 border-b border-gray-200">
           <div class="flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-800">{{ translate('notifications.title') }}</h3>
@@ -307,13 +307,13 @@
                 <div class="flex items-center justify-between">
                   <h4 [ngClass]="notification.isRead ? 'text-gray-800' : 'text-gray-900 font-semibold'"
                       class="text-sm truncate">
-                    {{ notification.title }}
+                    {{ getNotificationTitle(notification) }}
                   </h4>
                   <span *ngIf="!notification.isRead"
                         class="w-2 h-2 bg-blue-500 rounded-full flex-shrink-0"></span>
                 </div>
                 <p class="text-sm text-gray-600 mt-1 line-clamp-2">
-                  {{ notification.message }}
+                  {{ getNotificationMessage(notification) }}
                 </p>
                 <div class="flex items-center justify-between mt-2">
                   <span class="text-xs text-gray-500">
@@ -362,7 +362,7 @@
       <!-- User Menu Dropdown -->
       <div
         *ngIf="isUserMenuOpen"
-        class="absolute left-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
+        class="absolute right-0 mt-2 w-48 bg-white text-gray-800 rounded-lg shadow-lg z-20 py-2"
       >
         <div class="px-4 py-2 border-b border-gray-200">
           <div class="text-sm font-semibold text-gray-900">{{ teacherName }}</div>

@@ -866,6 +866,79 @@ export class LanguageService {
         'DE': 'Keine Benachrichtigungen',
         'TR': 'Bildirim yok'
       },
+      // Notification types (generic messages)
+      'notifications.type.upcomingHoliday.title': {
+        'AR': 'اقتراب عطلة',
+        'FR': 'Vacances à venir',
+        'EN': 'Upcoming holiday',
+        'ES': 'Próximas vacaciones',
+        'IT': 'Vacanze imminenti',
+        'DE': 'Bevorstehende Ferien',
+        'TR': 'Yaklaşan tatil'
+      },
+      'notifications.type.upcomingHoliday.message': {
+        'AR': 'تذكير بوجود عطلة قريبة ضمن التخطيط السنوي.',
+        'FR': 'Rappel d\'une période de vacances proche dans la planification annuelle.',
+        'EN': 'Reminder about an upcoming holiday in the annual planning.',
+        'ES': 'Recordatorio de unas próximas vacaciones en la planificación anual.',
+        'IT': 'Promemoria per una prossima vacanza nel piano annuale.',
+        'DE': 'Erinnerung an eine bevorstehende Ferienzeit im Jahresplan.',
+        'TR': 'Yıllık planlama kapsamında yaklaşan bir tatil için hatırlatma.'
+      },
+      'notifications.type.upcomingAssessment.title': {
+        'AR': 'تذكير بالتقييمات الأسبوعية',
+        'FR': 'Rappel des évaluations hebdomadaires',
+        'EN': 'Weekly assessment reminder',
+        'ES': 'Recordatorio de evaluaciones semanales',
+        'IT': 'Promemoria delle verifiche settimanali',
+        'DE': 'Erinnerung an wöchentliche Bewertungen',
+        'TR': 'Haftalık değerlendirme hatırlatıcısı'
+      },
+      'notifications.type.upcomingAssessment.message': {
+        'AR': 'تذكير بإجراء التقييمات الأسبوعية وفق التوزيع السنوي.',
+        'FR': 'Rappel d\'effectuer les évaluations hebdomadaires selon la répartition annuelle.',
+        'EN': 'Reminder to perform weekly assessments according to the annual distribution.',
+        'ES': 'Recordatorio para realizar las evaluaciones semanales según la distribución anual.',
+        'IT': 'Promemoria per svolgere le verifiche settimanali secondo la distribuzione annuale.',
+        'DE': 'Erinnerung, wöchentliche Bewertungen gemäß der Jahresverteilung durchzuführen.',
+        'TR': 'Yıllık dağılıma göre haftalık değerlendirmeleri yapmanız için hatırlatma.'
+      },
+      'notifications.type.incompleteTask.title': {
+        'AR': 'مهام غير مكتملة في الدفاتر',
+        'FR': 'Tâches incomplètes dans les cahiers',
+        'EN': 'Incomplete tasks in notebooks',
+        'ES': 'Tareas incompletas en los cuadernos',
+        'IT': 'Compiti incompleti nei quaderni',
+        'DE': 'Unvollständige Aufgaben in den Heften',
+        'TR': 'Defterlerde tamamlanmamış görevler'
+      },
+      'notifications.type.incompleteTask.message': {
+        'AR': 'يوجد مهام غير مكتملة في بعض الدفاتر. يُرجى استكمالها.',
+        'FR': 'Il existe des tâches incomplètes dans certains cahiers. Veuillez les compléter.',
+        'EN': 'There are incomplete tasks in some notebooks. Please complete them.',
+        'ES': 'Hay tareas incompletas en algunos cuadernos. Por favor complételas.',
+        'IT': 'Ci sono compiti incompleti in alcuni quaderni. Si prega di completarli.',
+        'DE': 'Es gibt unvollständige Aufgaben in einigen Heften. Bitte vervollständigen Sie diese.',
+        'TR': 'Bazı defterlerde tamamlanmamış görevler var. Lütfen tamamlayın.'
+      },
+      'notifications.type.subscriptionExpiring.title': {
+        'AR': 'تنبيه: انتهاء الاشتراك قريباً',
+        'FR': 'Alerte : abonnement bientôt expiré',
+        'EN': 'Alert: subscription expiring soon',
+        'ES': 'Alerta: la suscripción caducará pronto',
+        'IT': 'Avviso: abbonamento in scadenza',
+        'DE': 'Hinweis: Abonnement läuft bald ab',
+        'TR': 'Uyarı: abonelik yakında sona erecek'
+      },
+      'notifications.type.subscriptionExpiring.message': {
+        'AR': 'تذكير بقرب انتهاء الاشتراك الحالي. يُرجى التجديد في أقرب وقت.',
+        'FR': 'Rappel : votre abonnement actuel arrive à expiration. Veuillez le renouveler dès que possible.',
+        'EN': 'Reminder: your current subscription is about to expire. Please renew it as soon as possible.',
+        'ES': 'Recordatorio: su suscripción actual está a punto de caducar. Por favor, renuévela lo antes posible.',
+        'IT': 'Promemoria: il tuo abbonamento attuale sta per scadere. Si prega di rinnovarlo il prima possibile.',
+        'DE': 'Erinnerung: Ihr aktuelles Abonnement läuft bald ab. Bitte erneuern Sie es so bald wie möglich.',
+        'TR': 'Hatırlatma: mevcut aboneliğiniz yakında sona erecek. Lütfen en kısa sürede yenileyin.'
+      },
       'dashboard.classAverage': {
         'AR': 'معدل القسم',
         'FR': 'Moyenne de la classe',
@@ -1765,6 +1838,24 @@ export class LanguageService {
         'DE': 'Schüler mit Durchschnitt < 10',
         'TR': 'Ortalaması < 10 olan öğrenciler'
       },
+      'gradebook.studentsWithAverage10InTerm': {
+        'AR': 'عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):',
+        'FR': 'Nombre d\'élèves avec une moyenne ≥ 10 (dans le trimestre sélectionné) :',
+        'EN': 'Number of students with average ≥ 10 (in the selected term):',
+        'ES': 'Número de estudiantes con promedio ≥ 10 (en el trimestre seleccionado):',
+        'IT': 'Numero di studenti con media ≥ 10 (nel trimestre selezionato):',
+        'DE': 'Anzahl der Schüler mit Durchschnitt ≥ 10 (im gewählten Trimester):',
+        'TR': 'Seçilen dönemde ortalaması ≥ 10 olan öğrenci sayısı:'
+      },
+      'gradebook.studentsWithAverageBelow10InTerm': {
+        'AR': 'عدد التلاميذ بمعدل < 10 (في الفصل المحدد):',
+        'FR': 'Nombre d\'élèves avec une moyenne < 10 (dans le trimestre sélectionné) :',
+        'EN': 'Number of students with average < 10 (in the selected term):',
+        'ES': 'Número de estudiantes con promedio < 10 (en el trimestre seleccionado):',
+        'IT': 'Numero di studenti con media < 10 (nel trimestre selezionato):',
+        'DE': 'Anzahl der Schüler mit Durchschnitt < 10 (im gewählten Trimester):',
+        'TR': 'Seçilen dönemde ortalaması < 10 olan öğrenci sayısı:'
+      },
       'gradebook.openGradebook': {
         'AR': 'فتح السجل',
         'FR': 'Ouvrir le carnet',
@@ -1909,24 +2000,6 @@ export class LanguageService {
         'DE': 'Durchschnitt des Trimesters',
         'TR': 'Dönem ortalaması'
       },
-      'gradebook.ratings': {
-        'AR': 'التقديرات',
-        'FR': 'Appréciations',
-        'EN': 'Ratings',
-        'ES': 'Calificaciones',
-        'IT': 'Valutazioni',
-        'DE': 'Bewertungen',
-        'TR': 'Değerlendirmeler'
-      },
-      'gradebook.guidance': {
-        'AR': 'الإرشادات',
-        'FR': 'Conseils',
-        'EN': 'Guidance',
-        'ES': 'Orientación',
-        'IT': 'Consigli',
-        'DE': 'Beratung',
-        'TR': 'Rehberlik'
-      },
       'gradebook.ranking': {
         'AR': 'الترتيب',
         'FR': 'Classement',
@@ -1935,24 +2008,6 @@ export class LanguageService {
         'IT': 'Classifica',
         'DE': 'Rangfolge',
         'TR': 'Sıralama'
-      },
-      'gradebook.studentsWithAverage10InTerm': {
-        'AR': 'عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):',
-        'FR': 'Nombre d\'élèves avec moyenne ≥ 10 (dans le trimestre sélectionné):',
-        'EN': 'Students with average ≥ 10 (in selected term):',
-        'ES': 'Estudiantes con promedio ≥ 10 (en el trimestre seleccionado):',
-        'IT': 'Studenti con media ≥ 10 (nel trimestre selezionato):',
-        'DE': 'Schüler mit Durchschnitt ≥ 10 (im ausgewählten Trimester):',
-        'TR': 'Ortalaması ≥ 10 olan öğrenciler (seçilen dönemde):'
-      },
-      'gradebook.studentsWithAverageBelow10InTerm': {
-        'AR': 'عدد التلاميذ بمعدل < 10 (في الفصل المحدد):',
-        'FR': 'Nombre d\'élèves avec moyenne < 10 (dans le trimestre sélectionné):',
-        'EN': 'Students with average < 10 (in selected term):',
-        'ES': 'Estudiantes con promedio < 10 (en el trimestre seleccionado):',
-        'IT': 'Studenti con media < 10 (nel trimestre selezionato):',
-        'DE': 'Schüler mit Durchschnitt < 10 (im ausgewählten Trimester):',
-        'TR': 'Ortalaması < 10 olan öğrenciler (seçilen dönemde):'
       },
       'gradebook.classResults': {
         'AR': 'نتائج الفصل',
@@ -2396,6 +2451,42 @@ export class LanguageService {
         'IT': 'Stampa schemi posti per studenti in classe o laboratorio.',
         'DE': 'Sitzpläne für Schüler im Klassenzimmer oder Labor drucken.',
         'TR': 'Sınıf veya laboratuvardaki öğrenciler için oturma planlarını yazdırın.'
+      },
+      'reports.openStudentsReports': {
+        'AR': 'فتح تقارير التلاميذ',
+        'FR': 'Ouvrir les rapports des élèves',
+        'EN': 'Open student reports',
+        'ES': 'Abrir los informes de los alumnos',
+        'IT': 'Apri i rapporti degli alunni',
+        'DE': 'Schülerberichte öffnen',
+        'TR': 'Öğrenci raporlarını aç'
+      },
+      'reports.notebooks': {
+        'AR': 'تقارير الدفاتر',
+        'FR': 'Rapports des cahiers',
+        'EN': 'Notebook reports',
+        'ES': 'Informes de cuadernos',
+        'IT': 'Rapporti dei quaderni',
+        'DE': 'Heftberichte',
+        'TR': 'Defter raporları'
+      },
+      'reports.notebooksDesc': {
+        'AR': 'طباعة تقارير مفصلة للدفاتر المختارة.',
+        'FR': 'Imprimer des rapports détaillés pour les cahiers sélectionnés.',
+        'EN': 'Print detailed reports for selected notebooks.',
+        'ES': 'Imprimir informes detallados de los cuadernos seleccionados.',
+        'IT': 'Stampare rapporti dettagliati per i quaderni selezionati.',
+        'DE': 'Detaillierte Berichte für ausgewählte Hefte drucken.',
+        'TR': 'Seçilen defterler için ayrıntılı raporlar yazdırın.'
+      },
+      'reports.openNotebooksReports': {
+        'AR': 'فتح تقارير الدفاتر',
+        'FR': 'Ouvrir les rapports des cahiers',
+        'EN': 'Open notebook reports',
+        'ES': 'Abrir informes de cuadernos',
+        'IT': 'Apri i rapporti dei quaderni',
+        'DE': 'Heftberichte öffnen',
+        'TR': 'Defter raporlarını aç'
       },
       'reports.openPrintCharts': {
         'AR': 'فتح وطباعة المخططات',

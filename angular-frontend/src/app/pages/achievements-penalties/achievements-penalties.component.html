@@ -1,9 +1,9 @@
 <div class="page">
   <header class="page-header">
     <div>
-      <h1>الإجازات والعقوبات</h1>
+      <h1>{{ translate('achievementsPenalties.pageTitle') }}</h1>
       <p class="description">
-        مركز واحد لعرض شهادات التقدير والمخالفات السلوكية لكل قسم.
+        {{ translate('achievementsPenalties.description') }}
       </p>
     </div>
     <div class="tabs">
@@ -12,37 +12,41 @@
         [class.active]="activeTab === 'achievements'"
         (click)="onTabChange('achievements')"
       >
-        الإنجازات
+        {{ translate('achievementsPenalties.tabAchievements') }}
       </button>
       <button
         type="button"
         [class.active]="activeTab === 'penalties'"
         (click)="onTabChange('penalties')"
       >
-        العقوبات / التقارير
+        {{ translate('achievementsPenalties.tabPenalties') }}
       </button>
     </div>
   </header>
 
   <section *ngIf="activeTab === 'achievements'">
     <div class="certificate-region">
-      <h3>مولّد الشهادات</h3>
-      <p>حرِّر قالب الشهادة مباشرةً هنا لطباعته أو تصديره.</p>
+      <h3>{{ translate('certificate.title') }}</h3>
+      <p>{{ translate('certificate.description') }}</p>
       <app-certificate-generator [embedMode]="true"></app-certificate-generator>
     </div>
 
     <div class="divider"></div>
 
     <div class="controls">
-      <label for="classPickerCert">عرض الشهادات السابقة للقسم:</label>
+      <label for="classPickerCert">
+        {{ translate('achievementsPenalties.showPreviousCertificates') }}
+      </label>
       <select id="classPickerCert" (change)="onClassChange($event)" [value]="selectedClassId">
         <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
       </select>
     </div>
 
-    <div *ngIf="isLoadingCertificates" class="status">جارٍ تحميل سجل الشهادات...</div>
+    <div *ngIf="isLoadingCertificates" class="status">
+      {{ translate('achievementsPenalties.loadingCertificates') }}
+    </div>
     <div *ngIf="!isLoadingCertificates && certificateHistory.length === 0" class="status">
-      لا توجد شهادات مسجلة لهذا القسم.
+      {{ translate('achievementsPenalties.noCertificates') }}
     </div>
 
     <ul class="reports-list" *ngIf="certificateHistory.length">
@@ -64,7 +68,9 @@
     <div class="divider"></div>
 
     <div class="controls">
-      <label for="classPicker">عرض التقارير السابقة للقسم:</label>
+      <label for="classPicker">
+        {{ translate('achievementsPenalties.showPreviousReports') }}
+      </label>
       <select id="classPicker" (change)="onClassChange($event)" [value]="selectedClassId">
         <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
       </select>
@@ -73,16 +79,18 @@
         class="btn-export-pdf"
         (click)="exportPenaltiesToPDF()"
         [disabled]="isExportingPdf || behaviorReports.length === 0"
-        title="تصدير قائمة العقوبات والتقارير إلى PDF"
+        [title]="translate('achievementsPenalties.exportPenaltiesToPDF')"
       >
-        {{ isExportingPdf ? 'جارٍ التصدير...' : 'تصدير PDF' }}
+        {{ isExportingPdf ? translate('achievementsPenalties.exporting') : translate('achievementsPenalties.exportPDF') }}
       </button>
     </div>
 
-    <div *ngIf="isLoadingReports" class="status">جارٍ تحميل التقارير...</div>
+    <div *ngIf="isLoadingReports" class="status">
+      {{ translate('achievementsPenalties.loadingReports') }}
+    </div>
     <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
     <div *ngIf="!isLoadingReports && !errorMessage && behaviorReports.length === 0" class="status">
-      لا توجد تقارير سلوك في الوقت الحالي.
+      {{ translate('achievementsPenalties.noReports') }}
     </div>
 
     <ul class="reports-list" #penaltiesList *ngIf="behaviorReports.length">

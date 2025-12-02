@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
-export type NotificationType = 'upcoming_assessment' | 'upcoming_holiday' | 'incomplete_task' | 'upcoming_seminar' | 'upcoming_visit';
+export type NotificationType =
+  | 'upcoming_assessment'
+  | 'upcoming_holiday'
+  | 'incomplete_task'
+  | 'upcoming_seminar'
+  | 'upcoming_visit'
+  | 'subscription_expiring';
 export type NotificationPriority = 'low' | 'medium' | 'high' | 'urgent';
 
 export interface Notification {

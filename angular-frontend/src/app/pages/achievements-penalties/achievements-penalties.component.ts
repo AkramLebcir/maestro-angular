@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CertificateService } from '../../services/certificate.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { firstValueFrom } from 'rxjs';
@@ -73,7 +74,8 @@ export class AchievementsPenaltiesComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private certificateService: CertificateService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -98,6 +100,10 @@ export class AchievementsPenaltiesComponent implements OnInit {
         }, 500);
       }
     });
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 
   onTabChange(tab: 'achievements' | 'penalties'): void {
