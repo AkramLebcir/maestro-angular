@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
-import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
+import { ChartConfiguration, ChartData, ChartType, Chart } from 'chart.js';
 
 export type AssessmentType = 
   | 'notebook_correction'
@@ -140,7 +140,7 @@ export interface GradeRangeDistribution {
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
 })
-export class GradebookComponent implements OnInit {
+export class GradebookComponent implements OnInit, AfterViewInit {
   students: Student[] = [];
   classes: Class[] = [];
   assessments: Assessment[] = [];
@@ -154,6 +154,17 @@ export class GradebookComponent implements OnInit {
   showGradeModal = false;
   showReportModal = false;
   showImportModal = false;
+  showEnhancedImportModal = false;
+  
+  // Enhanced import variables
+  selectedLevel: 'primary' | 'middle' | 'secondary' = 'primary';
+  selectedLanguage: 'AR' | 'FR' | 'EN' = 'AR';
+  processedExcelData: any[] = [];
+  processedSheetsData: { sheetName: string; data: any[] }[] = [];
+  isProcessing = false;
+  
+  // Excel Analysis Charts
+  excelAnalysisCharts: { sheetName: string; charts: any }[] = [];
   
   // Sorting
   sortBy: 'firstName' | 'lastName' | 'idNumber' | 'termAverage' | 'term1Average' | 'term2Average' | 'term3Average' | 'annualAverage' | 'ranking' | null = null;
@@ -185,7 +196,7 @@ export class GradebookComponent implements OnInit {
   ];
 
   // View mode
-  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' = 'entry';
+  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' = 'entry';
 
   // Chart configurations
   public chartOptions: ChartConfiguration['options'] = {
@@ -2215,6 +2226,1004 @@ export class GradebookComponent implements OnInit {
       return `${year}/${month}/${day}`;
     }
     return `${day}/${month}/${year}`;
+  }
+
+  // Enhanced Excel Import Functions
+  openEnhancedImportModal(): void {
+    this.showEnhancedImportModal = true;
+    this.processedExcelData = [];
+    this.processedSheetsData = [];
+    this.selectedLevel = 'primary';
+    this.selectedLanguage = 'AR';
+  }
+
+  closeEnhancedImportModal(): void {
+    this.showEnhancedImportModal = false;
+    this.isProcessing = false;
+  }
+
+  onEnhancedExcelFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    const reader = new FileReader();
+
+    this.isProcessing = true;
+    this.processedSheetsData = [];
+
+    reader.onload = (e: any) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        
+        const sheetNames = workbook.SheetNames;
+        
+        // Process all sheets
+        let totalProcessed = 0;
+        const allProcessedData: any[] = [];
+        
+        for (let sheetIndex = 0; sheetIndex < sheetNames.length; sheetIndex++) {
+          const sheetName = sheetNames[sheetIndex];
+          const sheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+          
+          if (jsonData && jsonData.length > 0) {
+            const sheetProcessedData = this.processEnhancedExcelData(jsonData, sheetName);
+            if (sheetProcessedData && sheetProcessedData.length > 0) {
+              this.processedSheetsData.push({
+                sheetName: sheetName,
+                data: sheetProcessedData
+              });
+              allProcessedData.push(...sheetProcessedData);
+              totalProcessed += sheetProcessedData.length;
+            }
+          }
+        }
+
+        this.processedExcelData = allProcessedData;
+        this.isProcessing = false;
+        this.closeEnhancedImportModal();
+        
+        if (totalProcessed === 0) {
+          alert('لم يتم العثور على بيانات صحيحة في أي صفحة من صفحات الملف');
+        } else {
+          alert(`تم معالجة ${totalProcessed} سجل بنجاح من ${this.processedSheetsData.length} صفحة في ملف Excel`);
+        }
+      } catch (error) {
+        console.error('Error reading Excel file:', error);
+        alert('حدث خطأ أثناء قراءة ملف Excel');
+        this.isProcessing = false;
+      }
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  processEnhancedExcelData(data: any[], sheetName?: string): any[] {
+    if (!data || data.length === 0) {
+      alert('الملف فارغ أو غير صحيح');
+      return [];
+    }
+
+    // Find header row
+    let headerRow = 0;
+    for (let i = 0; i < Math.min(10, data.length); i++) {
+      const row = data[i];
+      if (Array.isArray(row) && row.some((cell: any) => {
+        const cellStr = String(cell || '').toLowerCase();
+        return cellStr.includes('name') || 
+               cellStr.includes('اسم') || 
+               cellStr.includes('nom') ||
+               cellStr.includes('score') ||
+               cellStr.includes('درجة') ||
+               cellStr.includes('note') ||
+               cellStr.includes('mark');
+      })) {
+        headerRow = i;
+        break;
+      }
+    }
+
+    const headers = data[headerRow] || [];
+    
+    // Find column indices
+    const findColumnIndex = (keywords: string[]): number => {
+      for (let i = 0; i < headers.length; i++) {
+        const headerStr = String(headers[i] || '').toLowerCase();
+        if (keywords.some(keyword => headerStr.includes(keyword))) {
+          return i;
+        }
+      }
+      return -1;
+    };
+
+    const firstNameColIndex = findColumnIndex(['firstname', 'الاسم', 'prénom', 'prenom', 'first', 'nom']);
+    const lastNameColIndex = findColumnIndex(['lastname', 'اللقب', 'nom', 'last', 'family']);
+    const nameColIndex = findColumnIndex(['name', 'اسم', 'nom', 'الاسم الكامل']);
+    const idColIndex = findColumnIndex(['id', 'رقم', 'code', 'numéro', 'number']);
+
+    // Find all grade columns (exclude name, id, and average columns)
+    const gradeColumnIndices: number[] = [];
+    const excludedKeywords = ['name', 'اسم', 'nom', 'id', 'رقم', 'code', 'obs', 'cons', 'ملاحظات', 'إرشادات', 'observation', 'guidance', 'observations', 'conseils', 'date', 'تاريخ', 'classe', 'قسم', 'class', 'ترتيب', 'ranking', 'رتبة', 'obv', 'obs.', 'cons.'];
+    
+    // Grade column keywords (common Arabic names for grade columns)
+    const gradeKeywords = [
+      'تقييم', 'تقييم مستمر', 'continuous', 'assessment', 'مستمر',
+      'فرض', 'assignment', 'devoir', 'contrôle', 'contrôle continu',
+      'اختبار', 'test', 'examen', 'exam', 'évaluation',
+      'شفوي', 'oral', 'expression', 'تعبير', 'expression orale',
+      'عملي', 'practical', 'pratique', 'travail', 'travaux pratiques',
+      'دفتر', 'notebook', 'cahier', 'cahier de classe',
+      'واجب', 'duty', 'devoir maison', 'devoirs',
+      'حضور', 'attendance', 'présence',
+      'سلوك', 'behavior', 'comportement', 'conduite',
+      'درجة', 'score', 'note', 'mark', 'point', 'points',
+      'معدل', 'average', 'moyenne', 'moy', 'moyennes',
+      'رياضيات', 'math', 'maths', 'mathematics', 'géométrie',
+      'عربية', 'arabe', 'arabic', 'langue',
+      'فرنسية', 'français', 'french',
+      'إنجليزية', 'anglais', 'english',
+      'علوم', 'sciences', 'science',
+      'تاريخ', 'histoire', 'history',
+      'جغرافيا', 'géographie', 'geography',
+      'تربية', 'éducation', 'éducation physique'
+    ];
+    
+    // Also exclude name and id column indices we already found
+    const excludedIndices = [firstNameColIndex, lastNameColIndex, nameColIndex, idColIndex].filter(idx => idx !== -1);
+    
+    for (let i = 0; i < headers.length; i++) {
+      // Skip excluded indices
+      if (excludedIndices.includes(i)) continue;
+      
+      const headerStr = String(headers[i] || '').trim();
+      if (headerStr === '' || headerStr === '#') continue;
+      
+      const headerStrLower = headerStr.toLowerCase();
+      
+      // Check if header is just a number (like 01, 02, 3, 9) - these could be grade columns
+      const isNumericHeader = /^0?\d+$/.test(headerStr.trim());
+      
+      // Check if this column header contains grade-related keywords
+      // Search both in lower case and original case (for Arabic)
+      const isGradeColumnByKeyword = gradeKeywords.some(keyword => {
+        const keywordLower = keyword.toLowerCase();
+        // Check in both directions for Arabic text
+        return headerStrLower.includes(keywordLower) || 
+               headerStr.includes(keyword) ||
+               headerStr.includes(keyword.toLowerCase()) ||
+               headerStr.includes(keyword.toUpperCase());
+      });
+      
+      // Skip if it's a name, id, or other excluded column
+      const isExcluded = excludedKeywords.some(keyword => headerStrLower.includes(keyword));
+      
+      // Check if this column contains numeric data (likely a grade column)
+      let numericValueCount = 0;
+      let totalChecked = 0;
+      
+      for (let j = headerRow + 1; j < Math.min(headerRow + 11, data.length); j++) {
+        const row = data[j];
+        if (row && row[i] !== undefined && row[i] !== null && row[i] !== '') {
+          totalChecked++;
+          const value = parseFloat(String(row[i]));
+          // Accept values between 0 and 20 (standard grading scale)
+          // Also accept percentage values (0-100) but we'll normalize them
+          if (!isNaN(value) && value >= 0 && (value <= 20 || value <= 100)) {
+            numericValueCount++;
+          }
+        }
+      }
+      
+      // More lenient: if column has numeric data and is not excluded, include it
+      // But exclude if header looks like it's a name, ID, or other metadata
+      const looksLikeMetadata = headerStrLower.includes('nom') || 
+                                 headerStrLower.includes('prenom') ||
+                                 headerStrLower.includes('prénom') ||
+                                 headerStrLower.includes('date') ||
+                                 headerStrLower.includes('classe') ||
+                                 headerStrLower.includes('قسم') ||
+                                 headerStrLower.includes('ترتيب') ||
+                                 headerStrLower.includes('ranking') ||
+                                 headerStrLower === 'obs' ||
+                                 headerStrLower === 'cons' ||
+                                 headerStrLower.includes('obs ') ||
+                                 headerStrLower.includes('cons ') ||
+                                 headerStrLower.startsWith('obs') ||
+                                 headerStrLower.startsWith('cons');
+      
+      // Include column if:
+      // 1. It has grade-related keywords in header, OR
+      // 2. At least 30% of checked values are numeric grades between 0-20 (more lenient), OR
+      // 3. It has at least 2 numeric grade values (very lenient for small datasets)
+      const hasValidNumericData = totalChecked > 0 && (numericValueCount / totalChecked) >= 0.3;
+      const hasMinNumericData = numericValueCount >= 2;
+      
+      // Include column if:
+      // 1. It's a numeric header (like 01, 02, 3, 9) AND has grade data, OR
+      // 2. It has grade-related keywords in header, OR
+      // 3. It has valid numeric grade data
+      // But exclude obs, cons, and metadata columns
+      if (!isExcluded && !looksLikeMetadata) {
+        // For numeric headers, check if they have grade data
+        if (isNumericHeader && (hasValidNumericData || hasMinNumericData)) {
+          gradeColumnIndices.push(i);
+        } else if (!isNumericHeader && (isGradeColumnByKeyword || hasValidNumericData || hasMinNumericData)) {
+          gradeColumnIndices.push(i);
+        }
+      }
+    }
+
+    if (gradeColumnIndices.length === 0) {
+      // Show found headers for debugging
+      const foundHeaders = headers.filter((h: any, idx: number) => 
+        !excludedIndices.includes(idx) && 
+        String(h || '').trim() !== '' && 
+        String(h || '').trim() !== '#'
+      ).slice(0, 10);
+      
+      const headersList = foundHeaders.length > 0 
+        ? `\nالأعمدة الموجودة في الملف:\n${foundHeaders.join(', ')}`
+        : '';
+      
+      alert(`لم يتم العثور على أعمدة الدرجات في ملف Excel.\n\nيرجى التأكد من أن الملف يحتوي على أعمدة للدرجات مثل:\n- التقييم المستمر\n- معدل الفرض\n- الاختبار\n- التعبير الشفهي\n- العمل العملي\n- تصحيح الدفتر\n- الواجب\n- الحضور\n- السلوك\n\n${headersList}\n\nملاحظة: يجب أن تحتوي أعمدة الدرجات على قيم رقمية بين 0 و 20`);
+      return [];
+    }
+
+    // Process rows
+    const processedData: any[] = [];
+    
+    for (let i = headerRow + 1; i < data.length; i++) {
+      const row = data[i];
+      if (!row || row.length === 0) continue;
+
+      let firstName = '';
+      let lastName = '';
+      let average = 0;
+
+      // Extract name
+      if (firstNameColIndex !== -1 && lastNameColIndex !== -1) {
+        firstName = String(row[firstNameColIndex] || '').trim();
+        lastName = String(row[lastNameColIndex] || '').trim();
+      } else if (nameColIndex !== -1) {
+        const fullName = String(row[nameColIndex] || '').trim();
+        const nameParts = fullName.split(/\s+/);
+        if (nameParts.length >= 2) {
+          firstName = nameParts[0];
+          lastName = nameParts.slice(1).join(' ');
+        } else {
+          firstName = fullName;
+          lastName = '';
+        }
+      } else {
+        // Skip rows without name
+        continue;
+      }
+
+      // Calculate average from grade columns
+      let sum = 0;
+      let count = 0;
+      
+      for (const gradeColIndex of gradeColumnIndices) {
+        const gradeValue = row[gradeColIndex];
+        if (gradeValue !== undefined && gradeValue !== null && gradeValue !== '') {
+          let grade = parseFloat(String(gradeValue));
+          if (!isNaN(grade) && grade >= 0) {
+            // If grade is in percentage format (0-100), convert to 0-20 scale
+            if (grade > 20 && grade <= 100) {
+              grade = (grade / 100) * 20;
+            }
+            // Only accept grades in 0-20 range
+            if (grade <= 20) {
+              sum += grade;
+              count++;
+            }
+          }
+        }
+      }
+
+      if (count === 0) {
+        continue; // Skip rows without valid grades
+      }
+
+      average = sum / count;
+
+      // Generate observation and guidance
+      const observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
+      const guidance = this.generateGuidance(average, this.selectedLevel, this.selectedLanguage);
+
+      processedData.push({
+        id: idColIndex !== -1 ? (row[idColIndex] || processedData.length + 1) : processedData.length + 1,
+        firstName,
+        lastName,
+        average,
+        observation,
+        guidance,
+        originalRow: row, // Keep original row data for export
+        gradeColumns: gradeColumnIndices.map(idx => ({
+          index: idx,
+          header: headers[idx],
+          value: row[idx]
+        }))
+      });
+    }
+
+    // Add sheet name to each processed row for reference
+    processedData.forEach(row => {
+      row.sheetName = sheetName || 'Sheet1';
+    });
+
+    return processedData;
+  }
+
+  generateObservation(average: number, level: 'primary' | 'middle' | 'secondary', language: 'AR' | 'FR' | 'EN'): string {
+    if (language === 'AR') {
+      if (average >= 18) {
+        return level === 'primary' ? 'تلميذ ممتاز، متفوق في جميع المواد' : 
+               level === 'middle' ? 'تلميذ ممتاز، متفوق في جميع المواد' : 
+               'طالب ممتاز، متفوق في جميع المواد';
+      } else if (average >= 16) {
+        return level === 'primary' ? 'تلميذ مجتهد، نتائج جيدة جداً' : 
+               level === 'middle' ? 'تلميذ مجتهد، نتائج جيدة جداً' : 
+               'طالب مجتهد، نتائج جيدة جداً';
+      } else if (average >= 14) {
+        return level === 'primary' ? 'تلميذ مجتهد، نتائج جيدة' : 
+               level === 'middle' ? 'تلميذ مجتهد، نتائج جيدة' : 
+               'طالب مجتهد، نتائج جيدة';
+      } else if (average >= 12) {
+        return level === 'primary' ? 'تلميذ يحتاج إلى مزيد من الجهد' : 
+               level === 'middle' ? 'تلميذ يحتاج إلى مزيد من الجهد' : 
+               'طالب يحتاج إلى مزيد من الجهد';
+      } else if (average >= 10) {
+        return level === 'primary' ? 'تلميذ يحتاج إلى تحسين الأداء' : 
+               level === 'middle' ? 'تلميذ يحتاج إلى تحسين الأداء' : 
+               'طالب يحتاج إلى تحسين الأداء';
+      } else if (average >= 8) {
+        return level === 'primary' ? 'تلميذ يحتاج إلى متابعة خاصة' : 
+               level === 'middle' ? 'تلميذ يحتاج إلى متابعة خاصة' : 
+               'طالب يحتاج إلى متابعة خاصة';
+      } else {
+        return level === 'primary' ? 'تلميذ يحتاج إلى دعم إضافي' : 
+               level === 'middle' ? 'تلميذ يحتاج إلى دعم إضافي' : 
+               'طالب يحتاج إلى دعم إضافي';
+      }
+    } else if (language === 'FR') {
+      if (average >= 18) {
+        return level === 'primary' ? 'Élève excellent, excellent dans toutes les matières' : 
+               level === 'middle' ? 'Élève excellent, excellent dans toutes les matières' : 
+               'Étudiant excellent, excellent dans toutes les matières';
+      } else if (average >= 16) {
+        return level === 'primary' ? 'Élève assidu, très bons résultats' : 
+               level === 'middle' ? 'Élève assidu, très bons résultats' : 
+               'Étudiant assidu, très bons résultats';
+      } else if (average >= 14) {
+        return level === 'primary' ? 'Élève assidu, bons résultats' : 
+               level === 'middle' ? 'Élève assidu, bons résultats' : 
+               'Étudiant assidu, bons résultats';
+      } else if (average >= 12) {
+        return level === 'primary' ? 'Élève nécessite plus d\'efforts' : 
+               level === 'middle' ? 'Élève nécessite plus d\'efforts' : 
+               'Étudiant nécessite plus d\'efforts';
+      } else if (average >= 10) {
+        return level === 'primary' ? 'Élève nécessite une amélioration des performances' : 
+               level === 'middle' ? 'Élève nécessite une amélioration des performances' : 
+               'Étudiant nécessite une amélioration des performances';
+      } else if (average >= 8) {
+        return level === 'primary' ? 'Élève nécessite un suivi spécial' : 
+               level === 'middle' ? 'Élève nécessite un suivi spécial' : 
+               'Étudiant nécessite un suivi spécial';
+      } else {
+        return level === 'primary' ? 'Élève nécessite un soutien supplémentaire' : 
+               level === 'middle' ? 'Élève nécessite un soutien supplémentaire' : 
+               'Étudiant nécessite un soutien supplémentaire';
+      }
+    } else { // EN
+      if (average >= 18) {
+        return level === 'primary' ? 'Excellent student, outstanding in all subjects' : 
+               level === 'middle' ? 'Excellent student, outstanding in all subjects' : 
+               'Excellent student, outstanding in all subjects';
+      } else if (average >= 16) {
+        return level === 'primary' ? 'Diligent student, very good results' : 
+               level === 'middle' ? 'Diligent student, very good results' : 
+               'Diligent student, very good results';
+      } else if (average >= 14) {
+        return level === 'primary' ? 'Diligent student, good results' : 
+               level === 'middle' ? 'Diligent student, good results' : 
+               'Diligent student, good results';
+      } else if (average >= 12) {
+        return level === 'primary' ? 'Student needs more effort' : 
+               level === 'middle' ? 'Student needs more effort' : 
+               'Student needs more effort';
+      } else if (average >= 10) {
+        return level === 'primary' ? 'Student needs performance improvement' : 
+               level === 'middle' ? 'Student needs performance improvement' : 
+               'Student needs performance improvement';
+      } else if (average >= 8) {
+        return level === 'primary' ? 'Student needs special follow-up' : 
+               level === 'middle' ? 'Student needs special follow-up' : 
+               'Student needs special follow-up';
+      } else {
+        return level === 'primary' ? 'Student needs additional support' : 
+               level === 'middle' ? 'Student needs additional support' : 
+               'Student needs additional support';
+      }
+    }
+  }
+
+  generateGuidance(average: number, level: 'primary' | 'middle' | 'secondary', language: 'AR' | 'FR' | 'EN'): string {
+    if (language === 'AR') {
+      if (average >= 18) {
+        return 'تلميذ نجيب يتمتع بقدرات عالية وجدية متميزة، أتمنى لك التوفيق والاستمرار في هذا المستوى المتميز';
+      } else if (average >= 16) {
+        return 'عمل يستحق الشكر والتشجيع، واصل في نفس الوتيرة للحفاظ على هذا المستوى الجيد';
+      } else if (average >= 14) {
+        return 'نتائج مرضية وفي تحسن مستمر، لديك إمكانيات لمواصلة التقدم والتحسن';
+      } else if (average >= 12) {
+        return 'نتائج حسنة، لديك إمكانيات لمواصلة التحسن، حاول بذل المزيد من الجهد';
+      } else if (average >= 10) {
+        return 'كان بالإمكان أن تكون النتائج أفضل، عليك ببذل المزيد من الجهد والتركيز في الدراسة';
+      } else if (average >= 8) {
+        return 'عليك بمضاعفة مجهوداتك والتركيز أكثر في الحصص الدراسية';
+      } else if (average >= 6) {
+        return 'عليك ببذل المزيد من الجهد لتحسين نتائجك، راجع دروسك بانتظام';
+      } else {
+        return 'عمل ناقص جداً، عليك بمضاعفة مجهودك والالتزام بالدراسة بشكل جدي';
+      }
+    } else if (language === 'FR') {
+      if (average >= 18) {
+        return 'Élève assidu avec des capacités élevées et un sérieux remarquable, je vous souhaite succès et continuation à ce niveau excellent';
+      } else if (average >= 16) {
+        return 'Travail méritant des félicitations et des encouragements, continuez à ce rythme pour maintenir ce bon niveau';
+      } else if (average >= 14) {
+        return 'Résultats satisfaisants et en amélioration continue, vous avez le potentiel de continuer à progresser';
+      } else if (average >= 12) {
+        return 'Résultats corrects, vous avez le potentiel de continuer à vous améliorer, essayez de faire plus d\'efforts';
+      } else if (average >= 10) {
+        return 'Les résultats auraient pu être meilleurs, vous devez faire plus d\'efforts et vous concentrer sur vos études';
+      } else if (average >= 8) {
+        return 'Vous devez multiplier vos efforts et vous concentrer davantage en classe';
+      } else if (average >= 6) {
+        return 'Vous devez faire plus d\'efforts pour améliorer vos résultats, révisez régulièrement vos leçons';
+      } else {
+        return 'Travail très insuffisant, vous devez multiplier vos efforts et vous engager sérieusement dans vos études';
+      }
+    } else { // EN
+      if (average >= 18) {
+        return 'Diligent student with high abilities and remarkable seriousness, I wish you success and continuation at this excellent level';
+      } else if (average >= 16) {
+        return 'Work deserving of congratulations and encouragement, continue at this pace to maintain this good level';
+      } else if (average >= 14) {
+        return 'Satisfactory results and continuous improvement, you have the potential to continue progressing';
+      } else if (average >= 12) {
+        return 'Good results, you have the potential to continue improving, try to make more effort';
+      } else if (average >= 10) {
+        return 'Results could have been better, you need to make more effort and focus on your studies';
+      } else if (average >= 8) {
+        return 'You need to multiply your efforts and focus more in class';
+      } else if (average >= 6) {
+        return 'You need to make more effort to improve your results, review your lessons regularly';
+      } else {
+        return 'Very insufficient work, you need to multiply your efforts and commit seriously to your studies';
+      }
+    }
+  }
+
+  downloadProcessedExcel(): void {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) {
+      alert('لا توجد بيانات للتحميل');
+      return;
+    }
+
+    // Create workbook
+    const wb = XLSX.utils.book_new();
+
+    // Process each sheet
+    if (this.processedSheetsData && this.processedSheetsData.length > 0) {
+      // If we have multiple sheets, create a sheet for each
+      this.processedSheetsData.forEach((sheetInfo, sheetIndex) => {
+        const sheetData = sheetInfo.data;
+        if (!sheetData || sheetData.length === 0) return;
+
+        // Get all unique column headers from this sheet's data
+        const allColumnHeaders = new Set<string>();
+        
+        // Collect all grade column headers
+        sheetData.forEach((row: any) => {
+          if (row.gradeColumns) {
+            row.gradeColumns.forEach((col: any) => {
+              if (col.header && !allColumnHeaders.has(String(col.header))) {
+                allColumnHeaders.add(String(col.header));
+              }
+            });
+          }
+        });
+
+        // Build headers array
+        const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
+        
+        // Add grade column headers
+        const gradeHeaders = Array.from(allColumnHeaders);
+        headers.push(...gradeHeaders);
+        
+        // Add calculated columns
+        headers.push('المعدل', 'الملاحظات (obs)', 'الإرشادات (cons)');
+        
+        const excelData: any[] = [headers];
+
+        // Data rows
+        sheetData.forEach((row: any, index: number) => {
+          const rowData: any[] = [
+            index + 1,
+            row.id || '-',
+            row.firstName || '-',
+            row.lastName || '-'
+          ];
+
+          // Add grade values in the same order as headers
+          gradeHeaders.forEach(header => {
+            const gradeCol = row.gradeColumns?.find((col: any) => String(col.header) === header);
+            const value = gradeCol?.value;
+            if (value !== undefined && value !== null && value !== '') {
+              const numValue = parseFloat(String(value));
+              rowData.push(isNaN(numValue) ? value : numValue);
+            } else {
+              rowData.push('-');
+            }
+          });
+
+          // Add calculated values
+          rowData.push(
+            row.average?.toFixed(2) || '-',
+            row.observation || '-',
+            row.guidance || '-'
+          );
+
+          excelData.push(rowData);
+        });
+
+        // Create worksheet
+        const ws = XLSX.utils.aoa_to_sheet(excelData);
+        
+        // Clean sheet name (Excel sheet names have limitations)
+        let cleanSheetName = sheetInfo.sheetName || `Sheet${sheetIndex + 1}`;
+        cleanSheetName = cleanSheetName.substring(0, 31); // Excel sheet name max length
+        cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_'); // Remove invalid characters
+        
+        XLSX.utils.book_append_sheet(wb, ws, cleanSheetName);
+      });
+    } else {
+      // Fallback: create a single sheet with all data
+      const allColumnHeaders = new Set<string>();
+      
+      this.processedExcelData.forEach(row => {
+        if (row.gradeColumns) {
+          row.gradeColumns.forEach((col: any) => {
+            if (col.header && !allColumnHeaders.has(String(col.header))) {
+              allColumnHeaders.add(String(col.header));
+            }
+          });
+        }
+      });
+
+      const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
+      const gradeHeaders = Array.from(allColumnHeaders);
+      headers.push(...gradeHeaders);
+      headers.push('المعدل', 'الملاحظات (obs)', 'الإرشادات (cons)');
+      
+      const excelData: any[] = [headers];
+
+      this.processedExcelData.forEach((row, index) => {
+        const rowData: any[] = [
+          index + 1,
+          row.id || '-',
+          row.firstName || '-',
+          row.lastName || '-'
+        ];
+
+        gradeHeaders.forEach(header => {
+          const gradeCol = row.gradeColumns?.find((col: any) => String(col.header) === header);
+          const value = gradeCol?.value;
+          if (value !== undefined && value !== null && value !== '') {
+            const numValue = parseFloat(String(value));
+            rowData.push(isNaN(numValue) ? value : numValue);
+          } else {
+            rowData.push('-');
+          }
+        });
+
+        rowData.push(
+          row.average?.toFixed(2) || '-',
+          row.observation || '-',
+          row.guidance || '-'
+        );
+
+        excelData.push(rowData);
+      });
+
+      const ws = XLSX.utils.aoa_to_sheet(excelData);
+      XLSX.utils.book_append_sheet(wb, ws, 'النتائج المعالجة');
+    }
+
+    // Generate filename
+    const levelNames: { [key: string]: string } = {
+      'primary': 'ابتدائي',
+      'middle': 'متوسط',
+      'secondary': 'ثانوي'
+    };
+    const levelName = levelNames[this.selectedLevel] || 'غير محدد';
+    const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    // Save file
+    XLSX.writeFile(wb, fileName);
+  }
+
+  // Excel Analysis Functions
+  onExcelAnalysisTabClick(): void {
+    this.viewMode = 'excelAnalysis';
+    // Update charts when switching to analysis tab
+    setTimeout(() => {
+      this.updateExcelAnalysisCharts();
+      this.cdr.detectChanges();
+    }, 100);
+  }
+
+  ngAfterViewInit(): void {
+    // Charts will be initialized when needed
+  }
+
+  calculateSheetAverage(data: any[]): number {
+    if (!data || data.length === 0) return 0;
+    const sum = data.reduce((acc, row) => acc + (row.average || 0), 0);
+    return sum / data.length;
+  }
+
+  getStudentsAbove10Count(data: any[]): number {
+    if (!data) return 0;
+    return data.filter(row => (row.average || 0) >= 10).length;
+  }
+
+  getStudentsBelow10Count(data: any[]): number {
+    if (!data) return 0;
+    return data.filter(row => (row.average || 0) > 0 && (row.average || 0) < 10).length;
+  }
+
+  getGradeStatisticsForSheet(data: any[]): GradeStatistics {
+    const stats: GradeStatistics = {
+      lessThan4: 0,
+      between4and6: 0,
+      between6and8: 0,
+      between8and10: 0,
+      between10and12: 0,
+      between12and14: 0,
+      between14and16: 0,
+      greaterThan16: 0,
+      total: data.length
+    };
+
+    data.forEach(row => {
+      const average = row.average || 0;
+      if (average < 4) stats.lessThan4++;
+      else if (average < 6) stats.between4and6++;
+      else if (average < 8) stats.between6and8++;
+      else if (average < 10) stats.between8and10++;
+      else if (average < 12) stats.between10and12++;
+      else if (average < 14) stats.between12and14++;
+      else if (average < 16) stats.between14and16++;
+      else stats.greaterThan16++;
+    });
+
+    return stats;
+  }
+
+  getGradeRangeDistributionForSheet(data: any[]): GradeRangeDistribution {
+    const dist: GradeRangeDistribution = {
+      congratulations: 0, // >16
+      encouragement: 0, // 14-16
+      honorRoll: 0, // 12-14
+      none: 0, // 10-12
+      remarks: 0 // <10
+    };
+
+    data.forEach(row => {
+      const average = row.average || 0;
+      if (average > 16) dist.congratulations++;
+      else if (average >= 14) dist.encouragement++;
+      else if (average >= 12) dist.honorRoll++;
+      else if (average >= 10) dist.none++;
+      else dist.remarks++;
+    });
+
+    return dist;
+  }
+
+  updateExcelAnalysisCharts(): void {
+    if (!this.processedSheetsData || this.processedSheetsData.length === 0) return;
+
+    this.processedSheetsData.forEach((sheetInfo, sheetIndex) => {
+      // Destroy existing charts if they exist
+      const gradeDistChartId = `gradeDistChart_${sheetIndex}`;
+      const gradeRangeChartId = `gradeRangeChart_${sheetIndex}`;
+      
+      // Get chart instances and destroy them
+      const gradeDistCanvas = document.getElementById(gradeDistChartId) as HTMLCanvasElement;
+      const gradeRangeCanvas = document.getElementById(gradeRangeChartId) as HTMLCanvasElement;
+
+      if (gradeDistCanvas) {
+        const existingChart = Chart.getChart(gradeDistCanvas);
+        if (existingChart) {
+          existingChart.destroy();
+        }
+      }
+
+      if (gradeRangeCanvas) {
+        const existingChart = Chart.getChart(gradeRangeCanvas);
+        if (existingChart) {
+          existingChart.destroy();
+        }
+      }
+
+      // Get statistics
+      const stats = this.getGradeStatisticsForSheet(sheetInfo.data);
+      const rangeDist = this.getGradeRangeDistributionForSheet(sheetInfo.data);
+
+      // Create Grade Distribution Chart
+      if (gradeDistCanvas) {
+        new Chart(gradeDistCanvas, {
+          type: 'bar',
+          data: {
+            labels: ['<4', '4-6', '6-8', '8-10', '10-12', '12-14', '14-16', '>16'],
+            datasets: [{
+              label: 'عدد التلاميذ',
+              data: [
+                stats.lessThan4,
+                stats.between4and6,
+                stats.between6and8,
+                stats.between8and10,
+                stats.between10and12,
+                stats.between12and14,
+                stats.between14and16,
+                stats.greaterThan16
+              ],
+              backgroundColor: 'rgba(59, 130, 246, 0.5)',
+              borderColor: 'rgba(59, 130, 246, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
+            },
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      }
+
+      // Create Grade Range Distribution Chart
+      if (gradeRangeCanvas) {
+        new Chart(gradeRangeCanvas, {
+          type: 'pie',
+          data: {
+            labels: ['تهنئة (>16)', 'تشجيع (14-16)', 'قائمة الشرف (12-14)', 'عادي (10-12)', 'ملاحظات (<10)'],
+            datasets: [{
+              data: [
+                rangeDist.congratulations,
+                rangeDist.encouragement,
+                rangeDist.honorRoll,
+                rangeDist.none,
+                rangeDist.remarks
+              ],
+              backgroundColor: [
+                'rgba(34, 197, 94, 0.7)',
+                'rgba(59, 130, 246, 0.7)',
+                'rgba(147, 51, 234, 0.7)',
+                'rgba(107, 114, 128, 0.7)',
+                'rgba(239, 68, 68, 0.7)'
+              ],
+              borderColor: [
+                'rgba(34, 197, 94, 1)',
+                'rgba(59, 130, 246, 1)',
+                'rgba(147, 51, 234, 1)',
+                'rgba(107, 114, 128, 1)',
+                'rgba(239, 68, 68, 1)'
+              ],
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: true,
+                position: 'top'
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  async exportExcelAnalysisToPDF(): Promise<void> {
+    if (!this.processedSheetsData || this.processedSheetsData.length === 0) {
+      alert('لا توجد بيانات للتصدير');
+      return;
+    }
+
+    try {
+      // Create a temporary container for export
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm'; // A4 width
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'تحليل بيانات Excel';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '28px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '30px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Process each sheet
+      for (let sheetIndex = 0; sheetIndex < this.processedSheetsData.length; sheetIndex++) {
+        const sheetInfo = this.processedSheetsData[sheetIndex];
+        
+        // Add sheet title
+        const sheetTitle = document.createElement('h2');
+        sheetTitle.textContent = `الصفحة: ${sheetInfo.sheetName}`;
+        sheetTitle.style.fontSize = '22px';
+        sheetTitle.style.fontWeight = 'bold';
+        sheetTitle.style.marginTop = '30px';
+        sheetTitle.style.marginBottom = '20px';
+        sheetTitle.style.color = '#1f2937';
+        sheetTitle.style.borderBottom = '2px solid #3b82f6';
+        sheetTitle.style.paddingBottom = '10px';
+        exportContainer.appendChild(sheetTitle);
+
+        // Add statistics
+        const statsDiv = document.createElement('div');
+        statsDiv.style.display = 'grid';
+        statsDiv.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        statsDiv.style.gap = '15px';
+        statsDiv.style.marginBottom = '20px';
+
+        const avg = this.calculateSheetAverage(sheetInfo.data);
+        const above10 = this.getStudentsAbove10Count(sheetInfo.data);
+        const below10 = this.getStudentsBelow10Count(sheetInfo.data);
+        const total = sheetInfo.data.length;
+
+        const stats = [
+          { label: 'معدل الصفحة', value: avg.toFixed(2), color: '#3b82f6' },
+          { label: 'معدل ≥ 10', value: above10.toString(), color: '#10b981' },
+          { label: 'معدل < 10', value: below10.toString(), color: '#ef4444' },
+          { label: 'إجمالي التلاميذ', value: total.toString(), color: '#8b5cf6' }
+        ];
+
+        stats.forEach(stat => {
+          const statCard = document.createElement('div');
+          statCard.style.backgroundColor = '#f3f4f6';
+          statCard.style.padding = '15px';
+          statCard.style.borderRadius = '8px';
+          statCard.style.textAlign = 'center';
+          statCard.style.border = `2px solid ${stat.color}`;
+          
+          const value = document.createElement('div');
+          value.textContent = stat.value;
+          value.style.fontSize = '24px';
+          value.style.fontWeight = 'bold';
+          value.style.color = stat.color;
+          value.style.marginBottom = '5px';
+          
+          const label = document.createElement('div');
+          label.textContent = stat.label;
+          label.style.fontSize = '12px';
+          label.style.color = '#6b7280';
+          
+          statCard.appendChild(value);
+          statCard.appendChild(label);
+          statsDiv.appendChild(statCard);
+        });
+
+        exportContainer.appendChild(statsDiv);
+
+        // Add charts (we'll use canvas to image conversion)
+        const chartsDiv = document.createElement('div');
+        chartsDiv.style.display = 'grid';
+        chartsDiv.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        chartsDiv.style.gap = '20px';
+        chartsDiv.style.marginBottom = '30px';
+
+        // Get chart canvases
+        const gradeDistCanvas = document.getElementById(`gradeDistChart_${sheetIndex}`) as HTMLCanvasElement;
+        const gradeRangeCanvas = document.getElementById(`gradeRangeChart_${sheetIndex}`) as HTMLCanvasElement;
+
+        if (gradeDistCanvas) {
+          const chartImg = document.createElement('img');
+          chartImg.src = gradeDistCanvas.toDataURL('image/png');
+          chartImg.style.width = '100%';
+          chartImg.style.height = 'auto';
+          chartImg.style.border = '1px solid #e5e7eb';
+          chartImg.style.borderRadius = '8px';
+          chartsDiv.appendChild(chartImg);
+        }
+
+        if (gradeRangeCanvas) {
+          const chartImg = document.createElement('img');
+          chartImg.src = gradeRangeCanvas.toDataURL('image/png');
+          chartImg.style.width = '100%';
+          chartImg.style.height = 'auto';
+          chartImg.style.border = '1px solid #e5e7eb';
+          chartImg.style.borderRadius = '8px';
+          chartsDiv.appendChild(chartImg);
+        }
+
+        exportContainer.appendChild(chartsDiv);
+      }
+
+      document.body.appendChild(exportContainer);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 1.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Create PDF
+      const imgWidth = 210; // A4 width in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const pageHeight = 297; // A4 height in mm
+      const margin = 10;
+      const availableHeight = pageHeight - (2 * margin);
+      
+      let finalHeight = imgHeight;
+      let position = 0;
+
+      // Add first page
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, imgWidth - (2 * margin), finalHeight);
+      
+      // Add additional pages if needed
+      let heightLeft = finalHeight - availableHeight;
+      while (heightLeft > 0) {
+        position = -availableHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, position, imgWidth - (2 * margin), finalHeight);
+        heightLeft -= availableHeight;
+      }
+
+      const fileName = `تحليل_بيانات_Excel_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+    }
   }
 }
 

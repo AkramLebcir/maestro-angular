@@ -67,6 +67,18 @@
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.analysis') }}
       </button>
+      <button 
+        (click)="viewMode = 'excelImport'"
+        [class]="viewMode === 'excelImport' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="px-4 py-2 font-semibold">
+        استيراد محسّن
+      </button>
+      <button 
+        (click)="onExcelAnalysisTabClick()"
+        [class]="viewMode === 'excelAnalysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        class="px-4 py-2 font-semibold">
+        تحليل بيانات Excel
+      </button>
     </div>
 
     <!-- Grade Entry View -->
@@ -521,6 +533,160 @@
       </div>
     </div>
 
+    <!-- Excel Import with Auto Observations/Guidance View -->
+    <div *ngIf="viewMode === 'excelImport'">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">استيراد ملف Excel مع توليد الملاحظات والإرشادات تلقائياً</h2>
+        <p class="text-gray-600 mb-6">قم باستيراد ملف Excel لعلامات التلاميذ وسيتم إضافة الملاحظات (obs) والإرشادات (cons) تلقائياً بناءً على المعدل</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <button 
+          (click)="openEnhancedImportModal()"
+          class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <span>استيراد ملف Excel</span>
+        </button>
+      </div>
+
+      <!-- Processed Data Preview -->
+      <div *ngIf="processedExcelData && processedExcelData.length > 0" class="bg-white p-6 rounded-lg shadow-md">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-semibold text-gray-800">معاينة البيانات المعالجة</h3>
+          <button 
+            (click)="downloadProcessedExcel()"
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>تحميل الملف المعالج</span>
+          </button>
+        </div>
+
+        <div *ngIf="processedSheetsData && processedSheetsData.length > 1" class="mb-4 text-sm text-gray-600">
+          <p>عدد الصفحات المعالجة: {{ processedSheetsData.length }}</p>
+        </div>
+        
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr class="bg-blue-600 text-white">
+                <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold" *ngIf="processedSheetsData && processedSheetsData.length > 1">الصفحة</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">الاسم</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">اللقب</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">الملاحظات (obs)</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات (cons)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let row of processedExcelData; let i = index" 
+                class="border-b border-gray-200 hover:bg-gray-50">
+                <td class="border border-gray-300 p-2 text-center">{{ i + 1 }}</td>
+                <td class="border border-gray-300 p-2 text-center" *ngIf="processedSheetsData && processedSheetsData.length > 1">
+                  {{ row.sheetName || '-' }}
+                </td>
+                <td class="border border-gray-300 p-2">{{ row.firstName || '-' }}</td>
+                <td class="border border-gray-300 p-2">{{ row.lastName || '-' }}</td>
+                <td class="border border-gray-300 p-2 text-center font-semibold"
+                    [class.text-red-600]="row.average < 10"
+                    [class.text-green-600]="row.average >= 10">
+                  {{ row.average?.toFixed(2) || '-' }}
+                </td>
+                <td class="border border-gray-300 p-2 text-right" style="min-width: 200px;">
+                  {{ row.observation || '-' }}
+                </td>
+                <td class="border border-gray-300 p-2 text-right" style="min-width: 200px;">
+                  {{ row.guidance || '-' }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Excel Analysis View -->
+    <div *ngIf="viewMode === 'excelAnalysis'">
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">تحليل بيانات Excel</h2>
+            <p class="text-gray-600">مخططات بيانية مفصلة لكل صفحة (قسم) في ملف Excel</p>
+          </div>
+          <button 
+            *ngIf="processedSheetsData && processedSheetsData.length > 0"
+            (click)="exportExcelAnalysisToPDF()"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>تصدير PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="processedSheetsData && processedSheetsData.length > 0">
+        <div *ngFor="let sheetInfo of processedSheetsData; let sheetIndex = index" class="mb-8">
+          <div class="bg-white p-6 rounded-lg shadow-md">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">{{ sheetInfo.sheetName }}</h3>
+            
+            <!-- Statistics Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                <div class="text-2xl font-bold text-blue-700 mb-1">{{ calculateSheetAverage(sheetInfo.data).toFixed(2) }}</div>
+                <div class="text-sm text-blue-600">معدل الصفحة</div>
+              </div>
+              <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                <div class="text-2xl font-bold text-green-700 mb-1">{{ getStudentsAbove10Count(sheetInfo.data) }}</div>
+                <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
+              </div>
+              <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                <div class="text-2xl font-bold text-red-700 mb-1">{{ getStudentsBelow10Count(sheetInfo.data) }}</div>
+                <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
+              </div>
+              <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+                <div class="text-2xl font-bold text-purple-700 mb-1">{{ sheetInfo.data.length }}</div>
+                <div class="text-sm text-purple-600">إجمالي التلاميذ</div>
+              </div>
+            </div>
+
+            <!-- Charts Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Grade Distribution Chart -->
+              <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع الدرجات</h4>
+                <div class="h-64">
+                  <canvas [attr.id]="'gradeDistChart_' + sheetIndex"></canvas>
+                </div>
+              </div>
+
+              <!-- Grade Range Chart -->
+              <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع حسب الفئات</h4>
+                <div class="h-64">
+                  <canvas [attr.id]="'gradeRangeChart_' + sheetIndex"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!processedSheetsData || processedSheetsData.length === 0" class="text-center text-gray-500 py-12">
+        <p class="mb-4">لا توجد بيانات معالجة للتحليل</p>
+        <button 
+          (click)="viewMode = 'excelImport'"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          استيراد ملف Excel أولاً
+        </button>
+      </div>
+    </div>
+
     <div *ngIf="!selectedClass" class="text-center text-gray-500 py-12">
         {{ translate('gradebook.selectClassFirst') }}
     </div>
@@ -640,6 +806,71 @@
         accept=".xlsx,.xls"
         (change)="onExcelFileSelected($event)"
         class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+    </div>
+  </div>
+</div>
+
+<!-- Enhanced Excel Import Modal -->
+<div 
+  *ngIf="showEnhancedImportModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  (click)="closeEnhancedImportModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">استيراد محسّن من Excel</h3>
+      <button 
+        (click)="closeEnhancedImportModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <p class="text-sm text-gray-600">
+        قم باختيار ملف Excel يحتوي على علامات التلاميذ. سيتم إضافة الملاحظات (obs) والإرشادات (cons) تلقائياً بناءً على المعدل.
+      </p>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">الطور</label>
+          <select 
+            [(ngModel)]="selectedLevel"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="primary">ابتدائي</option>
+            <option value="middle">متوسط</option>
+            <option value="secondary">ثانوي</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">اللغة</label>
+          <select 
+            [(ngModel)]="selectedLanguage"
+            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="AR">العربية</option>
+            <option value="FR">الفرنسية</option>
+            <option value="EN">الإنجليزية</option>
+          </select>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">اختر ملف Excel</label>
+        <input 
+          type="file"
+          accept=".xlsx,.xls"
+          (change)="onEnhancedExcelFileSelected($event)"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+      </div>
+
+      <div *ngIf="isProcessing" class="text-center py-4">
+        <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <p class="mt-2 text-sm text-gray-600">جاري المعالجة...</p>
+      </div>
     </div>
   </div>
 </div>
