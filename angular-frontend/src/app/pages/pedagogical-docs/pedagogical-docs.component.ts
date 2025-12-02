@@ -98,9 +98,28 @@ export class PedagogicalDocsComponent implements OnInit {
       next: (data) => {
         this.docs = data || [];
         this.loading = false;
+        this.errorMessage = '';
       },
-      error: () => {
-        this.errorMessage = 'فشل في جلب قائمة الوثائق البيداغوجية.';
+      error: (error) => {
+        console.error('Error loading pedagogical documents:', error);
+        // عرض رسالة خطأ أكثر تفصيلاً
+        let errorMessage = 'فشل في جلب قائمة الوثائق البيداغوجية.';
+        
+        if (error?.error?.message) {
+          errorMessage += ` ${error.error.message}`;
+        } else if (error?.status === 401) {
+          errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
+        } else if (error?.status === 403) {
+          errorMessage = 'ليس لديك صلاحية للوصول إلى الوثائق البيداغوجية.';
+        } else if (error?.status === 404) {
+          errorMessage = 'لم يتم العثور على نقطة النهاية. تحقق من إعدادات الخادم.';
+        } else if (error?.status === 500) {
+          errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+        } else if (error?.status === 0 || error?.message?.includes('Network')) {
+          errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من الاتصال بالإنترنت وإعدادات الـAPI.';
+        }
+        
+        this.errorMessage = errorMessage;
         this.loading = false;
       },
     });

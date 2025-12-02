@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../services/api.service';
+import { LanguageService } from '../../../services/language.service';
 
 export interface SubscriptionPlan {
   id: number;
@@ -140,7 +141,10 @@ export class SubscriptionManagementComponent implements OnInit {
   errorMessage = '';
   successMessage = '';
 
-  constructor(private api: ApiService) {}
+  constructor(
+    private api: ApiService,
+    public languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.loadStats();
@@ -375,13 +379,14 @@ export class SubscriptionManagementComponent implements OnInit {
   }
 
   getSubscriptionStatusText(status: string): string {
-    const texts: Record<string, string> = {
-      active: 'نشط',
-      expired: 'منتهي',
-      cancelled: 'ملغي',
-      pending: 'قيد الانتظار'
+    const statusMap: Record<string, string> = {
+      active: 'subscriptionManagement.statusActive',
+      expired: 'subscriptionManagement.statusExpired',
+      cancelled: 'subscriptionManagement.statusCancelled',
+      pending: 'subscriptionManagement.statusPending'
     };
-    return texts[status] || status;
+    const key = statusMap[status] || status;
+    return this.translate(key);
   }
 
   // ========== Payments Management ==========
@@ -517,22 +522,24 @@ export class SubscriptionManagementComponent implements OnInit {
   }
 
   getPaymentStatusText(status: string): string {
-    const texts: Record<string, string> = {
-      completed: 'مكتمل',
-      pending: 'قيد الانتظار',
-      failed: 'فشل',
-      refunded: 'مسترد'
+    const statusMap: Record<string, string> = {
+      completed: 'subscriptionManagement.statusCompleted',
+      pending: 'subscriptionManagement.statusPending',
+      failed: 'subscriptionManagement.statusFailed',
+      refunded: 'subscriptionManagement.statusRefunded'
     };
-    return texts[status] || status;
+    const key = statusMap[status] || status;
+    return this.translate(key);
   }
 
   getPaymentMethodText(method: string): string {
-    const texts: Record<string, string> = {
-      manual: 'يدوي/تحويل بنكي',
-      card: 'بطاقة ذهبية',
-      other: 'أخرى'
+    const methodMap: Record<string, string> = {
+      manual: 'subscriptionManagement.paymentMethodManual',
+      card: 'subscriptionManagement.paymentMethodCard',
+      other: 'subscriptionManagement.paymentMethodOther'
     };
-    return texts[method] || method;
+    const key = methodMap[method] || method;
+    return this.translate(key);
   }
 
   // ========== Stats ==========
@@ -585,10 +592,24 @@ export class SubscriptionManagementComponent implements OnInit {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('ar-DZ', {
+    const lang = this.languageService.getCurrentLanguage();
+    const localeMap: { [key: string]: string } = {
+      'AR': 'ar-DZ',
+      'FR': 'fr-FR',
+      'EN': 'en-US',
+      'ES': 'es-ES',
+      'IT': 'it-IT',
+      'DE': 'de-DE',
+      'TR': 'tr-TR'
+    };
+    return new Intl.NumberFormat(localeMap[lang] || 'ar-DZ', {
       style: 'currency',
       currency: 'DZD'
     }).format(amount);
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 }
 

@@ -103,12 +103,12 @@ export class AttendanceComponent implements OnInit {
   
   // Attendance statuses
   attendanceStatuses = [
+    { value: 'unrecorded', labelKey: 'attendance.status', color: 'gray', icon: '○' },
     { value: 'present', labelKey: 'attendance.present', color: 'green', icon: '✓' },
     { value: 'absent', labelKey: 'attendance.absent', color: 'red', icon: '✗' },
     { value: 'late', labelKey: 'attendance.late', color: 'blue', icon: '⏰' },
     { value: 'excused', labelKey: 'attendance.excused', color: 'purple', icon: '📝' },
-    { value: 'left_early', labelKey: 'attendance.leftEarly', color: 'orange', icon: '🚪' },
-    { value: 'unrecorded', labelKey: 'attendance.status', color: 'gray', icon: '○' }
+    { value: 'left_early', labelKey: 'attendance.leftEarly', color: 'orange', icon: '🚪' }
   ];
 
   // Weekly view
@@ -318,7 +318,9 @@ export class AttendanceComponent implements OnInit {
       lessonSubject: this.selectedLessonSubject || undefined
     };
 
-    if (existingRecord) {
+    // التحقق من أن السجل موجود وله ID صحيح (أكبر من 0)
+    // إذا كان ID = 0 فهذا يعني أنه سجل محلي مؤقت لم يتم حفظه بعد في الـAPI
+    if (existingRecord && existingRecord.id && existingRecord.id > 0) {
       // Update existing record
       this.apiService.patch<AttendanceRecord>(`/attendance/${existingRecord.id}`, recordData).subscribe({
         next: () => {
@@ -327,7 +329,30 @@ export class AttendanceComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating attendance:', error);
-          alert(this.translate('attendance.errorUpdate'));
+          // عرض رسالة خطأ أكثر تفصيلاً
+          let errorMessage = this.translate('attendance.errorUpdate');
+          
+          if (error?.error?.message) {
+            errorMessage += `: ${error.error.message}`;
+          } else if (error?.error?.error && Array.isArray(error.error.error)) {
+            errorMessage += `: ${error.error.error.join(', ')}`;
+          } else if (error?.error?.error) {
+            errorMessage += `: ${error.error.error}`;
+          } else if (error?.message) {
+            errorMessage += `: ${error.message}`;
+          } else if (error?.status === 401) {
+            errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
+          } else if (error?.status === 403) {
+            errorMessage = 'ليس لديك صلاحية لتحديث الحضور.';
+          } else if (error?.status === 404) {
+            errorMessage = 'لم يتم العثور على سجل الحضور.';
+          } else if (error?.status === 500) {
+            errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+          } else if (error?.status === 0 || error?.message?.includes('Network')) {
+            errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من الاتصال بالإنترنت.';
+          }
+          
+          alert(errorMessage);
         }
       });
     } else {

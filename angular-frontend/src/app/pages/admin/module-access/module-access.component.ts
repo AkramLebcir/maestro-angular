@@ -66,7 +66,7 @@ export class ModuleAccessComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading users:', error);
-        this.errorMessage = 'حدث خطأ أثناء تحميل قائمة المستخدمين';
+        this.errorMessage = this.translate('moduleAccess.error.loadUsers');
         this.isLoading = false;
       }
     });
@@ -114,13 +114,13 @@ export class ModuleAccessComponent implements OnInit {
     this.apiService.patch(`/users/${this.selectedUser.id}/modules`, { modules }).subscribe({
       next: () => {
         this.selectedUser!.allowedModules = modules;
-        this.successMessage = 'تم تحديث الصلاحيات بنجاح';
+        this.successMessage = this.translate('moduleAccess.success.updatePermissions');
         this.loadUsers();
         this.isLoading = false;
       },
       error: (error) => {
         console.error('Error updating modules:', error);
-        this.errorMessage = 'حدث خطأ أثناء تحديث الصلاحيات';
+        this.errorMessage = this.translate('moduleAccess.error.updatePermissions');
         this.isLoading = false;
       }
     });

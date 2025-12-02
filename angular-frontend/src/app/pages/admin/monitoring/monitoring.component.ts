@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../services/api.service';
 import { User } from '../../../services/auth.service';
+import { LanguageService } from '../../../services/language.service';
 
 export interface UserActivity extends User {
   lastLoginAt?: string;
@@ -18,7 +19,10 @@ export class MonitoringComponent implements OnInit {
   isLoading: boolean = false;
   searchTerm: string = '';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    public languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -50,9 +54,19 @@ export class MonitoringComponent implements OnInit {
   }
 
   formatDate(dateString?: string): string {
-    if (!dateString) return 'لم يسجل دخول';
+    if (!dateString) return this.translate('monitoring.neverLoggedIn');
     const date = new Date(dateString);
-    return date.toLocaleDateString('ar-EG', {
+    const lang = this.languageService.getCurrentLanguage();
+    const localeMap: { [key: string]: string } = {
+      'AR': 'ar-EG',
+      'FR': 'fr-FR',
+      'EN': 'en-US',
+      'ES': 'es-ES',
+      'IT': 'it-IT',
+      'DE': 'de-DE',
+      'TR': 'tr-TR'
+    };
+    return date.toLocaleDateString(localeMap[lang] || 'ar-EG', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -62,17 +76,21 @@ export class MonitoringComponent implements OnInit {
   }
 
   getDaysSinceLastLogin(dateString?: string): string {
-    if (!dateString) return 'لم يسجل دخول';
+    if (!dateString) return this.translate('monitoring.neverLoggedIn');
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'اليوم';
-    if (diffDays === 1) return 'أمس';
-    if (diffDays < 7) return `منذ ${diffDays} أيام`;
-    if (diffDays < 30) return `منذ ${Math.floor(diffDays / 7)} أسابيع`;
-    return `منذ ${Math.floor(diffDays / 30)} أشهر`;
+    if (diffDays === 0) return this.translate('monitoring.today');
+    if (diffDays === 1) return this.translate('monitoring.yesterday');
+    if (diffDays < 7) return `${this.translate('monitoring.daysAgo')} ${diffDays}`;
+    if (diffDays < 30) return `${this.translate('monitoring.weeksAgo')} ${Math.floor(diffDays / 7)}`;
+    return `${this.translate('monitoring.monthsAgo')} ${Math.floor(diffDays / 30)}`;
+  }
+
+  translate(key: string): string {
+    return this.languageService.translate(key);
   }
 }
 

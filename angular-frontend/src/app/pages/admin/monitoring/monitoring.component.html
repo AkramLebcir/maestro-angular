@@ -1,11 +1,11 @@
 <div>
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">المتابعة والإشراف</h2>
+    <h2 class="text-2xl font-bold text-gray-800">{{ translate('monitoring.title') }}</h2>
     <div class="w-64">
       <input
         type="text"
         [(ngModel)]="searchTerm"
-        placeholder="بحث عن مستخدم..."
+        [placeholder]="translate('monitoring.searchPlaceholder')"
         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
       />
     </div>
@@ -14,7 +14,7 @@
   <!-- Loading State -->
   <div *ngIf="isLoading" class="text-center py-12">
     <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-    <p class="mt-4 text-gray-600">جاري التحميل...</p>
+    <p class="mt-4 text-gray-600">{{ translate('monitoring.loading') }}</p>
   </div>
 
   <!-- Users Table -->
@@ -23,31 +23,31 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">المستخدم</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الدور</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">آخر تسجيل دخول</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">تاريخ الإنشاء</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الوحدات المفعلة</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.user') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.role') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.status') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.lastLogin') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.createdDate') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('monitoring.enabledModules') }}</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <tr *ngFor="let user of filteredUsers" class="hover:bg-gray-50">
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="text-sm font-medium text-gray-900">
-                {{ (user.firstName || '') + ' ' + (user.lastName || '') || 'بدون اسم' }}
+                {{ (user.firstName || '') + ' ' + (user.lastName || '') || translate('monitoring.noName') }}
               </div>
               <div class="text-sm text-gray-500">{{ user.email }}</div>
               <div *ngIf="user.username" class="text-xs text-gray-400">{{ user.username }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [class]="user.role === 'admin' ? 'px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800'">
-                {{ user.role === 'admin' ? 'مسؤول' : 'أستاذ' }}
+                {{ user.role === 'admin' ? translate('monitoring.roleAdmin') : translate('monitoring.roleTeacher') }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [class]="user.isActive ? 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800'">
-                {{ user.isActive ? 'نشط' : 'معطل' }}
+                {{ user.isActive ? translate('monitoring.statusActive') : translate('monitoring.statusInactive') }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
@@ -59,7 +59,7 @@
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="text-sm text-gray-600">
-                {{ user.role === 'admin' ? 'الكل' : (user.allowedModules?.length || 0) }}
+                {{ user.role === 'admin' ? translate('monitoring.allModules') : (user.allowedModules?.length || 0) }}
               </span>
             </td>
           </tr>
@@ -69,11 +69,9 @@
 
     <!-- Empty State -->
     <div *ngIf="filteredUsers.length === 0" class="text-center py-12 text-gray-500">
-      <p>لا توجد نتائج</p>
+      <p>{{ translate('monitoring.noResults') }}</p>
     </div>
   </div>
 </div>
-
-
 
 

@@ -486,6 +486,42 @@ export class LanguageService {
         'DE': 'Vorlage',
         'TR': 'Şablon'
       },
+      'common.name': {
+        'AR': 'الاسم',
+        'FR': 'Nom',
+        'EN': 'Name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Name',
+        'TR': 'İsim'
+      },
+      'common.status': {
+        'AR': 'الحالة',
+        'FR': 'Statut',
+        'EN': 'Status',
+        'ES': 'Estado',
+        'IT': 'Stato',
+        'DE': 'Status',
+        'TR': 'Durum'
+      },
+      'common.actions': {
+        'AR': 'الإجراءات',
+        'FR': 'Actions',
+        'EN': 'Actions',
+        'ES': 'Acciones',
+        'IT': 'Azioni',
+        'DE': 'Aktionen',
+        'TR': 'İşlemler'
+      },
+      'common.inactive': {
+        'AR': 'معطل',
+        'FR': 'Inactif',
+        'EN': 'Inactive',
+        'ES': 'Inactivo',
+        'IT': 'Inattivo',
+        'DE': 'Inaktiv',
+        'TR': 'Pasif'
+      },
 
       // Dashboard
       'dashboard.title': {
@@ -10824,6 +10860,1004 @@ export class LanguageService {
         'IT': 'Basso',
         'DE': 'Niedrig',
         'TR': 'Düşük'
+      },
+
+      // Users Management
+      'usersManagement.title': {
+        'AR': 'إدارة المستخدمين',
+        'FR': 'Gestion des utilisateurs',
+        'EN': 'User management',
+        'ES': 'Gestión de usuarios',
+        'IT': 'Gestione utenti',
+        'DE': 'Benutzerverwaltung',
+        'TR': 'Kullanıcı yönetimi'
+      },
+      'usersManagement.addUser': {
+        'AR': '+ إضافة مستخدم جديد',
+        'FR': '+ Ajouter un nouvel utilisateur',
+        'EN': '+ Add new user',
+        'ES': '+ Agregar nuevo usuario',
+        'IT': '+ Aggiungi nuovo utente',
+        'DE': '+ Neuen Benutzer hinzufügen',
+        'TR': '+ Yeni kullanıcı ekle'
+      },
+      'usersManagement.name': {
+        'AR': 'الاسم',
+        'FR': 'Nom',
+        'EN': 'Name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Name',
+        'TR': 'İsim'
+      },
+      'usersManagement.email': {
+        'AR': 'البريد الإلكتروني',
+        'FR': 'E-mail',
+        'EN': 'Email',
+        'ES': 'Correo electrónico',
+        'IT': 'Email',
+        'DE': 'E-Mail',
+        'TR': 'E-posta'
+      },
+      'usersManagement.role': {
+        'AR': 'الدور',
+        'FR': 'Rôle',
+        'EN': 'Role',
+        'ES': 'Rol',
+        'IT': 'Ruolo',
+        'DE': 'Rolle',
+        'TR': 'Rol'
+      },
+      'usersManagement.status': {
+        'AR': 'الحالة',
+        'FR': 'Statut',
+        'EN': 'Status',
+        'ES': 'Estado',
+        'IT': 'Stato',
+        'DE': 'Status',
+        'TR': 'Durum'
+      },
+      'usersManagement.lastLogin': {
+        'AR': 'آخر تسجيل دخول',
+        'FR': 'Dernière connexion',
+        'EN': 'Last login',
+        'ES': 'Último inicio de sesión',
+        'IT': 'Ultimo accesso',
+        'DE': 'Letzte Anmeldung',
+        'TR': 'Son giriş'
+      },
+      'usersManagement.actions': {
+        'AR': 'الإجراءات',
+        'FR': 'Actions',
+        'EN': 'Actions',
+        'ES': 'Acciones',
+        'IT': 'Azioni',
+        'DE': 'Aktionen',
+        'TR': 'İşlemler'
+      },
+      'usersManagement.loading': {
+        'AR': 'جاري التحميل...',
+        'FR': 'Chargement en cours...',
+        'EN': 'Loading...',
+        'ES': 'Cargando...',
+        'IT': 'Caricamento in corso...',
+        'DE': 'Wird geladen...',
+        'TR': 'Yükleniyor...'
+      },
+      'usersManagement.noUsers': {
+        'AR': 'لا يوجد مستخدمين',
+        'FR': 'Aucun utilisateur',
+        'EN': 'No users',
+        'ES': 'No hay usuarios',
+        'IT': 'Nessun utente',
+        'DE': 'Keine Benutzer',
+        'TR': 'Kullanıcı yok'
+      },
+      'usersManagement.editUser': {
+        'AR': 'تعديل مستخدم',
+        'FR': 'Modifier l\'utilisateur',
+        'EN': 'Edit user',
+        'ES': 'Editar usuario',
+        'IT': 'Modifica utente',
+        'DE': 'Benutzer bearbeiten',
+        'TR': 'Kullanıcıyı düzenle'
+      },
+      'usersManagement.addNewUser': {
+        'AR': 'إضافة مستخدم جديد',
+        'FR': 'Ajouter un nouvel utilisateur',
+        'EN': 'Add new user',
+        'ES': 'Agregar nuevo usuario',
+        'IT': 'Aggiungi nuovo utente',
+        'DE': 'Neuen Benutzer hinzufügen',
+        'TR': 'Yeni kullanıcı ekle'
+      },
+      'usersManagement.firstName': {
+        'AR': 'الاسم الأول',
+        'FR': 'Prénom',
+        'EN': 'First name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Vorname',
+        'TR': 'Ad'
+      },
+      'usersManagement.lastName': {
+        'AR': 'الاسم الأخير',
+        'FR': 'Nom',
+        'EN': 'Last name',
+        'ES': 'Apellido',
+        'IT': 'Cognome',
+        'DE': 'Nachname',
+        'TR': 'Soyad'
+      },
+      'usersManagement.username': {
+        'AR': 'اسم المستخدم (اختياري)',
+        'FR': 'Nom d\'utilisateur (optionnel)',
+        'EN': 'Username (optional)',
+        'ES': 'Nombre de usuario (opcional)',
+        'IT': 'Nome utente (opzionale)',
+        'DE': 'Benutzername (optional)',
+        'TR': 'Kullanıcı adı (isteğe bağlı)'
+      },
+      'usersManagement.password': {
+        'AR': 'كلمة المرور',
+        'FR': 'Mot de passe',
+        'EN': 'Password',
+        'ES': 'Contraseña',
+        'IT': 'Password',
+        'DE': 'Passwort',
+        'TR': 'Şifre'
+      },
+      'usersManagement.passwordKeepCurrent': {
+        'AR': '(اتركه فارغاً للحفاظ على الكلمة الحالية)',
+        'FR': '(laisser vide pour conserver le mot de passe actuel)',
+        'EN': '(leave empty to keep current password)',
+        'ES': '(dejar vacío para mantener la contraseña actual)',
+        'IT': '(lascia vuoto per mantenere la password attuale)',
+        'DE': '(leer lassen, um das aktuelle Passwort beizubehalten)',
+        'TR': '(mevcut şifreyi korumak için boş bırakın)'
+      },
+      'usersManagement.accountActive': {
+        'AR': 'الحساب نشط',
+        'FR': 'Compte actif',
+        'EN': 'Account active',
+        'ES': 'Cuenta activa',
+        'IT': 'Account attivo',
+        'DE': 'Konto aktiv',
+        'TR': 'Hesap aktif'
+      },
+      'usersManagement.roleTeacher': {
+        'AR': 'أستاذ',
+        'FR': 'Enseignant',
+        'EN': 'Teacher',
+        'ES': 'Profesor',
+        'IT': 'Insegnante',
+        'DE': 'Lehrer',
+        'TR': 'Öğretmen'
+      },
+      'usersManagement.roleAdmin': {
+        'AR': 'مسؤول',
+        'FR': 'Administrateur',
+        'EN': 'Admin',
+        'ES': 'Administrador',
+        'IT': 'Amministratore',
+        'DE': 'Administrator',
+        'TR': 'Yönetici'
+      },
+      'usersManagement.statusActive': {
+        'AR': 'نشط',
+        'FR': 'Actif',
+        'EN': 'Active',
+        'ES': 'Activo',
+        'IT': 'Attivo',
+        'DE': 'Aktiv',
+        'TR': 'Aktif'
+      },
+      'usersManagement.statusInactive': {
+        'AR': 'معطل',
+        'FR': 'Désactivé',
+        'EN': 'Inactive',
+        'ES': 'Inactivo',
+        'IT': 'Inattivo',
+        'DE': 'Inaktiv',
+        'TR': 'Pasif'
+      },
+      'usersManagement.edit': {
+        'AR': 'تعديل',
+        'FR': 'Modifier',
+        'EN': 'Edit',
+        'ES': 'Editar',
+        'IT': 'Modifica',
+        'DE': 'Bearbeiten',
+        'TR': 'Düzenle'
+      },
+      'usersManagement.disable': {
+        'AR': 'تعطيل',
+        'FR': 'Désactiver',
+        'EN': 'Disable',
+        'ES': 'Desactivar',
+        'IT': 'Disabilita',
+        'DE': 'Deaktivieren',
+        'TR': 'Devre dışı bırak'
+      },
+      'usersManagement.enable': {
+        'AR': 'تفعيل',
+        'FR': 'Activer',
+        'EN': 'Enable',
+        'ES': 'Activar',
+        'IT': 'Abilita',
+        'DE': 'Aktivieren',
+        'TR': 'Etkinleştir'
+      },
+      'usersManagement.update': {
+        'AR': 'تحديث',
+        'FR': 'Mettre à jour',
+        'EN': 'Update',
+        'ES': 'Actualizar',
+        'IT': 'Aggiorna',
+        'DE': 'Aktualisieren',
+        'TR': 'Güncelle'
+      },
+      'usersManagement.create': {
+        'AR': 'إنشاء',
+        'FR': 'Créer',
+        'EN': 'Create',
+        'ES': 'Crear',
+        'IT': 'Crea',
+        'DE': 'Erstellen',
+        'TR': 'Oluştur'
+      },
+      'usersManagement.noName': {
+        'AR': 'بدون اسم',
+        'FR': 'Sans nom',
+        'EN': 'No name',
+        'ES': 'Sin nombre',
+        'IT': 'Senza nome',
+        'DE': 'Kein Name',
+        'TR': 'İsim yok'
+      },
+      'usersManagement.neverLoggedIn': {
+        'AR': 'لم يسجل دخول',
+        'FR': 'Jamais connecté',
+        'EN': 'Never logged in',
+        'ES': 'Nunca inició sesión',
+        'IT': 'Mai connesso',
+        'DE': 'Nie angemeldet',
+        'TR': 'Hiç giriş yapılmadı'
+      },
+
+      // Monitoring
+      'monitoring.title': {
+        'AR': 'المتابعة والإشراف',
+        'FR': 'Suivi et supervision',
+        'EN': 'Monitoring & supervision',
+        'ES': 'Seguimiento y supervisión',
+        'IT': 'Monitoraggio e supervisione',
+        'DE': 'Überwachung & Aufsicht',
+        'TR': 'İzleme ve denetim'
+      },
+      'monitoring.searchPlaceholder': {
+        'AR': 'بحث عن مستخدم...',
+        'FR': 'Rechercher un utilisateur...',
+        'EN': 'Search for user...',
+        'ES': 'Buscar usuario...',
+        'IT': 'Cerca utente...',
+        'DE': 'Benutzer suchen...',
+        'TR': 'Kullanıcı ara...'
+      },
+      'monitoring.user': {
+        'AR': 'المستخدم',
+        'FR': 'Utilisateur',
+        'EN': 'User',
+        'ES': 'Usuario',
+        'IT': 'Utente',
+        'DE': 'Benutzer',
+        'TR': 'Kullanıcı'
+      },
+      'monitoring.createdDate': {
+        'AR': 'تاريخ الإنشاء',
+        'FR': 'Date de création',
+        'EN': 'Created date',
+        'ES': 'Fecha de creación',
+        'IT': 'Data di creazione',
+        'DE': 'Erstellungsdatum',
+        'TR': 'Oluşturulma tarihi'
+      },
+      'monitoring.enabledModules': {
+        'AR': 'الوحدات المفعلة',
+        'FR': 'Modules activés',
+        'EN': 'Enabled modules',
+        'ES': 'Módulos habilitados',
+        'IT': 'Moduli abilitati',
+        'DE': 'Aktivierte Module',
+        'TR': 'Etkin modüller'
+      },
+      'monitoring.allModules': {
+        'AR': 'الكل',
+        'FR': 'Tous',
+        'EN': 'All',
+        'ES': 'Todos',
+        'IT': 'Tutti',
+        'DE': 'Alle',
+        'TR': 'Tümü'
+      },
+      'monitoring.noResults': {
+        'AR': 'لا توجد نتائج',
+        'FR': 'Aucun résultat',
+        'EN': 'No results',
+        'ES': 'No hay resultados',
+        'IT': 'Nessun risultato',
+        'DE': 'Keine Ergebnisse',
+        'TR': 'Sonuç yok'
+      },
+      'monitoring.today': {
+        'AR': 'اليوم',
+        'FR': 'Aujourd\'hui',
+        'EN': 'Today',
+        'ES': 'Hoy',
+        'IT': 'Oggi',
+        'DE': 'Heute',
+        'TR': 'Bugün'
+      },
+      'monitoring.yesterday': {
+        'AR': 'أمس',
+        'FR': 'Hier',
+        'EN': 'Yesterday',
+        'ES': 'Ayer',
+        'IT': 'Ieri',
+        'DE': 'Gestern',
+        'TR': 'Dün'
+      },
+      'monitoring.daysAgo': {
+        'AR': 'منذ',
+        'FR': 'Il y a',
+        'EN': 'days ago',
+        'ES': 'hace días',
+        'IT': 'giorni fa',
+        'DE': 'Tage her',
+        'TR': 'gün önce'
+      },
+      'monitoring.weeksAgo': {
+        'AR': 'منذ',
+        'FR': 'Il y a',
+        'EN': 'weeks ago',
+        'ES': 'hace semanas',
+        'IT': 'settimane fa',
+        'DE': 'Wochen her',
+        'TR': 'hafta önce'
+      },
+      'monitoring.monthsAgo': {
+        'AR': 'منذ',
+        'FR': 'Il y a',
+        'EN': 'months ago',
+        'ES': 'hace meses',
+        'IT': 'mesi fa',
+        'DE': 'Monate her',
+        'TR': 'ay önce'
+      },
+      'monitoring.loading': {
+        'AR': 'جاري التحميل...',
+        'FR': 'Chargement en cours...',
+        'EN': 'Loading...',
+        'ES': 'Cargando...',
+        'IT': 'Caricamento in corso...',
+        'DE': 'Wird geladen...',
+        'TR': 'Yükleniyor...'
+      },
+      'monitoring.role': {
+        'AR': 'الدور',
+        'FR': 'Rôle',
+        'EN': 'Role',
+        'ES': 'Rol',
+        'IT': 'Ruolo',
+        'DE': 'Rolle',
+        'TR': 'Rol'
+      },
+      'monitoring.status': {
+        'AR': 'الحالة',
+        'FR': 'Statut',
+        'EN': 'Status',
+        'ES': 'Estado',
+        'IT': 'Stato',
+        'DE': 'Status',
+        'TR': 'Durum'
+      },
+      'monitoring.lastLogin': {
+        'AR': 'آخر تسجيل دخول',
+        'FR': 'Dernière connexion',
+        'EN': 'Last login',
+        'ES': 'Último inicio de sesión',
+        'IT': 'Ultimo accesso',
+        'DE': 'Letzte Anmeldung',
+        'TR': 'Son giriş'
+      },
+      'monitoring.roleAdmin': {
+        'AR': 'مسؤول',
+        'FR': 'Administrateur',
+        'EN': 'Admin',
+        'ES': 'Administrador',
+        'IT': 'Amministratore',
+        'DE': 'Administrator',
+        'TR': 'Yönetici'
+      },
+      'monitoring.roleTeacher': {
+        'AR': 'أستاذ',
+        'FR': 'Enseignant',
+        'EN': 'Teacher',
+        'ES': 'Profesor',
+        'IT': 'Insegnante',
+        'DE': 'Lehrer',
+        'TR': 'Öğretmen'
+      },
+      'monitoring.statusActive': {
+        'AR': 'نشط',
+        'FR': 'Actif',
+        'EN': 'Active',
+        'ES': 'Activo',
+        'IT': 'Attivo',
+        'DE': 'Aktiv',
+        'TR': 'Aktif'
+      },
+      'monitoring.statusInactive': {
+        'AR': 'معطل',
+        'FR': 'Désactivé',
+        'EN': 'Inactive',
+        'ES': 'Inactivo',
+        'IT': 'Inattivo',
+        'DE': 'Inaktiv',
+        'TR': 'Pasif'
+      },
+      'monitoring.noName': {
+        'AR': 'بدون اسم',
+        'FR': 'Sans nom',
+        'EN': 'No name',
+        'ES': 'Sin nombre',
+        'IT': 'Senza nome',
+        'DE': 'Kein Name',
+        'TR': 'İsim yok'
+      },
+      'monitoring.neverLoggedIn': {
+        'AR': 'لم يسجل دخول',
+        'FR': 'Jamais connecté',
+        'EN': 'Never logged in',
+        'ES': 'Nunca inició sesión',
+        'IT': 'Mai connesso',
+        'DE': 'Nie angemeldet',
+        'TR': 'Hiç giriş yapılmadı'
+      },
+
+      // Subscription Management
+      'subscriptionManagement.title': {
+        'AR': 'إدارة الاشتراكات والمدفوعات',
+        'FR': 'Gestion des abonnements et des paiements',
+        'EN': 'Subscription and payment management',
+        'ES': 'Gestión de suscripciones y pagos',
+        'IT': 'Gestione abbonamenti e pagamenti',
+        'DE': 'Verwaltung von Abonnements und Zahlungen',
+        'TR': 'Abonelik ve ödeme yönetimi'
+      },
+      'subscriptionManagement.description': {
+        'AR': 'إدارة الباقات والاشتراكات والمدفوعات للأساتذة',
+        'FR': 'Gérer les forfaits, abonnements et paiements pour les enseignants',
+        'EN': 'Manage plans, subscriptions and payments for teachers',
+        'ES': 'Gestionar planes, suscripciones y pagos para profesores',
+        'IT': 'Gestire piani, abbonamenti e pagamenti per gli insegnanti',
+        'DE': 'Verwalten Sie Pläne, Abonnements und Zahlungen für Lehrer',
+        'TR': 'Öğretmenler için planlar, abonelikler ve ödemeleri yönetin'
+      },
+      'subscriptionManagement.stats': {
+        'AR': 'الإحصائيات',
+        'FR': 'Statistiques',
+        'EN': 'Statistics',
+        'ES': 'Estadísticas',
+        'IT': 'Statistiche',
+        'DE': 'Statistiken',
+        'TR': 'İstatistikler'
+      },
+      'subscriptionManagement.plans': {
+        'AR': 'الباقات',
+        'FR': 'Forfaits',
+        'EN': 'Plans',
+        'ES': 'Planes',
+        'IT': 'Piani',
+        'DE': 'Pläne',
+        'TR': 'Planlar'
+      },
+      'subscriptionManagement.subscriptions': {
+        'AR': 'الاشتراكات',
+        'FR': 'Abonnements',
+        'EN': 'Subscriptions',
+        'ES': 'Suscripciones',
+        'IT': 'Abbonamenti',
+        'DE': 'Abonnements',
+        'TR': 'Abonelikler'
+      },
+      'subscriptionManagement.payments': {
+        'AR': 'المدفوعات',
+        'FR': 'Paiements',
+        'EN': 'Payments',
+        'ES': 'Pagos',
+        'IT': 'Pagamenti',
+        'DE': 'Zahlungen',
+        'TR': 'Ödemeler'
+      },
+      'subscriptionManagement.overview': {
+        'AR': 'نظرة عامة',
+        'FR': 'Vue d\'ensemble',
+        'EN': 'Overview',
+        'ES': 'Resumen',
+        'IT': 'Panoramica',
+        'DE': 'Übersicht',
+        'TR': 'Genel bakış'
+      },
+      'subscriptionManagement.totalSubscriptions': {
+        'AR': 'إجمالي الاشتراكات',
+        'FR': 'Total des abonnements',
+        'EN': 'Total subscriptions',
+        'ES': 'Total de suscripciones',
+        'IT': 'Totale abbonamenti',
+        'DE': 'Gesamte Abonnements',
+        'TR': 'Toplam abonelik'
+      },
+      'subscriptionManagement.activeSubscriptions': {
+        'AR': 'الاشتراكات النشطة',
+        'FR': 'Abonnements actifs',
+        'EN': 'Active subscriptions',
+        'ES': 'Suscripciones activas',
+        'IT': 'Abbonamenti attivi',
+        'DE': 'Aktive Abonnements',
+        'TR': 'Aktif abonelikler'
+      },
+      'subscriptionManagement.pendingSubscriptions': {
+        'AR': 'قيد الانتظار',
+        'FR': 'En attente',
+        'EN': 'Pending',
+        'ES': 'Pendiente',
+        'IT': 'In attesa',
+        'DE': 'Ausstehend',
+        'TR': 'Beklemede'
+      },
+      'subscriptionManagement.totalRevenue': {
+        'AR': 'إجمالي الإيرادات',
+        'FR': 'Revenus totaux',
+        'EN': 'Total revenue',
+        'ES': 'Ingresos totales',
+        'IT': 'Ricavi totali',
+        'DE': 'Gesamterlöse',
+        'TR': 'Toplam gelir'
+      },
+      'subscriptionManagement.addPlan': {
+        'AR': '+ إضافة باقة جديدة',
+        'FR': '+ Ajouter un nouveau forfait',
+        'EN': '+ Add new plan',
+        'ES': '+ Agregar nuevo plan',
+        'IT': '+ Aggiungi nuovo piano',
+        'DE': '+ Neuen Plan hinzufügen',
+        'TR': '+ Yeni plan ekle'
+      },
+      'subscriptionManagement.planName': {
+        'AR': 'الاسم (عربي)',
+        'FR': 'Nom (arabe)',
+        'EN': 'Name (Arabic)',
+        'ES': 'Nombre (árabe)',
+        'IT': 'Nome (arabo)',
+        'DE': 'Name (Arabisch)',
+        'TR': 'İsim (Arapça)'
+      },
+      'subscriptionManagement.planNameEn': {
+        'AR': 'الاسم (إنجليزي)',
+        'FR': 'Nom (anglais)',
+        'EN': 'Name (English)',
+        'ES': 'Nombre (inglés)',
+        'IT': 'Nome (inglese)',
+        'DE': 'Name (Englisch)',
+        'TR': 'İsim (İngilizce)'
+      },
+      'subscriptionManagement.planType': {
+        'AR': 'النوع',
+        'FR': 'Type',
+        'EN': 'Type',
+        'ES': 'Tipo',
+        'IT': 'Tipo',
+        'DE': 'Typ',
+        'TR': 'Tür'
+      },
+      'subscriptionManagement.planTypeSemester': {
+        'AR': 'فصل دراسي',
+        'FR': 'Semestre',
+        'EN': 'Semester',
+        'ES': 'Semestre',
+        'IT': 'Semestre',
+        'DE': 'Semester',
+        'TR': 'Dönem'
+      },
+      'subscriptionManagement.planTypeAnnual': {
+        'AR': 'سنة دراسية',
+        'FR': 'Année scolaire',
+        'EN': 'Academic year',
+        'ES': 'Año académico',
+        'IT': 'Anno accademico',
+        'DE': 'Akademisches Jahr',
+        'TR': 'Akademik yıl'
+      },
+      'subscriptionManagement.planPrice': {
+        'AR': 'السعر (دج)',
+        'FR': 'Prix (DA)',
+        'EN': 'Price (DA)',
+        'ES': 'Precio (DA)',
+        'IT': 'Prezzo (DA)',
+        'DE': 'Preis (DA)',
+        'TR': 'Fiyat (DA)'
+      },
+      'subscriptionManagement.planDuration': {
+        'AR': 'المدة (شهر)',
+        'FR': 'Durée (mois)',
+        'EN': 'Duration (months)',
+        'ES': 'Duración (meses)',
+        'IT': 'Durata (mesi)',
+        'DE': 'Dauer (Monate)',
+        'TR': 'Süre (ay)'
+      },
+      'subscriptionManagement.planDescription': {
+        'AR': 'الوصف (عربي)',
+        'FR': 'Description (arabe)',
+        'EN': 'Description (Arabic)',
+        'ES': 'Descripción (árabe)',
+        'IT': 'Descrizione (araba)',
+        'DE': 'Beschreibung (Arabisch)',
+        'TR': 'Açıklama (Arapça)'
+      },
+      'subscriptionManagement.planDescriptionEn': {
+        'AR': 'الوصف (إنجليزي)',
+        'FR': 'Description (anglais)',
+        'EN': 'Description (English)',
+        'ES': 'Descripción (inglés)',
+        'IT': 'Descrizione (inglese)',
+        'DE': 'Beschreibung (Englisch)',
+        'TR': 'Açıklama (İngilizce)'
+      },
+      'subscriptionManagement.noPlans': {
+        'AR': 'لا توجد باقات حالياً',
+        'FR': 'Aucun forfait pour le moment',
+        'EN': 'No plans currently',
+        'ES': 'No hay planes actualmente',
+        'IT': 'Nessun piano al momento',
+        'DE': 'Derzeit keine Pläne',
+        'TR': 'Şu anda plan yok'
+      },
+      'subscriptionManagement.noSubscriptions': {
+        'AR': 'لا توجد اشتراكات حالياً',
+        'FR': 'Aucun abonnement pour le moment',
+        'EN': 'No subscriptions currently',
+        'ES': 'No hay suscripciones actualmente',
+        'IT': 'Nessun abbonamento al momento',
+        'DE': 'Derzeit keine Abonnements',
+        'TR': 'Şu anda abonelik yok'
+      },
+      'subscriptionManagement.noPayments': {
+        'AR': 'لا توجد مدفوعات حالياً',
+        'FR': 'Aucun paiement pour le moment',
+        'EN': 'No payments currently',
+        'ES': 'No hay pagos actualmente',
+        'IT': 'Nessun pagamento al momento',
+        'DE': 'Derzeit keine Zahlungen',
+        'TR': 'Şu anda ödeme yok'
+      },
+      'subscriptionManagement.teacher': {
+        'AR': 'الأستاذ',
+        'FR': 'Enseignant',
+        'EN': 'Teacher',
+        'ES': 'Profesor',
+        'IT': 'Insegnante',
+        'DE': 'Lehrer',
+        'TR': 'Öğretmen'
+      },
+      'subscriptionManagement.plan': {
+        'AR': 'الباقة',
+        'FR': 'Forfait',
+        'EN': 'Plan',
+        'ES': 'Plan',
+        'IT': 'Piano',
+        'DE': 'Plan',
+        'TR': 'Plan'
+      },
+      'subscriptionManagement.startDate': {
+        'AR': 'تاريخ البداية',
+        'FR': 'Date de début',
+        'EN': 'Start date',
+        'ES': 'Fecha de inicio',
+        'IT': 'Data di inizio',
+        'DE': 'Startdatum',
+        'TR': 'Başlangıç tarihi'
+      },
+      'subscriptionManagement.endDate': {
+        'AR': 'تاريخ الانتهاء',
+        'FR': 'Date de fin',
+        'EN': 'End date',
+        'ES': 'Fecha de fin',
+        'IT': 'Data di fine',
+        'DE': 'Enddatum',
+        'TR': 'Bitiş tarihi'
+      },
+      'subscriptionManagement.amount': {
+        'AR': 'المبلغ',
+        'FR': 'Montant',
+        'EN': 'Amount',
+        'ES': 'Cantidad',
+        'IT': 'Importo',
+        'DE': 'Betrag',
+        'TR': 'Tutar'
+      },
+      'subscriptionManagement.paymentMethod': {
+        'AR': 'طريقة الدفع',
+        'FR': 'Méthode de paiement',
+        'EN': 'Payment method',
+        'ES': 'Método de pago',
+        'IT': 'Metodo di pagamento',
+        'DE': 'Zahlungsmethode',
+        'TR': 'Ödeme yöntemi'
+      },
+      'subscriptionManagement.paymentDate': {
+        'AR': 'تاريخ الدفع',
+        'FR': 'Date de paiement',
+        'EN': 'Payment date',
+        'ES': 'Fecha de pago',
+        'IT': 'Data di pagamento',
+        'DE': 'Zahlungsdatum',
+        'TR': 'Ödeme tarihi'
+      },
+      'subscriptionManagement.paymentMethodManual': {
+        'AR': 'يدوي/تحويل بنكي',
+        'FR': 'Manuel/Virement bancaire',
+        'EN': 'Manual/Bank transfer',
+        'ES': 'Manual/Transferencia bancaria',
+        'IT': 'Manuale/Bonifico bancario',
+        'DE': 'Manuell/Banküberweisung',
+        'TR': 'Manuel/Banka havalesi'
+      },
+      'subscriptionManagement.paymentMethodCard': {
+        'AR': 'بطاقة ذهبية',
+        'FR': 'Carte bancaire',
+        'EN': 'Credit card',
+        'ES': 'Tarjeta de crédito',
+        'IT': 'Carta di credito',
+        'DE': 'Kreditkarte',
+        'TR': 'Kredi kartı'
+      },
+      'subscriptionManagement.paymentMethodOther': {
+        'AR': 'أخرى',
+        'FR': 'Autre',
+        'EN': 'Other',
+        'ES': 'Otro',
+        'IT': 'Altro',
+        'DE': 'Andere',
+        'TR': 'Diğer'
+      },
+      'subscriptionManagement.statusPending': {
+        'AR': 'قيد الانتظار',
+        'FR': 'En attente',
+        'EN': 'Pending',
+        'ES': 'Pendiente',
+        'IT': 'In attesa',
+        'DE': 'Ausstehend',
+        'TR': 'Beklemede'
+      },
+      'subscriptionManagement.statusCompleted': {
+        'AR': 'مكتمل',
+        'FR': 'Complété',
+        'EN': 'Completed',
+        'ES': 'Completado',
+        'IT': 'Completato',
+        'DE': 'Abgeschlossen',
+        'TR': 'Tamamlandı'
+      },
+      'subscriptionManagement.statusFailed': {
+        'AR': 'فشل',
+        'FR': 'Échoué',
+        'EN': 'Failed',
+        'ES': 'Fallido',
+        'IT': 'Fallito',
+        'DE': 'Fehlgeschlagen',
+        'TR': 'Başarısız'
+      },
+      'subscriptionManagement.statusRefunded': {
+        'AR': 'مسترد',
+        'FR': 'Remboursé',
+        'EN': 'Refunded',
+        'ES': 'Reembolsado',
+        'IT': 'Rimborsato',
+        'DE': 'Erstattet',
+        'TR': 'İade edildi'
+      },
+      'subscriptionManagement.statusActive': {
+        'AR': 'نشط',
+        'FR': 'Actif',
+        'EN': 'Active',
+        'ES': 'Activo',
+        'IT': 'Attivo',
+        'DE': 'Aktiv',
+        'TR': 'Aktif'
+      },
+      'subscriptionManagement.statusExpired': {
+        'AR': 'منتهي',
+        'FR': 'Expiré',
+        'EN': 'Expired',
+        'ES': 'Expirado',
+        'IT': 'Scaduto',
+        'DE': 'Abgelaufen',
+        'TR': 'Süresi doldu'
+      },
+      'subscriptionManagement.statusCancelled': {
+        'AR': 'ملغي',
+        'FR': 'Annulé',
+        'EN': 'Cancelled',
+        'ES': 'Cancelado',
+        'IT': 'Annullato',
+        'DE': 'Storniert',
+        'TR': 'İptal edildi'
+      },
+      'subscriptionManagement.activate': {
+        'AR': 'تفعيل',
+        'FR': 'Activer',
+        'EN': 'Activate',
+        'ES': 'Activar',
+        'IT': 'Attiva',
+        'DE': 'Aktivieren',
+        'TR': 'Etkinleştir'
+      },
+      'subscriptionManagement.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Stornieren',
+        'TR': 'İptal et'
+      },
+      'subscriptionManagement.activateSubscription': {
+        'AR': 'تفعيل الاشتراك',
+        'FR': 'Activer l\'abonnement',
+        'EN': 'Activate subscription',
+        'ES': 'Activar suscripción',
+        'IT': 'Attiva abbonamento',
+        'DE': 'Abonnement aktivieren',
+        'TR': 'Aboneliği etkinleştir'
+      },
+      'subscriptionManagement.activateSubscriptionTitle': {
+        'AR': 'تفعيل الاشتراك',
+        'FR': 'Activer l\'abonnement',
+        'EN': 'Activate subscription',
+        'ES': 'Activar suscripción',
+        'IT': 'Attiva abbonamento',
+        'DE': 'Abonnement aktivieren',
+        'TR': 'Aboneliği etkinleştir'
+      },
+      'subscriptionManagement.editPlan': {
+        'AR': 'تعديل الباقة',
+        'FR': 'Modifier le forfait',
+        'EN': 'Edit plan',
+        'ES': 'Editar plan',
+        'IT': 'Modifica piano',
+        'DE': 'Plan bearbeiten',
+        'TR': 'Planı düzenle'
+      },
+      'subscriptionManagement.addNewPlan': {
+        'AR': 'إضافة باقة جديدة',
+        'FR': 'Ajouter un nouveau forfait',
+        'EN': 'Add new plan',
+        'ES': 'Agregar nuevo plan',
+        'IT': 'Aggiungi nuovo piano',
+        'DE': 'Neuen Plan hinzufügen',
+        'TR': 'Yeni plan ekle'
+      },
+      'subscriptionManagement.addNewPayment': {
+        'AR': '+ إضافة دفعة جديدة',
+        'FR': '+ Ajouter un nouveau paiement',
+        'EN': '+ Add new payment',
+        'ES': '+ Agregar nuevo pago',
+        'IT': '+ Aggiungi nuovo pagamento',
+        'DE': '+ Neue Zahlung hinzufügen',
+        'TR': '+ Yeni ödeme ekle'
+      },
+      'subscriptionManagement.updatePayment': {
+        'AR': 'تحديث سجل الدفع',
+        'FR': 'Mettre à jour le paiement',
+        'EN': 'Update payment',
+        'ES': 'Actualizar pago',
+        'IT': 'Aggiorna pagamento',
+        'DE': 'Zahlung aktualisieren',
+        'TR': 'Ödemeyi güncelle'
+      },
+      'subscriptionManagement.selectSubscription': {
+        'AR': 'اختر الاشتراك',
+        'FR': 'Sélectionner l\'abonnement',
+        'EN': 'Select subscription',
+        'ES': 'Seleccionar suscripción',
+        'IT': 'Seleziona abbonamento',
+        'DE': 'Abonnement auswählen',
+        'TR': 'Abonelik seç'
+      },
+      'subscriptionManagement.transactionId': {
+        'AR': 'رقم المعاملة',
+        'FR': 'Numéro de transaction',
+        'EN': 'Transaction ID',
+        'ES': 'ID de transacción',
+        'IT': 'ID transazione',
+        'DE': 'Transaktions-ID',
+        'TR': 'İşlem kimliği'
+      },
+      'subscriptionManagement.receiptNumber': {
+        'AR': 'رقم الإيصال',
+        'FR': 'Numéro de reçu',
+        'EN': 'Receipt number',
+        'ES': 'Número de recibo',
+        'IT': 'Numero ricevuta',
+        'DE': 'Quittungsnummer',
+        'TR': 'Fiş numarası'
+      },
+      'subscriptionManagement.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Notes',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Notizen',
+        'TR': 'Notlar'
+      },
+      'subscriptionManagement.unknown': {
+        'AR': 'غير معروف',
+        'FR': 'Inconnu',
+        'EN': 'Unknown',
+        'ES': 'Desconocido',
+        'IT': 'Sconosciuto',
+        'DE': 'Unbekannt',
+        'TR': 'Bilinmeyen'
+      },
+      'subscriptionManagement.unknownOrganizer': {
+        'AR': 'غير محددة',
+        'FR': 'Non spécifiée',
+        'EN': 'Not specified',
+        'ES': 'No especificado',
+        'IT': 'Non specificato',
+        'DE': 'Nicht angegeben',
+        'TR': 'Belirtilmemiş'
+      },
+      'subscriptionManagement.unknownLocation': {
+        'AR': 'غير محدد',
+        'FR': 'Non spécifié',
+        'EN': 'Not specified',
+        'ES': 'No especificado',
+        'IT': 'Non specificato',
+        'DE': 'Nicht angegeben',
+        'TR': 'Belirtilmemiş'
+      },
+
+      // Module Access - Error messages
+      'moduleAccess.error.loadUsers': {
+        'AR': 'حدث خطأ أثناء تحميل قائمة المستخدمين',
+        'FR': 'Erreur lors du chargement de la liste des utilisateurs',
+        'EN': 'Error loading user list',
+        'ES': 'Error al cargar la lista de usuarios',
+        'IT': 'Errore nel caricamento della lista utenti',
+        'DE': 'Fehler beim Laden der Benutzerliste',
+        'TR': 'Kullanıcı listesi yüklenirken hata'
+      },
+      'moduleAccess.success.updatePermissions': {
+        'AR': 'تم تحديث الصلاحيات بنجاح',
+        'FR': 'Autorisations mises à jour avec succès',
+        'EN': 'Permissions updated successfully',
+        'ES': 'Permisos actualizados con éxito',
+        'IT': 'Permessi aggiornati con successo',
+        'DE': 'Berechtigungen erfolgreich aktualisiert',
+        'TR': 'İzinler başarıyla güncellendi'
+      },
+      'moduleAccess.error.updatePermissions': {
+        'AR': 'حدث خطأ أثناء تحديث الصلاحيات',
+        'FR': 'Erreur lors de la mise à jour des autorisations',
+        'EN': 'Error updating permissions',
+        'ES': 'Error al actualizar permisos',
+        'IT': 'Errore nell\'aggiornamento dei permessi',
+        'DE': 'Fehler beim Aktualisieren der Berechtigungen',
+        'TR': 'İzinler güncellenirken hata'
       }
     };
   }
