@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
@@ -207,7 +208,12 @@ export class LabsComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
+    public languageService: LanguageService,
   ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     this.loadLabs();

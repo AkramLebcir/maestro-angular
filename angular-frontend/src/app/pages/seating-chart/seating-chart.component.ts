@@ -5,6 +5,7 @@ import {
   ViewChild,
 } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import { forkJoin } from 'rxjs';
 import {
   CdkDragDrop,
@@ -166,20 +167,31 @@ export class SeatingChartComponent implements OnInit {
   classroomLayout: any = null;
   layoutMode: 'workstations' | 'classroom' = 'workstations'; // وضع التخطيط: حواسيب أو قاعة
 
-  attendanceOptions = [
-    { value: 'present', label: 'حاضر' },
-    { value: 'absent', label: 'غائب' },
-    { value: 'late', label: 'متأخر' },
-    { value: 'excused', label: 'مُعذر' },
-  ];
+  get attendanceOptions() {
+    return [
+      { value: 'present', label: this.translate('seatingChart.present') },
+      { value: 'absent', label: this.translate('seatingChart.absent') },
+      { value: 'late', label: this.translate('seatingChart.late') },
+      { value: 'excused', label: this.translate('seatingChart.excused') },
+    ];
+  }
 
-  behaviorOptions = [
-    { value: 'positive', label: 'إيجابي' },
-    { value: 'neutral', label: 'محايد' },
-    { value: 'negative', label: 'سلبي' },
-  ];
+  get behaviorOptions() {
+    return [
+      { value: 'positive', label: this.translate('seatingChart.positive') },
+      { value: 'neutral', label: this.translate('seatingChart.neutral') },
+      { value: 'negative', label: this.translate('seatingChart.negative') },
+    ];
+  }
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private languageService: LanguageService
+  ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     this.loadClasses();
@@ -202,7 +214,7 @@ export class SeatingChartComponent implements OnInit {
         }
       },
       error: () => {
-        this.errorMessage = 'تعذر تحميل قائمة الأقسام';
+        this.errorMessage = this.translate('seatingChart.failedToLoadClasses');
       },
     });
   }
@@ -238,7 +250,7 @@ export class SeatingChartComponent implements OnInit {
               this.loading = false;
               this.loadStudentsForClassroom();
             } else {
-              this.errorMessage = 'تعذر تحميل تخطيط القاعة';
+              this.errorMessage = this.translate('seatingChart.failedToLoadRoomLayout');
               this.loading = false;
             }
           },
@@ -270,22 +282,22 @@ export class SeatingChartComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading seating layout:', error);
-        let errorMsg = 'تعذر تحميل مخطط المقاعد';
+        let errorMsg = this.translate('seatingChart.failedToLoadLayout');
         
         if (error.status === 0 || error.status === 504) {
-          errorMsg = 'لا يمكن الاتصال بالخادم. تأكد من أن الخادم يعمل.';
+          errorMsg = this.translate('seatingChart.cannotConnectServer');
         } else if (error.status === 401) {
-          errorMsg = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
+          errorMsg = this.translate('seatingChart.unauthorized');
         } else if (error.status === 403) {
-          errorMsg = 'ليس لديك صلاحيات للوصول إلى مخطط المقاعد. يرجى الاتصال بالمسؤول لإضافة صلاحية "مخطط المقاعد" إلى حسابك.';
+          errorMsg = this.translate('seatingChart.noPermission');
         } else if (error.status === 404) {
-          errorMsg = 'لم يتم العثور على مخطط المقاعد لهذا القسم.';
+          errorMsg = this.translate('seatingChart.layoutNotFound');
         } else if (error.status === 500) {
-          errorMsg = 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.';
+          errorMsg = this.translate('seatingChart.serverError');
         } else if (error.error?.message) {
-          errorMsg = `خطأ: ${error.error.message}`;
+          errorMsg = `${this.translate('seatingChart.error')}: ${error.error.message}`;
         } else if (error.message) {
-          errorMsg = `خطأ: ${error.message}`;
+          errorMsg = `${this.translate('seatingChart.error')}: ${error.message}`;
         }
         
         this.errorMessage = errorMsg;
@@ -316,7 +328,7 @@ export class SeatingChartComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error loading students:', error);
-          this.errorMessage = 'تعذر تحميل قائمة التلاميذ';
+          this.errorMessage = this.translate('seatingChart.failedToLoadStudents');
           this.loading = false;
         },
       });
@@ -470,8 +482,10 @@ export class SeatingChartComponent implements OnInit {
 
   toggleReorganize(): void {
     if (this.editingStations) {
-      const itemName = this.layoutMode === 'workstations' ? 'الحواسيب' : 'الطاولات';
-      alert(`أوقف تحريك ${itemName} أولاً.`);
+      const itemName = this.layoutMode === 'workstations' 
+        ? this.translate('seatingChart.computers') 
+        : this.translate('seatingChart.desks');
+      alert(`${this.translate('seatingChart.stopMovingFirst')} ${itemName} ${this.translate('seatingChart.first')}.`);
       return;
     }
     this.isReorganizing = !this.isReorganizing;
@@ -479,7 +493,7 @@ export class SeatingChartComponent implements OnInit {
 
   toggleStationEditing(): void {
     if (this.isReorganizing && !this.editingStations) {
-      alert('أوقف تنظيم التلاميذ أولاً.');
+      alert(this.translate('seatingChart.stopOrganizingFirst'));
       return;
     }
     this.editingStations = !this.editingStations;
@@ -500,8 +514,10 @@ export class SeatingChartComponent implements OnInit {
       targetSlot.occupants.length >= targetSlot.capacity &&
       event.previousContainer !== event.container
     ) {
-      const capacityText = targetSlot.capacity === 1 ? 'تلميذ واحد' : `${targetSlot.capacity} تلاميذ`;
-      alert(`هذه الطاولة ممتلئة (${capacityText} كحد أقصى).`);
+      const capacityText = targetSlot.capacity === 1 
+        ? this.translate('seatingChart.oneStudent') 
+        : `${targetSlot.capacity} ${this.translate('seatingChart.students')}`;
+      alert(`${this.translate('seatingChart.deskFull')} (${capacityText} ${this.translate('seatingChart.maximum')}).`);
       return;
     }
 
@@ -594,11 +610,11 @@ export class SeatingChartComponent implements OnInit {
         this.layoutDirty = false;
         this.layoutSaving = false;
         this.editingStations = false;
-        alert('تم حفظ أماكن الحواسيب');
+        alert(this.translate('seatingChart.computerPositionsSaved'));
       },
       error: (error) => {
         console.error('Error saving workstation positions:', error);
-        alert('تعذر حفظ أماكن الحواسيب');
+        alert(this.translate('seatingChart.failedToSaveComputerPositions'));
         this.layoutSaving = false;
       },
     });
@@ -633,11 +649,11 @@ export class SeatingChartComponent implements OnInit {
           this.stats = layout.stats;
           this.buildSeatGrid();
           this.saving = false;
-          alert('تم حفظ مخطط المقاعد بنجاح');
+          alert(this.translate('seatingChart.layoutSavedSuccessfully'));
         },
         error: (error) => {
           console.error('Error saving seating chart:', error);
-          alert('تعذر حفظ المخطط، حاول مرة أخرى');
+          alert(this.translate('seatingChart.failedToSaveLayout'));
           this.saving = false;
         },
       });
@@ -675,7 +691,7 @@ export class SeatingChartComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error generating print payload:', error);
-          alert('تعذر تجهيز ملف الطباعة');
+          alert(this.translate('seatingChart.failedToPreparePrint'));
           this.printLoading = false;
         },
       });
@@ -683,12 +699,12 @@ export class SeatingChartComponent implements OnInit {
 
   printSelectedWorkstationsAllClasses(): void {
     if (this.selectedStationsForPrint.size === 0) {
-      alert('يرجى تحديد حاسوب واحد على الأقل للطباعة.');
+      alert(this.translate('seatingChart.selectAtLeastOneComputer'));
       return;
     }
     const targetLabels = this.getSelectedWorkstationLabels();
     if (!targetLabels.length) {
-      alert('تعذر تحديد أسماء الحواسيب المحددة.');
+      alert(this.translate('seatingChart.failedToDetermineComputerNames'));
       return;
     }
     this.printLoading = true;
@@ -703,7 +719,7 @@ export class SeatingChartComponent implements OnInit {
         next: (response) => {
           const pages = this.buildWorkstationPages(response);
           if (!pages.length) {
-            alert('لا توجد بيانات لطباعتها للحواسيب المحددة.');
+            alert(this.translate('seatingChart.noDataToPrint'));
             this.printLoading = false;
             this.printMode = 'default';
             return;
@@ -718,18 +734,29 @@ export class SeatingChartComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error generating workstation print payload:', error);
-          alert('تعذر تجهيز ملف طباعة هذا الحاسوب');
+          alert(this.translate('seatingChart.failedToPrepareComputerPrint'));
           this.printLoading = false;
         },
       });
   }
 
   getAttendanceLabel(status: string): string {
-    return this.attendanceOptions.find((o) => o.value === status)?.label || '-';
+    const keyMap: { [key: string]: string } = {
+      'present': 'seatingChart.present',
+      'absent': 'seatingChart.absent',
+      'late': 'seatingChart.late',
+      'excused': 'seatingChart.excused',
+    };
+    return keyMap[status] ? this.translate(keyMap[status]) : '-';
   }
 
   getBehaviorLabel(status: string): string {
-    return this.behaviorOptions.find((o) => o.value === status)?.label || '-';
+    const keyMap: { [key: string]: string } = {
+      'positive': 'seatingChart.positive',
+      'neutral': 'seatingChart.neutral',
+      'negative': 'seatingChart.negative',
+    };
+    return keyMap[status] ? this.translate(keyMap[status]) : '-';
   }
 
   getStudentInitials(student: Student): string {
@@ -822,7 +849,7 @@ export class SeatingChartComponent implements OnInit {
       doc.save(filename);
     } catch (error) {
       console.error('Error rendering PDF', error);
-      alert('تعذر توليد ملف PDF للمخطط');
+      alert(this.translate('seatingChart.failedToGeneratePDF'));
     } finally {
       this.printData = null;
       this.printMode = 'default';
@@ -888,7 +915,7 @@ export class SeatingChartComponent implements OnInit {
 
   createClassroomLayout(): void {
     if (!this.selectedClassId) {
-      alert('يرجى اختيار قسم أولاً');
+      alert(this.translate('seatingChart.selectClassFirst'));
       return;
     }
 
@@ -905,11 +932,11 @@ export class SeatingChartComponent implements OnInit {
         this.loadStudentsForClassroom();
         this.showRoomSetup = false;
         this.creatingLayout = false;
-        alert('تم إنشاء تخطيط القاعة بنجاح');
+        alert(this.translate('seatingChart.roomLayoutCreatedSuccessfully'));
       },
       error: (error) => {
         console.error('Error creating classroom layout:', error);
-        alert('تعذر إنشاء تخطيط القاعة');
+        alert(this.translate('seatingChart.failedToCreateRoomLayout'));
         this.creatingLayout = false;
       },
     });
@@ -944,11 +971,11 @@ export class SeatingChartComponent implements OnInit {
           this.classroomLayout = layout;
           this.buildClassroomSeatGrid();
           this.saving = false;
-          alert('تم حفظ مخطط المقاعد بنجاح');
+          alert(this.translate('seatingChart.layoutSavedSuccessfully'));
         },
         error: (error) => {
           console.error('Error saving classroom assignments:', error);
-          alert('تعذر حفظ المخطط، حاول مرة أخرى');
+          alert(this.translate('seatingChart.failedToSaveLayout'));
           this.saving = false;
         },
       });
@@ -978,11 +1005,11 @@ export class SeatingChartComponent implements OnInit {
           this.layoutDirty = false;
           this.layoutSaving = false;
           this.editingStations = false;
-          alert('تم حفظ أماكن الطاولات');
+          alert(this.translate('seatingChart.deskPositionsSaved'));
         },
         error: (error) => {
           console.error('Error saving desk positions:', error);
-          alert('تعذر حفظ أماكن الطاولات');
+          alert(this.translate('seatingChart.failedToSaveDeskPositions'));
           this.layoutSaving = false;
         },
       });

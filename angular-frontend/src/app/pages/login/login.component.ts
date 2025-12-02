@@ -56,26 +56,6 @@ export class LoginComponent implements OnInit {
       }
     });
   }
-
-    this.isLoading = true;
-    this.errorMessage = '';
-
-    this.authService.login(this.identifier, this.password).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        // Redirect based on role
-        if (response.user.role === 'admin') {
-          this.router.navigate(['/admin']);
-        } else {
-          this.router.navigate(['/dashboard']);
-        }
-      },
-      error: (error) => {
-        this.isLoading = false;
-        this.errorMessage = error?.error?.message || 'خطأ في تسجيل الدخول. الرجاء التحقق من البيانات المدخلة.';
-      }
-    });
-  }
 }
 
 

@@ -105,3 +105,4 @@ export class MyEntity extends TenantOwnedEntity {
 - `owner: User` relation
 
 
+

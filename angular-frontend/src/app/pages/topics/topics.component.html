@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">إدارة المواضيع</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('topics.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -9,7 +9,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span>إضافة موضوع جديد</span>
+          <span>{{ translate('topics.addNew') }}</span>
         </button>
       </div>
     </div>
@@ -17,36 +17,36 @@
     <!-- Search & Filters Section -->
     <div class="mb-6 space-y-3">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">البحث</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.search') }}</label>
         <input 
           type="text"
           [(ngModel)]="searchTerm"
           (input)="onSearchChange()"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="ابحث بالعنوان، العنوان الفرعي أو الوصف...">
+          [placeholder]="translate('topics.searchPlaceholder')">
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب المستوى</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.filterByLevel') }}</label>
           <select
             [(ngModel)]="selectedLevelFilter"
             (change)="onLevelFilterChange()"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">كل المستويات</option>
+            <option value="">{{ translate('topics.allLevels') }}</option>
             <option *ngFor="let lvl of levels" [ngValue]="lvl">
               {{ lvl }}
             </option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">تصفية حسب الشعبة / الجذع</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.filterByTrack') }}</label>
           <select
             [(ngModel)]="selectedTrackFilter"
             (change)="onTrackFilterChange()"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">كل الشعب</option>
+            <option value="">{{ translate('topics.allTracks') }}</option>
             <option *ngFor="let trk of tracks" [ngValue]="trk">
               {{ trk }}
             </option>
@@ -55,7 +55,9 @@
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة المواضيع ({{ filteredTopics.length }})</h2>
+    <h2 class="text-xl font-bold text-gray-700 mb-4">
+      {{ translate('topics.listTitle', { count: filteredTopics.length.toString() }) }}
+    </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div 
@@ -65,8 +67,8 @@
           <div class="flex-1">
             <h3 class="text-lg font-semibold text-gray-800">{{ topic.title }}</h3>
             <p *ngIf="topic.subtitle" class="text-sm font-medium text-gray-700 mt-1">{{ topic.subtitle }}</p>
-            <p *ngIf="topic.level" class="text-xs text-gray-600 mt-1">المستوى: {{ topic.level }}</p>
-            <p *ngIf="topic.track" class="text-xs text-gray-600">الشعبة: {{ topic.track }}</p>
+            <p *ngIf="topic.level" class="text-xs text-gray-600 mt-1">{{ translate('topics.level') }}: {{ topic.level }}</p>
+            <p *ngIf="topic.track" class="text-xs text-gray-600">{{ translate('topics.track') }}: {{ topic.track }}</p>
           </div>
           <button 
             (click)="deleteTopic(topic.id)"
@@ -78,23 +80,23 @@
         </div>
         <p *ngIf="topic.description" class="text-sm text-gray-600 mb-2">{{ topic.description }}</p>
         <div class="text-xs text-gray-500 mb-3">
-          {{ topic.elements.length || 0 }} عنصر
+          {{ translate('topics.itemsCount', { count: (topic.elements.length || 0).toString() }) }}
         </div>
         <div class="flex gap-2">
           <button 
             (click)="openEditModal(topic)"
             class="flex-1 bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700 transition">
-            تعديل
+            {{ translate('topics.edit') }}
           </button>
           <button 
             (click)="openAddTopicElementModal(topic)"
             class="flex-1 bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
-            إضافة عنصر
+            {{ translate('topics.addElement') }}
           </button>
         </div>
       </div>
       <div *ngIf="filteredTopics.length === 0" class="col-span-full text-center text-gray-500 py-8">
-        لا توجد مواضيع
+        {{ translate('topics.noTopics') }}
       </div>
     </div>
   </div>
@@ -110,7 +112,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingTopic ? 'تعديل الموضوع' : 'إضافة موضوع جديد' }}
+        {{ editingTopic ? translate('topics.editTopic') : translate('topics.addNew') }}
       </h3>
       <button 
         (click)="closeModal()"
@@ -123,58 +125,58 @@
 
     <form #topicForm="ngForm" (ngSubmit)="saveTopic()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">عنوان الموضوع *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.topicTitle') }}</label>
         <input 
           type="text"
           [(ngModel)]="topicFormData.title"
           name="title"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل عنوان الموضوع">
+          [placeholder]="translate('topics.topicTitlePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">العنوان الفرعي</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.subtitle') }}</label>
         <input 
           type="text"
           [(ngModel)]="topicFormData.subtitle"
           name="subtitle"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل العنوان الفرعي">
+          [placeholder]="translate('topics.subtitlePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.topicDescription') }}</label>
         <textarea 
           [(ngModel)]="topicFormData.description"
           name="description"
           rows="2"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل وصف الموضوع"></textarea>
+          [placeholder]="translate('topics.topicDescriptionPlaceholder')"></textarea>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">المستوى</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.level') }}</label>
           <select
             [(ngModel)]="topicFormData.level"
             name="level"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">اختر المستوى</option>
+            <option value="">{{ translate('topics.selectLevel') }}</option>
             <option *ngFor="let lvl of levels" [ngValue]="lvl">
               {{ lvl }}
             </option>
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">الشعبة / الجذع</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.track') }}</label>
           <select
             [(ngModel)]="topicFormData.track"
             name="track"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">اختر الشعبة</option>
+            <option value="">{{ translate('topics.selectTrack') }}</option>
             <option *ngFor="let trk of tracks" [ngValue]="trk">
               {{ trk }}
             </option>
@@ -184,12 +186,12 @@
 
       <div *ngIf="editingTopic" class="mt-4">
         <div class="flex justify-between items-center mb-2">
-          <h4 class="font-semibold text-gray-700">عناصر الموضوع</h4>
+          <h4 class="font-semibold text-gray-700">{{ translate('topics.topicElements') }}</h4>
           <button 
             type="button"
             (click)="openAddTopicElementModal(editingTopic)"
             class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition">
-            إضافة عنصر
+            {{ translate('topics.addElement') }}
           </button>
         </div>
         <div class="space-y-2 max-h-60 overflow-y-auto">
@@ -200,18 +202,18 @@
                 type="button"
                 (click)="openEditTopicElementModal(element, editingTopic)"
                 class="text-blue-600 hover:text-blue-800 text-xs">
-                تعديل
+                {{ translate('topics.edit') }}
               </button>
               <button 
                 type="button"
                 (click)="deleteTopicElement(editingTopic.id, element.id)"
                 class="text-red-600 hover:text-red-800 text-xs">
-                حذف
+                {{ translate('topics.delete') }}
               </button>
             </div>
           </div>
           <div *ngIf="!editingTopic.elements || editingTopic.elements.length === 0" class="text-center text-gray-400 text-sm py-4">
-            لا توجد عناصر
+            {{ translate('topics.noElements') }}
           </div>
         </div>
       </div>
@@ -221,13 +223,13 @@
           type="submit"
           [disabled]="!topicForm.valid"
           class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingTopic ? 'تحديث' : 'إضافة' }}
+          {{ editingTopic ? translate('topics.updateButton') : translate('topics.addButton') }}
         </button>
         <button 
           type="button"
           (click)="closeModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('topics.cancel') }}
         </button>
       </div>
     </form>
@@ -244,7 +246,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingTopicElement ? 'تعديل العنصر' : 'إضافة عنصر جديد' }}
+        {{ editingTopicElement ? translate('topics.editElementTitle') : translate('topics.addElementTitle') }}
         <span class="text-sm font-normal text-gray-600">
           - {{ currentTopicForElement.title }}
         </span>
@@ -260,14 +262,14 @@
 
     <form #elementForm="ngForm" (ngSubmit)="saveTopicElement()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">محتوى العنصر *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('topics.elementContent') }}</label>
         <textarea 
           [(ngModel)]="topicElementFormData.content"
           name="content"
           required
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل محتوى العنصر..."></textarea>
+          [placeholder]="translate('topics.elementContentPlaceholder')"></textarea>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -275,13 +277,13 @@
           type="submit"
           [disabled]="!elementForm.valid"
           class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingTopicElement ? 'تحديث' : 'إضافة' }}
+          {{ editingTopicElement ? translate('topics.updateButton') : translate('topics.addButton') }}
         </button>
         <button 
           type="button"
           (click)="closeTopicElementModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('topics.cancel') }}
         </button>
       </div>
     </form>

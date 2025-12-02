@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-4">
-      <h1 class="text-3xl font-bold text-gray-800">إدارة المخبر</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('labs.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -9,7 +9,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span>إضافة مخبر</span>
+          <span>{{ translate('labs.addLab') }}</span>
         </button>
       </div>
     </div>
@@ -22,7 +22,7 @@
         [class.border-b-2]="activeTab === 'labs'"
         [class.border-green-600]="activeTab === 'labs'"
         (click)="activeTab = 'labs'">
-        المخابر
+        {{ translate('labs.labs') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -30,7 +30,7 @@
         [class.border-b-2]="activeTab === 'deviceLogs'"
         [class.border-green-600]="activeTab === 'deviceLogs'"
         (click)="activeTab = 'deviceLogs'">
-        متابعة عمل وسلامة الأجهزة
+        {{ translate('labs.deviceTracking') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -38,7 +38,7 @@
         [class.border-b-2]="activeTab === 'equipment'"
         [class.border-green-600]="activeTab === 'equipment'"
         (click)="activeTab = 'equipment'">
-        أجهزة معمل الحاسب
+        {{ translate('labs.computerLabEquipment') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -46,7 +46,7 @@
         [class.border-b-2]="activeTab === 'software'"
         [class.border-green-600]="activeTab === 'software'"
         (click)="activeTab = 'software'">
-        برامج حواسيب المعمل
+        {{ translate('labs.labComputerSoftware') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -54,7 +54,7 @@
         [class.border-b-2]="activeTab === 'furniture'"
         [class.border-green-600]="activeTab === 'furniture'"
         (click)="activeTab = 'furniture'">
-        أثاث معمل الحاسب
+        {{ translate('labs.computerLabFurniture') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -62,7 +62,7 @@
         [class.border-b-2]="activeTab === 'inventory'"
         [class.border-green-600]="activeTab === 'inventory'"
         (click)="activeTab = 'inventory'">
-        أرقام الجرد
+        {{ translate('labs.inventoryNumbers') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -70,7 +70,7 @@
         [class.border-b-2]="activeTab === 'checklist'"
         [class.border-green-600]="activeTab === 'checklist'"
         (click)="activeTab = 'checklist'">
-        المكوّنات المادية والبرمجية
+        {{ translate('labs.hardwareSoftwareChecklist') }}
       </button>
       <button
         class="pb-2 text-sm font-semibold"
@@ -78,22 +78,22 @@
         [class.border-b-2]="activeTab === 'cleaning'"
         [class.border-green-600]="activeTab === 'cleaning'"
         (click)="activeTab = 'cleaning'">
-        نظافة معمل الحاسب
+        {{ translate('labs.computerLabCleaning') }}
       </button>
     </div>
 
     <!-- Labs tab -->
     <div *ngIf="activeTab === 'labs'">
-      <h2 class="text-xl font-bold text-gray-700 mb-4">قائمة المخابر</h2>
+      <h2 class="text-xl font-bold text-gray-700 mb-4">{{ translate('labs.labsList') }}</h2>
       <div class="overflow-x-auto">
         <table class="w-full border-collapse">
           <thead>
             <tr class="bg-gray-100 border-b-2 border-gray-300">
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم المخبر</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">الوصف</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">الموقع</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.labName') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.description') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.location') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.status') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -106,7 +106,7 @@
                   [class]="lab.isAvailable 
                     ? 'px-3 py-1 rounded-full text-sm bg-green-100 text-green-800' 
                     : 'px-3 py-1 rounded-full text-sm bg-red-100 text-red-800'">
-                  {{ lab.isAvailable ? 'متاح' : 'غير متاح' }}
+                  {{ lab.isAvailable ? translate('labs.available') : translate('labs.unavailable') }}
                 </span>
               </td>
               <td class="py-3 px-4">
@@ -129,7 +129,7 @@
               </td>
             </tr>
             <tr *ngIf="labs.length === 0">
-              <td colspan="5" class="py-8 text-center text-gray-500">لا توجد مخابر</td>
+              <td colspan="5" class="py-8 text-center text-gray-500">{{ translate('labs.noLabs') }}</td>
             </tr>
           </tbody>
         </table>
@@ -139,17 +139,17 @@
     <!-- Device logs tab -->
     <div *ngIf="activeTab === 'deviceLogs'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">سجل خروج ودخول الأجهزة</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.deviceExitEntryLog') }}</h2>
         <button
           (click)="exportDeviceLogsToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveDeviceLog()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">اسم ولقب الأستاذ</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.teacherFullName') }}</label>
           <input 
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.teacherName"
@@ -158,35 +158,35 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">نوع العتاد (من أجهزة المعمل)</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.equipmentTypeFromLab') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.equipmentType"
             name="equipmentType"
             required
           >
-            <option value="" disabled>اختر نوع العتاد</option>
+            <option value="" disabled>{{ translate('labs.selectEquipmentType') }}</option>
             <option *ngFor="let eq of equipmentItems" [value]="eq.itemName">
-              {{ eq.itemName }} (عدد: {{ eq.totalCount }})
+              {{ eq.itemName }} ({{ translate('labs.count') }}: {{ eq.totalCount }})
             </option>
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">رقم الجرد</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.inventoryNumber') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.inventoryNumber"
             name="inventoryNumber"
             required
           >
-            <option value="" disabled>اختر رقم الجرد</option>
+            <option value="" disabled>{{ translate('labs.selectInventoryNumber') }}</option>
             <option *ngFor="let inv of inventoryItems" [value]="inv.inventoryNumber">
               {{ inv.inventoryNumber }} - {{ inv.category }} {{ inv.label }}
             </option>
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">تاريخ الحركة</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.movementDate') }}</label>
           <input 
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -196,31 +196,31 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">نوع العملية</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.operationType') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogOperation"
             name="operationType"
             required
           >
-            <option value="exit">خروج الجهاز</option>
-            <option value="return">استلام الجهاز</option>
+            <option value="exit">{{ translate('labs.deviceExit') }}</option>
+            <option value="return">{{ translate('labs.deviceReturn') }}</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">حالة العتاد (✓ / ✗)</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.equipmentStatus') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceStatus"
             name="deviceStatus"
             required
           >
-            <option value="ok">يعمل ✓</option>
-            <option value="bad">لا يعمل ✗</option>
+            <option value="ok">{{ translate('labs.working') }} ✓</option>
+            <option value="bad">{{ translate('labs.notWorking') }} ✗</option>
           </select>
         </div>
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">ملاحظات</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notes') }}</label>
           <input 
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.notes"
@@ -230,7 +230,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-4 hover:bg-green-700 transition">
-          حفظ سجل جديد
+          {{ translate('labs.saveNewLog') }}
         </button>
       </form>
 
@@ -239,14 +239,14 @@
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
               <th class="p-2">#</th>
-              <th class="p-2">تاريخ الخروج</th>
-              <th class="p-2">الأستاذ</th>
-              <th class="p-2">نوع العتاد</th>
-              <th class="p-2">رقم الجرد</th>
-              <th class="p-2">حالة العتاد عند الخروج</th>
-              <th class="p-2">تاريخ الاستلام</th>
-              <th class="p-2">حالة العتاد عند الاستلام</th>
-              <th class="p-2">ملاحظات</th>
+              <th class="p-2">{{ translate('labs.exitDate') }}</th>
+              <th class="p-2">{{ translate('labs.teacher') }}</th>
+              <th class="p-2">{{ translate('labs.equipmentType') }}</th>
+              <th class="p-2">{{ translate('labs.inventoryNumber') }}</th>
+              <th class="p-2">{{ translate('labs.equipmentStatusOnExit') }}</th>
+              <th class="p-2">{{ translate('labs.returnDate') }}</th>
+              <th class="p-2">{{ translate('labs.equipmentStatusOnReturn') }}</th>
+              <th class="p-2">{{ translate('labs.notes') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -262,7 +262,7 @@
               <td class="p-2">{{ log.notes || '-' }}</td>
             </tr>
             <tr *ngIf="deviceLogs.length === 0">
-              <td colspan="9" class="py-6 text-center text-gray-500">لا توجد سجلات للأجهزة</td>
+              <td colspan="9" class="py-6 text-center text-gray-500">{{ translate('labs.noDeviceLogs') }}</td>
             </tr>
           </tbody>
         </table>
@@ -272,17 +272,17 @@
     <!-- Lab equipment tab -->
     <div *ngIf="activeTab === 'equipment'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">أجهزة معمل الحاسب الآلي</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabEquipment') }}</h2>
         <button
           (click)="exportEquipmentToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveEquipment()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">اسم الجهاز</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="equipmentForm.itemName"
@@ -291,7 +291,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">الموديل</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.model') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="equipmentForm.model"
@@ -299,7 +299,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">العدد الكلي</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.totalCount') }}</label>
           <input
             type="number"
             min="0"
@@ -310,7 +310,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">عدد الذي يعمل</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.workingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -320,7 +320,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">عدد الذي لا يعمل</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notWorkingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -332,7 +332,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
-          حفظ جهاز في السجل
+          {{ translate('labs.saveDeviceToRecord') }}
         </button>
       </form>
 
@@ -341,11 +341,11 @@
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
               <th class="p-2">#</th>
-              <th class="p-2">اسم الجهاز</th>
-              <th class="p-2">الموديل</th>
-              <th class="p-2">العدد الكلي</th>
-              <th class="p-2">يعمل</th>
-              <th class="p-2">لا يعمل</th>
+              <th class="p-2">{{ translate('labs.deviceName') }}</th>
+              <th class="p-2">{{ translate('labs.model') }}</th>
+              <th class="p-2">{{ translate('labs.totalCount') }}</th>
+              <th class="p-2">{{ translate('labs.working') }}</th>
+              <th class="p-2">{{ translate('labs.notWorking') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -359,7 +359,7 @@
             </tr>
             <tr *ngIf="equipmentItems.length === 0">
               <td colspan="6" class="py-6 text-center text-gray-500">
-                لا توجد بيانات لأجهزة المعمل بعد
+                {{ translate('labs.noEquipmentData') }}
               </td>
             </tr>
           </tbody>
@@ -370,17 +370,17 @@
     <!-- Lab software tab -->
     <div *ngIf="activeTab === 'software'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">برامج حواسيب معمل الحاسب الآلي</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.labComputerSoftware') }}</h2>
         <button
           (click)="exportSoftwareToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveSoftware()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">اسم البرنامج</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.programName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="softwareForm.programName"
@@ -389,7 +389,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">الإصدار / المثبّت</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.versionInstalled') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="softwareForm.version"
@@ -399,7 +399,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-1 hover:bg-green-700 transition">
-          حفظ برنامج
+          {{ translate('labs.saveProgram') }}
         </button>
       </form>
 
@@ -408,8 +408,8 @@
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
               <th class="p-2">#</th>
-              <th class="p-2">البرنامج</th>
-              <th class="p-2">المثبت / الإصدار</th>
+              <th class="p-2">{{ translate('labs.program') }}</th>
+              <th class="p-2">{{ translate('labs.installedVersion') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -420,7 +420,7 @@
             </tr>
             <tr *ngIf="softwareItems.length === 0">
               <td colspan="3" class="py-6 text-center text-gray-500">
-                لا توجد بيانات لبرامج حواسيب المعمل بعد
+                {{ translate('labs.noSoftwareData') }}
               </td>
             </tr>
           </tbody>
@@ -431,17 +431,17 @@
     <!-- Lab furniture tab -->
     <div *ngIf="activeTab === 'furniture'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">أثاث معمل الحاسب الآلي</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabFurniture') }}</h2>
         <button
           (click)="exportFurnitureToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveFurniture()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">اسم الأثاث</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.furnitureName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="furnitureForm.itemName"
@@ -450,7 +450,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">الموديل / الوصف</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.modelDescription') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="furnitureForm.model"
@@ -458,7 +458,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">العدد الكلي</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.totalCount') }}</label>
           <input
             type="number"
             min="0"
@@ -469,7 +469,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">عدد الذي يعمل</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.workingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -479,7 +479,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">عدد الذي لا يعمل</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notWorkingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -491,7 +491,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
-          حفظ قطعة أثاث
+          {{ translate('labs.saveFurnitureItem') }}
         </button>
       </form>
 
@@ -500,11 +500,11 @@
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
               <th class="p-2">#</th>
-              <th class="p-2">اسم الأثاث</th>
-              <th class="p-2">الموديل</th>
-              <th class="p-2">العدد الكلي</th>
-              <th class="p-2">يعمل</th>
-              <th class="p-2">لا يعمل</th>
+              <th class="p-2">{{ translate('labs.furnitureName') }}</th>
+              <th class="p-2">{{ translate('labs.model') }}</th>
+              <th class="p-2">{{ translate('labs.totalCount') }}</th>
+              <th class="p-2">{{ translate('labs.working') }}</th>
+              <th class="p-2">{{ translate('labs.notWorking') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -518,7 +518,7 @@
             </tr>
             <tr *ngIf="furnitureItems.length === 0">
               <td colspan="6" class="py-6 text-center text-gray-500">
-                لا توجد بيانات لأثاث المعمل بعد
+                {{ translate('labs.noFurnitureData') }}
               </td>
             </tr>
           </tbody>
@@ -529,17 +529,17 @@
     <!-- Lab inventory tab -->
     <div *ngIf="activeTab === 'inventory'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">أرقام جرد أجهزة وأثاث المعمل</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.labEquipmentFurnitureInventory') }}</h2>
         <button
           (click)="exportInventoryToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveInventory()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">الفئة</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.category') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.category"
@@ -548,7 +548,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">وصف الجهاز</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceDescription') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.label"
@@ -557,7 +557,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">رقم الجرد</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.inventoryNumber') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.inventoryNumber"
@@ -568,7 +568,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-1 hover:bg-green-700 transition">
-          حفظ رقم الجرد
+          {{ translate('labs.saveInventoryNumber') }}
         </button>
       </form>
 
@@ -577,9 +577,9 @@
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
               <th class="p-2">#</th>
-              <th class="p-2">الفئة</th>
-              <th class="p-2">الجهاز</th>
-              <th class="p-2">رقم الجرد</th>
+              <th class="p-2">{{ translate('labs.category') }}</th>
+              <th class="p-2">{{ translate('labs.device') }}</th>
+              <th class="p-2">{{ translate('labs.inventoryNumber') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -591,7 +591,7 @@
             </tr>
             <tr *ngIf="inventoryItems.length === 0">
               <td colspan="4" class="py-6 text-center text-gray-500">
-                لا توجد أرقام جرد مسجلة بعد
+                {{ translate('labs.noInventoryNumbers') }}
               </td>
             </tr>
           </tbody>
@@ -602,17 +602,17 @@
     <!-- Hardware / software checklist tab -->
     <div *ngIf="activeTab === 'checklist'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">فحص المكوّنات المادية والبرمجية لأجهزة المعمل</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.hardwareSoftwareChecklist') }}</h2>
         <button
           (click)="exportChecklistToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveChecklist()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">رقم الجهاز (1 - 16)</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceNumberRange') }}</label>
           <input
             type="number"
             min="1"
@@ -625,52 +625,52 @@
 
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.hasSystemUnit" name="chkSystemUnit" />
-          <span class="text-sm">وحدة النظام</span>
+          <span class="text-sm">{{ translate('labs.systemUnit') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.hasMonitor" name="chkMonitor" />
-          <span class="text-sm">الشاشة</span>
+          <span class="text-sm">{{ translate('labs.monitor') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.hasMouse" name="chkMouse" />
-          <span class="text-sm">الفأرة</span>
+          <span class="text-sm">{{ translate('labs.mouse') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.hasKeyboard" name="chkKeyboard" />
-          <span class="text-sm">لوحة المفاتيح</span>
+          <span class="text-sm">{{ translate('labs.keyboard') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.hasCabling" name="chkCabling" />
-          <span class="text-sm">التمديدات</span>
+          <span class="text-sm">{{ translate('labs.cabling') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.isClean" name="chkClean" />
-          <span class="text-sm">نظافة الجهاز</span>
+          <span class="text-sm">{{ translate('labs.deviceCleanliness') }}</span>
         </div>
 
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.osInstalled" name="chkOS" />
-          <span class="text-sm">نظام التشغيل</span>
+          <span class="text-sm">{{ translate('labs.operatingSystem') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.officeInstalled" name="chkOffice" />
-          <span class="text-sm">برامج الأوفيس</span>
+          <span class="text-sm">{{ translate('labs.officeSoftware') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.netSupportInstalled" name="chkNetSupport" />
-          <span class="text-sm">نت سبورت</span>
+          <span class="text-sm">{{ translate('labs.netSupport') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.desktopCleaned" name="chkDesktopClean" />
-          <span class="text-sm">تنظيف سطح المكتب</span>
+          <span class="text-sm">{{ translate('labs.desktopCleaned') }}</span>
         </div>
         <div class="flex items-center gap-2">
           <input type="checkbox" [(ngModel)]="checklistForm.antivirusInstalled" name="chkAntivirus" />
-          <span class="text-sm">مضاد الفيروسات</span>
+          <span class="text-sm">{{ translate('labs.antivirus') }}</span>
         </div>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">تاريخ الفحص</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.checkDate') }}</label>
           <input
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -681,7 +681,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">ملاحظات</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notes') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="checklistForm.notes"
@@ -692,7 +692,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-5 hover:bg-green-700 transition">
-          حفظ فحص الجهاز
+          {{ translate('labs.saveDeviceCheck') }}
         </button>
       </form>
 
@@ -700,20 +700,20 @@
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
-              <th class="p-2">رقم الجهاز</th>
-              <th class="p-2">وحدة النظام</th>
-              <th class="p-2">الشاشة</th>
-              <th class="p-2">الفأرة</th>
-              <th class="p-2">لوحة المفاتيح</th>
-              <th class="p-2">التمديدات</th>
-              <th class="p-2">نظافة الجهاز</th>
-              <th class="p-2">نظام التشغيل</th>
-              <th class="p-2">الأوفيس</th>
-              <th class="p-2">Net Support</th>
-              <th class="p-2">تنظيف سطح المكتب</th>
-              <th class="p-2">مضاد الفيروسات</th>
-              <th class="p-2">تاريخ الفحص</th>
-              <th class="p-2">ملاحظات</th>
+              <th class="p-2">{{ translate('labs.deviceNumber') }}</th>
+              <th class="p-2">{{ translate('labs.systemUnit') }}</th>
+              <th class="p-2">{{ translate('labs.monitor') }}</th>
+              <th class="p-2">{{ translate('labs.mouse') }}</th>
+              <th class="p-2">{{ translate('labs.keyboard') }}</th>
+              <th class="p-2">{{ translate('labs.cabling') }}</th>
+              <th class="p-2">{{ translate('labs.deviceCleanliness') }}</th>
+              <th class="p-2">{{ translate('labs.operatingSystem') }}</th>
+              <th class="p-2">{{ translate('labs.office') }}</th>
+              <th class="p-2">{{ translate('labs.netSupport') }}</th>
+              <th class="p-2">{{ translate('labs.desktopCleaned') }}</th>
+              <th class="p-2">{{ translate('labs.antivirus') }}</th>
+              <th class="p-2">{{ translate('labs.checkDate') }}</th>
+              <th class="p-2">{{ translate('labs.notes') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -735,7 +735,7 @@
             </tr>
             <tr *ngIf="checklistItems.length === 0">
               <td colspan="14" class="py-6 text-center text-gray-500">
-                لا توجد سجلات فحص بعد
+                {{ translate('labs.noCheckRecords') }}
               </td>
             </tr>
           </tbody>
@@ -746,23 +746,23 @@
     <!-- Lab cleaning tab -->
     <div *ngIf="activeTab === 'cleaning'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">نظافة معمل الحاسب الآلي</h2>
+        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabCleaning') }}</h2>
         <button
           (click)="exportCleaningToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
-          تصدير PDF
+          {{ translate('labs.exportPDF') }}
         </button>
       </div>
 
       <form (ngSubmit)="saveCleaning()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <label class="block text-xs text-gray-600 mb-1 md:col-span-3">حالات النظافة</label>
+        <label class="block text-xs text-gray-600 mb-1 md:col-span-3">{{ translate('labs.cleaningStatuses') }}</label>
         <select
           class="border p-2 rounded text-sm"
           [(ngModel)]="cleaningForm.deviceCleanliness"
           name="clDevice"
           required>
-          <option value="good">نظافة الجهاز: جيدة</option>
-          <option value="bad">نظافة الجهاز: سيئة</option>
+          <option value="good">{{ translate('labs.deviceCleanliness') }}: {{ translate('labs.good') }}</option>
+          <option value="bad">{{ translate('labs.deviceCleanliness') }}: {{ translate('labs.bad') }}</option>
         </select>
 
         <select
@@ -770,8 +770,8 @@
           [(ngModel)]="cleaningForm.desktopCleanliness"
           name="clDesktop"
           required>
-          <option value="good">نظافة سطح المكتب: جيدة</option>
-          <option value="bad">نظافة سطح المكتب: سيئة</option>
+          <option value="good">{{ translate('labs.desktopCleanliness') }}: {{ translate('labs.good') }}</option>
+          <option value="bad">{{ translate('labs.desktopCleanliness') }}: {{ translate('labs.bad') }}</option>
         </select>
 
         <select
@@ -779,8 +779,8 @@
           [(ngModel)]="cleaningForm.roomCleanliness"
           name="clRoom"
           required>
-          <option value="good">نظافة القاعة: جيدة</option>
-          <option value="bad">نظافة القاعة: سيئة</option>
+          <option value="good">{{ translate('labs.roomCleanliness') }}: {{ translate('labs.good') }}</option>
+          <option value="bad">{{ translate('labs.roomCleanliness') }}: {{ translate('labs.bad') }}</option>
         </select>
 
         <select
@@ -788,12 +788,12 @@
           [(ngModel)]="cleaningForm.wiringStatus"
           name="clWiring"
           required>
-          <option value="complete">التمديدات: كاملة</option>
-          <option value="incomplete">التمديدات: غير كاملة</option>
+          <option value="complete">{{ translate('labs.cabling') }}: {{ translate('labs.complete') }}</option>
+          <option value="incomplete">{{ translate('labs.cabling') }}: {{ translate('labs.incomplete') }}</option>
         </select>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">تاريخ الفحص</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.checkDate') }}</label>
           <input
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -804,7 +804,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">ملاحظات عامة</label>
+          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.generalNotes') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="cleaningForm.notes"
@@ -815,7 +815,7 @@
         <button
           type="submit"
           class="bg-green-600 text-white py-2 rounded-lg md:col-span-3 hover:bg-green-700 transition">
-          حفظ حالة النظافة
+          {{ translate('labs.saveCleaningStatus') }}
         </button>
       </form>
 
@@ -823,28 +823,28 @@
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
             <tr class="bg-gray-100 border-b text-center md:text-center">
-              <th class="p-2">تاريخ الفحص</th>
-              <th class="p-2">نظافة الجهاز</th>
-              <th class="p-2">نظافة سطح المكتب</th>
-              <th class="p-2">نظافة القاعة</th>
-              <th class="p-2">التمديدات</th>
-              <th class="p-2">ملاحظات</th>
+              <th class="p-2">{{ translate('labs.checkDate') }}</th>
+              <th class="p-2">{{ translate('labs.deviceCleanliness') }}</th>
+              <th class="p-2">{{ translate('labs.desktopCleanliness') }}</th>
+              <th class="p-2">{{ translate('labs.roomCleanliness') }}</th>
+              <th class="p-2">{{ translate('labs.cabling') }}</th>
+              <th class="p-2">{{ translate('labs.notes') }}</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let cl of cleaningEntries" class="border-b text-center md:text-center">
               <td class="p-2 text-center">{{ cl.checkDate || '-' }}</td>
               <td class="p-2 text-center">
-                {{ cl.deviceCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+                {{ cl.deviceCleanliness === 'good' ? translate('labs.good') : translate('labs.bad') }}
               </td>
               <td class="p-2 text-center">
-                {{ cl.desktopCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+                {{ cl.desktopCleanliness === 'good' ? translate('labs.good') : translate('labs.bad') }}
               </td>
               <td class="p-2 text-center">
-                {{ cl.roomCleanliness === 'good' ? 'جيدة' : 'سيئة' }}
+                {{ cl.roomCleanliness === 'good' ? translate('labs.good') : translate('labs.bad') }}
               </td>
               <td class="p-2 text-center">
-                {{ cl.wiringStatus === 'complete' ? 'كاملة' : 'غير كاملة' }}
+                {{ cl.wiringStatus === 'complete' ? translate('labs.complete') : translate('labs.incomplete') }}
               </td>
               <td class="p-2">
                 {{ cl.notes || '-' }}
@@ -852,7 +852,7 @@
             </tr>
             <tr *ngIf="cleaningEntries.length === 0">
               <td colspan="6" class="py-6 text-center text-gray-500">
-                لا توجد سجلات لنظافة المعمل بعد
+                {{ translate('labs.noCleaningRecords') }}
               </td>
             </tr>
           </tbody>
@@ -872,7 +872,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingLab ? 'تعديل المخبر' : 'إضافة مخبر جديد' }}
+        {{ editingLab ? translate('labs.editLab') : translate('labs.addNewLab') }}
       </h3>
       <button 
         (click)="closeModal()"
@@ -885,34 +885,34 @@
 
     <form #labForm="ngForm" (ngSubmit)="saveLab()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">اسم المخبر *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.labName') }} *</label>
         <input 
           type="text"
           [(ngModel)]="formData.name"
           name="name"
           required
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="أدخل اسم المخبر">
+          [placeholder]="translate('labs.enterLabName')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.description') }}</label>
         <textarea 
           [(ngModel)]="formData.description"
           name="description"
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="أدخل وصف المخبر"></textarea>
+          [placeholder]="translate('labs.enterLabDescription')"></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الموقع</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.location') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.location"
           name="location"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="أدخل موقع المخبر">
+          [placeholder]="translate('labs.enterLabLocation')">
       </div>
 
       <div class="flex items-center gap-2">
@@ -922,7 +922,7 @@
           name="isAvailable"
           id="isAvailable"
           class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-        <label for="isAvailable" class="text-sm font-medium text-gray-700">المخبر متاح</label>
+        <label for="isAvailable" class="text-sm font-medium text-gray-700">{{ translate('labs.labAvailable') }}</label>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -930,13 +930,13 @@
           type="submit"
           [disabled]="!labForm.valid"
           class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingLab ? 'تحديث' : 'إضافة' }}
+          {{ editingLab ? translate('labs.update') : translate('labs.add') }}
         </button>
         <button 
           type="button"
           (click)="closeModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('labs.cancel') }}
         </button>
       </div>
     </form>

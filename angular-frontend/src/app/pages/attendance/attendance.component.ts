@@ -103,12 +103,12 @@ export class AttendanceComponent implements OnInit {
   
   // Attendance statuses
   attendanceStatuses = [
-    { value: 'present', label: 'حاضر', labelAr: 'حاضر', color: 'green', icon: '✓' },
-    { value: 'absent', label: 'غائب', labelAr: 'غائب', color: 'red', icon: '✗' },
-    { value: 'late', label: 'متأخر', labelAr: 'متأخر', color: 'blue', icon: '⏰' },
-    { value: 'excused', label: 'معذور', labelAr: 'معذور', color: 'purple', icon: '📝' },
-    { value: 'left_early', label: 'غادر مبكراً', labelAr: 'غادر مبكراً', color: 'orange', icon: '🚪' },
-    { value: 'unrecorded', label: 'غير مسجل', labelAr: 'غير مسجل', color: 'gray', icon: '○' }
+    { value: 'present', labelKey: 'attendance.present', color: 'green', icon: '✓' },
+    { value: 'absent', labelKey: 'attendance.absent', color: 'red', icon: '✗' },
+    { value: 'late', labelKey: 'attendance.late', color: 'blue', icon: '⏰' },
+    { value: 'excused', labelKey: 'attendance.excused', color: 'purple', icon: '📝' },
+    { value: 'left_early', labelKey: 'attendance.leftEarly', color: 'orange', icon: '🚪' },
+    { value: 'unrecorded', labelKey: 'attendance.status', color: 'gray', icon: '○' }
   ];
 
   // Weekly view
@@ -125,6 +125,27 @@ export class AttendanceComponent implements OnInit {
 
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'FR':
+        return 'fr-FR';
+      case 'EN':
+        return 'en-US';
+      case 'ES':
+        return 'es-ES';
+      case 'IT':
+        return 'it-IT';
+      case 'DE':
+        return 'de-DE';
+      case 'TR':
+        return 'tr-TR';
+      case 'AR':
+      default:
+        return 'ar-EG';
+    }
   }
 
   ngOnInit(): void {
@@ -306,7 +327,7 @@ export class AttendanceComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating attendance:', error);
-          alert('حدث خطأ أثناء تحديث الحضور');
+          alert(this.translate('attendance.errorUpdate'));
         }
       });
     } else {
@@ -323,7 +344,7 @@ export class AttendanceComponent implements OnInit {
                                ? error.error.error.join(', ') 
                                : error.error?.error) ||
                              error?.message || 
-                             'حدث خطأ أثناء تسجيل الحضور';
+                             this.translate('attendance.errorCreate');
           alert(errorMessage);
         }
       });
@@ -332,11 +353,11 @@ export class AttendanceComponent implements OnInit {
 
   recordAttendanceForWeek(): void {
     if (!this.selectedClass || this.students.length === 0) {
-      alert('يرجى اختيار قسم وتحميل التلاميذ');
+      alert(this.translate('attendance.selectClassAndStudents'));
       return;
     }
 
-    if (confirm('هل تريد تسجيل الحضور لجميع أيام الأسبوع للتلاميذ المحددين؟')) {
+    if (confirm(this.translate('attendance.confirmRecordWeek'))) {
       // Record attendance for each day of the week
       this.weekDays.forEach(date => {
         const dateStr = this.formatDateForAPI(date);
@@ -360,7 +381,7 @@ export class AttendanceComponent implements OnInit {
         });
       });
       
-      alert('تم تسجيل الحضور للأسبوع بنجاح');
+      alert(this.translate('attendance.weekRecorded'));
       this.loadAttendanceForDate();
     }
   }
@@ -395,12 +416,25 @@ export class AttendanceComponent implements OnInit {
   }
 
   getStatusLabel(status: AttendanceStatus): string {
-    const statusObj = this.attendanceStatuses.find(s => s.value === status);
-    return statusObj ? statusObj.labelAr : 'غير معروف';
+    switch (status) {
+      case 'present':
+        return this.translate('attendance.present');
+      case 'absent':
+        return this.translate('attendance.absent');
+      case 'late':
+        return this.translate('attendance.late');
+      case 'excused':
+        return this.translate('attendance.excused');
+      case 'left_early':
+        return this.translate('attendance.leftEarly');
+      case 'unrecorded':
+      default:
+        return this.translate('attendance.status');
+    }
   }
 
   formatDate(date: Date): string {
-    return date.toLocaleDateString('ar-EG', { 
+    return date.toLocaleDateString(this.getLocale(), { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -409,7 +443,7 @@ export class AttendanceComponent implements OnInit {
   }
 
   formatDateShort(date: Date): string {
-    return date.toLocaleDateString('ar-EG', { 
+    return date.toLocaleDateString(this.getLocale(), { 
       year: 'numeric', 
       month: 'short', 
       day: 'numeric' 
@@ -424,7 +458,7 @@ export class AttendanceComponent implements OnInit {
   }
 
   getDayName(date: Date): string {
-    return date.toLocaleDateString('ar-EG', { weekday: 'long' });
+    return date.toLocaleDateString(this.getLocale(), { weekday: 'long' });
   }
 
   getStudentPhoto(student: Student): string {
@@ -645,7 +679,7 @@ export class AttendanceComponent implements OnInit {
 
   async exportReportToPDF(): Promise<void> {
     if (this.reportType !== 'absences') {
-      alert('تصدير PDF متاح فقط لتقرير الغيابات');
+      alert(this.translate('attendance.exportOnlyAbsences'));
       return;
     }
 
@@ -657,7 +691,7 @@ export class AttendanceComponent implements OnInit {
       const reportTable = document.querySelector('#absences-report-table') as HTMLElement;
       
       if (!reportTable) {
-        alert('لا يمكن العثور على جدول التقرير. يرجى التأكد من فتح تقرير الغيابات');
+        alert(this.translate('attendance.reportTableNotFound'));
         return;
       }
 
@@ -699,7 +733,7 @@ export class AttendanceComponent implements OnInit {
       
       // Add title
       const title = document.createElement('h2');
-      title.textContent = 'تقرير الغيابات';
+      title.textContent = this.translate('attendance.absencesReport');
       title.style.textAlign = 'right';
       title.style.fontSize = '18px';
       title.style.fontWeight = 'bold';
@@ -713,8 +747,10 @@ export class AttendanceComponent implements OnInit {
       info.style.fontSize = '12px';
       info.style.color = '#6b7280';
       
-      const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
-      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      const classLabel = this.translate('students.class');
+      const dateLabel = this.translate('attendance.date');
+      const classInfo = this.selectedClass ? `${classLabel} ${this.selectedClass.name}` : '';
+      const dateInfo = `${dateLabel} ${new Date().toLocaleDateString(this.getLocale())}`;
       info.innerHTML = `${classInfo}<br>${dateInfo}`;
       
       exportContainer.appendChild(title);
@@ -783,11 +819,11 @@ export class AttendanceComponent implements OnInit {
       }
       
       // Save PDF
-      const fileName = `تقرير_الغيابات_${this.selectedClass?.name || 'قسم'}_${new Date().toISOString().split('T')[0]}.pdf`;
+      const fileName = `${this.translate('attendance.absencesReport').replace(/\s+/g, '_')}_${this.selectedClass?.name || 'class'}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('حدث خطأ أثناء تصدير التقرير إلى PDF');
+      alert(this.translate('attendance.errorExportPdf'));
     }
   }
 

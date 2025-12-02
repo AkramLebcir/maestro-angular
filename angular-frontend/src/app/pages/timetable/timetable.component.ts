@@ -3,6 +3,7 @@ import { ApiService } from '../../services/api.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
+import { LanguageService } from '../../services/language.service';
 
 export interface TimetableEntry {
   id: number;
@@ -77,13 +78,7 @@ export class TimetableComponent implements OnInit {
   };
 
   // Working days (Sunday to Thursday for Arabic countries)
-  workingDays = [
-    { value: 0, label: 'الأحد', short: 'أحد' },
-    { value: 1, label: 'الإثنين', short: 'إثنين' },
-    { value: 2, label: 'الثلاثاء', short: 'ثلاثاء' },
-    { value: 3, label: 'الأربعاء', short: 'أربعاء' },
-    { value: 4, label: 'الخميس', short: 'خميس' }
-  ];
+  workingDays: Array<{ value: number; label: string; short: string }> = [];
 
   // Time slots (8:00 AM to 5:00 PM)
   timeSlots: string[] = [];
@@ -98,6 +93,7 @@ export class TimetableComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
+    public languageService: LanguageService
   ) {
     // Generate time slots from 8:00 to 16:00 (4:00 PM) - 1 hour intervals
     // Removed 17:00-18:00 (5 PM to 6 PM) slot to fit on one page
@@ -106,6 +102,36 @@ export class TimetableComponent implements OnInit {
       const nextHour = hour + 1;
       const nextTime = `${nextHour.toString().padStart(2, '0')}:00`;
       this.timeSlots.push(currentTime);
+      this.timeSlotLabels.push(`${hour}h to ${nextHour}h`);
+    }
+    this.updateWorkingDays();
+    this.updateTimeSlotLabels();
+    
+    // Subscribe to language changes
+    this.languageService.currentLanguage$.subscribe(() => {
+      this.updateWorkingDays();
+      this.updateTimeSlotLabels();
+    });
+  }
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
+
+  updateWorkingDays(): void {
+    this.workingDays = [
+      { value: 0, label: this.translate('timetable.sunday'), short: this.translate('timetable.sundayShort') },
+      { value: 1, label: this.translate('timetable.monday'), short: this.translate('timetable.mondayShort') },
+      { value: 2, label: this.translate('timetable.tuesday'), short: this.translate('timetable.tuesdayShort') },
+      { value: 3, label: this.translate('timetable.wednesday'), short: this.translate('timetable.wednesdayShort') },
+      { value: 4, label: this.translate('timetable.thursday'), short: this.translate('timetable.thursdayShort') }
+    ];
+  }
+
+  updateTimeSlotLabels(): void {
+    this.timeSlotLabels = [];
+    for (let hour = 8; hour <= 16; hour++) {
+      const nextHour = hour + 1;
       this.timeSlotLabels.push(`${hour}h to ${nextHour}h`);
     }
   }
@@ -208,13 +234,13 @@ export class TimetableComponent implements OnInit {
 
   saveEntry(): void {
     if (!this.formData.classId) {
-      alert('يرجى اختيار القسم');
+      alert(this.translate('timetable.selectClassError'));
       return;
     }
 
     // Validate that times are provided
     if (!this.formData.startTime || !this.formData.endTime) {
-      alert('يرجى إدخال وقت البداية ووقت النهاية');
+      alert(this.translate('timetable.enterTimesError'));
       return;
     }
 
@@ -241,7 +267,7 @@ export class TimetableComponent implements OnInit {
     console.log('End time:', this.formData.endTime, '-> normalized:', normalizedEndTime, '->', endMinutes, 'minutes');
     
     if (isNaN(startMinutes) || isNaN(endMinutes)) {
-      alert('خطأ في تنسيق الوقت. يرجى التأكد من إدخال الوقت بشكل صحيح');
+      alert(this.translate('timetable.timeFormatError'));
       return;
     }
     
@@ -256,7 +282,7 @@ export class TimetableComponent implements OnInit {
     }
     
     if (startMinutes >= endMinutes) {
-      alert(`وقت البداية (${normalizedStartTime}) يجب أن يكون قبل وقت النهاية (${normalizedEndTime})`);
+      alert(`${this.translate('timetable.startBeforeEndError')}: ${normalizedStartTime} - ${normalizedEndTime}`);
       return;
     }
 
@@ -283,7 +309,7 @@ export class TimetableComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating timetable entry:', error);
-          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تحديث جدول الأوقات';
+          const errorMessage = error?.error?.message || error?.message || this.translate('timetable.updateError');
           alert(errorMessage);
         }
       });
@@ -300,7 +326,7 @@ export class TimetableComponent implements OnInit {
                                ? error.error.error.join(', ') 
                                : error.error?.error) ||
                              error?.message || 
-                             'حدث خطأ أثناء إضافة جدول الأوقات';
+                             this.translate('timetable.createError');
           alert(errorMessage);
         }
       });
@@ -308,14 +334,14 @@ export class TimetableComponent implements OnInit {
   }
 
   deleteEntry(id: number): void {
-    if (confirm('هل أنت متأكد من حذف هذا العنصر من جدول الأوقات؟')) {
+    if (confirm(this.translate('timetable.deleteConfirm'))) {
       this.apiService.delete(`/timetable/${id}`).subscribe({
         next: () => {
           this.loadTimetableEntries();
         },
         error: (error) => {
           console.error('Error deleting timetable entry:', error);
-          alert('حدث خطأ أثناء حذف العنصر');
+          alert(this.translate('timetable.deleteError'));
         }
       });
     }
@@ -344,19 +370,19 @@ export class TimetableComponent implements OnInit {
           
           // Same class conflict
           if (entry1.classId === entry2.classId) {
-            reason = `نفس القسم (${this.getClassName(entry1.classId)}) في نفس الوقت`;
+            reason = `${this.translate('timetable.sameClassConflict')} (${this.getClassName(entry1.classId)}) ${this.translate('timetable.atSameTime')}`;
           }
           // Same lab conflict
           else if (entry1.labId && entry2.labId && entry1.labId === entry2.labId) {
-            reason = `نفس المخبر (${this.getLabName(entry1.labId)}) في نفس الوقت`;
+            reason = `${this.translate('timetable.sameLabConflict')} (${this.getLabName(entry1.labId)}) ${this.translate('timetable.atSameTime')}`;
           }
           // Same classroom conflict
           else if (entry1.classroom && entry2.classroom && entry1.classroom === entry2.classroom) {
-            reason = `نفس القاعة (${entry1.classroom}) في نفس الوقت`;
+            reason = `${this.translate('timetable.sameRoomConflict')} (${entry1.classroom}) ${this.translate('timetable.atSameTime')}`;
           }
           // Time overlap
           else {
-            reason = 'تداخل في الوقت';
+            reason = this.translate('timetable.timeOverlap');
           }
           
           this.conflicts.push({ entry1, entry2, reason });
@@ -466,13 +492,13 @@ export class TimetableComponent implements OnInit {
 
   getClassName(classId: number): string {
     const classItem = this.classes.find(c => c.id === classId);
-    return classItem ? classItem.name : `قسم ${classId}`;
+    return classItem ? classItem.name : `${this.translate('timetable.classLabel')} ${classId}`;
   }
 
   getLabName(labId?: number): string {
     if (!labId) return '-';
     const lab = this.labs.find(l => l.id === labId);
-    return lab ? lab.name : `مخبر ${labId}`;
+    return lab ? lab.name : `${this.translate('timetable.labLabel')} ${labId}`;
   }
 
   getDayLabel(dayOfWeek: number): string {
@@ -481,7 +507,18 @@ export class TimetableComponent implements OnInit {
   }
 
   formatDate(date: Date): string {
-    return date.toLocaleDateString('ar-EG', { 
+    const lang = this.languageService.getCurrentLanguage();
+    const localeMap: { [key: string]: string } = {
+      'AR': 'ar-EG',
+      'FR': 'fr-FR',
+      'EN': 'en-US',
+      'ES': 'es-ES',
+      'IT': 'it-IT',
+      'DE': 'de-DE',
+      'TR': 'tr-TR'
+    };
+    const locale = localeMap[lang] || 'en-US';
+    return date.toLocaleDateString(locale, { 
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
@@ -516,7 +553,7 @@ export class TimetableComponent implements OnInit {
       // Get the table element
       const tableElement = document.querySelector('.overflow-x-auto table');
       if (!tableElement) {
-        alert('لا يمكن العثور على الجدول. يرجى التأكد من أنك في عرض الأسبوع.');
+        alert(this.translate('timetable.tableNotFoundError'));
         return;
       }
 
@@ -531,7 +568,7 @@ export class TimetableComponent implements OnInit {
 
       // Clone the table and add title
       const title = document.createElement('h1');
-      title.textContent = 'جدول الأوقات';
+      title.textContent = this.translate('timetable.title');
       title.style.textAlign = 'center';
       title.style.fontSize = '20px'; // Reduced font size
       title.style.fontWeight = 'bold';
@@ -603,7 +640,7 @@ export class TimetableComponent implements OnInit {
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت المكتبات المطلوبة.');
+      alert(this.translate('timetable.pdfExportError'));
     }
   }
 
@@ -682,7 +719,7 @@ export class TimetableComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error updating timetable entry:', error);
-        const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تحديث جدول الأوقات';
+        const errorMessage = error?.error?.message || error?.message || this.translate('timetable.updateError');
         alert(errorMessage);
       }
     });
@@ -696,6 +733,21 @@ export class TimetableComponent implements OnInit {
     const hours = Math.floor(minutes / 60);
     const mins = minutes % 60;
     return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+  }
+
+  formatMonthYear(date: Date): string {
+    const lang = this.languageService.getCurrentLanguage();
+    const localeMap: { [key: string]: string } = {
+      'AR': 'ar-EG',
+      'FR': 'fr-FR',
+      'EN': 'en-US',
+      'ES': 'es-ES',
+      'IT': 'it-IT',
+      'DE': 'de-DE',
+      'TR': 'tr-TR'
+    };
+    const locale = localeMap[lang] || 'en-US';
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'long' });
   }
 }
 

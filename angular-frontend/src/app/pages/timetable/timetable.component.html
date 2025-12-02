@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
   <div class="bg-white rounded-lg shadow-lg p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">جدول الأوقات</h1>
+      <h1 class="text-3xl font-bold text-gray-800">{{ translate('timetable.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="exportToPDF()"
@@ -9,7 +9,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span>تصدير PDF</span>
+          <span>{{ translate('timetable.exportPDF') }}</span>
         </button>
         <button 
           (click)="openAddModal()"
@@ -17,7 +17,7 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
-          <span>إضافة حصة</span>
+          <span>{{ translate('timetable.addLesson') }}</span>
         </button>
       </div>
     </div>
@@ -29,31 +29,31 @@
         [class]="viewMode === 'weekly' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
           : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
-        أسبوعي
+        {{ translate('timetable.weekly') }}
       </button>
       <button 
         (click)="setViewMode('daily')"
         [class]="viewMode === 'daily' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
           : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
-        يومي
+        {{ translate('timetable.daily') }}
       </button>
       <button 
         (click)="setViewMode('monthly')"
         [class]="viewMode === 'monthly' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
           : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
-        شهري
+        {{ translate('timetable.monthly') }}
       </button>
     </div>
 
     <!-- Conflict Alerts -->
     <div *ngIf="conflicts.length > 0" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-      <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ تنبيهات التعارض</h3>
+      <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ {{ translate('timetable.conflictAlerts') }}</h3>
       <div class="space-y-2">
         <div *ngFor="let conflict of conflicts" class="text-sm text-red-700">
           • {{ conflict.reason }}: {{ getClassName(conflict.entry1.classId) }} ({{ conflict.entry1.startTime }} - {{ conflict.entry1.endTime }}) 
-          و {{ getClassName(conflict.entry2.classId) }} ({{ conflict.entry2.startTime }} - {{ conflict.entry2.endTime }})
+          {{ translate('timetable.and') }} {{ getClassName(conflict.entry2.classId) }} ({{ conflict.entry2.startTime }} - {{ conflict.entry2.endTime }})
         </div>
       </div>
     </div>
@@ -64,27 +64,27 @@
         <button 
           (click)="navigateWeek('prev')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          ← الأسبوع السابق
+          ← {{ translate('timetable.previousWeek') }}
         </button>
         <h2 class="text-xl font-bold text-gray-800">
-          الأسبوع: {{ formatDate(getWeekStart(currentDate)) }}
+          {{ translate('timetable.week') }}: {{ formatDate(getWeekStart(currentDate)) }}
         </h2>
         <button 
           (click)="navigateWeek('next')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          الأسبوع التالي →
+          {{ translate('timetable.nextWeek') }} →
         </button>
         <button 
           (click)="goToToday()"
           class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-          اليوم
+          {{ translate('timetable.today') }}
         </button>
       </div>
 
       <table class="w-full border-collapse">
         <thead>
           <tr>
-            <th class="border border-gray-300 p-2 bg-gray-100 font-semibold text-gray-700">الوقت</th>
+            <th class="border border-gray-300 p-2 bg-gray-100 font-semibold text-gray-700">{{ translate('timetable.time') }}</th>
             <th *ngFor="let day of workingDays" class="border border-gray-300 p-2 bg-gray-100 font-semibold text-gray-700">
               {{ day.label }}
             </th>
@@ -115,10 +115,10 @@
                   {{ entry.startTime }} - {{ entry.endTime }}
                 </div>
                 <div *ngIf="entry.labId" class="text-blue-500 text-xs">
-                  مخبر: {{ getLabName(entry.labId) }}
+                  {{ translate('timetable.labLabel') }}: {{ getLabName(entry.labId) }}
                 </div>
                 <div *ngIf="entry.classroom" class="text-blue-500 text-xs">
-                  قاعة: {{ entry.classroom }}
+                  {{ translate('timetable.roomLabel') }}: {{ entry.classroom }}
                 </div>
                 </div>
               </ng-container>
@@ -134,7 +134,7 @@
         <button 
           (click)="navigateDay('prev')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          ← اليوم السابق
+          ← {{ translate('timetable.previousDay') }}
         </button>
         <h2 class="text-xl font-bold text-gray-800">
           {{ formatDate(selectedDate) }}
@@ -143,12 +143,12 @@
           <button 
             (click)="goToToday()"
             class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-            اليوم
+            {{ translate('timetable.today') }}
           </button>
           <button 
             (click)="navigateDay('next')"
             class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-            اليوم التالي →
+            {{ translate('timetable.nextDay') }} →
           </button>
         </div>
       </div>
@@ -165,8 +165,8 @@
                 {{ entry.startTime }} - {{ entry.endTime }}
               </p>
               <div class="flex gap-4 mt-2 text-sm text-blue-600">
-                <span *ngIf="entry.labId">مخبر: {{ getLabName(entry.labId) }}</span>
-                <span *ngIf="entry.classroom">قاعة: {{ entry.classroom }}</span>
+                <span *ngIf="entry.labId">{{ translate('timetable.labLabel') }}: {{ getLabName(entry.labId) }}</span>
+                <span *ngIf="entry.classroom">{{ translate('timetable.roomLabel') }}: {{ entry.classroom }}</span>
               </div>
               <p *ngIf="entry.notes" class="text-gray-600 text-sm mt-2">{{ entry.notes }}</p>
             </div>
@@ -180,7 +180,7 @@
           </div>
         </div>
         <div *ngIf="getEntriesForDate(selectedDate).length === 0" class="text-center text-gray-400 py-8">
-          لا توجد حصص في هذا اليوم
+          {{ translate('timetable.noLessonsToday') }}
         </div>
       </div>
     </div>
@@ -191,21 +191,21 @@
         <button 
           (click)="navigateMonth('prev')"
           class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-          ← الشهر السابق
+          ← {{ translate('timetable.previousMonth') }}
         </button>
         <h2 class="text-xl font-bold text-gray-800">
-          {{ currentDate.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' }) }}
+          {{ formatMonthYear(currentDate) }}
         </h2>
         <div class="flex gap-2">
           <button 
             (click)="goToToday()"
             class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">
-            اليوم
+            {{ translate('timetable.today') }}
           </button>
           <button 
             (click)="navigateMonth('next')"
             class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-            الشهر التالي →
+            {{ translate('timetable.nextMonth') }} →
           </button>
         </div>
       </div>
@@ -215,8 +215,8 @@
         <div *ngFor="let day of workingDays" class="p-2 text-center font-semibold text-gray-700 bg-gray-100">
           {{ day.short }}
         </div>
-        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">الجمعة</div>
-        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">السبت</div>
+        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">{{ translate('timetable.fridayShort') }}</div>
+        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">{{ translate('timetable.saturdayShort') }}</div>
 
         <!-- Calendar days -->
         <div *ngFor="let date of getMonthDays()" 
@@ -251,7 +251,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        {{ editingEntry ? 'تعديل حصة' : 'إضافة حصة جديدة' }}
+        {{ editingEntry ? translate('timetable.editLesson') : translate('timetable.addNewLesson') }}
       </h3>
       <button 
         (click)="closeModal()"
@@ -266,7 +266,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Day of Week -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">يوم الأسبوع *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.dayOfWeek') }} *</label>
           <select 
             [(ngModel)]="formData.dayOfWeek"
             name="dayOfWeek"
@@ -278,19 +278,19 @@
 
         <!-- Subject -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">المادة *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.subject') }} *</label>
           <input 
             type="text"
             [(ngModel)]="formData.subject"
             name="subject"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل اسم المادة">
+            [placeholder]="translate('timetable.enterSubject')">
         </div>
 
         <!-- Start Time -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">وقت البداية *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.startTime') }} *</label>
           <input 
             type="time"
             [(ngModel)]="formData.startTime"
@@ -302,7 +302,7 @@
 
         <!-- End Time -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">وقت النهاية *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.endTime') }} *</label>
           <input 
             type="time"
             [(ngModel)]="formData.endTime"
@@ -314,50 +314,50 @@
 
         <!-- Class -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">القسم *</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.class') }} *</label>
           <select 
             [(ngModel)]="formData.classId"
             name="classId"
             required
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="0">اختر القسم</option>
+            <option [ngValue]="0">{{ translate('timetable.selectClass') }}</option>
             <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
           </select>
         </div>
 
         <!-- Lab -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">المخبر</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.lab') }}</label>
           <select 
             [(ngModel)]="formData.labId"
             name="labId"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-            <option [ngValue]="undefined">لا يوجد</option>
+            <option [ngValue]="undefined">{{ translate('timetable.none') }}</option>
             <option *ngFor="let lab of labs" [ngValue]="lab.id">{{ lab.name }}</option>
           </select>
         </div>
 
         <!-- Classroom -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">القاعة</label>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.room') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.classroom"
             name="classroom"
             class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="أدخل رقم القاعة">
+            [placeholder]="translate('timetable.enterRoom')">
         </div>
       </div>
 
       <!-- Notes -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.notes') }}</label>
         <textarea 
           [(ngModel)]="formData.notes"
           name="notes"
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="أدخل ملاحظات"></textarea>
+          [placeholder]="translate('timetable.enterNotes')"></textarea>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -365,13 +365,13 @@
           type="submit"
           [disabled]="!entryForm.valid"
           class="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          {{ editingEntry ? 'تحديث' : 'إضافة' }}
+          {{ editingEntry ? translate('timetable.update') : translate('timetable.add') }}
         </button>
         <button 
           type="button"
           (click)="closeModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('timetable.cancel') }}
         </button>
       </div>
     </form>

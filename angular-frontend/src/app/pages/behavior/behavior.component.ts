@@ -140,6 +140,27 @@ export class BehaviorComponent implements OnInit {
     return this.languageService.translate(key);
   }
 
+  private getLocale(): string {
+    const lang = this.languageService.getCurrentLanguage();
+    switch (lang) {
+      case 'FR':
+        return 'fr-FR';
+      case 'EN':
+        return 'en-US';
+      case 'ES':
+        return 'es-ES';
+      case 'IT':
+        return 'it-IT';
+      case 'DE':
+        return 'de-DE';
+      case 'TR':
+        return 'tr-TR';
+      case 'AR':
+      default:
+        return 'ar-EG';
+    }
+  }
+
   ngOnInit(): void {
     this.loadClasses();
     this.loadBehaviors();
@@ -269,7 +290,7 @@ export class BehaviorComponent implements OnInit {
 
   saveBehaviorEvent(): void {
     if (!this.formData.behaviorId) {
-      alert('يرجى اختيار نوع السلوك');
+      alert(this.translate('behavior.selectTypeRequired'));
       return;
     }
 
@@ -285,14 +306,14 @@ export class BehaviorComponent implements OnInit {
                              ? error.error.error.join(', ') 
                              : error.error?.error) ||
                            error?.message || 
-                           'حدث خطأ أثناء حفظ السلوك';
+                           this.translate('behavior.errorSave');
         alert(errorMessage);
       }
     });
   }
 
   deleteBehaviorEvent(eventId: number): void {
-    if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+  if (confirm(this.translate('behavior.confirmDelete'))) {
       this.apiService.delete(`/behavior-events/${eventId}`).subscribe({
         next: () => {
           this.loadBehaviorCounts();
@@ -302,7 +323,7 @@ export class BehaviorComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error deleting behavior event:', error);
-          alert('حدث خطأ أثناء حذف السجل');
+        alert(this.translate('behavior.errorDelete'));
         }
       });
     }
@@ -345,7 +366,12 @@ export class BehaviorComponent implements OnInit {
 
         // Check for warnings
         if (this.reportData.negativeCount >= this.warningThreshold) {
-          alert(`⚠️ تحذير: التلميذ ${this.reportData.studentName} لديه ${this.reportData.negativeCount} سلوك سلبي. تم تجاوز الحد المسموح (${this.warningThreshold}).`);
+          alert(
+            this.translate('behavior.warningExceeded')
+              .replace('{{studentName}}', this.reportData.studentName)
+              .replace('{{negativeCount}}', String(this.reportData.negativeCount))
+              .replace('{{threshold}}', String(this.warningThreshold))
+          );
         }
       },
       error: (error) => {
@@ -363,7 +389,7 @@ export class BehaviorComponent implements OnInit {
 
   openClassReport(): void {
     if (!this.selectedClass) {
-      alert('يرجى اختيار قسم أولاً');
+      alert(this.translate('behavior.selectClassFirst'));
       return;
     }
     this.showReportModal = true;
@@ -404,7 +430,14 @@ export class BehaviorComponent implements OnInit {
 
   getBehaviorName(behaviorId: number): string {
     const behavior = this.allBehaviors.find(b => b.id === behaviorId);
-    return behavior ? behavior.nameAr : 'غير معروف';
+    if (!behavior) {
+      // Fallback to a generic "unknown" label if available
+      return this.translate('common.unknown') || 'Unknown';
+    }
+    // Use Arabic name when UI language is Arabic, otherwise default to non-Arabic name
+    return this.languageService.getCurrentLanguage() === 'AR'
+      ? (behavior.nameAr || behavior.name)
+      : (behavior.name || behavior.nameAr);
   }
 
   getBehaviorType(behaviorId: number): 'positive' | 'negative' | null {
@@ -415,7 +448,7 @@ export class BehaviorComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('ar-EG', { 
+    return d.toLocaleDateString(this.getLocale(), { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric' 
@@ -425,7 +458,7 @@ export class BehaviorComponent implements OnInit {
   formatDateTime(date: Date | string): string {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('ar-EG', { 
+    return d.toLocaleDateString(this.getLocale(), { 
       year: 'numeric', 
       month: 'long', 
       day: 'numeric',
@@ -464,7 +497,7 @@ export class BehaviorComponent implements OnInit {
 
   exportStudentReportToPDF(student: Student): void {
     if (!this.reportData || !this.studentReportContent) {
-      alert('لا توجد بيانات للتصدير');
+      alert(this.translate('behavior.noDataToExport'));
       return;
     }
 
@@ -548,11 +581,13 @@ export class BehaviorComponent implements OnInit {
         }
 
         // Save PDF
-        const fileName = `تقرير_السلوك_${this.reportData?.studentName || 'تلميذ'}_${new Date().toISOString().split('T')[0]}.pdf`;
+        const baseName = this.translate('behavior.studentReportTitle').replace(/\s+/g, '_');
+        const studentName = this.reportData?.studentName || 'student';
+        const fileName = `${baseName}_${studentName}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
       }).catch((error) => {
         console.error('Error generating PDF:', error);
-        alert('حدث خطأ أثناء تصدير PDF');
+        alert(this.translate('behavior.errorExportPdf'));
         
         // Restore original styles on error
         contentElement.style.maxHeight = originalMaxHeight;
@@ -572,13 +607,13 @@ export class BehaviorComponent implements OnInit {
 
   exportClassReportToPDF(): void {
     if (!this.selectedClass || !this.classReportContent) {
-      alert('يرجى اختيار قسم');
+      alert(this.translate('behavior.selectClassFirst'));
       return;
     }
 
     const reportData = this.getClassReportData();
     if (reportData.length === 0) {
-      alert('لا توجد بيانات للتصدير');
+      alert(this.translate('behavior.noDataToExport'));
       return;
     }
 
@@ -655,11 +690,13 @@ export class BehaviorComponent implements OnInit {
         }
 
         // Save PDF
-        const fileName = `تقرير_السلوك_القسم_${this.selectedClass?.name || 'قسم'}_${new Date().toISOString().split('T')[0]}.pdf`;
+        const baseName = this.translate('behavior.classReportTitle').replace(/\s+/g, '_');
+        const className = this.selectedClass?.name || 'class';
+        const fileName = `${baseName}_${className}_${new Date().toISOString().split('T')[0]}.pdf`;
         doc.save(fileName);
       }).catch((error) => {
         console.error('Error generating PDF:', error);
-        alert('حدث خطأ أثناء تصدير PDF');
+        alert(this.translate('behavior.errorExportPdf'));
         
         // Restore original styles on error
         contentElement.style.maxHeight = originalMaxHeight;

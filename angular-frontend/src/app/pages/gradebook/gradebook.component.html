@@ -71,13 +71,13 @@
         (click)="viewMode = 'excelImport'"
         [class]="viewMode === 'excelImport' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
         class="px-4 py-2 font-semibold">
-        استيراد محسّن
+        {{ translate('gradebook.enhancedImport') }}
       </button>
       <button 
         (click)="onExcelAnalysisTabClick()"
         [class]="viewMode === 'excelAnalysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
         class="px-4 py-2 font-semibold">
-        تحليل بيانات Excel
+        {{ translate('gradebook.excelAnalysis') }}
       </button>
     </div>
 
@@ -212,7 +212,7 @@
                    max="20"
                    step="0.5"
                    placeholder="0"
-                   title="التعبير الشفهي/العمل العملي">
+                   [title]="translate('gradebook.oralExpression')">
                </td>
               <!-- الفرض -->
               <td class="border border-gray-300 p-2">
@@ -275,7 +275,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-blue-50">
-              <td colspan="16" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
+              <td colspan="16" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
               <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
@@ -283,7 +283,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-red-50">
-              <td colspan="16" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
+              <td colspan="16" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
               <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>
@@ -298,14 +298,14 @@
     <!-- Grades View -->
     <div *ngIf="viewMode === 'grades' && selectedClass">
       <div class="mb-4 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">نتائج الفصل</h2>
+        <h2 class="text-xl font-semibold text-gray-800">{{ translate('gradebook.classResults') }}</h2>
         <button 
           (click)="exportGradesToPDF()"
           class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
-          <span>تصدير PDF</span>
+          <span>{{ translate('gradebook.exportPDF') }}</span>
         </button>
       </div>
 
@@ -317,38 +317,38 @@
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('idNumber')">
-                رقم الهوية أو الكود <span class="text-xs">{{ getSortIcon('idNumber') }}</span>
+                {{ translate('gradebook.idNumberOrCode') }} <span class="text-xs">{{ getSortIcon('idNumber') }}</span>
               </th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('firstName')">
-                الاسم <span class="text-xs">{{ getSortIcon('firstName') }}</span>
+                {{ translate('gradebook.firstName') }} <span class="text-xs">{{ getSortIcon('firstName') }}</span>
               </th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('lastName')">
-                اللقب <span class="text-xs">{{ getSortIcon('lastName') }}</span>
+                {{ translate('gradebook.lastName') }} <span class="text-xs">{{ getSortIcon('lastName') }}</span>
               </th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">تاريخ الميلاد</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">تصحيح الدفتر</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الواجب</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الحضور (5)</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">السلوك (5)</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التقييم المستمر</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التعبير الشفهي/العمل العملي</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الفرض</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الاختبار</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.birthDate') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.notebookCorrection') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.homework') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.attendance5') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.behavior5') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.continuousAssessment') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.assignment') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.test') }}</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('termAverage')">
-                معدل الفصل <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
+                {{ translate('gradebook.termAverage') }} <span class="text-xs">{{ getSortIcon('termAverage') }}</span>
               </th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">التقديرات</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.ratings') }}</th>
+              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.guidance') }}</th>
               <th 
                 class="border border-blue-700 p-2 text-right font-semibold cursor-pointer hover:bg-blue-700 transition"
                 (click)="sortStudents('ranking')">
-                الترتيب <span class="text-xs">{{ getSortIcon('ranking') }}</span>
+                {{ translate('gradebook.ranking') }} <span class="text-xs">{{ getSortIcon('ranking') }}</span>
               </th>
             </tr>
           </thead>
@@ -415,7 +415,7 @@
           </tbody>
           <tfoot>
             <tr class="bg-gray-100 font-semibold">
-              <td colspan="14" class="border border-gray-300 p-2 text-right">معدل القسم:</td>
+              <td colspan="14" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.classAverage') }}:</td>
               <td class="border border-gray-300 p-2 text-center">
                 {{ calculateClassAverage().toFixed(2) }}
               </td>
@@ -424,7 +424,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-blue-50">
-              <td colspan="15" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):</td>
+              <td colspan="15" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
               <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
@@ -433,7 +433,7 @@
               <td class="border border-gray-300 p-2"></td>
             </tr>
             <tr class="bg-red-50">
-              <td colspan="15" class="border border-gray-300 p-2 text-right">عدد التلاميذ بمعدل < 10 (في الفصل المحدد):</td>
+              <td colspan="15" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
               <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>
@@ -449,15 +449,15 @@
     <!-- Data Analysis View -->
     <div *ngIf="viewMode === 'analysis' && selectedClass">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">تحليل البيانات</h2>
-        <p class="text-gray-600 mb-6">تحليل شامل لنتائج التلاميذ من خلال الرسوم البيانية</p>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ translate('gradebook.dataAnalysis') }}</h2>
+        <p class="text-gray-600 mb-6">{{ translate('gradebook.comprehensiveAnalysis') }}</p>
       </div>
 
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Grade Distribution Chart -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">توزيع الدرجات حسب النطاقات</h3>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.gradeDistributionByRange') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="gradeDistributionChartType"
@@ -469,7 +469,7 @@
 
         <!-- Grade Range Distribution Chart -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">توزيع التلاميذ حسب الفئات</h3>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.studentDistributionByCategory') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="gradeRangeChartType"
@@ -481,7 +481,7 @@
 
         <!-- Gender Comparison Chart -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">مقارنة النتائج حسب الجنس</h3>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.comparisonByGender') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="genderChartType"
@@ -493,7 +493,7 @@
 
         <!-- Term Comparison Chart -->
         <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">مقارنة معدلات الفصول الدراسية</h3>
+          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.comparisonByTerm') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="termComparisonChartType"
@@ -506,7 +506,7 @@
 
       <!-- Assessment Performance Chart -->
       <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">أداء التلاميذ حسب نوع التقييم</h3>
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.studentPerformanceByType') }}</h3>
         <div class="h-96">
           <canvas baseChart
             [type]="assessmentChartType"
@@ -520,15 +520,15 @@
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
           <div class="text-3xl font-bold text-blue-700 mb-2">{{ calculateClassAverage().toFixed(2) }}</div>
-          <div class="text-sm text-blue-600">معدل القسم</div>
+          <div class="text-sm text-blue-600">{{ translate('gradebook.classAverage') }}</div>
         </div>
         <div class="bg-green-50 p-6 rounded-lg border border-green-200">
           <div class="text-3xl font-bold text-green-700 mb-2">{{ getStudentsAbove10() }}</div>
-          <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
+          <div class="text-sm text-green-600">{{ translate('gradebook.studentsWithAverage10') }}</div>
         </div>
         <div class="bg-red-50 p-6 rounded-lg border border-red-200">
           <div class="text-3xl font-bold text-red-700 mb-2">{{ getStudentsBelow10() }}</div>
-          <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
+          <div class="text-sm text-red-600">{{ translate('gradebook.studentsWithAverageBelow10') }}</div>
         </div>
       </div>
     </div>
@@ -536,8 +536,8 @@
     <!-- Excel Import with Auto Observations/Guidance View -->
     <div *ngIf="viewMode === 'excelImport'">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">استيراد ملف Excel مع توليد الملاحظات والإرشادات تلقائياً</h2>
-        <p class="text-gray-600 mb-6">قم باستيراد ملف Excel لعلامات التلاميذ وسيتم إضافة الملاحظات (obs) والإرشادات (cons) تلقائياً بناءً على المعدل</p>
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ translate('gradebook.excelImportWithAutoNotes') }}</h2>
+        <p class="text-gray-600 mb-6">{{ translate('gradebook.excelImportDescription') }}</p>
       </div>
 
       <div class="bg-white p-6 rounded-lg shadow-md mb-6">
@@ -547,26 +547,26 @@
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
           </svg>
-          <span>استيراد ملف Excel</span>
+          <span>{{ translate('gradebook.importExcel') }}</span>
         </button>
       </div>
 
       <!-- Processed Data Preview -->
       <div *ngIf="processedExcelData && processedExcelData.length > 0" class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-semibold text-gray-800">معاينة البيانات المعالجة</h3>
+          <h3 class="text-xl font-semibold text-gray-800">{{ translate('gradebook.processedDataPreview') }}</h3>
           <button 
             (click)="downloadProcessedExcel()"
             class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>تحميل الملف المعالج</span>
+            <span>{{ translate('gradebook.downloadProcessedFile') }}</span>
           </button>
         </div>
 
         <div *ngIf="processedSheetsData && processedSheetsData.length > 1" class="mb-4 text-sm text-gray-600">
-          <p>عدد الصفحات المعالجة: {{ processedSheetsData.length }}</p>
+          <p>{{ translate('gradebook.processedSheetsCount') }} {{ processedSheetsData.length }}</p>
         </div>
         
         <div class="overflow-x-auto">
@@ -574,12 +574,12 @@
             <thead>
               <tr class="bg-blue-600 text-white">
                 <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold" *ngIf="processedSheetsData && processedSheetsData.length > 1">الصفحة</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold">الاسم</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold">اللقب</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold">الملاحظات (obs)</th>
-                <th class="border border-blue-700 p-2 text-right font-semibold">الإرشادات (cons)</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold" *ngIf="processedSheetsData && processedSheetsData.length > 1">{{ translate('gradebook.sheet') }}</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.firstName') }}</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.lastName') }}</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.average') }}</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.notes') }}</th>
+                <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.guidanceCons') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -615,8 +615,8 @@
       <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">تحليل بيانات Excel</h2>
-            <p class="text-gray-600">مخططات بيانية مفصلة لكل صفحة (قسم) في ملف Excel</p>
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ translate('gradebook.excelAnalysisTitle') }}</h2>
+            <p class="text-gray-600">{{ translate('gradebook.detailedChartsPerSheet') }}</p>
           </div>
           <button 
             *ngIf="processedSheetsData && processedSheetsData.length > 0"
@@ -625,7 +625,7 @@
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
             </svg>
-            <span>تصدير PDF</span>
+            <span>{{ translate('gradebook.exportPDF') }}</span>
           </button>
         </div>
       </div>
@@ -639,19 +639,19 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
               <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
                 <div class="text-2xl font-bold text-blue-700 mb-1">{{ calculateSheetAverage(sheetInfo.data).toFixed(2) }}</div>
-                <div class="text-sm text-blue-600">معدل الصفحة</div>
+                <div class="text-sm text-blue-600">{{ translate('gradebook.sheetAverage') }}</div>
               </div>
               <div class="bg-green-50 p-4 rounded-lg border border-green-200">
                 <div class="text-2xl font-bold text-green-700 mb-1">{{ getStudentsAbove10Count(sheetInfo.data) }}</div>
-                <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
+                <div class="text-sm text-green-600">{{ translate('gradebook.studentsWithAverage10') }}</div>
               </div>
               <div class="bg-red-50 p-4 rounded-lg border border-red-200">
                 <div class="text-2xl font-bold text-red-700 mb-1">{{ getStudentsBelow10Count(sheetInfo.data) }}</div>
-                <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
+                <div class="text-sm text-red-600">{{ translate('gradebook.studentsWithAverageBelow10') }}</div>
               </div>
               <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
                 <div class="text-2xl font-bold text-purple-700 mb-1">{{ sheetInfo.data.length }}</div>
-                <div class="text-sm text-purple-600">إجمالي التلاميذ</div>
+                <div class="text-sm text-purple-600">{{ translate('gradebook.totalStudents') }}</div>
               </div>
             </div>
 
@@ -659,7 +659,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Grade Distribution Chart -->
               <div class="bg-white p-4 rounded-lg border border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع الدرجات</h4>
+                <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.gradeDistribution') }}</h4>
                 <div class="h-64">
                   <canvas [attr.id]="'gradeDistChart_' + sheetIndex"></canvas>
                 </div>
@@ -667,7 +667,7 @@
 
               <!-- Grade Range Chart -->
               <div class="bg-white p-4 rounded-lg border border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">توزيع حسب الفئات</h4>
+                <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.distributionByCategory') }}</h4>
                 <div class="h-64">
                   <canvas [attr.id]="'gradeRangeChart_' + sheetIndex"></canvas>
                 </div>
@@ -678,11 +678,11 @@
       </div>
 
       <div *ngIf="!processedSheetsData || processedSheetsData.length === 0" class="text-center text-gray-500 py-12">
-        <p class="mb-4">لا توجد بيانات معالجة للتحليل</p>
+        <p class="mb-4">{{ translate('gradebook.noProcessedData') }}</p>
         <button 
           (click)="viewMode = 'excelImport'"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-          استيراد ملف Excel أولاً
+          {{ translate('gradebook.importExcelFirst') }}
         </button>
       </div>
     </div>

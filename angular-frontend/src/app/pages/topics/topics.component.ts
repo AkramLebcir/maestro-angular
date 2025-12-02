@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 
 export interface TopicElement {
   id: number;
@@ -86,10 +87,17 @@ export class TopicsComponent implements OnInit {
     topicId: 0
   };
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.loadTopics();
+  }
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
   }
 
   loadTopics(): void {
@@ -166,7 +174,7 @@ export class TopicsComponent implements OnInit {
 
   saveTopic(): void {
     if (!this.topicFormData.title) {
-      alert('يرجى إدخال عنوان الموضوع');
+      alert(this.translate('topics.enterTitleError'));
       return;
     }
 
@@ -191,7 +199,7 @@ export class TopicsComponent implements OnInit {
                                ? error.error.error.join(', ') 
                                : error.error?.error) ||
                              error?.message || 
-                             'حدث خطأ أثناء تحديث الموضوع';
+                             this.translate('topics.updateError');
           alert(errorMessage);
         }
       });
@@ -208,7 +216,7 @@ export class TopicsComponent implements OnInit {
                                ? error.error.error.join(', ') 
                                : error.error?.error) ||
                              error?.message || 
-                             'حدث خطأ أثناء إضافة الموضوع';
+                             this.translate('topics.createError');
           alert(errorMessage);
         }
       });
@@ -216,14 +224,14 @@ export class TopicsComponent implements OnInit {
   }
 
   deleteTopic(id: number): void {
-    if (confirm('هل أنت متأكد من حذف هذا الموضوع؟ سيتم حذف جميع العناصر المرتبطة به.')) {
+    if (confirm(this.translate('topics.deleteConfirm'))) {
       this.apiService.delete(`/topics/${id}`).subscribe({
         next: () => {
           this.loadTopics();
         },
         error: (error) => {
           console.error('Error deleting topic:', error);
-          alert('حدث خطأ أثناء حذف الموضوع');
+          alert(this.translate('topics.deleteError'));
         }
       });
     }
@@ -258,7 +266,7 @@ export class TopicsComponent implements OnInit {
 
   saveTopicElement(): void {
     if (!this.topicElementFormData.content) {
-      alert('يرجى إدخال محتوى العنصر');
+      alert(this.translate('topics.enterElementContentError'));
       return;
     }
 
@@ -275,7 +283,7 @@ export class TopicsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating topic element:', error);
-          alert('حدث خطأ أثناء تحديث العنصر');
+          alert(this.translate('topics.updateElementError'));
         }
       });
     } else {
@@ -286,21 +294,21 @@ export class TopicsComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error creating topic element:', error);
-          alert('حدث خطأ أثناء إضافة العنصر');
+          alert(this.translate('topics.createElementError'));
         }
       });
     }
   }
 
   deleteTopicElement(topicId: number, elementId: number): void {
-    if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+    if (confirm(this.translate('topics.deleteElementConfirm'))) {
       this.apiService.delete(`/topics/${topicId}/elements/${elementId}`).subscribe({
         next: () => {
           this.loadTopicElements(topicId);
         },
         error: (error) => {
           console.error('Error deleting topic element:', error);
-          alert('حدث خطأ أثناء حذف العنصر');
+          alert(this.translate('topics.deleteElementError'));
         }
       });
     }
@@ -348,7 +356,9 @@ export class TopicsComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('ar-EG');
+    const lang = this.languageService.getCurrentLanguage();
+    const locale = lang === 'AR' ? 'ar-EG' : (lang === 'FR' ? 'fr-FR' : 'en-US');
+    return d.toLocaleDateString(locale);
   }
 }
 

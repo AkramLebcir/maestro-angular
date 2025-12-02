@@ -76,7 +76,7 @@
         <button 
           (click)="openStudentReport(student); $event.stopPropagation()"
           class="mt-2 w-full bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700 transition">
-          عرض التقرير
+          {{ translate('behavior.viewReport') }}
         </button>
 
         <!-- Warning Indicator -->
@@ -89,11 +89,11 @@
     </div>
 
     <div *ngIf="selectedClass && filteredStudents.length === 0" class="text-center text-gray-500 py-12">
-      لا يوجد تلاميذ في هذا القسم
+      {{ translate('behavior.noStudents') }}
     </div>
 
     <div *ngIf="!selectedClass" class="text-center text-gray-500 py-12">
-      يرجى اختيار قسم لعرض التلاميذ
+      {{ translate('behavior.selectClassToView') }}
     </div>
   </div>
 </div>
@@ -108,7 +108,7 @@
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-xl font-bold text-gray-800">
-        تسجيل سلوك - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
+        {{ translate('behavior.recordBehaviorTitle') }} - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
       </h3>
       <button 
         (click)="closeBehaviorModal()"
@@ -122,7 +122,7 @@
     <form #behaviorForm="ngForm" (ngSubmit)="saveBehaviorEvent()" class="space-y-4">
       <!-- Date -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">التاريخ *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('behavior.date') }} *</label>
         <input 
           type="date"
           [(ngModel)]="formData.date"
@@ -133,12 +133,12 @@
 
       <!-- Behavior Selection -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">اختر نوع السلوك *</label>
+        <label class="block text-sm font-medium text-gray-700 mb-2">{{ translate('behavior.addBehavior') }} *</label>
         
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <!-- Negative Behaviors (Left) -->
           <div>
-            <h4 class="text-sm font-semibold text-red-700 mb-2">السلوك السلبي</h4>
+            <h4 class="text-sm font-semibold text-red-700 mb-2">{{ translate('behavior.negative') }}</h4>
             <div class="space-y-2">
               <button 
                 *ngFor="let behavior of negativeBehaviors"
@@ -149,7 +149,7 @@
                   : 'bg-red-50 text-red-700 border border-red-200 hover:bg-red-100'"
                 class="w-full p-3 rounded-lg text-right flex items-center gap-2 transition">
                 <span class="text-xl">{{ behavior.icon }}</span>
-                <span class="flex-1">{{ behavior.nameAr }}</span>
+                <span class="flex-1">{{ getBehaviorName(behavior.id) }}</span>
                 <span *ngIf="formData.behaviorId === behavior.id" class="text-white">✓</span>
               </button>
             </div>
@@ -157,7 +157,7 @@
 
           <!-- Positive Behaviors (Right) -->
           <div>
-            <h4 class="text-sm font-semibold text-green-700 mb-2">السلوك الإيجابي</h4>
+            <h4 class="text-sm font-semibold text-green-700 mb-2">{{ translate('behavior.positive') }}</h4>
             <div class="space-y-2">
               <button 
                 *ngFor="let behavior of positiveBehaviors"
@@ -166,7 +166,7 @@
                 class="w-full p-3 rounded-lg text-right flex items-center gap-2 transition behavior-positive-card"
                 [class.behavior-positive-card--active]="formData.behaviorId === behavior.id">
                 <span class="text-xl">{{ behavior.icon }}</span>
-                <span class="flex-1">{{ behavior.nameAr }}</span>
+                <span class="flex-1">{{ getBehaviorName(behavior.id) }}</span>
                 <span *ngIf="formData.behaviorId === behavior.id" class="text-white">✓</span>
               </button>
             </div>
@@ -176,13 +176,13 @@
 
       <!-- Description -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">الوصف (اختياري)</label>
+        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('behavior.description') }} ({{ translate('common.optional') }})</label>
         <textarea 
           [(ngModel)]="formData.description"
           name="description"
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          placeholder="أدخل وصف إضافي للسلوك..."></textarea>
+          [placeholder]="translate('behavior.descriptionPlaceholder')"></textarea>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -190,13 +190,13 @@
           type="submit"
           [disabled]="!behaviorForm.valid || !formData.behaviorId"
           class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
-          حفظ
+          {{ translate('behavior.save') }}
         </button>
         <button 
           type="button"
           (click)="closeBehaviorModal()"
           class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('common.cancel') }}
         </button>
       </div>
     </form>
@@ -215,7 +215,7 @@
     <!-- Header (Fixed) -->
     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 flex-shrink-0">
       <h3 class="text-xl font-bold text-gray-800">
-        تقرير السلوك - {{ reportData.studentName }}
+        {{ translate('behavior.studentReportTitle') }} - {{ reportData.studentName }}
       </h3>
       <div class="flex gap-2">
         <button 
@@ -239,15 +239,15 @@
       <div class="grid grid-cols-3 gap-4 mb-6">
         <div class="rounded-lg p-4 text-center" [ngStyle]="{'background-color': '#f0fdf4', 'border': '1px solid #bbf7d0'}">
           <div class="text-2xl font-bold" [ngStyle]="{'color': '#15803d'}">{{ reportData.positiveCount }}</div>
-          <div class="text-sm" [ngStyle]="{'color': '#16a34a'}">سلوك إيجابي</div>
+          <div class="text-sm" [ngStyle]="{'color': '#16a34a'}">{{ translate('behavior.positive') }}</div>
         </div>
         <div class="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-red-700">{{ reportData.negativeCount }}</div>
-          <div class="text-sm text-red-600">سلوك سلبي</div>
+          <div class="text-sm text-red-600">{{ translate('behavior.negative') }}</div>
         </div>
         <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-green-700">{{ reportData.totalEvents }}</div>
-          <div class="text-sm text-green-600">إجمالي السجلات</div>
+          <div class="text-sm text-green-600">{{ translate('behavior.totalRecords') }}</div>
         </div>
       </div>
 
@@ -256,9 +256,11 @@
         <div class="flex items-center gap-2">
           <span class="text-2xl">⚠️</span>
           <div>
-            <div class="font-semibold text-red-800">تحذير: تجاوز الحد المسموح</div>
+            <div class="font-semibold text-red-800">{{ translate('behavior.warningTitle') }}</div>
             <div class="text-sm text-red-700">
-              عدد السلوكيات السلبية ({{ reportData.negativeCount }}) تجاوز الحد المسموح ({{ warningThreshold }})
+              {{ translate('behavior.warningBody')
+                .replace('{{negativeCount}}', reportData.negativeCount.toString())
+                .replace('{{threshold}}', warningThreshold.toString()) }}
             </div>
           </div>
         </div>
@@ -280,7 +282,7 @@
               <span 
                 [class]="getBehaviorType(event.behaviorId) === 'positive' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
                 class="px-2 py-0.5 rounded text-xs">
-                {{ getBehaviorType(event.behaviorId) === 'positive' ? 'إيجابي' : 'سلبي' }}
+                {{ getBehaviorType(event.behaviorId) === 'positive' ? translate('behavior.positive') : translate('behavior.negative') }}
               </span>
             </div>
             <div class="text-sm text-gray-600 mb-1">{{ formatDateTime(event.date) }}</div>
@@ -296,7 +298,7 @@
         </div>
       </div>
       <div *ngIf="reportData.events.length === 0" class="text-center text-gray-400 py-8">
-        لا توجد سجلات سلوك
+        {{ translate('behavior.noEvents') }}
       </div>
       </div>
     </div>
@@ -315,13 +317,13 @@
     <!-- Header (Fixed) -->
     <div class="flex justify-between items-center p-6 pb-4 border-b border-gray-200 flex-shrink-0">
       <h3 class="text-xl font-bold text-gray-800">
-        تقرير السلوك - {{ selectedClass.name }}
+        {{ translate('behavior.classReportTitle') }} - {{ selectedClass.name }}
       </h3>
       <div class="flex gap-2">
         <button 
           (click)="exportClassReportToPDF()"
           class="btn-export-pdf bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition">
-          تصدير PDF
+          {{ translate('behavior.exportPdf') }}
         </button>
         <button 
           (click)="closeClassReportModal()"
@@ -338,12 +340,12 @@
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">اسم التلميذ</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">السلوك الإيجابي</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">السلوك السلبي</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجمالي</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الحالة</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">الإجراءات</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.studentName') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.positiveCount') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.negativeCount') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.total') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.status') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('behavior.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -359,12 +361,12 @@
               <span 
                 *ngIf="report.negativeCount >= warningThreshold"
                 class="px-2 py-1 bg-red-100 text-red-800 rounded text-sm font-semibold">
-                ⚠️ تحذير
+                ⚠️ {{ translate('behavior.statusWarning') }}
               </span>
               <span 
                 *ngIf="report.negativeCount < warningThreshold"
                 class="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">
-                طبيعي
+                {{ translate('behavior.statusNormal') }}
               </span>
             </td>
             <td class="py-3 px-4">
@@ -372,12 +374,12 @@
                 *ngIf="getStudentById(report.studentId)"
                 (click)="openStudentReport(getStudentById(report.studentId)!)"
                 class="text-green-600 hover:text-green-800 text-sm">
-                عرض التفاصيل
+                {{ translate('behavior.viewDetails') }}
               </button>
             </td>
           </tr>
           <tr *ngIf="getClassReportData().length === 0">
-            <td colspan="6" class="py-8 text-center text-gray-500">لا توجد بيانات</td>
+            <td colspan="6" class="py-8 text-center text-gray-500">{{ translate('behavior.noData') }}</td>
           </tr>
         </tbody>
       </table>

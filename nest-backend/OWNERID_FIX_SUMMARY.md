@@ -51,3 +51,4 @@ async create(@CurrentUser() user: AuthUser, @Body() dto: CreateDto) {
 - جميع الاستعلامات يجب أن تعزل البيانات بـ ownerId
 
 
+

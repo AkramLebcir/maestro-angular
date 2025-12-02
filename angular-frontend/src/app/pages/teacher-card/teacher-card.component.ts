@@ -2,6 +2,7 @@ import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { AuthService } from '../../services/auth.service';
+import { LanguageService } from '../../services/language.service';
 
 interface TeacherCardForm {
   // معلومات أعلى الصفحة
@@ -138,7 +139,14 @@ export class TeacherCardComponent implements OnInit {
   isSaved = false;
   @ViewChild('printCard') printCardRef!: ElementRef<HTMLDivElement>;
 
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    public languageService: LanguageService
+  ) {}
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
+  }
 
   ngOnInit(): void {
     this.loadCard();

@@ -315,15 +315,6 @@ export class LanguageService {
         'DE': 'Speichern',
         'TR': 'Kaydet'
       },
-      'common.cancel': {
-        'AR': 'إلغاء',
-        'FR': 'Annuler',
-        'EN': 'Cancel',
-        'ES': 'Cancelar',
-        'IT': 'Annulla',
-        'DE': 'Abbrechen',
-        'TR': 'İptal'
-      },
       'common.delete': {
         'AR': 'حذف',
         'FR': 'Supprimer',
@@ -1521,6 +1512,393 @@ export class LanguageService {
         'IT': 'Si prega di selezionare un file Excel contenente colonne: nome studente e voto',
         'DE': 'Bitte wählen Sie eine Excel-Datei mit Spalten: Schülername und Note',
         'TR': 'Lütfen sütunlar içeren bir Excel dosyası seçin: öğrenci adı ve not'
+      },
+      'gradebook.enhancedImport': {
+        'AR': 'استيراد محسّن',
+        'FR': 'Import amélioré',
+        'EN': 'Enhanced import',
+        'ES': 'Importación mejorada',
+        'IT': 'Importazione migliorata',
+        'DE': 'Verbesserter Import',
+        'TR': 'Geliştirilmiş içe aktarma'
+      },
+      'gradebook.excelAnalysis': {
+        'AR': 'تحليل بيانات Excel',
+        'FR': 'Analyse des données Excel',
+        'EN': 'Excel data analysis',
+        'ES': 'Análisis de datos Excel',
+        'IT': 'Analisi dati Excel',
+        'DE': 'Excel-Datenanalyse',
+        'TR': 'Excel veri analizi'
+      },
+      'gradebook.idNumberOrCode': {
+        'AR': 'رقم الهوية أو الكود',
+        'FR': 'Numéro d\'identité ou code',
+        'EN': 'ID number or code',
+        'ES': 'Número de identificación o código',
+        'IT': 'Numero identificativo o codice',
+        'DE': 'Ausweisnummer oder Code',
+        'TR': 'Kimlik numarası veya kod'
+      },
+      'gradebook.firstName': {
+        'AR': 'الاسم',
+        'FR': 'Prénom',
+        'EN': 'First name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Vorname',
+        'TR': 'Ad'
+      },
+      'gradebook.lastName': {
+        'AR': 'اللقب',
+        'FR': 'Nom',
+        'EN': 'Last name',
+        'ES': 'Apellido',
+        'IT': 'Cognome',
+        'DE': 'Nachname',
+        'TR': 'Soyad'
+      },
+      'gradebook.birthDate': {
+        'AR': 'تاريخ الميلاد',
+        'FR': 'Date de naissance',
+        'EN': 'Birth date',
+        'ES': 'Fecha de nacimiento',
+        'IT': 'Data di nascita',
+        'DE': 'Geburtsdatum',
+        'TR': 'Doğum tarihi'
+      },
+      'gradebook.homework': {
+        'AR': 'الواجب',
+        'FR': 'Devoir',
+        'EN': 'Homework',
+        'ES': 'Tarea',
+        'IT': 'Compiti',
+        'DE': 'Hausaufgaben',
+        'TR': 'Ödev'
+      },
+      'gradebook.attendance5': {
+        'AR': 'الحضور (5)',
+        'FR': 'Présence (5)',
+        'EN': 'Attendance (5)',
+        'ES': 'Asistencia (5)',
+        'IT': 'Presenze (5)',
+        'DE': 'Anwesenheit (5)',
+        'TR': 'Yoklama (5)'
+      },
+      'gradebook.behavior5': {
+        'AR': 'السلوك (5)',
+        'FR': 'Comportement (5)',
+        'EN': 'Behavior (5)',
+        'ES': 'Comportamiento (5)',
+        'IT': 'Comportamento (5)',
+        'DE': 'Verhalten (5)',
+        'TR': 'Davranış (5)'
+      },
+      'gradebook.continuousAssessment': {
+        'AR': 'التقييم المستمر',
+        'FR': 'Évaluation continue',
+        'EN': 'Continuous assessment',
+        'ES': 'Evaluación continua',
+        'IT': 'Valutazione continua',
+        'DE': 'Kontinuierliche Bewertung',
+        'TR': 'Sürekli değerlendirme'
+      },
+      'gradebook.oralExpression': {
+        'AR': 'التعبير الشفهي/العمل العملي',
+        'FR': 'Expression orale/Travail pratique',
+        'EN': 'Oral expression/Practical work',
+        'ES': 'Expresión oral/Trabajo práctico',
+        'IT': 'Espressione orale/Lavoro pratico',
+        'DE': 'Mündlicher Ausdruck/Praktische Arbeit',
+        'TR': 'Sözlü ifade/Pratik çalışma'
+      },
+      'gradebook.assignment': {
+        'AR': 'الفرض',
+        'FR': 'Devoir surveillé',
+        'EN': 'Assignment',
+        'ES': 'Tarea',
+        'IT': 'Compito in classe',
+        'DE': 'Klassenarbeit',
+        'TR': 'Sınav'
+      },
+      'gradebook.test': {
+        'AR': 'الاختبار',
+        'FR': 'Test',
+        'EN': 'Test',
+        'ES': 'Examen',
+        'IT': 'Test',
+        'DE': 'Test',
+        'TR': 'Test'
+      },
+      'gradebook.termAverage': {
+        'AR': 'معدل الفصل',
+        'FR': 'Moyenne du trimestre',
+        'EN': 'Term average',
+        'ES': 'Promedio del trimestre',
+        'IT': 'Media del trimestre',
+        'DE': 'Durchschnitt des Trimesters',
+        'TR': 'Dönem ortalaması'
+      },
+      'gradebook.ratings': {
+        'AR': 'التقديرات',
+        'FR': 'Appréciations',
+        'EN': 'Ratings',
+        'ES': 'Calificaciones',
+        'IT': 'Valutazioni',
+        'DE': 'Bewertungen',
+        'TR': 'Değerlendirmeler'
+      },
+      'gradebook.guidance': {
+        'AR': 'الإرشادات',
+        'FR': 'Conseils',
+        'EN': 'Guidance',
+        'ES': 'Orientación',
+        'IT': 'Consigli',
+        'DE': 'Beratung',
+        'TR': 'Rehberlik'
+      },
+      'gradebook.ranking': {
+        'AR': 'الترتيب',
+        'FR': 'Classement',
+        'EN': 'Ranking',
+        'ES': 'Clasificación',
+        'IT': 'Classifica',
+        'DE': 'Rangfolge',
+        'TR': 'Sıralama'
+      },
+      'gradebook.studentsWithAverage10InTerm': {
+        'AR': 'عدد التلاميذ بمعدل ≥ 10 (في الفصل المحدد):',
+        'FR': 'Nombre d\'élèves avec moyenne ≥ 10 (dans le trimestre sélectionné):',
+        'EN': 'Students with average ≥ 10 (in selected term):',
+        'ES': 'Estudiantes con promedio ≥ 10 (en el trimestre seleccionado):',
+        'IT': 'Studenti con media ≥ 10 (nel trimestre selezionato):',
+        'DE': 'Schüler mit Durchschnitt ≥ 10 (im ausgewählten Trimester):',
+        'TR': 'Ortalaması ≥ 10 olan öğrenciler (seçilen dönemde):'
+      },
+      'gradebook.studentsWithAverageBelow10InTerm': {
+        'AR': 'عدد التلاميذ بمعدل < 10 (في الفصل المحدد):',
+        'FR': 'Nombre d\'élèves avec moyenne < 10 (dans le trimestre sélectionné):',
+        'EN': 'Students with average < 10 (in selected term):',
+        'ES': 'Estudiantes con promedio < 10 (en el trimestre seleccionado):',
+        'IT': 'Studenti con media < 10 (nel trimestre selezionato):',
+        'DE': 'Schüler mit Durchschnitt < 10 (im ausgewählten Trimester):',
+        'TR': 'Ortalaması < 10 olan öğrenciler (seçilen dönemde):'
+      },
+      'gradebook.classResults': {
+        'AR': 'نتائج الفصل',
+        'FR': 'Résultats de la classe',
+        'EN': 'Class results',
+        'ES': 'Resultados de la clase',
+        'IT': 'Risultati della classe',
+        'DE': 'Klassenergebnisse',
+        'TR': 'Sınıf sonuçları'
+      },
+      'gradebook.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'gradebook.dataAnalysis': {
+        'AR': 'تحليل البيانات',
+        'FR': 'Analyse des données',
+        'EN': 'Data analysis',
+        'ES': 'Análisis de datos',
+        'IT': 'Analisi dati',
+        'DE': 'Datenanalyse',
+        'TR': 'Veri analizi'
+      },
+      'gradebook.comprehensiveAnalysis': {
+        'AR': 'تحليل شامل لنتائج التلاميذ من خلال الرسوم البيانية',
+        'FR': 'Analyse complète des résultats des élèves à travers des graphiques',
+        'EN': 'Comprehensive analysis of student results through charts',
+        'ES': 'Análisis completo de los resultados de los estudiantes a través de gráficos',
+        'IT': 'Analisi completa dei risultati degli studenti attraverso grafici',
+        'DE': 'Umfassende Analyse der Schülerergebnisse durch Diagramme',
+        'TR': 'Grafikler aracılığıyla öğrenci sonuçlarının kapsamlı analizi'
+      },
+      'gradebook.gradeDistributionByRange': {
+        'AR': 'توزيع الدرجات حسب النطاقات',
+        'FR': 'Répartition des notes par plages',
+        'EN': 'Grade distribution by ranges',
+        'ES': 'Distribución de calificaciones por rangos',
+        'IT': 'Distribuzione voti per intervalli',
+        'DE': 'Notenverteilung nach Bereichen',
+        'TR': 'Aralıklara göre not dağılımı'
+      },
+      'gradebook.studentDistributionByCategory': {
+        'AR': 'توزيع التلاميذ حسب الفئات',
+        'FR': 'Répartition des élèves par catégories',
+        'EN': 'Student distribution by categories',
+        'ES': 'Distribución de estudiantes por categorías',
+        'IT': 'Distribuzione studenti per categorie',
+        'DE': 'Schülerverteilung nach Kategorien',
+        'TR': 'Kategorilere göre öğrenci dağılımı'
+      },
+      'gradebook.comparisonByGender': {
+        'AR': 'مقارنة النتائج حسب الجنس',
+        'FR': 'Comparaison des résultats par sexe',
+        'EN': 'Comparison of results by gender',
+        'ES': 'Comparación de resultados por género',
+        'IT': 'Confronto risultati per genere',
+        'DE': 'Vergleich der Ergebnisse nach Geschlecht',
+        'TR': 'Cinsiyete göre sonuç karşılaştırması'
+      },
+      'gradebook.comparisonByTerm': {
+        'AR': 'مقارنة معدلات الفصول الدراسية',
+        'FR': 'Comparaison des moyennes des trimestres',
+        'EN': 'Comparison of term averages',
+        'ES': 'Comparación de promedios de trimestres',
+        'IT': 'Confronto medie trimestri',
+        'DE': 'Vergleich der Trimestermittelwerte',
+        'TR': 'Dönem ortalamalarının karşılaştırması'
+      },
+      'gradebook.studentPerformanceByType': {
+        'AR': 'أداء التلاميذ حسب نوع التقييم',
+        'FR': 'Performance des élèves par type d\'évaluation',
+        'EN': 'Student performance by assessment type',
+        'ES': 'Rendimiento de estudiantes por tipo de evaluación',
+        'IT': 'Prestazioni studenti per tipo di valutazione',
+        'DE': 'Schülerleistung nach Bewertungstyp',
+        'TR': 'Değerlendirme türüne göre öğrenci performansı'
+      },
+      'gradebook.totalStudents': {
+        'AR': 'إجمالي التلاميذ',
+        'FR': 'Total des élèves',
+        'EN': 'Total students',
+        'ES': 'Total de estudiantes',
+        'IT': 'Totale studenti',
+        'DE': 'Gesamtzahl der Schüler',
+        'TR': 'Toplam öğrenci'
+      },
+      'gradebook.excelImportWithAutoNotes': {
+        'AR': 'استيراد ملف Excel مع توليد الملاحظات والإرشادات تلقائياً',
+        'FR': 'Importer un fichier Excel avec génération automatique des notes et conseils',
+        'EN': 'Import Excel file with automatic generation of notes and guidance',
+        'ES': 'Importar archivo Excel con generación automática de notas y orientación',
+        'IT': 'Importa file Excel con generazione automatica di note e consigli',
+        'DE': 'Excel-Datei importieren mit automatischer Generierung von Notizen und Beratung',
+        'TR': 'Notlar ve rehberliğin otomatik oluşturulmasıyla Excel dosyası içe aktar'
+      },
+      'gradebook.excelImportDescription': {
+        'AR': 'قم باستيراد ملف Excel لعلامات التلاميذ وسيتم إضافة الملاحظات (obs) والإرشادات (cons) تلقائياً بناءً على المعدل',
+        'FR': 'Importez un fichier Excel des notes des élèves et les notes (obs) et conseils (cons) seront ajoutés automatiquement en fonction de la moyenne',
+        'EN': 'Import an Excel file of student grades and notes (obs) and guidance (cons) will be added automatically based on the average',
+        'ES': 'Importe un archivo Excel de calificaciones de estudiantes y las notas (obs) y orientación (cons) se agregarán automáticamente según el promedio',
+        'IT': 'Importa un file Excel dei voti degli studenti e le note (obs) e i consigli (cons) verranno aggiunti automaticamente in base alla media',
+        'DE': 'Importieren Sie eine Excel-Datei mit Schülernoten und Notizen (obs) und Beratung (cons) werden automatisch basierend auf dem Durchschnitt hinzugefügt',
+        'TR': 'Öğrenci notlarının bir Excel dosyasını içe aktarın ve notlar (obs) ve rehberlik (cons) ortalamaya göre otomatik olarak eklenecektir'
+      },
+      'gradebook.processedDataPreview': {
+        'AR': 'معاينة البيانات المعالجة',
+        'FR': 'Aperçu des données traitées',
+        'EN': 'Processed data preview',
+        'ES': 'Vista previa de datos procesados',
+        'IT': 'Anteprima dati elaborati',
+        'DE': 'Vorschau der verarbeiteten Daten',
+        'TR': 'İşlenmiş veri önizleme'
+      },
+      'gradebook.downloadProcessedFile': {
+        'AR': 'تحميل الملف المعالج',
+        'FR': 'Télécharger le fichier traité',
+        'EN': 'Download processed file',
+        'ES': 'Descargar archivo procesado',
+        'IT': 'Scarica file elaborato',
+        'DE': 'Verarbeitete Datei herunterladen',
+        'TR': 'İşlenmiş dosyayı indir'
+      },
+      'gradebook.processedSheetsCount': {
+        'AR': 'عدد الصفحات المعالجة:',
+        'FR': 'Nombre de feuilles traitées:',
+        'EN': 'Processed sheets count:',
+        'ES': 'Número de hojas procesadas:',
+        'IT': 'Numero di fogli elaborati:',
+        'DE': 'Anzahl der verarbeiteten Blätter:',
+        'TR': 'İşlenmiş sayfa sayısı:'
+      },
+      'gradebook.sheet': {
+        'AR': 'الصفحة',
+        'FR': 'Feuille',
+        'EN': 'Sheet',
+        'ES': 'Hoja',
+        'IT': 'Foglio',
+        'DE': 'Blatt',
+        'TR': 'Sayfa'
+      },
+      'gradebook.notes': {
+        'AR': 'الملاحظات (obs)',
+        'FR': 'Notes (obs)',
+        'EN': 'Notes (obs)',
+        'ES': 'Notas (obs)',
+        'IT': 'Note (obs)',
+        'DE': 'Notizen (obs)',
+        'TR': 'Notlar (obs)'
+      },
+      'gradebook.guidanceCons': {
+        'AR': 'الإرشادات (cons)',
+        'FR': 'Conseils (cons)',
+        'EN': 'Guidance (cons)',
+        'ES': 'Orientación (cons)',
+        'IT': 'Consigli (cons)',
+        'DE': 'Beratung (cons)',
+        'TR': 'Rehberlik (cons)'
+      },
+      'gradebook.excelAnalysisTitle': {
+        'AR': 'تحليل بيانات Excel',
+        'FR': 'Analyse des données Excel',
+        'EN': 'Excel data analysis',
+        'ES': 'Análisis de datos Excel',
+        'IT': 'Analisi dati Excel',
+        'DE': 'Excel-Datenanalyse',
+        'TR': 'Excel veri analizi'
+      },
+      'gradebook.detailedChartsPerSheet': {
+        'AR': 'مخططات بيانية مفصلة لكل صفحة (قسم) في ملف Excel',
+        'FR': 'Graphiques détaillés pour chaque feuille (classe) dans le fichier Excel',
+        'EN': 'Detailed charts for each sheet (class) in the Excel file',
+        'ES': 'Gráficos detallados para cada hoja (clase) en el archivo Excel',
+        'IT': 'Grafici dettagliati per ogni foglio (classe) nel file Excel',
+        'DE': 'Detaillierte Diagramme für jedes Blatt (Klasse) in der Excel-Datei',
+        'TR': 'Excel dosyasındaki her sayfa (sınıf) için detaylı grafikler'
+      },
+      'gradebook.sheetAverage': {
+        'AR': 'معدل الصفحة',
+        'FR': 'Moyenne de la feuille',
+        'EN': 'Sheet average',
+        'ES': 'Promedio de la hoja',
+        'IT': 'Media del foglio',
+        'DE': 'Blattdurchschnitt',
+        'TR': 'Sayfa ortalaması'
+      },
+      'gradebook.distributionByCategory': {
+        'AR': 'توزيع حسب الفئات',
+        'FR': 'Répartition par catégories',
+        'EN': 'Distribution by categories',
+        'ES': 'Distribución por categorías',
+        'IT': 'Distribuzione per categorie',
+        'DE': 'Verteilung nach Kategorien',
+        'TR': 'Kategorilere göre dağılım'
+      },
+      'gradebook.noProcessedData': {
+        'AR': 'لا توجد بيانات معالجة للتحليل',
+        'FR': 'Aucune donnée traitée pour l\'analyse',
+        'EN': 'No processed data for analysis',
+        'ES': 'No hay datos procesados para análisis',
+        'IT': 'Nessun dato elaborato per l\'analisi',
+        'DE': 'Keine verarbeiteten Daten für die Analyse',
+        'TR': 'Analiz için işlenmiş veri yok'
+      },
+      'gradebook.importExcelFirst': {
+        'AR': 'استيراد ملف Excel أولاً',
+        'FR': 'Importer d\'abord un fichier Excel',
+        'EN': 'Import Excel file first',
+        'ES': 'Importar archivo Excel primero',
+        'IT': 'Importa prima il file Excel',
+        'DE': 'Zuerst Excel-Datei importieren',
+        'TR': 'Önce Excel dosyasını içe aktar'
       },
 
       // Reports
@@ -3721,6 +4099,105 @@ export class LanguageService {
         'DE': 'Speichern',
         'TR': 'Kaydet'
       },
+      'common.unknown': {
+        'AR': 'غير معروف',
+        'FR': 'Inconnu',
+        'EN': 'Unknown',
+        'ES': 'Desconocido',
+        'IT': 'Sconosciuto',
+        'DE': 'Unbekannt',
+        'TR': 'Bilinmiyor'
+      },
+      'common.optional': {
+        'AR': 'اختياري',
+        'FR': 'Optionnel',
+        'EN': 'Optional',
+        'ES': 'Opcional',
+        'IT': 'Opzionale',
+        'DE': 'Optional',
+        'TR': 'İsteğe bağlı'
+      },
+      'common.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'attendance.errorUpdate': {
+        'AR': 'حدث خطأ أثناء تحديث الحضور',
+        'FR': 'Une erreur s\'est produite lors de la mise à jour de la présence',
+        'EN': 'An error occurred while updating attendance',
+        'ES': 'Se produjo un error al actualizar la asistencia',
+        'IT': 'Si è verificato un errore durante l\'aggiornamento delle presenze',
+        'DE': 'Beim Aktualisieren der Anwesenheit ist ein Fehler aufgetreten',
+        'TR': 'Yoklama güncellenirken bir hata oluştu'
+      },
+      'attendance.errorCreate': {
+        'AR': 'حدث خطأ أثناء تسجيل الحضور',
+        'FR': 'Une erreur s\'est produite lors de l\'enregistrement de la présence',
+        'EN': 'An error occurred while saving attendance',
+        'ES': 'Se produjo un error al registrar la asistencia',
+        'IT': 'Si è verificato un errore durante il salvataggio delle presenze',
+        'DE': 'Beim Speichern der Anwesenheit ist ein Fehler aufgetreten',
+        'TR': 'Yoklama kaydedilirken bir hata oluştu'
+      },
+      'attendance.selectClassAndStudents': {
+        'AR': 'يرجى اختيار قسم وتحميل التلاميذ',
+        'FR': 'Veuillez sélectionner une classe et charger les élèves',
+        'EN': 'Please select a class and load students',
+        'ES': 'Seleccione una clase y cargue los estudiantes',
+        'IT': 'Seleziona una classe e carica gli studenti',
+        'DE': 'Bitte wählen Sie eine Klasse und laden Sie die Schüler',
+        'TR': 'Lütfen bir sınıf seçin ve öğrencileri yükleyin'
+      },
+      'attendance.confirmRecordWeek': {
+        'AR': 'هل تريد تسجيل الحضور لجميع أيام الأسبوع للتلاميذ المحددين؟',
+        'FR': 'Voulez-vous enregistrer la présence pour tous les jours de la semaine pour les élèves sélectionnés ?',
+        'EN': 'Do you want to record attendance for all days of the week for the selected students?',
+        'ES': '¿Desea registrar la asistencia para todos los días de la semana para los estudiantes seleccionados?',
+        'IT': 'Vuoi registrare la presenza per tutti i giorni della settimana per gli studenti selezionati?',
+        'DE': 'Möchten Sie die Anwesenheit für alle Wochentage für die ausgewählten Schüler erfassen?',
+        'TR': 'Seçilen öğrenciler için haftanın tüm günleri için yoklama kaydetmek istiyor musunuz?'
+      },
+      'attendance.weekRecorded': {
+        'AR': 'تم تسجيل الحضور للأسبوع بنجاح',
+        'FR': 'La présence pour la semaine a été enregistrée avec succès',
+        'EN': 'Week attendance has been recorded successfully',
+        'ES': 'La asistencia de la semana se ha registrado correctamente',
+        'IT': 'La presenza per la settimana è stata registrata con successo',
+        'DE': 'Die Anwesenheit für die Woche wurde erfolgreich erfasst',
+        'TR': 'Haftalık yoklama başarıyla kaydedildi'
+      },
+      'attendance.exportOnlyAbsences': {
+        'AR': 'تصدير PDF متاح فقط لتقرير الغيابات',
+        'FR': 'L\'export PDF est disponible uniquement pour le rapport des absences',
+        'EN': 'PDF export is only available for the absences report',
+        'ES': 'La exportación en PDF solo está disponible para el informe de ausencias',
+        'IT': 'L\'esportazione PDF è disponibile solo per il rapporto delle assenze',
+        'DE': 'PDF-Export ist nur für den Abwesenheitsbericht verfügbar',
+        'TR': 'PDF dışa aktarma yalnızca devamsızlık raporu için kullanılabilir'
+      },
+      'attendance.reportTableNotFound': {
+        'AR': 'لا يمكن العثور على جدول التقرير. يرجى التأكد من فتح تقرير الغيابات',
+        'FR': 'Impossible de trouver le tableau du rapport. Veuillez vérifier que le rapport des absences est ouvert',
+        'EN': 'Cannot find the report table. Please make sure the absences report is open',
+        'ES': 'No se puede encontrar la tabla del informe. Asegúrese de que el informe de ausencias esté abierto',
+        'IT': 'Impossibile trovare la tabella del rapporto. Assicurati che il rapporto delle assenze sia aperto',
+        'DE': 'Der Berichtstisch kann nicht gefunden werden. Bitte stellen Sie sicher, dass der Abwesenheitsbericht geöffnet ist',
+        'TR': 'Rapor tablosu bulunamıyor. Lütfen devamsızlık raporunun açık olduğundan emin olun'
+      },
+      'attendance.errorExportPdf': {
+        'AR': 'حدث خطأ أثناء تصدير التقرير إلى PDF',
+        'FR': 'Une erreur s\'est produite lors de l\'exportation du rapport en PDF',
+        'EN': 'An error occurred while exporting the report to PDF',
+        'ES': 'Se produjo un error al exportar el informe a PDF',
+        'IT': 'Si è verificato un errore durante l\'esportazione del rapporto in PDF',
+        'DE': 'Beim Exportieren des Berichts in PDF ist ein Fehler aufgetreten',
+        'TR': 'Rapor PDF\'e aktarılırken bir hata oluştu'
+      },
 
       // Behavior
       'behavior.title': {
@@ -3794,6 +4271,285 @@ export class LanguageService {
         'IT': 'Descrizione',
         'DE': 'Beschreibung',
         'TR': 'Açıklama'
+      },
+      'behavior.descriptionPlaceholder': {
+        'AR': 'أدخل وصفًا إضافيًا للسلوك...',
+        'FR': 'Saisissez une description supplémentaire du comportement...',
+        'EN': 'Enter additional description for the behavior...',
+        'ES': 'Introduzca una descripción adicional del comportamiento...',
+        'IT': 'Inserisci una descrizione aggiuntiva del comportamento...',
+        'DE': 'Geben Sie eine zusätzliche Beschreibung des Verhaltens ein...',
+        'TR': 'Davranış için ek bir açıklama girin...'
+      },
+      'behavior.selectTypeRequired': {
+        'AR': 'يرجى اختيار نوع السلوك',
+        'FR': 'Veuillez sélectionner un type de comportement',
+        'EN': 'Please select a behavior type',
+        'ES': 'Seleccione un tipo de comportamiento',
+        'IT': 'Seleziona un tipo di comportamento',
+        'DE': 'Bitte wählen Sie eine Verhaltensart aus',
+        'TR': 'Lütfen bir davranış türü seçin'
+      },
+      'behavior.errorSave': {
+        'AR': 'حدث خطأ أثناء حفظ السلوك',
+        'FR': 'Une erreur s\'est produite lors de l\'enregistrement du comportement',
+        'EN': 'An error occurred while saving the behavior',
+        'ES': 'Se produjo un error al guardar el comportamiento',
+        'IT': 'Si è verificato un errore durante il salvataggio del comportamento',
+        'DE': 'Beim Speichern des Verhaltens ist ein Fehler aufgetreten',
+        'TR': 'Davranış kaydedilirken bir hata oluştu'
+      },
+      'behavior.confirmDelete': {
+        'AR': 'هل أنت متأكد من حذف هذا السجل؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer cet enregistrement ?',
+        'EN': 'Are you sure you want to delete this record?',
+        'ES': '¿Está seguro de que desea eliminar este registro?',
+        'IT': 'Sei sicuro di voler eliminare questo record?',
+        'DE': 'Möchten Sie diesen Eintrag wirklich löschen?',
+        'TR': 'Bu kaydı silmek istediğinizden emin misiniz?'
+      },
+      'behavior.errorDelete': {
+        'AR': 'حدث خطأ أثناء حذف السجل',
+        'FR': 'Une erreur s\'est produite lors de la suppression de l\'enregistrement',
+        'EN': 'An error occurred while deleting the record',
+        'ES': 'Se produjo un error al eliminar el registro',
+        'IT': 'Si è verificato un errore durante l\'eliminazione del record',
+        'DE': 'Beim Löschen des Eintrags ist ein Fehler aufgetreten',
+        'TR': 'Kayıt silinirken bir hata oluştu'
+      },
+      'behavior.warningExceeded': {
+        'AR': '⚠️ تحذير: التلميذ {{studentName}} لديه {{negativeCount}} سلوك سلبي. تم تجاوز الحد المسموح ({{threshold}}).',
+        'FR': '⚠️ Avertissement : l\'élève {{studentName}} a {{negativeCount}} comportements négatifs. Le seuil autorisé ({{threshold}}) a été dépassé.',
+        'EN': '⚠️ Warning: student {{studentName}} has {{negativeCount}} negative behaviors. The allowed threshold ({{threshold}}) has been exceeded.',
+        'ES': '⚠️ Aviso: el estudiante {{studentName}} tiene {{negativeCount}} comportamientos negativos. Se ha superado el umbral permitido ({{threshold}}).',
+        'IT': '⚠️ Avviso: lo studente {{studentName}} ha {{negativeCount}} comportamenti negativi. È stata superata la soglia consentita ({{threshold}}).',
+        'DE': '⚠️ Warnung: Schüler {{studentName}} hat {{negativeCount}} negative Verhaltensweisen. Der erlaubte Schwellenwert ({{threshold}}) wurde überschritten.',
+        'TR': '⚠️ Uyarı: {{studentName}} öğrencisinin {{negativeCount}} olumsuz davranışı var. İzin verilen eşik ({{threshold}}) aşıldı.'
+      },
+      'behavior.selectClassFirst': {
+        'AR': 'يرجى اختيار قسم أولاً',
+        'FR': 'Veuillez d\'abord sélectionner une classe',
+        'EN': 'Please select a class first',
+        'ES': 'Seleccione primero una clase',
+        'IT': 'Seleziona prima una classe',
+        'DE': 'Bitte wählen Sie zuerst eine Klasse aus',
+        'TR': 'Lütfen önce bir sınıf seçin'
+      },
+      'behavior.noDataToExport': {
+        'AR': 'لا توجد بيانات للتصدير',
+        'FR': 'Aucune donnée à exporter',
+        'EN': 'No data to export',
+        'ES': 'No hay datos para exportar',
+        'IT': 'Nessun dato da esportare',
+        'DE': 'Keine Daten zum Exportieren',
+        'TR': 'Dışa aktarılacak veri yok'
+      },
+      'behavior.studentReportTitle': {
+        'AR': 'تقرير السلوك (تلميذ)',
+        'FR': 'Rapport de comportement (élève)',
+        'EN': 'Behavior report (student)',
+        'ES': 'Informe de comportamiento (estudiante)',
+        'IT': 'Rapporto di comportamento (studente)',
+        'DE': 'Verhaltensbericht (Schüler)',
+        'TR': 'Davranış raporu (öğrenci)'
+      },
+      'behavior.classReportTitle': {
+        'AR': 'تقرير السلوك (القسم)',
+        'FR': 'Rapport de comportement (classe)',
+        'EN': 'Behavior report (class)',
+        'ES': 'Informe de comportamiento (clase)',
+        'IT': 'Rapporto di comportamento (classe)',
+        'DE': 'Verhaltensbericht (Klasse)',
+        'TR': 'Davranış raporu (sınıf)'
+      },
+      'behavior.errorExportPdf': {
+        'AR': 'حدث خطأ أثناء تصدير PDF',
+        'FR': 'Une erreur s\'est produite lors de l\'exportation en PDF',
+        'EN': 'An error occurred while exporting PDF',
+        'ES': 'Se produjo un error al exportar a PDF',
+        'IT': 'Si è verificato un errore durante l\'esportazione in PDF',
+        'DE': 'Beim Exportieren in PDF ist ein Fehler aufgetreten',
+        'TR': 'PDF dışa aktarılırken bir hata oluştu'
+      },
+      'behavior.totalRecords': {
+        'AR': 'إجمالي السجلات',
+        'FR': 'Nombre total d\'enregistrements',
+        'EN': 'Total records',
+        'ES': 'Registros totales',
+        'IT': 'Record totali',
+        'DE': 'Gesamtanzahl der Einträge',
+        'TR': 'Toplam kayıt'
+      },
+      'behavior.warningTitle': {
+        'AR': 'تحذير: تجاوز الحد المسموح',
+        'FR': 'Avertissement : seuil dépassé',
+        'EN': 'Warning: threshold exceeded',
+        'ES': 'Aviso: umbral superado',
+        'IT': 'Avviso: soglia superata',
+        'DE': 'Warnung: Schwellenwert überschritten',
+        'TR': 'Uyarı: eşik aşıldı'
+      },
+      'behavior.warningBody': {
+        'AR': 'عدد السلوكيات السلبية ({{negativeCount}}) تجاوز الحد المسموح ({{threshold}})',
+        'FR': 'Le nombre de comportements négatifs ({{negativeCount}}) a dépassé le seuil autorisé ({{threshold}})',
+        'EN': 'The number of negative behaviors ({{negativeCount}}) has exceeded the allowed threshold ({{threshold}})',
+        'ES': 'El número de comportamientos negativos ({{negativeCount}}) ha superado el umbral permitido ({{threshold}})',
+        'IT': 'Il numero di comportamenti negativi ({{negativeCount}}) ha superato la soglia consentita ({{threshold}})',
+        'DE': 'Die Anzahl der negativen Verhaltensweisen ({{negativeCount}}) hat den erlaubten Schwellenwert ({{threshold}}) überschritten',
+        'TR': 'Olumsuz davranış sayısı ({{negativeCount}}) izin verilen eşiği ({{threshold}}) aştı'
+      },
+      'behavior.noEvents': {
+        'AR': 'لا توجد سجلات سلوك',
+        'FR': 'Aucun enregistrement de comportement',
+        'EN': 'No behavior records',
+        'ES': 'No hay registros de comportamiento',
+        'IT': 'Nessun registro di comportamento',
+        'DE': 'Keine Verhaltensaufzeichnungen',
+        'TR': 'Davranış kaydı yok'
+      },
+      'behavior.exportPdf': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'Als PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'behavior.studentName': {
+        'AR': 'اسم التلميذ',
+        'FR': 'Nom de l\'élève',
+        'EN': 'Student name',
+        'ES': 'Nombre del estudiante',
+        'IT': 'Nome dello studente',
+        'DE': 'Schülername',
+        'TR': 'Öğrenci adı'
+      },
+      'behavior.positiveCount': {
+        'AR': 'السلوك الإيجابي',
+        'FR': 'Comportement positif',
+        'EN': 'Positive behavior',
+        'ES': 'Comportamiento positivo',
+        'IT': 'Comportamento positivo',
+        'DE': 'Positives Verhalten',
+        'TR': 'Olumlu davranış'
+      },
+      'behavior.negativeCount': {
+        'AR': 'السلوك السلبي',
+        'FR': 'Comportement négatif',
+        'EN': 'Negative behavior',
+        'ES': 'Comportamiento negativo',
+        'IT': 'Comportamento negativo',
+        'DE': 'Negatives Verhalten',
+        'TR': 'Olumsuz davranış'
+      },
+      'behavior.total': {
+        'AR': 'الإجمالي',
+        'FR': 'Total',
+        'EN': 'Total',
+        'ES': 'Total',
+        'IT': 'Totale',
+        'DE': 'Gesamt',
+        'TR': 'Toplam'
+      },
+      'behavior.status': {
+        'AR': 'الحالة',
+        'FR': 'Statut',
+        'EN': 'Status',
+        'ES': 'Estado',
+        'IT': 'Stato',
+        'DE': 'Status',
+        'TR': 'Durum'
+      },
+      'behavior.actions': {
+        'AR': 'الإجراءات',
+        'FR': 'Actions',
+        'EN': 'Actions',
+        'ES': 'Acciones',
+        'IT': 'Azioni',
+        'DE': 'Aktionen',
+        'TR': 'İşlemler'
+      },
+      'behavior.statusWarning': {
+        'AR': 'تحذير',
+        'FR': 'Avertissement',
+        'EN': 'Warning',
+        'ES': 'Aviso',
+        'IT': 'Avviso',
+        'DE': 'Warnung',
+        'TR': 'Uyarı'
+      },
+      'behavior.statusNormal': {
+        'AR': 'طبيعي',
+        'FR': 'Normal',
+        'EN': 'Normal',
+        'ES': 'Normal',
+        'IT': 'Normale',
+        'DE': 'Normal',
+        'TR': 'Normal'
+      },
+      'behavior.viewDetails': {
+        'AR': 'عرض التفاصيل',
+        'FR': 'Voir les détails',
+        'EN': 'View details',
+        'ES': 'Ver detalles',
+        'IT': 'Vedi dettagli',
+        'DE': 'Details anzeigen',
+        'TR': 'Detayları göster'
+      },
+      'behavior.noData': {
+        'AR': 'لا توجد بيانات',
+        'FR': 'Aucune donnée',
+        'EN': 'No data',
+        'ES': 'Sin datos',
+        'IT': 'Nessun dato',
+        'DE': 'Keine Daten',
+        'TR': 'Veri yok'
+      },
+      'behavior.viewReport': {
+        'AR': 'عرض التقرير',
+        'FR': 'Voir le rapport',
+        'EN': 'View report',
+        'ES': 'Ver informe',
+        'IT': 'Vedi rapporto',
+        'DE': 'Bericht anzeigen',
+        'TR': 'Raporu görüntüle'
+      },
+      'behavior.noStudents': {
+        'AR': 'لا يوجد تلاميذ في هذا القسم',
+        'FR': 'Aucun élève dans cette classe',
+        'EN': 'No students in this class',
+        'ES': 'No hay estudiantes en esta clase',
+        'IT': 'Nessuno studente in questa classe',
+        'DE': 'Keine Schüler in dieser Klasse',
+        'TR': 'Bu sınıfta öğrenci yok'
+      },
+      'behavior.selectClassToView': {
+        'AR': 'يرجى اختيار قسم لعرض التلاميذ',
+        'FR': 'Veuillez sélectionner une classe pour afficher les élèves',
+        'EN': 'Please select a class to view students',
+        'ES': 'Seleccione una clase para ver los estudiantes',
+        'IT': 'Seleziona una classe per visualizzare gli studenti',
+        'DE': 'Bitte wählen Sie eine Klasse, um die Schüler anzuzeigen',
+        'TR': 'Öğrencileri görmek için lütfen bir sınıf seçin'
+      },
+      'behavior.recordBehaviorTitle': {
+        'AR': 'تسجيل سلوك',
+        'FR': 'Enregistrer un comportement',
+        'EN': 'Record behavior',
+        'ES': 'Registrar comportamiento',
+        'IT': 'Registrare comportamento',
+        'DE': 'Verhalten aufzeichnen',
+        'TR': 'Davranış kaydet'
+      },
+      'behavior.save': {
+        'AR': 'حفظ',
+        'FR': 'Enregistrer',
+        'EN': 'Save',
+        'ES': 'Guardar',
+        'IT': 'Salva',
+        'DE': 'Speichern',
+        'TR': 'Kaydet'
       },
 
       // Seating Chart
@@ -3886,6 +4642,1014 @@ export class LanguageService {
         'IT': 'Nessuno studente su questo computer per questa classe.',
         'DE': 'Keine Schüler auf diesem Computer für diese Klasse.',
         'TR': 'Bu sınıf için bu bilgisayarda öğrenci yok.'
+      },
+      'seatingChart.roomDesign': {
+        'AR': 'تصميم القاعة',
+        'FR': 'Conception de la salle',
+        'EN': 'Room Design',
+        'ES': 'Diseño de la sala',
+        'IT': 'Progettazione della sala',
+        'DE': 'Raumgestaltung',
+        'TR': 'Oda Tasarımı'
+      },
+      'seatingChart.numberOfRows': {
+        'AR': 'عدد الصفوف',
+        'FR': 'Nombre de rangées',
+        'EN': 'Number of rows',
+        'ES': 'Número de filas',
+        'IT': 'Numero di file',
+        'DE': 'Anzahl der Reihen',
+        'TR': 'Sıra sayısı'
+      },
+      'seatingChart.threeRows': {
+        'AR': '3 صفوف',
+        'FR': '3 rangées',
+        'EN': '3 rows',
+        'ES': '3 filas',
+        'IT': '3 file',
+        'DE': '3 Reihen',
+        'TR': '3 sıra'
+      },
+      'seatingChart.fourRows': {
+        'AR': '4 صفوف',
+        'FR': '4 rangées',
+        'EN': '4 rows',
+        'ES': '4 filas',
+        'IT': '4 file',
+        'DE': '4 Reihen',
+        'TR': '4 sıra'
+      },
+      'seatingChart.tableType': {
+        'AR': 'نوع الطاولة',
+        'FR': 'Type de table',
+        'EN': 'Table type',
+        'ES': 'Tipo de mesa',
+        'IT': 'Tipo di tavolo',
+        'DE': 'Tischtyp',
+        'TR': 'Masa tipi'
+      },
+      'seatingChart.singleTable': {
+        'AR': 'طاولة فردية',
+        'FR': 'Table individuelle',
+        'EN': 'Single table',
+        'ES': 'Mesa individual',
+        'IT': 'Tavolo singolo',
+        'DE': 'Einzeltisch',
+        'TR': 'Tekli masa'
+      },
+      'seatingChart.oneStudent': {
+        'AR': 'تلميذ واحد',
+        'FR': 'Un élève',
+        'EN': 'One student',
+        'ES': 'Un estudiante',
+        'IT': 'Uno studente',
+        'DE': 'Ein Schüler',
+        'TR': 'Bir öğrenci'
+      },
+      'seatingChart.doubleTable': {
+        'AR': 'طاولة مزدوجة',
+        'FR': 'Table double',
+        'EN': 'Double table',
+        'ES': 'Mesa doble',
+        'IT': 'Tavolo doppio',
+        'DE': 'Doppeltisch',
+        'TR': 'Çiftli masa'
+      },
+      'seatingChart.twoStudents': {
+        'AR': 'تلميذان',
+        'FR': 'Deux élèves',
+        'EN': 'Two students',
+        'ES': 'Dos estudiantes',
+        'IT': 'Due studenti',
+        'DE': 'Zwei Schüler',
+        'TR': 'İki öğrenci'
+      },
+      'seatingChart.createLayout': {
+        'AR': 'إنشاء التخطيط',
+        'FR': 'Créer la disposition',
+        'EN': 'Create layout',
+        'ES': 'Crear disposición',
+        'IT': 'Crea layout',
+        'DE': 'Layout erstellen',
+        'TR': 'Düzen oluştur'
+      },
+      'seatingChart.creating': {
+        'AR': '... جاري الإنشاء',
+        'FR': '... Création en cours',
+        'EN': '... Creating',
+        'ES': '... Creando',
+        'IT': '... Creazione in corso',
+        'DE': '... Wird erstellt',
+        'TR': '... Oluşturuluyor'
+      },
+      'seatingChart.computerLayout': {
+        'AR': 'مخطط الحواسيب (المخبر)',
+        'FR': 'Plan des ordinateurs (Laboratoire)',
+        'EN': 'Computer layout (Lab)',
+        'ES': 'Disposición de computadoras (Laboratorio)',
+        'IT': 'Layout computer (Laboratorio)',
+        'DE': 'Computer-Layout (Labor)',
+        'TR': 'Bilgisayar düzeni (Laboratuvar)'
+      },
+      'seatingChart.seatingLayout': {
+        'AR': 'مخطط الجلوس (القاعة)',
+        'FR': 'Plan de placement (Salle)',
+        'EN': 'Seating layout (Classroom)',
+        'ES': 'Disposición de asientos (Aula)',
+        'IT': 'Layout posti (Aula)',
+        'DE': 'Sitzplan (Klassenzimmer)',
+        'TR': 'Oturma düzeni (Sınıf)'
+      },
+      'seatingChart.level': {
+        'AR': 'المستوى:',
+        'FR': 'Niveau:',
+        'EN': 'Level:',
+        'ES': 'Nivel:',
+        'IT': 'Livello:',
+        'DE': 'Stufe:',
+        'TR': 'Seviye:'
+      },
+      'seatingChart.allStudents': {
+        'AR': 'جميع التلاميذ',
+        'FR': 'Tous les élèves',
+        'EN': 'All students',
+        'ES': 'Todos los estudiantes',
+        'IT': 'Tutti gli studenti',
+        'DE': 'Alle Schüler',
+        'TR': 'Tüm öğrenciler'
+      },
+      'seatingChart.studentCount': {
+        'AR': 'عدد التلاميذ:',
+        'FR': 'Nombre d\'élèves:',
+        'EN': 'Number of students:',
+        'ES': 'Número de estudiantes:',
+        'IT': 'Numero di studenti:',
+        'DE': 'Anzahl der Schüler:',
+        'TR': 'Öğrenci sayısı:'
+      },
+      'seatingChart.averageAttendance': {
+        'AR': 'متوسط الحضور',
+        'FR': 'Taux de présence moyen',
+        'EN': 'Average attendance',
+        'ES': 'Asistencia promedio',
+        'IT': 'Presenza media',
+        'DE': 'Durchschnittliche Anwesenheit',
+        'TR': 'Ortalama devam'
+      },
+      'seatingChart.averageGrade': {
+        'AR': 'متوسط النقاط',
+        'FR': 'Note moyenne',
+        'EN': 'Average grade',
+        'ES': 'Calificación promedio',
+        'IT': 'Voto medio',
+        'DE': 'Durchschnittsnote',
+        'TR': 'Ortalama not'
+      },
+      'seatingChart.positiveBehavior': {
+        'AR': 'السلوك الإيجابي',
+        'FR': 'Comportement positif',
+        'EN': 'Positive behavior',
+        'ES': 'Comportamiento positivo',
+        'IT': 'Comportamento positivo',
+        'DE': 'Positives Verhalten',
+        'TR': 'Pozitif davranış'
+      },
+      'seatingChart.numberOfDesks': {
+        'AR': 'عدد الطاولات',
+        'FR': 'Nombre de tables',
+        'EN': 'Number of desks',
+        'ES': 'Número de mesas',
+        'IT': 'Numero di banchi',
+        'DE': 'Anzahl der Tische',
+        'TR': 'Masa sayısı'
+      },
+      'seatingChart.numberOfRowsLabel': {
+        'AR': 'عدد الصفوف',
+        'FR': 'Nombre de rangées',
+        'EN': 'Number of rows',
+        'ES': 'Número de filas',
+        'IT': 'Numero di file',
+        'DE': 'Anzahl der Reihen',
+        'TR': 'Sıra sayısı'
+      },
+      'seatingChart.single': {
+        'AR': 'فردية',
+        'FR': 'Individuelle',
+        'EN': 'Single',
+        'ES': 'Individual',
+        'IT': 'Singola',
+        'DE': 'Einzel',
+        'TR': 'Tekli'
+      },
+      'seatingChart.double': {
+        'AR': 'مزدوجة',
+        'FR': 'Double',
+        'EN': 'Double',
+        'ES': 'Doble',
+        'IT': 'Doppia',
+        'DE': 'Doppel',
+        'TR': 'Çiftli'
+      },
+      'seatingChart.class': {
+        'AR': 'القسم',
+        'FR': 'Classe',
+        'EN': 'Class',
+        'ES': 'Clase',
+        'IT': 'Classe',
+        'DE': 'Klasse',
+        'TR': 'Sınıf'
+      },
+      'seatingChart.layoutType': {
+        'AR': 'نوع المخطط',
+        'FR': 'Type de plan',
+        'EN': 'Layout type',
+        'ES': 'Tipo de disposición',
+        'IT': 'Tipo di layout',
+        'DE': 'Layout-Typ',
+        'TR': 'Düzen tipi'
+      },
+      'seatingChart.computerLayoutU': {
+        'AR': 'مخطط الحواسيب (U)',
+        'FR': 'Plan des ordinateurs (U)',
+        'EN': 'Computer layout (U)',
+        'ES': 'Disposición de computadoras (U)',
+        'IT': 'Layout computer (U)',
+        'DE': 'Computer-Layout (U)',
+        'TR': 'Bilgisayar düzeni (U)'
+      },
+      'seatingChart.seatingLayoutRoom': {
+        'AR': 'مخطط الجلوس (قاعة)',
+        'FR': 'Plan de placement (Salle)',
+        'EN': 'Seating layout (Room)',
+        'ES': 'Disposición de asientos (Sala)',
+        'IT': 'Layout posti (Sala)',
+        'DE': 'Sitzplan (Raum)',
+        'TR': 'Oturma düzeni (Oda)'
+      },
+      'seatingChart.searchStudent': {
+        'AR': 'بحث عن تلميذ',
+        'FR': 'Rechercher un élève',
+        'EN': 'Search for student',
+        'ES': 'Buscar estudiante',
+        'IT': 'Cerca studente',
+        'DE': 'Schüler suchen',
+        'TR': 'Öğrenci ara'
+      },
+      'seatingChart.searchPlaceholder': {
+        'AR': 'اكتب اسم التلميذ',
+        'FR': 'Tapez le nom de l\'élève',
+        'EN': 'Type student name',
+        'ES': 'Escriba el nombre del estudiante',
+        'IT': 'Digita il nome dello studente',
+        'DE': 'Schülername eingeben',
+        'TR': 'Öğrenci adını yazın'
+      },
+      'seatingChart.printSelectedAllClasses': {
+        'AR': 'طباعة الحواسيب المحددة (جميع الأقسام)',
+        'FR': 'Imprimer les ordinateurs sélectionnés (toutes les classes)',
+        'EN': 'Print selected computers (all classes)',
+        'ES': 'Imprimir computadoras seleccionadas (todas las clases)',
+        'IT': 'Stampa computer selezionati (tutte le classi)',
+        'DE': 'Ausgewählte Computer drucken (alle Klassen)',
+        'TR': 'Seçili bilgisayarları yazdır (tüm sınıflar)'
+      },
+      'seatingChart.printGroup': {
+        'AR': 'طباعة الفوج',
+        'FR': 'Imprimer le groupe',
+        'EN': 'Print group',
+        'ES': 'Imprimir grupo',
+        'IT': 'Stampa gruppo',
+        'DE': 'Gruppe drucken',
+        'TR': 'Grubu yazdır'
+      },
+      'seatingChart.printClass': {
+        'AR': 'طباعة القسم',
+        'FR': 'Imprimer la classe',
+        'EN': 'Print class',
+        'ES': 'Imprimir clase',
+        'IT': 'Stampa classe',
+        'DE': 'Klasse drucken',
+        'TR': 'Sınıfı yazdır'
+      },
+      'seatingChart.printAllClasses': {
+        'AR': 'طباعة جميع الأقسام',
+        'FR': 'Imprimer toutes les classes',
+        'EN': 'Print all classes',
+        'ES': 'Imprimir todas las clases',
+        'IT': 'Stampa tutte le classi',
+        'DE': 'Alle Klassen drucken',
+        'TR': 'Tüm sınıfları yazdır'
+      },
+      'seatingChart.createRoomLayout': {
+        'AR': 'إنشاء تخطيط قاعة',
+        'FR': 'Créer un plan de salle',
+        'EN': 'Create room layout',
+        'ES': 'Crear disposición de sala',
+        'IT': 'Crea layout sala',
+        'DE': 'Raumlayout erstellen',
+        'TR': 'Oda düzeni oluştur'
+      },
+      'seatingChart.editRoomLayout': {
+        'AR': 'تعديل تخطيط القاعة',
+        'FR': 'Modifier le plan de la salle',
+        'EN': 'Edit room layout',
+        'ES': 'Editar disposición de sala',
+        'IT': 'Modifica layout sala',
+        'DE': 'Raumlayout bearbeiten',
+        'TR': 'Oda düzenini düzenle'
+      },
+      'seatingChart.organizeStudents': {
+        'AR': 'تنظيم التلاميذ',
+        'FR': 'Organiser les élèves',
+        'EN': 'Organize students',
+        'ES': 'Organizar estudiantes',
+        'IT': 'Organizza studenti',
+        'DE': 'Schüler organisieren',
+        'TR': 'Öğrencileri düzenle'
+      },
+      'seatingChart.stopOrganizing': {
+        'AR': 'إيقاف تنظيم التلاميذ',
+        'FR': 'Arrêter l\'organisation',
+        'EN': 'Stop organizing',
+        'ES': 'Dejar de organizar',
+        'IT': 'Smetti di organizzare',
+        'DE': 'Organisation beenden',
+        'TR': 'Düzenlemeyi durdur'
+      },
+      'seatingChart.moveComputers': {
+        'AR': 'تحريك الحواسيب',
+        'FR': 'Déplacer les ordinateurs',
+        'EN': 'Move computers',
+        'ES': 'Mover computadoras',
+        'IT': 'Sposta computer',
+        'DE': 'Computer verschieben',
+        'TR': 'Bilgisayarları taşı'
+      },
+      'seatingChart.stopMovingComputers': {
+        'AR': 'إيقاف تحريك الحواسيب',
+        'FR': 'Arrêter le déplacement',
+        'EN': 'Stop moving computers',
+        'ES': 'Dejar de mover computadoras',
+        'IT': 'Smetti di spostare i computer',
+        'DE': 'Verschieben beenden',
+        'TR': 'Bilgisayarları taşımayı durdur'
+      },
+      'seatingChart.moveDesks': {
+        'AR': 'تحريك الطاولات',
+        'FR': 'Déplacer les tables',
+        'EN': 'Move desks',
+        'ES': 'Mover mesas',
+        'IT': 'Sposta banchi',
+        'DE': 'Tische verschieben',
+        'TR': 'Masaları taşı'
+      },
+      'seatingChart.stopMovingDesks': {
+        'AR': 'إيقاف تحريك الطاولات',
+        'FR': 'Arrêter le déplacement',
+        'EN': 'Stop moving desks',
+        'ES': 'Dejar de mover mesas',
+        'IT': 'Smetti di spostare i banchi',
+        'DE': 'Verschieben beenden',
+        'TR': 'Masaları taşımayı durdur'
+      },
+      'seatingChart.saveStudentDistribution': {
+        'AR': 'حفظ توزيع التلاميذ',
+        'FR': 'Enregistrer la répartition des élèves',
+        'EN': 'Save student distribution',
+        'ES': 'Guardar distribución de estudiantes',
+        'IT': 'Salva distribuzione studenti',
+        'DE': 'Schülerverteilung speichern',
+        'TR': 'Öğrenci dağılımını kaydet'
+      },
+      'seatingChart.saving': {
+        'AR': '... جاري الحفظ',
+        'FR': '... Enregistrement en cours',
+        'EN': '... Saving',
+        'ES': '... Guardando',
+        'IT': '... Salvataggio in corso',
+        'DE': '... Wird gespeichert',
+        'TR': '... Kaydediliyor'
+      },
+      'seatingChart.saveComputerPositions': {
+        'AR': 'حفظ أماكن الحواسيب',
+        'FR': 'Enregistrer les positions des ordinateurs',
+        'EN': 'Save computer positions',
+        'ES': 'Guardar posiciones de computadoras',
+        'IT': 'Salva posizioni computer',
+        'DE': 'Computerpositionen speichern',
+        'TR': 'Bilgisayar konumlarını kaydet'
+      },
+      'seatingChart.saveDeskPositions': {
+        'AR': 'حفظ أماكن الطاولات',
+        'FR': 'Enregistrer les positions des tables',
+        'EN': 'Save desk positions',
+        'ES': 'Guardar posiciones de mesas',
+        'IT': 'Salva posizioni banchi',
+        'DE': 'Tischpositionen speichern',
+        'TR': 'Masa konumlarını kaydet'
+      },
+      'seatingChart.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'seatingChart.exporting': {
+        'AR': '... جاري التصدير',
+        'FR': '... Exportation en cours',
+        'EN': '... Exporting',
+        'ES': '... Exportando',
+        'IT': '... Esportazione in corso',
+        'DE': '... Wird exportiert',
+        'TR': '... Dışa aktarılıyor'
+      },
+      'seatingChart.unsavedChanges': {
+        'AR': 'هناك تعديلات غير محفوظة',
+        'FR': 'Il y a des modifications non enregistrées',
+        'EN': 'There are unsaved changes',
+        'ES': 'Hay cambios sin guardar',
+        'IT': 'Ci sono modifiche non salvate',
+        'DE': 'Es gibt ungespeicherte Änderungen',
+        'TR': 'Kaydedilmemiş değişiklikler var'
+      },
+      'seatingChart.hide': {
+        'AR': 'إخفاء',
+        'FR': 'Masquer',
+        'EN': 'Hide',
+        'ES': 'Ocultar',
+        'IT': 'Nascondi',
+        'DE': 'Ausblenden',
+        'TR': 'Gizle'
+      },
+      'seatingChart.retry': {
+        'AR': 'إعادة المحاولة',
+        'FR': 'Réessayer',
+        'EN': 'Retry',
+        'ES': 'Reintentar',
+        'IT': 'Riprova',
+        'DE': 'Wiederholen',
+        'TR': 'Yeniden dene'
+      },
+      'seatingChart.computerLayoutUInverted': {
+        'AR': 'مخطط الحواسيب (حرف U مقلوب)',
+        'FR': 'Plan des ordinateurs (U inversé)',
+        'EN': 'Computer layout (Inverted U)',
+        'ES': 'Disposición de computadoras (U invertida)',
+        'IT': 'Layout computer (U invertita)',
+        'DE': 'Computer-Layout (Umgekehrtes U)',
+        'TR': 'Bilgisayar düzeni (Ters U)'
+      },
+      'seatingChart.seatingLayoutClassroom': {
+        'AR': 'مخطط الجلوس (القاعة الدراسية)',
+        'FR': 'Plan de placement (Salle de classe)',
+        'EN': 'Seating layout (Classroom)',
+        'ES': 'Disposición de asientos (Aula)',
+        'IT': 'Layout posti (Aula)',
+        'DE': 'Sitzplan (Klassenzimmer)',
+        'TR': 'Oturma düzeni (Sınıf)'
+      },
+      'seatingChart.zoomHint': {
+        'AR': 'يمكن تكبير العرض بالتمرير',
+        'FR': 'Vous pouvez zoomer en faisant défiler',
+        'EN': 'You can zoom by scrolling',
+        'ES': 'Puede hacer zoom desplazándose',
+        'IT': 'Puoi ingrandire scorrendo',
+        'DE': 'Sie können durch Scrollen zoomen',
+        'TR': 'Kaydırarak yakınlaştırabilirsiniz'
+      },
+      'seatingChart.left': {
+        'AR': 'يسار',
+        'FR': 'Gauche',
+        'EN': 'Left',
+        'ES': 'Izquierda',
+        'IT': 'Sinistra',
+        'DE': 'Links',
+        'TR': 'Sol'
+      },
+      'seatingChart.right': {
+        'AR': 'يمين',
+        'FR': 'Droite',
+        'EN': 'Right',
+        'ES': 'Derecha',
+        'IT': 'Destra',
+        'DE': 'Rechts',
+        'TR': 'Sağ'
+      },
+      'seatingChart.dragMaxTwoStudents': {
+        'AR': 'اسحب تلميذين كحد أقصى لهذا الحاسوب',
+        'FR': 'Glissez jusqu\'à deux élèves pour cet ordinateur',
+        'EN': 'Drag up to two students for this computer',
+        'ES': 'Arrastre hasta dos estudiantes para esta computadora',
+        'IT': 'Trascina fino a due studenti per questo computer',
+        'DE': 'Ziehen Sie bis zu zwei Schüler für diesen Computer',
+        'TR': 'Bu bilgisayar için en fazla iki öğrenci sürükleyin'
+      },
+      'seatingChart.dragOneStudent': {
+        'AR': 'اسحب تلميذ واحد لهذه الطاولة',
+        'FR': 'Glissez un élève pour cette table',
+        'EN': 'Drag one student for this desk',
+        'ES': 'Arrastre un estudiante para esta mesa',
+        'IT': 'Trascina uno studente per questo banco',
+        'DE': 'Ziehen Sie einen Schüler für diesen Tisch',
+        'TR': 'Bu masa için bir öğrenci sürükleyin'
+      },
+      'seatingChart.dragTwoStudents': {
+        'AR': 'اسحب تلميذين لهذه الطاولة',
+        'FR': 'Glissez deux élèves pour cette table',
+        'EN': 'Drag two students for this desk',
+        'ES': 'Arrastre dos estudiantes para esta mesa',
+        'IT': 'Trascina due studenti per questo banco',
+        'DE': 'Ziehen Sie zwei Schüler für diesen Tisch',
+        'TR': 'Bu masa için iki öğrenci sürükleyin'
+      },
+      'seatingChart.loadingLayout': {
+        'AR': 'جاري تحميل المخطط...',
+        'FR': 'Chargement du plan...',
+        'EN': 'Loading layout...',
+        'ES': 'Cargando disposición...',
+        'IT': 'Caricamento layout...',
+        'DE': 'Layout wird geladen...',
+        'TR': 'Düzen yükleniyor...'
+      },
+      'seatingChart.noRoomLayout': {
+        'AR': 'لا يوجد تخطيط قاعة',
+        'FR': 'Aucun plan de salle',
+        'EN': 'No room layout',
+        'ES': 'Sin disposición de sala',
+        'IT': 'Nessun layout sala',
+        'DE': 'Kein Raumlayout',
+        'TR': 'Oda düzeni yok'
+      },
+      'seatingChart.createNewRoomLayout': {
+        'AR': 'يرجى إنشاء تخطيط جديد للقاعة',
+        'FR': 'Veuillez créer un nouveau plan de salle',
+        'EN': 'Please create a new room layout',
+        'ES': 'Por favor, cree una nueva disposición de sala',
+        'IT': 'Si prega di creare un nuovo layout sala',
+        'DE': 'Bitte erstellen Sie ein neues Raumlayout',
+        'TR': 'Lütfen yeni bir oda düzeni oluşturun'
+      },
+      'seatingChart.attendance': {
+        'AR': 'الحضور',
+        'FR': 'Présence',
+        'EN': 'Attendance',
+        'ES': 'Asistencia',
+        'IT': 'Presenza',
+        'DE': 'Anwesenheit',
+        'TR': 'Devam'
+      },
+      'seatingChart.behavior': {
+        'AR': 'السلوك',
+        'FR': 'Comportement',
+        'EN': 'Behavior',
+        'ES': 'Comportamiento',
+        'IT': 'Comportamento',
+        'DE': 'Verhalten',
+        'TR': 'Davranış'
+      },
+      'seatingChart.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Notes',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Notizen',
+        'TR': 'Notlar'
+      },
+      'seatingChart.done': {
+        'AR': 'تم',
+        'FR': 'Terminé',
+        'EN': 'Done',
+        'ES': 'Hecho',
+        'IT': 'Fatto',
+        'DE': 'Fertig',
+        'TR': 'Tamamlandı'
+      },
+      'seatingChart.availableStudents': {
+        'AR': 'التلاميذ المتاحون',
+        'FR': 'Élèves disponibles',
+        'EN': 'Available students',
+        'ES': 'Estudiantes disponibles',
+        'IT': 'Studenti disponibili',
+        'DE': 'Verfügbare Schüler',
+        'TR': 'Mevcut öğrenciler'
+      },
+      'seatingChart.students': {
+        'AR': 'تلميذاً',
+        'FR': 'élèves',
+        'EN': 'students',
+        'ES': 'estudiantes',
+        'IT': 'studenti',
+        'DE': 'Schüler',
+        'TR': 'öğrenci'
+      },
+      'seatingChart.allClassStudentsAssigned': {
+        'AR': 'جميع التلاميذ تم توزيعهم',
+        'FR': 'Tous les élèves ont été assignés',
+        'EN': 'All students have been assigned',
+        'ES': 'Todos los estudiantes han sido asignados',
+        'IT': 'Tutti gli studenti sono stati assegnati',
+        'DE': 'Alle Schüler wurden zugewiesen',
+        'TR': 'Tüm öğrenciler atandı'
+      },
+      'seatingChart.empty': {
+        'AR': 'فارغ',
+        'FR': 'Vide',
+        'EN': 'Empty',
+        'ES': 'Vacío',
+        'IT': 'Vuoto',
+        'DE': 'Leer',
+        'TR': 'Boş'
+      },
+      'seatingChart.noClassesAvailable': {
+        'AR': 'لا توجد أقسام متاحة. يرجى إضافة قسم أولاً.',
+        'FR': 'Aucune classe disponible. Veuillez d\'abord ajouter une classe.',
+        'EN': 'No classes available. Please add a class first.',
+        'ES': 'No hay clases disponibles. Por favor, agregue una clase primero.',
+        'IT': 'Nessuna classe disponibile. Si prega di aggiungere prima una classe.',
+        'DE': 'Keine Klassen verfügbar. Bitte fügen Sie zuerst eine Klasse hinzu.',
+        'TR': 'Mevcut sınıf yok. Lütfen önce bir sınıf ekleyin.'
+      },
+      'seatingChart.present': {
+        'AR': 'حاضر',
+        'FR': 'Présent',
+        'EN': 'Present',
+        'ES': 'Presente',
+        'IT': 'Presente',
+        'DE': 'Anwesend',
+        'TR': 'Mevcut'
+      },
+      'seatingChart.absent': {
+        'AR': 'غائب',
+        'FR': 'Absent',
+        'EN': 'Absent',
+        'ES': 'Ausente',
+        'IT': 'Assente',
+        'DE': 'Abwesend',
+        'TR': 'Yok'
+      },
+      'seatingChart.late': {
+        'AR': 'متأخر',
+        'FR': 'En retard',
+        'EN': 'Late',
+        'ES': 'Tarde',
+        'IT': 'In ritardo',
+        'DE': 'Verspätet',
+        'TR': 'Geç'
+      },
+      'seatingChart.excused': {
+        'AR': 'مُعذر',
+        'FR': 'Excusé',
+        'EN': 'Excused',
+        'ES': 'Justificado',
+        'IT': 'Giustificato',
+        'DE': 'Entschuldigt',
+        'TR': 'Mazeretli'
+      },
+      'seatingChart.positive': {
+        'AR': 'إيجابي',
+        'FR': 'Positif',
+        'EN': 'Positive',
+        'ES': 'Positivo',
+        'IT': 'Positivo',
+        'DE': 'Positiv',
+        'TR': 'Pozitif'
+      },
+      'seatingChart.neutral': {
+        'AR': 'محايد',
+        'FR': 'Neutre',
+        'EN': 'Neutral',
+        'ES': 'Neutro',
+        'IT': 'Neutro',
+        'DE': 'Neutral',
+        'TR': 'Nötr'
+      },
+      'seatingChart.negative': {
+        'AR': 'سلبي',
+        'FR': 'Négatif',
+        'EN': 'Negative',
+        'ES': 'Negativo',
+        'IT': 'Negativo',
+        'DE': 'Negativ',
+        'TR': 'Negatif'
+      },
+      'seatingChart.groupUndefined': {
+        'AR': 'غير محدد',
+        'FR': 'Non défini',
+        'EN': 'Undefined',
+        'ES': 'No definido',
+        'IT': 'Non definito',
+        'DE': 'Nicht definiert',
+        'TR': 'Tanımsız'
+      },
+      'seatingChart.attendanceLabel': {
+        'AR': 'الحضور',
+        'FR': 'Présence',
+        'EN': 'Attendance',
+        'ES': 'Asistencia',
+        'IT': 'Presenza',
+        'DE': 'Anwesenheit',
+        'TR': 'Devam'
+      },
+      'seatingChart.behaviorLabel': {
+        'AR': 'السلوك',
+        'FR': 'Comportement',
+        'EN': 'Behavior',
+        'ES': 'Comportamiento',
+        'IT': 'Comportamento',
+        'DE': 'Verhalten',
+        'TR': 'Davranış'
+      },
+      'seatingChart.failedToLoadClasses': {
+        'AR': 'تعذر تحميل قائمة الأقسام',
+        'FR': 'Impossible de charger la liste des classes',
+        'EN': 'Failed to load class list',
+        'ES': 'Error al cargar la lista de clases',
+        'IT': 'Impossibile caricare l\'elenco delle classi',
+        'DE': 'Klassenliste konnte nicht geladen werden',
+        'TR': 'Sınıf listesi yüklenemedi'
+      },
+      'seatingChart.failedToLoadRoomLayout': {
+        'AR': 'تعذر تحميل تخطيط القاعة',
+        'FR': 'Impossible de charger le plan de la salle',
+        'EN': 'Failed to load room layout',
+        'ES': 'Error al cargar la disposición de sala',
+        'IT': 'Impossibile caricare il layout della sala',
+        'DE': 'Raumlayout konnte nicht geladen werden',
+        'TR': 'Oda düzeni yüklenemedi'
+      },
+      'seatingChart.failedToLoadLayout': {
+        'AR': 'تعذر تحميل مخطط المقاعد',
+        'FR': 'Impossible de charger le plan de placement',
+        'EN': 'Failed to load seating layout',
+        'ES': 'Error al cargar la disposición de asientos',
+        'IT': 'Impossibile caricare il layout dei posti',
+        'DE': 'Sitzplan konnte nicht geladen werden',
+        'TR': 'Oturma düzeni yüklenemedi'
+      },
+      'seatingChart.cannotConnectServer': {
+        'AR': 'لا يمكن الاتصال بالخادم. تأكد من أن الخادم يعمل.',
+        'FR': 'Impossible de se connecter au serveur. Assurez-vous que le serveur fonctionne.',
+        'EN': 'Cannot connect to server. Make sure the server is running.',
+        'ES': 'No se puede conectar al servidor. Asegúrese de que el servidor esté en ejecución.',
+        'IT': 'Impossibile connettersi al server. Assicurati che il server sia in esecuzione.',
+        'DE': 'Keine Verbindung zum Server. Stellen Sie sicher, dass der Server läuft.',
+        'TR': 'Sunucuya bağlanılamıyor. Sunucunun çalıştığından emin olun.'
+      },
+      'seatingChart.unauthorized': {
+        'AR': 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.',
+        'FR': 'Vous n\'êtes pas autorisé à accéder. Veuillez vous reconnecter.',
+        'EN': 'You are not authorized to access. Please log in again.',
+        'ES': 'No está autorizado para acceder. Por favor, inicie sesión nuevamente.',
+        'IT': 'Non sei autorizzato ad accedere. Si prega di accedere di nuovo.',
+        'DE': 'Sie sind nicht berechtigt zuzugreifen. Bitte melden Sie sich erneut an.',
+        'TR': 'Erişim yetkiniz yok. Lütfen tekrar giriş yapın.'
+      },
+      'seatingChart.noPermission': {
+        'AR': 'ليس لديك صلاحيات للوصول إلى مخطط المقاعد. يرجى الاتصال بالمسؤول لإضافة صلاحية "مخطط المقاعد" إلى حسابك.',
+        'FR': 'Vous n\'avez pas les permissions pour accéder au plan de placement. Veuillez contacter l\'administrateur pour ajouter la permission "Plan de placement" à votre compte.',
+        'EN': 'You do not have permission to access the seating chart. Please contact the administrator to add the "Seating Chart" permission to your account.',
+        'ES': 'No tiene permiso para acceder al plano de asientos. Por favor, contacte al administrador para agregar el permiso "Plano de asientos" a su cuenta.',
+        'IT': 'Non hai il permesso di accedere al piano dei posti. Si prega di contattare l\'amministratore per aggiungere il permesso "Piano dei posti" al tuo account.',
+        'DE': 'Sie haben keine Berechtigung, auf den Sitzplan zuzugreifen. Bitte kontaktieren Sie den Administrator, um die Berechtigung "Sitzplan" zu Ihrem Konto hinzuzufügen.',
+        'TR': 'Oturma planına erişim izniniz yok. Lütfen yöneticiyle iletişime geçerek hesabınıza "Oturma Planı" iznini ekleyin.'
+      },
+      'seatingChart.layoutNotFound': {
+        'AR': 'لم يتم العثور على مخطط المقاعد لهذا القسم.',
+        'FR': 'Plan de placement introuvable pour cette classe.',
+        'EN': 'Seating layout not found for this class.',
+        'ES': 'Disposición de asientos no encontrada para esta clase.',
+        'IT': 'Layout dei posti non trovato per questa classe.',
+        'DE': 'Sitzplan für diese Klasse nicht gefunden.',
+        'TR': 'Bu sınıf için oturma düzeni bulunamadı.'
+      },
+      'seatingChart.serverError': {
+        'AR': 'حدث خطأ في الخادم. يرجى المحاولة مرة أخرى لاحقاً.',
+        'FR': 'Une erreur s\'est produite sur le serveur. Veuillez réessayer plus tard.',
+        'EN': 'A server error occurred. Please try again later.',
+        'ES': 'Ocurrió un error en el servidor. Por favor, intente nuevamente más tarde.',
+        'IT': 'Si è verificato un errore del server. Si prega di riprovare più tardi.',
+        'DE': 'Ein Serverfehler ist aufgetreten. Bitte versuchen Sie es später erneut.',
+        'TR': 'Sunucu hatası oluştu. Lütfen daha sonra tekrar deneyin.'
+      },
+      'seatingChart.failedToLoadStudents': {
+        'AR': 'تعذر تحميل قائمة التلاميذ',
+        'FR': 'Impossible de charger la liste des élèves',
+        'EN': 'Failed to load student list',
+        'ES': 'Error al cargar la lista de estudiantes',
+        'IT': 'Impossibile caricare l\'elenco degli studenti',
+        'DE': 'Schülerliste konnte nicht geladen werden',
+        'TR': 'Öğrenci listesi yüklenemedi'
+      },
+      'seatingChart.stopMovingFirst': {
+        'AR': 'أوقف تحريك',
+        'FR': 'Arrêtez de déplacer',
+        'EN': 'Stop moving',
+        'ES': 'Dejar de mover',
+        'IT': 'Smetti di spostare',
+        'DE': 'Verschieben beenden',
+        'TR': 'Taşımayı durdur'
+      },
+      'seatingChart.stopOrganizingFirst': {
+        'AR': 'أوقف تنظيم التلاميذ أولاً.',
+        'FR': 'Arrêtez d\'abord d\'organiser les élèves.',
+        'EN': 'Stop organizing students first.',
+        'ES': 'Deje de organizar estudiantes primero.',
+        'IT': 'Smetti prima di organizzare gli studenti.',
+        'DE': 'Beenden Sie zuerst die Organisation der Schüler.',
+        'TR': 'Önce öğrencileri düzenlemeyi durdurun.'
+      },
+      'seatingChart.deskFull': {
+        'AR': 'هذه الطاولة ممتلئة',
+        'FR': 'Cette table est pleine',
+        'EN': 'This desk is full',
+        'ES': 'Esta mesa está llena',
+        'IT': 'Questo banco è pieno',
+        'DE': 'Dieser Tisch ist voll',
+        'TR': 'Bu masa dolu'
+      },
+      'seatingChart.maximum': {
+        'AR': 'كحد أقصى',
+        'FR': 'au maximum',
+        'EN': 'maximum',
+        'ES': 'máximo',
+        'IT': 'massimo',
+        'DE': 'maximal',
+        'TR': 'maksimum'
+      },
+      'seatingChart.computerPositionsSaved': {
+        'AR': 'تم حفظ أماكن الحواسيب',
+        'FR': 'Positions des ordinateurs enregistrées',
+        'EN': 'Computer positions saved',
+        'ES': 'Posiciones de computadoras guardadas',
+        'IT': 'Posizioni computer salvate',
+        'DE': 'Computerpositionen gespeichert',
+        'TR': 'Bilgisayar konumları kaydedildi'
+      },
+      'seatingChart.failedToSaveComputerPositions': {
+        'AR': 'تعذر حفظ أماكن الحواسيب',
+        'FR': 'Impossible d\'enregistrer les positions des ordinateurs',
+        'EN': 'Failed to save computer positions',
+        'ES': 'Error al guardar posiciones de computadoras',
+        'IT': 'Impossibile salvare le posizioni dei computer',
+        'DE': 'Computerpositionen konnten nicht gespeichert werden',
+        'TR': 'Bilgisayar konumları kaydedilemedi'
+      },
+      'seatingChart.layoutSavedSuccessfully': {
+        'AR': 'تم حفظ مخطط المقاعد بنجاح',
+        'FR': 'Plan de placement enregistré avec succès',
+        'EN': 'Seating layout saved successfully',
+        'ES': 'Disposición de asientos guardada exitosamente',
+        'IT': 'Layout dei posti salvato con successo',
+        'DE': 'Sitzplan erfolgreich gespeichert',
+        'TR': 'Oturma düzeni başarıyla kaydedildi'
+      },
+      'seatingChart.failedToSaveLayout': {
+        'AR': 'تعذر حفظ المخطط، حاول مرة أخرى',
+        'FR': 'Impossible d\'enregistrer le plan, réessayez',
+        'EN': 'Failed to save layout, please try again',
+        'ES': 'Error al guardar la disposición, intente nuevamente',
+        'IT': 'Impossibile salvare il layout, riprova',
+        'DE': 'Layout konnte nicht gespeichert werden, bitte versuchen Sie es erneut',
+        'TR': 'Düzen kaydedilemedi, lütfen tekrar deneyin'
+      },
+      'seatingChart.failedToPreparePrint': {
+        'AR': 'تعذر تجهيز ملف الطباعة',
+        'FR': 'Impossible de préparer le fichier d\'impression',
+        'EN': 'Failed to prepare print file',
+        'ES': 'Error al preparar el archivo de impresión',
+        'IT': 'Impossibile preparare il file di stampa',
+        'DE': 'Druckdatei konnte nicht vorbereitet werden',
+        'TR': 'Yazdırma dosyası hazırlanamadı'
+      },
+      'seatingChart.selectAtLeastOneComputer': {
+        'AR': 'يرجى تحديد حاسوب واحد على الأقل للطباعة.',
+        'FR': 'Veuillez sélectionner au moins un ordinateur pour l\'impression.',
+        'EN': 'Please select at least one computer for printing.',
+        'ES': 'Por favor, seleccione al menos una computadora para imprimir.',
+        'IT': 'Si prega di selezionare almeno un computer per la stampa.',
+        'DE': 'Bitte wählen Sie mindestens einen Computer zum Drucken aus.',
+        'TR': 'Lütfen yazdırma için en az bir bilgisayar seçin.'
+      },
+      'seatingChart.failedToDetermineComputerNames': {
+        'AR': 'تعذر تحديد أسماء الحواسيب المحددة.',
+        'FR': 'Impossible de déterminer les noms des ordinateurs sélectionnés.',
+        'EN': 'Failed to determine selected computer names.',
+        'ES': 'Error al determinar los nombres de las computadoras seleccionadas.',
+        'IT': 'Impossibile determinare i nomi dei computer selezionati.',
+        'DE': 'Ausgewählte Computernamen konnten nicht ermittelt werden.',
+        'TR': 'Seçili bilgisayar adları belirlenemedi.'
+      },
+      'seatingChart.noDataToPrint': {
+        'AR': 'لا توجد بيانات لطباعتها للحواسيب المحددة.',
+        'FR': 'Aucune donnée à imprimer pour les ordinateurs sélectionnés.',
+        'EN': 'No data to print for selected computers.',
+        'ES': 'No hay datos para imprimir para las computadoras seleccionadas.',
+        'IT': 'Nessun dato da stampare per i computer selezionati.',
+        'DE': 'Keine Daten zum Drucken für ausgewählte Computer.',
+        'TR': 'Seçili bilgisayarlar için yazdırılacak veri yok.'
+      },
+      'seatingChart.failedToPrepareComputerPrint': {
+        'AR': 'تعذر تجهيز ملف طباعة هذا الحاسوب',
+        'FR': 'Impossible de préparer le fichier d\'impression de cet ordinateur',
+        'EN': 'Failed to prepare print file for this computer',
+        'ES': 'Error al preparar el archivo de impresión para esta computadora',
+        'IT': 'Impossibile preparare il file di stampa per questo computer',
+        'DE': 'Druckdatei für diesen Computer konnte nicht vorbereitet werden',
+        'TR': 'Bu bilgisayar için yazdırma dosyası hazırlanamadı'
+      },
+      'seatingChart.failedToGeneratePDF': {
+        'AR': 'تعذر توليد ملف PDF للمخطط',
+        'FR': 'Impossible de générer le fichier PDF du plan',
+        'EN': 'Failed to generate PDF file for layout',
+        'ES': 'Error al generar el archivo PDF para la disposición',
+        'IT': 'Impossibile generare il file PDF per il layout',
+        'DE': 'PDF-Datei für Layout konnte nicht generiert werden',
+        'TR': 'Düzen için PDF dosyası oluşturulamadı'
+      },
+      'seatingChart.selectClassFirst': {
+        'AR': 'يرجى اختيار قسم أولاً',
+        'FR': 'Veuillez d\'abord sélectionner une classe',
+        'EN': 'Please select a class first',
+        'ES': 'Por favor, seleccione una clase primero',
+        'IT': 'Si prega di selezionare prima una classe',
+        'DE': 'Bitte wählen Sie zuerst eine Klasse aus',
+        'TR': 'Lütfen önce bir sınıf seçin'
+      },
+      'seatingChart.roomLayoutCreatedSuccessfully': {
+        'AR': 'تم إنشاء تخطيط القاعة بنجاح',
+        'FR': 'Plan de salle créé avec succès',
+        'EN': 'Room layout created successfully',
+        'ES': 'Disposición de sala creada exitosamente',
+        'IT': 'Layout sala creato con successo',
+        'DE': 'Raumlayout erfolgreich erstellt',
+        'TR': 'Oda düzeni başarıyla oluşturuldu'
+      },
+      'seatingChart.failedToCreateRoomLayout': {
+        'AR': 'تعذر إنشاء تخطيط القاعة',
+        'FR': 'Impossible de créer le plan de la salle',
+        'EN': 'Failed to create room layout',
+        'ES': 'Error al crear la disposición de sala',
+        'IT': 'Impossibile creare il layout della sala',
+        'DE': 'Raumlayout konnte nicht erstellt werden',
+        'TR': 'Oda düzeni oluşturulamadı'
+      },
+      'seatingChart.deskPositionsSaved': {
+        'AR': 'تم حفظ أماكن الطاولات',
+        'FR': 'Positions des tables enregistrées',
+        'EN': 'Desk positions saved',
+        'ES': 'Posiciones de mesas guardadas',
+        'IT': 'Posizioni banchi salvate',
+        'DE': 'Tischpositionen gespeichert',
+        'TR': 'Masa konumları kaydedildi'
+      },
+      'seatingChart.failedToSaveDeskPositions': {
+        'AR': 'تعذر حفظ أماكن الطاولات',
+        'FR': 'Impossible d\'enregistrer les positions des tables',
+        'EN': 'Failed to save desk positions',
+        'ES': 'Error al guardar posiciones de mesas',
+        'IT': 'Impossibile salvare le posizioni dei banchi',
+        'DE': 'Tischpositionen konnten nicht gespeichert werden',
+        'TR': 'Masa konumları kaydedilemedi'
+      },
+      'seatingChart.computers': {
+        'AR': 'الحواسيب',
+        'FR': 'Ordinateurs',
+        'EN': 'Computers',
+        'ES': 'Computadoras',
+        'IT': 'Computer',
+        'DE': 'Computer',
+        'TR': 'Bilgisayarlar'
+      },
+      'seatingChart.desks': {
+        'AR': 'الطاولات',
+        'FR': 'Tables',
+        'EN': 'Desks',
+        'ES': 'Mesas',
+        'IT': 'Banchi',
+        'DE': 'Tische',
+        'TR': 'Masalar'
+      },
+      'seatingChart.first': {
+        'AR': 'أولاً',
+        'FR': 'd\'abord',
+        'EN': 'first',
+        'ES': 'primero',
+        'IT': 'prima',
+        'DE': 'zuerst',
+        'TR': 'önce'
+      },
+      'seatingChart.error': {
+        'AR': 'خطأ',
+        'FR': 'Erreur',
+        'EN': 'Error',
+        'ES': 'Error',
+        'IT': 'Errore',
+        'DE': 'Fehler',
+        'TR': 'Hata'
       },
 
       // Labs
@@ -3997,6 +5761,879 @@ export class LanguageService {
         'DE': 'In Wartung',
         'TR': 'Bakımda'
       },
+      'labs.addLab': {
+        'AR': 'إضافة مخبر',
+        'FR': 'Ajouter un laboratoire',
+        'EN': 'Add lab',
+        'ES': 'Agregar laboratorio',
+        'IT': 'Aggiungi laboratorio',
+        'DE': 'Labor hinzufügen',
+        'TR': 'Laboratuvar ekle'
+      },
+      'labs.labs': {
+        'AR': 'المخابر',
+        'FR': 'Laboratoires',
+        'EN': 'Labs',
+        'ES': 'Laboratorios',
+        'IT': 'Laboratori',
+        'DE': 'Labore',
+        'TR': 'Laboratuvarlar'
+      },
+      'labs.deviceTracking': {
+        'AR': 'متابعة عمل وسلامة الأجهزة',
+        'FR': 'Suivi du fonctionnement et de la sécurité des équipements',
+        'EN': 'Device operation and safety tracking',
+        'ES': 'Seguimiento del funcionamiento y seguridad de los equipos',
+        'IT': 'Monitoraggio funzionamento e sicurezza dispositivi',
+        'DE': 'Gerätebetriebs- und Sicherheitsverfolgung',
+        'TR': 'Cihaz çalışması ve güvenlik takibi'
+      },
+      'labs.computerLabEquipment': {
+        'AR': 'أجهزة معمل الحاسب',
+        'FR': 'Équipements du laboratoire informatique',
+        'EN': 'Computer lab equipment',
+        'ES': 'Equipos del laboratorio de informática',
+        'IT': 'Attrezzature del laboratorio informatico',
+        'DE': 'Computerlabor-Ausrüstung',
+        'TR': 'Bilgisayar laboratuvarı ekipmanları'
+      },
+      'labs.labComputerSoftware': {
+        'AR': 'برامج حواسيب المعمل',
+        'FR': 'Logiciels des ordinateurs du laboratoire',
+        'EN': 'Lab computer software',
+        'ES': 'Software de los ordenadores del laboratorio',
+        'IT': 'Software dei computer del laboratorio',
+        'DE': 'Laborcomputer-Software',
+        'TR': 'Laboratuvar bilgisayar yazılımları'
+      },
+      'labs.computerLabFurniture': {
+        'AR': 'أثاث معمل الحاسب',
+        'FR': 'Mobilier du laboratoire informatique',
+        'EN': 'Computer lab furniture',
+        'ES': 'Mobiliario del laboratorio de informática',
+        'IT': 'Arredamento del laboratorio informatico',
+        'DE': 'Computerlabor-Möbel',
+        'TR': 'Bilgisayar laboratuvarı mobilyaları'
+      },
+      'labs.inventoryNumbers': {
+        'AR': 'أرقام الجرد',
+        'FR': 'Numéros d\'inventaire',
+        'EN': 'Inventory numbers',
+        'ES': 'Números de inventario',
+        'IT': 'Numeri di inventario',
+        'DE': 'Inventarnummern',
+        'TR': 'Envanter numaraları'
+      },
+      'labs.hardwareSoftwareChecklist': {
+        'AR': 'المكوّنات المادية والبرمجية',
+        'FR': 'Composants matériels et logiciels',
+        'EN': 'Hardware and software components',
+        'ES': 'Componentes de hardware y software',
+        'IT': 'Componenti hardware e software',
+        'DE': 'Hardware- und Softwarekomponenten',
+        'TR': 'Donanım ve yazılım bileşenleri'
+      },
+      'labs.computerLabCleaning': {
+        'AR': 'نظافة معمل الحاسب',
+        'FR': 'Nettoyage du laboratoire informatique',
+        'EN': 'Computer lab cleaning',
+        'ES': 'Limpieza del laboratorio de informática',
+        'IT': 'Pulizia del laboratorio informatico',
+        'DE': 'Computerlabor-Reinigung',
+        'TR': 'Bilgisayar laboratuvarı temizliği'
+      },
+      'labs.labsList': {
+        'AR': 'قائمة المخابر',
+        'FR': 'Liste des laboratoires',
+        'EN': 'Labs list',
+        'ES': 'Lista de laboratorios',
+        'IT': 'Elenco laboratori',
+        'DE': 'Laborliste',
+        'TR': 'Laboratuvar listesi'
+      },
+      'labs.labName': {
+        'AR': 'اسم المخبر',
+        'FR': 'Nom du laboratoire',
+        'EN': 'Lab name',
+        'ES': 'Nombre del laboratorio',
+        'IT': 'Nome laboratorio',
+        'DE': 'Laborname',
+        'TR': 'Laboratuvar adı'
+      },
+      'labs.description': {
+        'AR': 'الوصف',
+        'FR': 'Description',
+        'EN': 'Description',
+        'ES': 'Descripción',
+        'IT': 'Descrizione',
+        'DE': 'Beschreibung',
+        'TR': 'Açıklama'
+      },
+      'labs.location': {
+        'AR': 'الموقع',
+        'FR': 'Emplacement',
+        'EN': 'Location',
+        'ES': 'Ubicación',
+        'IT': 'Posizione',
+        'DE': 'Standort',
+        'TR': 'Konum'
+      },
+      'labs.actions': {
+        'AR': 'الإجراءات',
+        'FR': 'Actions',
+        'EN': 'Actions',
+        'ES': 'Acciones',
+        'IT': 'Azioni',
+        'DE': 'Aktionen',
+        'TR': 'İşlemler'
+      },
+      'labs.available': {
+        'AR': 'متاح',
+        'FR': 'Disponible',
+        'EN': 'Available',
+        'ES': 'Disponible',
+        'IT': 'Disponibile',
+        'DE': 'Verfügbar',
+        'TR': 'Müsait'
+      },
+      'labs.unavailable': {
+        'AR': 'غير متاح',
+        'FR': 'Indisponible',
+        'EN': 'Unavailable',
+        'ES': 'No disponible',
+        'IT': 'Non disponibile',
+        'DE': 'Nicht verfügbar',
+        'TR': 'Müsait değil'
+      },
+      'labs.noLabs': {
+        'AR': 'لا توجد مخابر',
+        'FR': 'Aucun laboratoire',
+        'EN': 'No labs',
+        'ES': 'No hay laboratorios',
+        'IT': 'Nessun laboratorio',
+        'DE': 'Keine Labore',
+        'TR': 'Laboratuvar yok'
+      },
+      'labs.deviceExitEntryLog': {
+        'AR': 'سجل خروج ودخول الأجهزة',
+        'FR': 'Journal de sortie et d\'entrée des équipements',
+        'EN': 'Device exit and entry log',
+        'ES': 'Registro de salida y entrada de dispositivos',
+        'IT': 'Registro uscita e ingresso dispositivi',
+        'DE': 'Geräteaus- und -eingangsprotokoll',
+        'TR': 'Cihaz çıkış ve giriş kaydı'
+      },
+      'labs.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'labs.teacherFullName': {
+        'AR': 'اسم ولقب الأستاذ',
+        'FR': 'Nom et prénom du professeur',
+        'EN': 'Teacher full name',
+        'ES': 'Nombre completo del profesor',
+        'IT': 'Nome completo insegnante',
+        'DE': 'Vollständiger Name des Lehrers',
+        'TR': 'Öğretmen adı soyadı'
+      },
+      'labs.equipmentTypeFromLab': {
+        'AR': 'نوع العتاد (من أجهزة المعمل)',
+        'FR': 'Type d\'équipement (du laboratoire)',
+        'EN': 'Equipment type (from lab equipment)',
+        'ES': 'Tipo de equipo (del equipo del laboratorio)',
+        'IT': 'Tipo di attrezzatura (dalle attrezzature del laboratorio)',
+        'DE': 'Gerätetyp (aus Laborausrüstung)',
+        'TR': 'Ekipman tipi (laboratuvar ekipmanlarından)'
+      },
+      'labs.selectEquipmentType': {
+        'AR': 'اختر نوع العتاد',
+        'FR': 'Sélectionner le type d\'équipement',
+        'EN': 'Select equipment type',
+        'ES': 'Seleccionar tipo de equipo',
+        'IT': 'Seleziona tipo di attrezzatura',
+        'DE': 'Gerätetyp auswählen',
+        'TR': 'Ekipman tipini seçin'
+      },
+      'labs.count': {
+        'AR': 'عدد',
+        'FR': 'Nombre',
+        'EN': 'Count',
+        'ES': 'Cantidad',
+        'IT': 'Conteggio',
+        'DE': 'Anzahl',
+        'TR': 'Sayı'
+      },
+      'labs.selectInventoryNumber': {
+        'AR': 'اختر رقم الجرد',
+        'FR': 'Sélectionner le numéro d\'inventaire',
+        'EN': 'Select inventory number',
+        'ES': 'Seleccionar número de inventario',
+        'IT': 'Seleziona numero di inventario',
+        'DE': 'Inventarnummer auswählen',
+        'TR': 'Envanter numarasını seçin'
+      },
+      'labs.movementDate': {
+        'AR': 'تاريخ الحركة',
+        'FR': 'Date du mouvement',
+        'EN': 'Movement date',
+        'ES': 'Fecha del movimiento',
+        'IT': 'Data del movimento',
+        'DE': 'Bewegungsdatum',
+        'TR': 'Hareket tarihi'
+      },
+      'labs.operationType': {
+        'AR': 'نوع العملية',
+        'FR': 'Type d\'opération',
+        'EN': 'Operation type',
+        'ES': 'Tipo de operación',
+        'IT': 'Tipo di operazione',
+        'DE': 'Vorgangstyp',
+        'TR': 'İşlem tipi'
+      },
+      'labs.deviceExit': {
+        'AR': 'خروج الجهاز',
+        'FR': 'Sortie de l\'équipement',
+        'EN': 'Device exit',
+        'ES': 'Salida del dispositivo',
+        'IT': 'Uscita dispositivo',
+        'DE': 'Geräteausgang',
+        'TR': 'Cihaz çıkışı'
+      },
+      'labs.deviceReturn': {
+        'AR': 'استلام الجهاز',
+        'FR': 'Retour de l\'équipement',
+        'EN': 'Device return',
+        'ES': 'Retorno del dispositivo',
+        'IT': 'Ritorno dispositivo',
+        'DE': 'Geräterückgabe',
+        'TR': 'Cihaz iadesi'
+      },
+      'labs.equipmentStatus': {
+        'AR': 'حالة العتاد (✓ / ✗)',
+        'FR': 'État de l\'équipement (✓ / ✗)',
+        'EN': 'Equipment status (✓ / ✗)',
+        'ES': 'Estado del equipo (✓ / ✗)',
+        'IT': 'Stato attrezzatura (✓ / ✗)',
+        'DE': 'Gerätestatus (✓ / ✗)',
+        'TR': 'Ekipman durumu (✓ / ✗)'
+      },
+      'labs.notWorking': {
+        'AR': 'لا يعمل',
+        'FR': 'Ne fonctionne pas',
+        'EN': 'Not working',
+        'ES': 'No funciona',
+        'IT': 'Non funziona',
+        'DE': 'Funktioniert nicht',
+        'TR': 'Çalışmıyor'
+      },
+      'labs.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Notes',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Notizen',
+        'TR': 'Notlar'
+      },
+      'labs.saveNewLog': {
+        'AR': 'حفظ سجل جديد',
+        'FR': 'Enregistrer un nouveau journal',
+        'EN': 'Save new log',
+        'ES': 'Guardar nuevo registro',
+        'IT': 'Salva nuovo registro',
+        'DE': 'Neues Protokoll speichern',
+        'TR': 'Yeni kayıt kaydet'
+      },
+      'labs.exitDate': {
+        'AR': 'تاريخ الخروج',
+        'FR': 'Date de sortie',
+        'EN': 'Exit date',
+        'ES': 'Fecha de salida',
+        'IT': 'Data di uscita',
+        'DE': 'Austrittsdatum',
+        'TR': 'Çıkış tarihi'
+      },
+      'labs.teacher': {
+        'AR': 'الأستاذ',
+        'FR': 'Professeur',
+        'EN': 'Teacher',
+        'ES': 'Profesor',
+        'IT': 'Insegnante',
+        'DE': 'Lehrer',
+        'TR': 'Öğretmen'
+      },
+      'labs.equipmentType': {
+        'AR': 'نوع العتاد',
+        'FR': 'Type d\'équipement',
+        'EN': 'Equipment type',
+        'ES': 'Tipo de equipo',
+        'IT': 'Tipo di attrezzatura',
+        'DE': 'Gerätetyp',
+        'TR': 'Ekipman tipi'
+      },
+      'labs.equipmentStatusOnExit': {
+        'AR': 'حالة العتاد عند الخروج',
+        'FR': 'État de l\'équipement à la sortie',
+        'EN': 'Equipment status on exit',
+        'ES': 'Estado del equipo al salir',
+        'IT': 'Stato attrezzatura all\'uscita',
+        'DE': 'Gerätestatus beim Verlassen',
+        'TR': 'Çıkışta ekipman durumu'
+      },
+      'labs.returnDate': {
+        'AR': 'تاريخ الاستلام',
+        'FR': 'Date de retour',
+        'EN': 'Return date',
+        'ES': 'Fecha de retorno',
+        'IT': 'Data di ritorno',
+        'DE': 'Rückgabedatum',
+        'TR': 'İade tarihi'
+      },
+      'labs.equipmentStatusOnReturn': {
+        'AR': 'حالة العتاد عند الاستلام',
+        'FR': 'État de l\'équipement au retour',
+        'EN': 'Equipment status on return',
+        'ES': 'Estado del equipo al retornar',
+        'IT': 'Stato attrezzatura al ritorno',
+        'DE': 'Gerätestatus bei Rückgabe',
+        'TR': 'İadede ekipman durumu'
+      },
+      'labs.noDeviceLogs': {
+        'AR': 'لا توجد سجلات للأجهزة',
+        'FR': 'Aucun journal d\'équipement',
+        'EN': 'No device logs',
+        'ES': 'No hay registros de dispositivos',
+        'IT': 'Nessun registro dispositivo',
+        'DE': 'Keine Geräteprotokolle',
+        'TR': 'Cihaz kaydı yok'
+      },
+      'labs.model': {
+        'AR': 'الموديل',
+        'FR': 'Modèle',
+        'EN': 'Model',
+        'ES': 'Modelo',
+        'IT': 'Modello',
+        'DE': 'Modell',
+        'TR': 'Model'
+      },
+      'labs.totalCount': {
+        'AR': 'العدد الكلي',
+        'FR': 'Nombre total',
+        'EN': 'Total count',
+        'ES': 'Cantidad total',
+        'IT': 'Conteggio totale',
+        'DE': 'Gesamtzahl',
+        'TR': 'Toplam sayı'
+      },
+      'labs.workingCount': {
+        'AR': 'عدد الذي يعمل',
+        'FR': 'Nombre fonctionnel',
+        'EN': 'Working count',
+        'ES': 'Cantidad funcionando',
+        'IT': 'Conteggio funzionante',
+        'DE': 'Funktionierende Anzahl',
+        'TR': 'Çalışan sayısı'
+      },
+      'labs.notWorkingCount': {
+        'AR': 'عدد الذي لا يعمل',
+        'FR': 'Nombre non fonctionnel',
+        'EN': 'Not working count',
+        'ES': 'Cantidad no funcionando',
+        'IT': 'Conteggio non funzionante',
+        'DE': 'Nicht funktionierende Anzahl',
+        'TR': 'Çalışmayan sayısı'
+      },
+      'labs.saveDeviceToRecord': {
+        'AR': 'حفظ جهاز في السجل',
+        'FR': 'Enregistrer l\'équipement dans le registre',
+        'EN': 'Save device to record',
+        'ES': 'Guardar dispositivo en el registro',
+        'IT': 'Salva dispositivo nel registro',
+        'DE': 'Gerät im Protokoll speichern',
+        'TR': 'Cihazı kayda kaydet'
+      },
+      'labs.noEquipmentData': {
+        'AR': 'لا توجد بيانات لأجهزة المعمل بعد',
+        'FR': 'Aucune donnée d\'équipement de laboratoire pour le moment',
+        'EN': 'No lab equipment data yet',
+        'ES': 'Aún no hay datos de equipos del laboratorio',
+        'IT': 'Nessun dato attrezzatura laboratorio ancora',
+        'DE': 'Noch keine Laborausrüstungsdaten',
+        'TR': 'Henüz laboratuvar ekipman verisi yok'
+      },
+      'labs.programName': {
+        'AR': 'اسم البرنامج',
+        'FR': 'Nom du programme',
+        'EN': 'Program name',
+        'ES': 'Nombre del programa',
+        'IT': 'Nome programma',
+        'DE': 'Programmname',
+        'TR': 'Program adı'
+      },
+      'labs.versionInstalled': {
+        'AR': 'الإصدار / المثبّت',
+        'FR': 'Version / Installé',
+        'EN': 'Version / Installed',
+        'ES': 'Versión / Instalado',
+        'IT': 'Versione / Installato',
+        'DE': 'Version / Installiert',
+        'TR': 'Sürüm / Yüklü'
+      },
+      'labs.saveProgram': {
+        'AR': 'حفظ برنامج',
+        'FR': 'Enregistrer le programme',
+        'EN': 'Save program',
+        'ES': 'Guardar programa',
+        'IT': 'Salva programma',
+        'DE': 'Programm speichern',
+        'TR': 'Programı kaydet'
+      },
+      'labs.program': {
+        'AR': 'البرنامج',
+        'FR': 'Programme',
+        'EN': 'Program',
+        'ES': 'Programa',
+        'IT': 'Programma',
+        'DE': 'Programm',
+        'TR': 'Program'
+      },
+      'labs.installedVersion': {
+        'AR': 'المثبت / الإصدار',
+        'FR': 'Installé / Version',
+        'EN': 'Installed / Version',
+        'ES': 'Instalado / Versión',
+        'IT': 'Installato / Versione',
+        'DE': 'Installiert / Version',
+        'TR': 'Yüklü / Sürüm'
+      },
+      'labs.noSoftwareData': {
+        'AR': 'لا توجد بيانات لبرامج حواسيب المعمل بعد',
+        'FR': 'Aucune donnée de logiciel de laboratoire pour le moment',
+        'EN': 'No lab computer software data yet',
+        'ES': 'Aún no hay datos de software del laboratorio',
+        'IT': 'Nessun dato software computer laboratorio ancora',
+        'DE': 'Noch keine Laborcomputer-Softwaredaten',
+        'TR': 'Henüz laboratuvar bilgisayar yazılım verisi yok'
+      },
+      'labs.furnitureName': {
+        'AR': 'اسم الأثاث',
+        'FR': 'Nom du mobilier',
+        'EN': 'Furniture name',
+        'ES': 'Nombre del mobiliario',
+        'IT': 'Nome mobilio',
+        'DE': 'Möbelname',
+        'TR': 'Mobilya adı'
+      },
+      'labs.modelDescription': {
+        'AR': 'الموديل / الوصف',
+        'FR': 'Modèle / Description',
+        'EN': 'Model / Description',
+        'ES': 'Modelo / Descripción',
+        'IT': 'Modello / Descrizione',
+        'DE': 'Modell / Beschreibung',
+        'TR': 'Model / Açıklama'
+      },
+      'labs.saveFurnitureItem': {
+        'AR': 'حفظ قطعة أثاث',
+        'FR': 'Enregistrer un meuble',
+        'EN': 'Save furniture item',
+        'ES': 'Guardar mueble',
+        'IT': 'Salva mobile',
+        'DE': 'Möbelstück speichern',
+        'TR': 'Mobilya öğesini kaydet'
+      },
+      'labs.noFurnitureData': {
+        'AR': 'لا توجد بيانات لأثاث المعمل بعد',
+        'FR': 'Aucune donnée de mobilier de laboratoire pour le moment',
+        'EN': 'No lab furniture data yet',
+        'ES': 'Aún no hay datos de mobiliario del laboratorio',
+        'IT': 'Nessun dato mobilio laboratorio ancora',
+        'DE': 'Noch keine Labormöbeldaten',
+        'TR': 'Henüz laboratuvar mobilya verisi yok'
+      },
+      'labs.labEquipmentFurnitureInventory': {
+        'AR': 'أرقام جرد أجهزة وأثاث المعمل',
+        'FR': 'Numéros d\'inventaire des équipements et mobiliers du laboratoire',
+        'EN': 'Lab equipment and furniture inventory numbers',
+        'ES': 'Números de inventario de equipos y mobiliario del laboratorio',
+        'IT': 'Numeri di inventario attrezzature e mobili laboratorio',
+        'DE': 'Inventarnummern für Laborausrüstung und -möbel',
+        'TR': 'Laboratuvar ekipman ve mobilya envanter numaraları'
+      },
+      'labs.category': {
+        'AR': 'الفئة',
+        'FR': 'Catégorie',
+        'EN': 'Category',
+        'ES': 'Categoría',
+        'IT': 'Categoria',
+        'DE': 'Kategorie',
+        'TR': 'Kategori'
+      },
+      'labs.deviceDescription': {
+        'AR': 'وصف الجهاز',
+        'FR': 'Description de l\'équipement',
+        'EN': 'Device description',
+        'ES': 'Descripción del dispositivo',
+        'IT': 'Descrizione dispositivo',
+        'DE': 'Gerätebeschreibung',
+        'TR': 'Cihaz açıklaması'
+      },
+      'labs.saveInventoryNumber': {
+        'AR': 'حفظ رقم الجرد',
+        'FR': 'Enregistrer le numéro d\'inventaire',
+        'EN': 'Save inventory number',
+        'ES': 'Guardar número de inventario',
+        'IT': 'Salva numero di inventario',
+        'DE': 'Inventarnummer speichern',
+        'TR': 'Envanter numarasını kaydet'
+      },
+      'labs.device': {
+        'AR': 'الجهاز',
+        'FR': 'Équipement',
+        'EN': 'Device',
+        'ES': 'Dispositivo',
+        'IT': 'Dispositivo',
+        'DE': 'Gerät',
+        'TR': 'Cihaz'
+      },
+      'labs.noInventoryNumbers': {
+        'AR': 'لا توجد أرقام جرد مسجلة بعد',
+        'FR': 'Aucun numéro d\'inventaire enregistré pour le moment',
+        'EN': 'No inventory numbers recorded yet',
+        'ES': 'Aún no hay números de inventario registrados',
+        'IT': 'Nessun numero di inventario registrato ancora',
+        'DE': 'Noch keine Inventarnummern erfasst',
+        'TR': 'Henüz kayıtlı envanter numarası yok'
+      },
+      'labs.deviceNumberRange': {
+        'AR': 'رقم الجهاز (1 - 16)',
+        'FR': 'Numéro de l\'équipement (1 - 16)',
+        'EN': 'Device number (1 - 16)',
+        'ES': 'Número del dispositivo (1 - 16)',
+        'IT': 'Numero dispositivo (1 - 16)',
+        'DE': 'Gerätenummer (1 - 16)',
+        'TR': 'Cihaz numarası (1 - 16)'
+      },
+      'labs.systemUnit': {
+        'AR': 'وحدة النظام',
+        'FR': 'Unité système',
+        'EN': 'System unit',
+        'ES': 'Unidad del sistema',
+        'IT': 'Unità di sistema',
+        'DE': 'Systemeinheit',
+        'TR': 'Sistem birimi'
+      },
+      'labs.monitor': {
+        'AR': 'الشاشة',
+        'FR': 'Moniteur',
+        'EN': 'Monitor',
+        'ES': 'Monitor',
+        'IT': 'Monitor',
+        'DE': 'Monitor',
+        'TR': 'Monitör'
+      },
+      'labs.mouse': {
+        'AR': 'الفأرة',
+        'FR': 'Souris',
+        'EN': 'Mouse',
+        'ES': 'Ratón',
+        'IT': 'Mouse',
+        'DE': 'Maus',
+        'TR': 'Fare'
+      },
+      'labs.keyboard': {
+        'AR': 'لوحة المفاتيح',
+        'FR': 'Clavier',
+        'EN': 'Keyboard',
+        'ES': 'Teclado',
+        'IT': 'Tastiera',
+        'DE': 'Tastatur',
+        'TR': 'Klavye'
+      },
+      'labs.cabling': {
+        'AR': 'التمديدات',
+        'FR': 'Câblage',
+        'EN': 'Cabling',
+        'ES': 'Cableado',
+        'IT': 'Cablaggio',
+        'DE': 'Verkabelung',
+        'TR': 'Kablolama'
+      },
+      'labs.deviceCleanliness': {
+        'AR': 'نظافة الجهاز',
+        'FR': 'Nettoyage de l\'équipement',
+        'EN': 'Device cleanliness',
+        'ES': 'Limpieza del dispositivo',
+        'IT': 'Pulizia dispositivo',
+        'DE': 'Gerätereinheit',
+        'TR': 'Cihaz temizliği'
+      },
+      'labs.operatingSystem': {
+        'AR': 'نظام التشغيل',
+        'FR': 'Système d\'exploitation',
+        'EN': 'Operating system',
+        'ES': 'Sistema operativo',
+        'IT': 'Sistema operativo',
+        'DE': 'Betriebssystem',
+        'TR': 'İşletim sistemi'
+      },
+      'labs.officeSoftware': {
+        'AR': 'برامج الأوفيس',
+        'FR': 'Logiciels Office',
+        'EN': 'Office software',
+        'ES': 'Software de oficina',
+        'IT': 'Software Office',
+        'DE': 'Office-Software',
+        'TR': 'Ofis yazılımı'
+      },
+      'labs.office': {
+        'AR': 'الأوفيس',
+        'FR': 'Office',
+        'EN': 'Office',
+        'ES': 'Office',
+        'IT': 'Office',
+        'DE': 'Office',
+        'TR': 'Office'
+      },
+      'labs.netSupport': {
+        'AR': 'نت سبورت',
+        'FR': 'Net Support',
+        'EN': 'Net Support',
+        'ES': 'Net Support',
+        'IT': 'Net Support',
+        'DE': 'Net Support',
+        'TR': 'Net Support'
+      },
+      'labs.desktopCleaned': {
+        'AR': 'تنظيف سطح المكتب',
+        'FR': 'Nettoyage du bureau',
+        'EN': 'Desktop cleaned',
+        'ES': 'Escritorio limpiado',
+        'IT': 'Desktop pulito',
+        'DE': 'Desktop gereinigt',
+        'TR': 'Masaüstü temizlendi'
+      },
+      'labs.antivirus': {
+        'AR': 'مضاد الفيروسات',
+        'FR': 'Antivirus',
+        'EN': 'Antivirus',
+        'ES': 'Antivirus',
+        'IT': 'Antivirus',
+        'DE': 'Antivirus',
+        'TR': 'Antivirus'
+      },
+      'labs.checkDate': {
+        'AR': 'تاريخ الفحص',
+        'FR': 'Date de vérification',
+        'EN': 'Check date',
+        'ES': 'Fecha de verificación',
+        'IT': 'Data verifica',
+        'DE': 'Prüfdatum',
+        'TR': 'Kontrol tarihi'
+      },
+      'labs.saveDeviceCheck': {
+        'AR': 'حفظ فحص الجهاز',
+        'FR': 'Enregistrer la vérification de l\'équipement',
+        'EN': 'Save device check',
+        'ES': 'Guardar verificación del dispositivo',
+        'IT': 'Salva verifica dispositivo',
+        'DE': 'Geräteprüfung speichern',
+        'TR': 'Cihaz kontrolünü kaydet'
+      },
+      'labs.deviceNumber': {
+        'AR': 'رقم الجهاز',
+        'FR': 'Numéro de l\'équipement',
+        'EN': 'Device number',
+        'ES': 'Número del dispositivo',
+        'IT': 'Numero dispositivo',
+        'DE': 'Gerätenummer',
+        'TR': 'Cihaz numarası'
+      },
+      'labs.noCheckRecords': {
+        'AR': 'لا توجد سجلات فحص بعد',
+        'FR': 'Aucun enregistrement de vérification pour le moment',
+        'EN': 'No check records yet',
+        'ES': 'Aún no hay registros de verificación',
+        'IT': 'Nessun registro di verifica ancora',
+        'DE': 'Noch keine Prüfprotokolle',
+        'TR': 'Henüz kontrol kaydı yok'
+      },
+      'labs.cleaningStatuses': {
+        'AR': 'حالات النظافة',
+        'FR': 'États de nettoyage',
+        'EN': 'Cleaning statuses',
+        'ES': 'Estados de limpieza',
+        'IT': 'Stati di pulizia',
+        'DE': 'Reinigungsstatus',
+        'TR': 'Temizlik durumları'
+      },
+      'labs.good': {
+        'AR': 'جيدة',
+        'FR': 'Bonne',
+        'EN': 'Good',
+        'ES': 'Buena',
+        'IT': 'Buona',
+        'DE': 'Gut',
+        'TR': 'İyi'
+      },
+      'labs.bad': {
+        'AR': 'سيئة',
+        'FR': 'Mauvaise',
+        'EN': 'Bad',
+        'ES': 'Mala',
+        'IT': 'Cattiva',
+        'DE': 'Schlecht',
+        'TR': 'Kötü'
+      },
+      'labs.desktopCleanliness': {
+        'AR': 'نظافة سطح المكتب',
+        'FR': 'Nettoyage du bureau',
+        'EN': 'Desktop cleanliness',
+        'ES': 'Limpieza del escritorio',
+        'IT': 'Pulizia desktop',
+        'DE': 'Desktop-Reinheit',
+        'TR': 'Masaüstü temizliği'
+      },
+      'labs.roomCleanliness': {
+        'AR': 'نظافة القاعة',
+        'FR': 'Nettoyage de la salle',
+        'EN': 'Room cleanliness',
+        'ES': 'Limpieza de la sala',
+        'IT': 'Pulizia sala',
+        'DE': 'Raumreinheit',
+        'TR': 'Oda temizliği'
+      },
+      'labs.complete': {
+        'AR': 'كاملة',
+        'FR': 'Complète',
+        'EN': 'Complete',
+        'ES': 'Completa',
+        'IT': 'Completa',
+        'DE': 'Vollständig',
+        'TR': 'Tamamlandı'
+      },
+      'labs.incomplete': {
+        'AR': 'غير كاملة',
+        'FR': 'Incomplète',
+        'EN': 'Incomplete',
+        'ES': 'Incompleta',
+        'IT': 'Incompleta',
+        'DE': 'Unvollständig',
+        'TR': 'Tamamlanmadı'
+      },
+      'labs.generalNotes': {
+        'AR': 'ملاحظات عامة',
+        'FR': 'Notes générales',
+        'EN': 'General notes',
+        'ES': 'Notas generales',
+        'IT': 'Note generali',
+        'DE': 'Allgemeine Notizen',
+        'TR': 'Genel notlar'
+      },
+      'labs.saveCleaningStatus': {
+        'AR': 'حفظ حالة النظافة',
+        'FR': 'Enregistrer l\'état de nettoyage',
+        'EN': 'Save cleaning status',
+        'ES': 'Guardar estado de limpieza',
+        'IT': 'Salva stato pulizia',
+        'DE': 'Reinigungsstatus speichern',
+        'TR': 'Temizlik durumunu kaydet'
+      },
+      'labs.noCleaningRecords': {
+        'AR': 'لا توجد سجلات لنظافة المعمل بعد',
+        'FR': 'Aucun enregistrement de nettoyage de laboratoire pour le moment',
+        'EN': 'No lab cleaning records yet',
+        'ES': 'Aún no hay registros de limpieza del laboratorio',
+        'IT': 'Nessun registro pulizia laboratorio ancora',
+        'DE': 'Noch keine Laborreinigungsprotokolle',
+        'TR': 'Henüz laboratuvar temizlik kaydı yok'
+      },
+      'labs.editLab': {
+        'AR': 'تعديل المخبر',
+        'FR': 'Modifier le laboratoire',
+        'EN': 'Edit lab',
+        'ES': 'Editar laboratorio',
+        'IT': 'Modifica laboratorio',
+        'DE': 'Labor bearbeiten',
+        'TR': 'Laboratuvarı düzenle'
+      },
+      'labs.addNewLab': {
+        'AR': 'إضافة مخبر جديد',
+        'FR': 'Ajouter un nouveau laboratoire',
+        'EN': 'Add new lab',
+        'ES': 'Agregar nuevo laboratorio',
+        'IT': 'Aggiungi nuovo laboratorio',
+        'DE': 'Neues Labor hinzufügen',
+        'TR': 'Yeni laboratuvar ekle'
+      },
+      'labs.enterLabName': {
+        'AR': 'أدخل اسم المخبر',
+        'FR': 'Entrez le nom du laboratoire',
+        'EN': 'Enter lab name',
+        'ES': 'Ingrese el nombre del laboratorio',
+        'IT': 'Inserisci nome laboratorio',
+        'DE': 'Laborname eingeben',
+        'TR': 'Laboratuvar adını girin'
+      },
+      'labs.enterLabDescription': {
+        'AR': 'أدخل وصف المخبر',
+        'FR': 'Entrez la description du laboratoire',
+        'EN': 'Enter lab description',
+        'ES': 'Ingrese la descripción del laboratorio',
+        'IT': 'Inserisci descrizione laboratorio',
+        'DE': 'Laborbeschreibung eingeben',
+        'TR': 'Laboratuvar açıklamasını girin'
+      },
+      'labs.enterLabLocation': {
+        'AR': 'أدخل موقع المخبر',
+        'FR': 'Entrez l\'emplacement du laboratoire',
+        'EN': 'Enter lab location',
+        'ES': 'Ingrese la ubicación del laboratorio',
+        'IT': 'Inserisci posizione laboratorio',
+        'DE': 'Laborstandort eingeben',
+        'TR': 'Laboratuvar konumunu girin'
+      },
+      'labs.labAvailable': {
+        'AR': 'المخبر متاح',
+        'FR': 'Le laboratoire est disponible',
+        'EN': 'Lab available',
+        'ES': 'Laboratorio disponible',
+        'IT': 'Laboratorio disponibile',
+        'DE': 'Labor verfügbar',
+        'TR': 'Laboratuvar müsait'
+      },
+      'labs.update': {
+        'AR': 'تحديث',
+        'FR': 'Mettre à jour',
+        'EN': 'Update',
+        'ES': 'Actualizar',
+        'IT': 'Aggiorna',
+        'DE': 'Aktualisieren',
+        'TR': 'Güncelle'
+      },
+      'labs.add': {
+        'AR': 'إضافة',
+        'FR': 'Ajouter',
+        'EN': 'Add',
+        'ES': 'Agregar',
+        'IT': 'Aggiungi',
+        'DE': 'Hinzufügen',
+        'TR': 'Ekle'
+      },
+      'labs.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
 
       // Timetable
       'timetable.title': {
@@ -4089,6 +6726,537 @@ export class LanguageService {
         'DE': 'Raum',
         'TR': 'Sınıf'
       },
+      'timetable.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF Dışa Aktar'
+      },
+      'timetable.editLesson': {
+        'AR': 'تعديل حصة',
+        'FR': 'Modifier la leçon',
+        'EN': 'Edit lesson',
+        'ES': 'Editar lección',
+        'IT': 'Modifica lezione',
+        'DE': 'Stunde bearbeiten',
+        'TR': 'Dersi düzenle'
+      },
+      'timetable.addNewLesson': {
+        'AR': 'إضافة حصة جديدة',
+        'FR': 'Ajouter une nouvelle leçon',
+        'EN': 'Add new lesson',
+        'ES': 'Agregar nueva lección',
+        'IT': 'Aggiungi nuova lezione',
+        'DE': 'Neue Stunde hinzufügen',
+        'TR': 'Yeni ders ekle'
+      },
+      'timetable.dayOfWeek': {
+        'AR': 'يوم الأسبوع',
+        'FR': 'Jour de la semaine',
+        'EN': 'Day of week',
+        'ES': 'Día de la semana',
+        'IT': 'Giorno della settimana',
+        'DE': 'Wochentag',
+        'TR': 'Haftanın günü'
+      },
+      'timetable.startTime': {
+        'AR': 'وقت البداية',
+        'FR': 'Heure de début',
+        'EN': 'Start time',
+        'ES': 'Hora de inicio',
+        'IT': 'Ora di inizio',
+        'DE': 'Startzeit',
+        'TR': 'Başlangıç saati'
+      },
+      'timetable.endTime': {
+        'AR': 'وقت النهاية',
+        'FR': 'Heure de fin',
+        'EN': 'End time',
+        'ES': 'Hora de finalización',
+        'IT': 'Ora di fine',
+        'DE': 'Endzeit',
+        'TR': 'Bitiş saati'
+      },
+      'timetable.lab': {
+        'AR': 'المخبر',
+        'FR': 'Laboratoire',
+        'EN': 'Lab',
+        'ES': 'Laboratorio',
+        'IT': 'Laboratorio',
+        'DE': 'Labor',
+        'TR': 'Laboratuvar'
+      },
+      'timetable.notes': {
+        'AR': 'ملاحظات',
+        'FR': 'Notes',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Notizen',
+        'TR': 'Notlar'
+      },
+      'timetable.selectClass': {
+        'AR': 'اختر القسم',
+        'FR': 'Sélectionner la classe',
+        'EN': 'Select class',
+        'ES': 'Seleccionar clase',
+        'IT': 'Seleziona classe',
+        'DE': 'Klasse auswählen',
+        'TR': 'Sınıf seç'
+      },
+      'timetable.none': {
+        'AR': 'لا يوجد',
+        'FR': 'Aucun',
+        'EN': 'None',
+        'ES': 'Ninguno',
+        'IT': 'Nessuno',
+        'DE': 'Keine',
+        'TR': 'Yok'
+      },
+      'timetable.enterSubject': {
+        'AR': 'أدخل اسم المادة',
+        'FR': 'Entrez le nom de la matière',
+        'EN': 'Enter subject name',
+        'ES': 'Ingrese el nombre de la asignatura',
+        'IT': 'Inserisci nome materia',
+        'DE': 'Fachname eingeben',
+        'TR': 'Ders adını girin'
+      },
+      'timetable.enterRoom': {
+        'AR': 'أدخل رقم القاعة',
+        'FR': 'Entrez le numéro de la salle',
+        'EN': 'Enter room number',
+        'ES': 'Ingrese el número de aula',
+        'IT': 'Inserisci numero aula',
+        'DE': 'Raumnummer eingeben',
+        'TR': 'Sınıf numarasını girin'
+      },
+      'timetable.enterNotes': {
+        'AR': 'أدخل ملاحظات',
+        'FR': 'Entrez des notes',
+        'EN': 'Enter notes',
+        'ES': 'Ingrese notas',
+        'IT': 'Inserisci note',
+        'DE': 'Notizen eingeben',
+        'TR': 'Notları girin'
+      },
+      'timetable.update': {
+        'AR': 'تحديث',
+        'FR': 'Mettre à jour',
+        'EN': 'Update',
+        'ES': 'Actualizar',
+        'IT': 'Aggiorna',
+        'DE': 'Aktualisieren',
+        'TR': 'Güncelle'
+      },
+      'timetable.add': {
+        'AR': 'إضافة',
+        'FR': 'Ajouter',
+        'EN': 'Add',
+        'ES': 'Agregar',
+        'IT': 'Aggiungi',
+        'DE': 'Hinzufügen',
+        'TR': 'Ekle'
+      },
+      'timetable.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'timetable.previousWeek': {
+        'AR': 'الأسبوع السابق',
+        'FR': 'Semaine précédente',
+        'EN': 'Previous week',
+        'ES': 'Semana anterior',
+        'IT': 'Settimana precedente',
+        'DE': 'Vorherige Woche',
+        'TR': 'Önceki hafta'
+      },
+      'timetable.nextWeek': {
+        'AR': 'الأسبوع التالي',
+        'FR': 'Semaine suivante',
+        'EN': 'Next week',
+        'ES': 'Semana siguiente',
+        'IT': 'Settimana successiva',
+        'DE': 'Nächste Woche',
+        'TR': 'Sonraki hafta'
+      },
+      'timetable.today': {
+        'AR': 'اليوم',
+        'FR': "Aujourd'hui",
+        'EN': 'Today',
+        'ES': 'Hoy',
+        'IT': 'Oggi',
+        'DE': 'Heute',
+        'TR': 'Bugün'
+      },
+      'timetable.week': {
+        'AR': 'الأسبوع',
+        'FR': 'Semaine',
+        'EN': 'Week',
+        'ES': 'Semana',
+        'IT': 'Settimana',
+        'DE': 'Woche',
+        'TR': 'Hafta'
+      },
+      'timetable.previousDay': {
+        'AR': 'اليوم السابق',
+        'FR': 'Jour précédent',
+        'EN': 'Previous day',
+        'ES': 'Día anterior',
+        'IT': 'Giorno precedente',
+        'DE': 'Vorheriger Tag',
+        'TR': 'Önceki gün'
+      },
+      'timetable.nextDay': {
+        'AR': 'اليوم التالي',
+        'FR': 'Jour suivant',
+        'EN': 'Next day',
+        'ES': 'Día siguiente',
+        'IT': 'Giorno successivo',
+        'DE': 'Nächster Tag',
+        'TR': 'Sonraki gün'
+      },
+      'timetable.previousMonth': {
+        'AR': 'الشهر السابق',
+        'FR': 'Mois précédent',
+        'EN': 'Previous month',
+        'ES': 'Mes anterior',
+        'IT': 'Mese precedente',
+        'DE': 'Vorheriger Monat',
+        'TR': 'Önceki ay'
+      },
+      'timetable.nextMonth': {
+        'AR': 'الشهر التالي',
+        'FR': 'Mois suivant',
+        'EN': 'Next month',
+        'ES': 'Mes siguiente',
+        'IT': 'Mese successivo',
+        'DE': 'Nächster Monat',
+        'TR': 'Sonraki ay'
+      },
+      'timetable.noLessonsToday': {
+        'AR': 'لا توجد حصص في هذا اليوم',
+        'FR': 'Aucune leçon ce jour',
+        'EN': 'No lessons today',
+        'ES': 'No hay lecciones hoy',
+        'IT': 'Nessuna lezione oggi',
+        'DE': 'Keine Stunden heute',
+        'TR': 'Bugün ders yok'
+      },
+      'timetable.conflictAlerts': {
+        'AR': 'تنبيهات التعارض',
+        'FR': 'Alertes de conflit',
+        'EN': 'Conflict alerts',
+        'ES': 'Alertas de conflicto',
+        'IT': 'Avvisi di conflitto',
+        'DE': 'Konfliktwarnungen',
+        'TR': 'Çakışma uyarıları'
+      },
+      'timetable.sameClassConflict': {
+        'AR': 'نفس القسم',
+        'FR': 'Même classe',
+        'EN': 'Same class',
+        'ES': 'Misma clase',
+        'IT': 'Stessa classe',
+        'DE': 'Gleiche Klasse',
+        'TR': 'Aynı sınıf'
+      },
+      'timetable.sameLabConflict': {
+        'AR': 'نفس المخبر',
+        'FR': 'Même laboratoire',
+        'EN': 'Same lab',
+        'ES': 'Mismo laboratorio',
+        'IT': 'Stesso laboratorio',
+        'DE': 'Gleiches Labor',
+        'TR': 'Aynı laboratuvar'
+      },
+      'timetable.sameRoomConflict': {
+        'AR': 'نفس القاعة',
+        'FR': 'Même salle',
+        'EN': 'Same room',
+        'ES': 'Misma aula',
+        'IT': 'Stessa aula',
+        'DE': 'Gleicher Raum',
+        'TR': 'Aynı sınıf'
+      },
+      'timetable.timeOverlap': {
+        'AR': 'تداخل في الوقت',
+        'FR': 'Chevauchement horaire',
+        'EN': 'Time overlap',
+        'ES': 'Superposición de tiempo',
+        'IT': 'Sovrapposizione oraria',
+        'DE': 'Zeitüberschneidung',
+        'TR': 'Zaman çakışması'
+      },
+      'timetable.atSameTime': {
+        'AR': 'في نفس الوقت',
+        'FR': 'Au même moment',
+        'EN': 'At the same time',
+        'ES': 'Al mismo tiempo',
+        'IT': 'Allo stesso tempo',
+        'DE': 'Zur gleichen Zeit',
+        'TR': 'Aynı zamanda'
+      },
+      'timetable.and': {
+        'AR': 'و',
+        'FR': 'et',
+        'EN': 'and',
+        'ES': 'y',
+        'IT': 'e',
+        'DE': 'und',
+        'TR': 've'
+      },
+      'timetable.sunday': {
+        'AR': 'الأحد',
+        'FR': 'Dimanche',
+        'EN': 'Sunday',
+        'ES': 'Domingo',
+        'IT': 'Domenica',
+        'DE': 'Sonntag',
+        'TR': 'Pazar'
+      },
+      'timetable.sundayShort': {
+        'AR': 'أحد',
+        'FR': 'Dim',
+        'EN': 'Sun',
+        'ES': 'Dom',
+        'IT': 'Dom',
+        'DE': 'So',
+        'TR': 'Paz'
+      },
+      'timetable.monday': {
+        'AR': 'الإثنين',
+        'FR': 'Lundi',
+        'EN': 'Monday',
+        'ES': 'Lunes',
+        'IT': 'Lunedì',
+        'DE': 'Montag',
+        'TR': 'Pazartesi'
+      },
+      'timetable.mondayShort': {
+        'AR': 'إثنين',
+        'FR': 'Lun',
+        'EN': 'Mon',
+        'ES': 'Lun',
+        'IT': 'Lun',
+        'DE': 'Mo',
+        'TR': 'Pzt'
+      },
+      'timetable.tuesday': {
+        'AR': 'الثلاثاء',
+        'FR': 'Mardi',
+        'EN': 'Tuesday',
+        'ES': 'Martes',
+        'IT': 'Martedì',
+        'DE': 'Dienstag',
+        'TR': 'Salı'
+      },
+      'timetable.tuesdayShort': {
+        'AR': 'ثلاثاء',
+        'FR': 'Mar',
+        'EN': 'Tue',
+        'ES': 'Mar',
+        'IT': 'Mar',
+        'DE': 'Di',
+        'TR': 'Sal'
+      },
+      'timetable.wednesday': {
+        'AR': 'الأربعاء',
+        'FR': 'Mercredi',
+        'EN': 'Wednesday',
+        'ES': 'Miércoles',
+        'IT': 'Mercoledì',
+        'DE': 'Mittwoch',
+        'TR': 'Çarşamba'
+      },
+      'timetable.wednesdayShort': {
+        'AR': 'أربعاء',
+        'FR': 'Mer',
+        'EN': 'Wed',
+        'ES': 'Mié',
+        'IT': 'Mer',
+        'DE': 'Mi',
+        'TR': 'Çar'
+      },
+      'timetable.thursday': {
+        'AR': 'الخميس',
+        'FR': 'Jeudi',
+        'EN': 'Thursday',
+        'ES': 'Jueves',
+        'IT': 'Giovedì',
+        'DE': 'Donnerstag',
+        'TR': 'Perşembe'
+      },
+      'timetable.thursdayShort': {
+        'AR': 'خميس',
+        'FR': 'Jeu',
+        'EN': 'Thu',
+        'ES': 'Jue',
+        'IT': 'Gio',
+        'DE': 'Do',
+        'TR': 'Per'
+      },
+      'timetable.friday': {
+        'AR': 'الجمعة',
+        'FR': 'Vendredi',
+        'EN': 'Friday',
+        'ES': 'Viernes',
+        'IT': 'Venerdì',
+        'DE': 'Freitag',
+        'TR': 'Cuma'
+      },
+      'timetable.fridayShort': {
+        'AR': 'جمعة',
+        'FR': 'Ven',
+        'EN': 'Fri',
+        'ES': 'Vie',
+        'IT': 'Ven',
+        'DE': 'Fr',
+        'TR': 'Cum'
+      },
+      'timetable.saturday': {
+        'AR': 'السبت',
+        'FR': 'Samedi',
+        'EN': 'Saturday',
+        'ES': 'Sábado',
+        'IT': 'Sabato',
+        'DE': 'Samstag',
+        'TR': 'Cumartesi'
+      },
+      'timetable.saturdayShort': {
+        'AR': 'سبت',
+        'FR': 'Sam',
+        'EN': 'Sat',
+        'ES': 'Sáb',
+        'IT': 'Sab',
+        'DE': 'Sa',
+        'TR': 'Cmt'
+      },
+      'timetable.selectClassError': {
+        'AR': 'يرجى اختيار القسم',
+        'FR': 'Veuillez sélectionner une classe',
+        'EN': 'Please select a class',
+        'ES': 'Por favor seleccione una clase',
+        'IT': 'Si prega di selezionare una classe',
+        'DE': 'Bitte wählen Sie eine Klasse aus',
+        'TR': 'Lütfen bir sınıf seçin'
+      },
+      'timetable.enterTimesError': {
+        'AR': 'يرجى إدخال وقت البداية ووقت النهاية',
+        'FR': 'Veuillez entrer l\'heure de début et l\'heure de fin',
+        'EN': 'Please enter start time and end time',
+        'ES': 'Por favor ingrese la hora de inicio y la hora de finalización',
+        'IT': 'Si prega di inserire l\'ora di inizio e l\'ora di fine',
+        'DE': 'Bitte geben Sie Start- und Endzeit ein',
+        'TR': 'Lütfen başlangıç ve bitiş saatini girin'
+      },
+      'timetable.timeFormatError': {
+        'AR': 'خطأ في تنسيق الوقت. يرجى التأكد من إدخال الوقت بشكل صحيح',
+        'FR': 'Erreur de format d\'heure. Veuillez vous assurer d\'entrer l\'heure correctement',
+        'EN': 'Time format error. Please make sure to enter the time correctly',
+        'ES': 'Error de formato de hora. Por favor asegúrese de ingresar la hora correctamente',
+        'IT': 'Errore di formato ora. Assicurati di inserire l\'ora correttamente',
+        'DE': 'Zeitformatfehler. Bitte stellen Sie sicher, dass Sie die Zeit korrekt eingeben',
+        'TR': 'Zaman formatı hatası. Lütfen saati doğru girdiğinizden emin olun'
+      },
+      'timetable.startBeforeEndError': {
+        'AR': 'وقت البداية يجب أن يكون قبل وقت النهاية',
+        'FR': 'L\'heure de début doit être avant l\'heure de fin',
+        'EN': 'Start time must be before end time',
+        'ES': 'La hora de inicio debe ser antes de la hora de finalización',
+        'IT': 'L\'ora di inizio deve essere prima dell\'ora di fine',
+        'DE': 'Die Startzeit muss vor der Endzeit liegen',
+        'TR': 'Başlangıç saati bitiş saatinden önce olmalıdır'
+      },
+      'timetable.deleteConfirm': {
+        'AR': 'هل أنت متأكد من حذف هذا العنصر من جدول الأوقات؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer cet élément du planning ?',
+        'EN': 'Are you sure you want to delete this item from the timetable?',
+        'ES': '¿Está seguro de que desea eliminar este elemento del horario?',
+        'IT': 'Sei sicuro di voler eliminare questo elemento dall\'orario?',
+        'DE': 'Sind Sie sicher, dass Sie dieses Element aus dem Stundenplan löschen möchten?',
+        'TR': 'Bu öğeyi ders programından silmek istediğinizden emin misiniz?'
+      },
+      'timetable.deleteError': {
+        'AR': 'حدث خطأ أثناء حذف العنصر',
+        'FR': 'Une erreur s\'est produite lors de la suppression de l\'élément',
+        'EN': 'An error occurred while deleting the item',
+        'ES': 'Ocurrió un error al eliminar el elemento',
+        'IT': 'Si è verificato un errore durante l\'eliminazione dell\'elemento',
+        'DE': 'Beim Löschen des Elements ist ein Fehler aufgetreten',
+        'TR': 'Öğe silinirken bir hata oluştu'
+      },
+      'timetable.updateError': {
+        'AR': 'حدث خطأ أثناء تحديث جدول الأوقات',
+        'FR': 'Une erreur s\'est produite lors de la mise à jour du planning',
+        'EN': 'An error occurred while updating the timetable',
+        'ES': 'Ocurrió un error al actualizar el horario',
+        'IT': 'Si è verificato un errore durante l\'aggiornamento dell\'orario',
+        'DE': 'Beim Aktualisieren des Stundenplans ist ein Fehler aufgetreten',
+        'TR': 'Ders programı güncellenirken bir hata oluştu'
+      },
+      'timetable.createError': {
+        'AR': 'حدث خطأ أثناء إضافة جدول الأوقات',
+        'FR': 'Une erreur s\'est produite lors de l\'ajout au planning',
+        'EN': 'An error occurred while adding to the timetable',
+        'ES': 'Ocurrió un error al agregar al horario',
+        'IT': 'Si è verificato un errore durante l\'aggiunta all\'orario',
+        'DE': 'Beim Hinzufügen zum Stundenplan ist ein Fehler aufgetreten',
+        'TR': 'Ders programına eklenirken bir hata oluştu'
+      },
+      'timetable.tableNotFoundError': {
+        'AR': 'لا يمكن العثور على الجدول. يرجى التأكد من أنك في عرض الأسبوع.',
+        'FR': 'Impossible de trouver le tableau. Veuillez vous assurer que vous êtes en vue hebdomadaire.',
+        'EN': 'Cannot find the table. Please make sure you are in weekly view.',
+        'ES': 'No se puede encontrar la tabla. Por favor asegúrese de estar en la vista semanal.',
+        'IT': 'Impossibile trovare la tabella. Assicurati di essere in vista settimanale.',
+        'DE': 'Die Tabelle kann nicht gefunden werden. Bitte stellen Sie sicher, dass Sie sich in der Wochenansicht befinden.',
+        'TR': 'Tablo bulunamadı. Lütfen haftalık görünümde olduğunuzdan emin olun.'
+      },
+      'timetable.pdfExportError': {
+        'AR': 'حدث خطأ أثناء تصدير PDF. يرجى التأكد من تثبيت المكتبات المطلوبة.',
+        'FR': 'Une erreur s\'est produite lors de l\'exportation PDF. Veuillez vous assurer que les bibliothèques requises sont installées.',
+        'EN': 'An error occurred while exporting PDF. Please make sure the required libraries are installed.',
+        'ES': 'Ocurrió un error al exportar PDF. Por favor asegúrese de que las bibliotecas requeridas estén instaladas.',
+        'IT': 'Si è verificato un errore durante l\'esportazione PDF. Assicurati che le librerie richieste siano installate.',
+        'DE': 'Beim Exportieren des PDFs ist ein Fehler aufgetreten. Bitte stellen Sie sicher, dass die erforderlichen Bibliotheken installiert sind.',
+        'TR': 'PDF dışa aktarılırken bir hata oluştu. Lütfen gerekli kütüphanelerin yüklü olduğundan emin olun.'
+      },
+      'timetable.classLabel': {
+        'AR': 'قسم',
+        'FR': 'Classe',
+        'EN': 'Class',
+        'ES': 'Clase',
+        'IT': 'Classe',
+        'DE': 'Klasse',
+        'TR': 'Sınıf'
+      },
+      'timetable.labLabel': {
+        'AR': 'مخبر',
+        'FR': 'Laboratoire',
+        'EN': 'Lab',
+        'ES': 'Laboratorio',
+        'IT': 'Laboratorio',
+        'DE': 'Labor',
+        'TR': 'Laboratuvar'
+      },
+      'timetable.roomLabel': {
+        'AR': 'قاعة',
+        'FR': 'Salle',
+        'EN': 'Room',
+        'ES': 'Aula',
+        'IT': 'Aula',
+        'DE': 'Raum',
+        'TR': 'Sınıf'
+      },
 
       // Topics
       'topics.title': {
@@ -4163,6 +7331,330 @@ export class LanguageService {
         'DE': 'Themenelemente',
         'TR': 'Konu öğeleri'
       },
+      'topics.search': {
+        'AR': 'البحث',
+        'FR': 'Recherche',
+        'EN': 'Search',
+        'ES': 'Búsqueda',
+        'IT': 'Ricerca',
+        'DE': 'Suche',
+        'TR': 'Arama'
+      },
+      'topics.searchPlaceholder': {
+        'AR': 'ابحث بالعنوان، العنوان الفرعي أو الوصف...',
+        'FR': 'Rechercher par titre, sous-titre ou description...',
+        'EN': 'Search by title, subtitle or description...',
+        'ES': 'Buscar por título, subtítulo o descripción...',
+        'IT': 'Cerca per titolo, sottotitolo o descrizione...',
+        'DE': 'Suche nach Titel, Untertitel oder Beschreibung...',
+        'TR': 'Başlık, alt başlık veya açıklamaya göre ara...'
+      },
+      'topics.filterByLevel': {
+        'AR': 'تصفية حسب المستوى',
+        'FR': 'Filtrer par niveau',
+        'EN': 'Filter by level',
+        'ES': 'Filtrar por nivel',
+        'IT': 'Filtra per livello',
+        'DE': 'Nach Niveau filtern',
+        'TR': 'Düzeye göre filtrele'
+      },
+      'topics.allLevels': {
+        'AR': 'كل المستويات',
+        'FR': 'Tous les niveaux',
+        'EN': 'All levels',
+        'ES': 'Todos los niveles',
+        'IT': 'Tutti i livelli',
+        'DE': 'Alle Niveaus',
+        'TR': 'Tüm seviyeler'
+      },
+      'topics.filterByTrack': {
+        'AR': 'تصفية حسب الشعبة / الجذع',
+        'FR': 'Filtrer par filière / tronc commun',
+        'EN': 'Filter by track / stream',
+        'ES': 'Filtrar por rama / tronco común',
+        'IT': 'Filtra per indirizzo / tronco comune',
+        'DE': 'Nach Zweig / Stamm filtern',
+        'TR': 'Alan / ortak temel göre filtrele'
+      },
+      'topics.allTracks': {
+        'AR': 'كل الشعب',
+        'FR': 'Toutes les filières',
+        'EN': 'All tracks',
+        'ES': 'Todas las ramas',
+        'IT': 'Tutti gli indirizzi',
+        'DE': 'Alle Zweige',
+        'TR': 'Tüm alanlar'
+      },
+      'topics.listTitle': {
+        'AR': 'قائمة المواضيع ({{count}})',
+        'FR': 'Liste des sujets ({{count}})',
+        'EN': 'Topics list ({{count}})',
+        'ES': 'Lista de temas ({{count}})',
+        'IT': 'Elenco argomenti ({{count}})',
+        'DE': 'Themenliste ({{count}})',
+        'TR': 'Konu listesi ({{count}})'
+      },
+      'topics.itemsCount': {
+        'AR': '{{count}} عنصر',
+        'FR': '{{count}} élément(s)',
+        'EN': '{{count}} item(s)',
+        'ES': '{{count}} elemento(s)',
+        'IT': '{{count}} elemento/i',
+        'DE': '{{count}} Element(e)',
+        'TR': '{{count}} öğe'
+      },
+      'topics.addElement': {
+        'AR': 'إضافة عنصر',
+        'FR': 'Ajouter un élément',
+        'EN': 'Add element',
+        'ES': 'Agregar elemento',
+        'IT': 'Aggiungi elemento',
+        'DE': 'Element hinzufügen',
+        'TR': 'Öğe ekle'
+      },
+      'topics.noTopics': {
+        'AR': 'لا توجد مواضيع',
+        'FR': 'Aucun sujet',
+        'EN': 'No topics',
+        'ES': 'No hay temas',
+        'IT': 'Nessun argomento',
+        'DE': 'Keine Themen',
+        'TR': 'Konu yok'
+      },
+      'topics.subtitle': {
+        'AR': 'العنوان الفرعي',
+        'FR': 'Sous-titre',
+        'EN': 'Subtitle',
+        'ES': 'Subtítulo',
+        'IT': 'Sottotitolo',
+        'DE': 'Untertitel',
+        'TR': 'Alt başlık'
+      },
+      'topics.subtitlePlaceholder': {
+        'AR': 'أدخل العنوان الفرعي',
+        'FR': 'Entrez le sous-titre',
+        'EN': 'Enter subtitle',
+        'ES': 'Ingrese el subtítulo',
+        'IT': 'Inserisci sottotitolo',
+        'DE': 'Untertitel eingeben',
+        'TR': 'Alt başlığı girin'
+      },
+      'topics.level': {
+        'AR': 'المستوى',
+        'FR': 'Niveau',
+        'EN': 'Level',
+        'ES': 'Nivel',
+        'IT': 'Livello',
+        'DE': 'Niveau',
+        'TR': 'Seviye'
+      },
+      'topics.selectLevel': {
+        'AR': 'اختر المستوى',
+        'FR': 'Choisissez le niveau',
+        'EN': 'Select level',
+        'ES': 'Seleccione el nivel',
+        'IT': 'Seleziona livello',
+        'DE': 'Niveau auswählen',
+        'TR': 'Seviye seçin'
+      },
+      'topics.track': {
+        'AR': 'الشعبة / الجذع',
+        'FR': 'Filière / tronc commun',
+        'EN': 'Track / stream',
+        'ES': 'Rama / tronco común',
+        'IT': 'Indirizzo / tronco comune',
+        'DE': 'Zweig / Stamm',
+        'TR': 'Alan / ortak temel'
+      },
+      'topics.selectTrack': {
+        'AR': 'اختر الشعبة',
+        'FR': 'Choisissez la filière',
+        'EN': 'Select track',
+        'ES': 'Seleccione la rama',
+        'IT': 'Seleziona indirizzo',
+        'DE': 'Zweig auswählen',
+        'TR': 'Alan seçin'
+      },
+      'topics.addButton': {
+        'AR': 'إضافة',
+        'FR': 'Ajouter',
+        'EN': 'Add',
+        'ES': 'Agregar',
+        'IT': 'Aggiungi',
+        'DE': 'Hinzufügen',
+        'TR': 'Ekle'
+      },
+      'topics.updateButton': {
+        'AR': 'تحديث',
+        'FR': 'Mettre à jour',
+        'EN': 'Update',
+        'ES': 'Actualizar',
+        'IT': 'Aggiorna',
+        'DE': 'Aktualisieren',
+        'TR': 'Güncelle'
+      },
+      'topics.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'topics.edit': {
+        'AR': 'تعديل',
+        'FR': 'Modifier',
+        'EN': 'Edit',
+        'ES': 'Editar',
+        'IT': 'Modifica',
+        'DE': 'Bearbeiten',
+        'TR': 'Düzenle'
+      },
+      'topics.delete': {
+        'AR': 'حذف',
+        'FR': 'Supprimer',
+        'EN': 'Delete',
+        'ES': 'Eliminar',
+        'IT': 'Elimina',
+        'DE': 'Löschen',
+        'TR': 'Sil'
+      },
+      'topics.addElementTitle': {
+        'AR': 'إضافة عنصر جديد',
+        'FR': 'Ajouter un nouvel élément',
+        'EN': 'Add new element',
+        'ES': 'Agregar nuevo elemento',
+        'IT': 'Aggiungi nuovo elemento',
+        'DE': 'Neues Element hinzufügen',
+        'TR': 'Yeni öğe ekle'
+      },
+      'topics.editElementTitle': {
+        'AR': 'تعديل العنصر',
+        'FR': 'Modifier l’élément',
+        'EN': 'Edit element',
+        'ES': 'Editar elemento',
+        'IT': 'Modifica elemento',
+        'DE': 'Element bearbeiten',
+        'TR': 'Öğeyi düzenle'
+      },
+      'topics.elementContent': {
+        'AR': 'محتوى العنصر *',
+        'FR': 'Contenu de l’élément *',
+        'EN': 'Element content *',
+        'ES': 'Contenido del elemento *',
+        'IT': 'Contenuto elemento *',
+        'DE': 'Elementinhalt *',
+        'TR': 'Öğe içeriği *'
+      },
+      'topics.elementContentPlaceholder': {
+        'AR': 'أدخل محتوى العنصر...',
+        'FR': 'Entrez le contenu de l’élément...',
+        'EN': 'Enter element content...',
+        'ES': 'Ingrese el contenido del elemento...',
+        'IT': 'Inserisci il contenuto dell’elemento...',
+        'DE': 'Elementinhalt eingeben...',
+        'TR': 'Öğe içeriğini girin...'
+      },
+      'topics.noElements': {
+        'AR': 'لا توجد عناصر',
+        'FR': 'Aucun élément',
+        'EN': 'No elements',
+        'ES': 'No hay elementos',
+        'IT': 'Nessun elemento',
+        'DE': 'Keine Elemente',
+        'TR': 'Öğe yok'
+      },
+      'topics.enterTitleError': {
+        'AR': 'يرجى إدخال عنوان الموضوع',
+        'FR': 'Veuillez saisir le titre du sujet',
+        'EN': 'Please enter the topic title',
+        'ES': 'Por favor ingrese el título del tema',
+        'IT': 'Inserisci il titolo dell’argomento',
+        'DE': 'Bitte geben Sie den Thementitel ein',
+        'TR': 'Lütfen konu başlığını girin'
+      },
+      'topics.updateError': {
+        'AR': 'حدث خطأ أثناء تحديث الموضوع',
+        'FR': 'Une erreur s’est produite lors de la mise à jour du sujet',
+        'EN': 'An error occurred while updating the topic',
+        'ES': 'Se produjo un error al actualizar el tema',
+        'IT': 'Si è verificato un errore durante l’aggiornamento dell’argomento',
+        'DE': 'Beim Aktualisieren des Themas ist ein Fehler aufgetreten',
+        'TR': 'Konu güncellenirken bir hata oluştu'
+      },
+      'topics.createError': {
+        'AR': 'حدث خطأ أثناء إضافة الموضوع',
+        'FR': 'Une erreur s’est produite lors de l’ajout du sujet',
+        'EN': 'An error occurred while adding the topic',
+        'ES': 'Se produjo un error al agregar el tema',
+        'IT': 'Si è verificato un errore durante l’aggiunta dell’argomento',
+        'DE': 'Beim Hinzufügen des Themas ist ein Fehler aufgetreten',
+        'TR': 'Konu eklenirken bir hata oluştu'
+      },
+      'topics.deleteConfirm': {
+        'AR': 'هل أنت متأكد من حذف هذا الموضوع؟ سيتم حذف جميع العناصر المرتبطة به.',
+        'FR': 'Êtes-vous sûr de vouloir supprimer ce sujet ? Tous les éléments associés seront supprimés.',
+        'EN': 'Are you sure you want to delete this topic? All related elements will be deleted.',
+        'ES': '¿Está seguro de que desea eliminar este tema? Se eliminarán todos los elementos relacionados.',
+        'IT': 'Sei sicuro di voler eliminare questo argomento? Tutti gli elementi correlati verranno eliminati.',
+        'DE': 'Möchten Sie dieses Thema wirklich löschen? Alle zugehörigen Elemente werden gelöscht.',
+        'TR': 'Bu konuyu silmek istediğinizden emin misiniz? İlgili tüm öğeler silinecek.'
+      },
+      'topics.deleteError': {
+        'AR': 'حدث خطأ أثناء حذف الموضوع',
+        'FR': 'Une erreur s’est produite lors de la suppression du sujet',
+        'EN': 'An error occurred while deleting the topic',
+        'ES': 'Se produjo un error al eliminar el tema',
+        'IT': 'Si è verificato un errore durante l’eliminazione dell’argomento',
+        'DE': 'Beim Löschen des Themas ist ein Fehler aufgetreten',
+        'TR': 'Konu silinirken bir hata oluştu'
+      },
+      'topics.enterElementContentError': {
+        'AR': 'يرجى إدخال محتوى العنصر',
+        'FR': 'Veuillez saisir le contenu de l’élément',
+        'EN': 'Please enter the element content',
+        'ES': 'Por favor ingrese el contenido del elemento',
+        'IT': 'Inserisci il contenuto dell’elemento',
+        'DE': 'Bitte geben Sie den Elementinhalt ein',
+        'TR': 'Lütfen öğe içeriğini girin'
+      },
+      'topics.updateElementError': {
+        'AR': 'حدث خطأ أثناء تحديث العنصر',
+        'FR': 'Une erreur s’est produite lors de la mise à jour de l’élément',
+        'EN': 'An error occurred while updating the element',
+        'ES': 'Se produjo un error al actualizar el elemento',
+        'IT': 'Si è verificato un errore durante l’aggiornamento dell’elemento',
+        'DE': 'Beim Aktualisieren des Elements ist ein Fehler aufgetreten',
+        'TR': 'Öğe güncellenirken bir hata oluştu'
+      },
+      'topics.createElementError': {
+        'AR': 'حدث خطأ أثناء إضافة العنصر',
+        'FR': 'Une erreur s’est produite lors de l’ajout de l’élément',
+        'EN': 'An error occurred while adding the element',
+        'ES': 'Se produjo un error al agregar el elemento',
+        'IT': 'Si è verificato un errore durante l’aggiunta dell’elemento',
+        'DE': 'Beim Hinzufügen des Elements ist ein Fehler aufgetreten',
+        'TR': 'Öğe eklenirken bir hata oluştu'
+      },
+      'topics.deleteElementConfirm': {
+        'AR': 'هل أنت متأكد من حذف هذا العنصر؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer cet élément ?',
+        'EN': 'Are you sure you want to delete this element?',
+        'ES': '¿Está seguro de que desea eliminar este elemento?',
+        'IT': 'Sei sicuro di voler eliminare questo elemento?',
+        'DE': 'Möchten Sie dieses Element wirklich löschen?',
+        'TR': 'Bu öğeyi silmek istediğinizden emin misiniz?'
+      },
+      'topics.deleteElementError': {
+        'AR': 'حدث خطأ أثناء حذف العنصر',
+        'FR': 'Une erreur s’est produite lors de la suppression de l’élément',
+        'EN': 'An error occurred while deleting the element',
+        'ES': 'Se produjo un error al eliminar el elemento',
+        'IT': 'Si è verificato un errore durante l’eliminazione dell’elemento',
+        'DE': 'Beim Löschen des Elements ist ein Fehler aufgetreten',
+        'TR': 'Öğe silinirken bir hata oluştu'
+      },
 
       // Notebooks
       'notebooks.title': {
@@ -4209,6 +7701,483 @@ export class LanguageService {
         'IT': 'Materia',
         'DE': 'Fach',
         'TR': 'Ders'
+      },
+      'notebooks.search': {
+        'AR': 'البحث',
+        'FR': 'Recherche',
+        'EN': 'Search',
+        'ES': 'Búsqueda',
+        'IT': 'Ricerca',
+        'DE': 'Suche',
+        'TR': 'Arama'
+      },
+      'notebooks.searchPlaceholder': {
+        'AR': 'ابحث بالعنوان، الوصف، المحتوى...',
+        'FR': 'Rechercher par titre, description ou contenu...',
+        'EN': 'Search by title, description or content...',
+        'ES': 'Buscar por título, descripción o contenido...',
+        'IT': 'Cerca per titolo, descrizione o contenuto...',
+        'DE': 'Suche nach Titel, Beschreibung oder Inhalt...',
+        'TR': 'Başlık, açıklama veya içeriğe göre ara...'
+      },
+      'notebooks.filterByClass': {
+        'AR': 'تصفية حسب القسم',
+        'FR': 'Filtrer par classe',
+        'EN': 'Filter by class',
+        'ES': 'Filtrar por clase',
+        'IT': 'Filtra per classe',
+        'DE': 'Nach Klasse filtern',
+        'TR': 'Sınıfa göre filtrele'
+      },
+      'notebooks.allClasses': {
+        'AR': 'جميع الأقسام',
+        'FR': 'Toutes les classes',
+        'EN': 'All classes',
+        'ES': 'Todas las clases',
+        'IT': 'Tutte le classi',
+        'DE': 'Alle Klassen',
+        'TR': 'Tüm sınıflar'
+      },
+      'notebooks.listTitle': {
+        'AR': 'قائمة الدفاتر ({{count}})',
+        'FR': 'Liste des cahiers ({{count}})',
+        'EN': 'Notebooks list ({{count}})',
+        'ES': 'Lista de cuadernos ({{count}})',
+        'IT': 'Elenco quaderni ({{count}})',
+        'DE': 'Hefteliste ({{count}})',
+        'TR': 'Defter listesi ({{count}})'
+      },
+      'notebooks.general': {
+        'AR': 'عام',
+        'FR': 'Général',
+        'EN': 'General',
+        'ES': 'General',
+        'IT': 'Generale',
+        'DE': 'Allgemein',
+        'TR': 'Genel'
+      },
+      'notebooks.sessionsCount': {
+        'AR': '{{count}} حصة',
+        'FR': '{{count}} séance(s)',
+        'EN': '{{count}} session(s)',
+        'ES': '{{count}} sesión(es)',
+        'IT': '{{count}} lezione/i',
+        'DE': '{{count}} Stunde(n)',
+        'TR': '{{count}} ders'
+      },
+      'notebooks.sessionTitles': {
+        'AR': 'عناوين الحصص:',
+        'FR': 'Titres des séances :',
+        'EN': 'Session titles:',
+        'ES': 'Títulos de las sesiones:',
+        'IT': 'Titoli delle lezioni:',
+        'DE': 'Stundentitel:',
+        'TR': 'Ders başlıkları:'
+      },
+      'notebooks.addSession': {
+        'AR': 'إضافة حصة',
+        'FR': 'Ajouter une séance',
+        'EN': 'Add session',
+        'ES': 'Agregar sesión',
+        'IT': 'Aggiungi lezione',
+        'DE': 'Stunde hinzufügen',
+        'TR': 'Ders ekle'
+      },
+      'notebooks.showReport': {
+        'AR': 'عرض التقرير',
+        'FR': 'Afficher le rapport',
+        'EN': 'Show report',
+        'ES': 'Mostrar informe',
+        'IT': 'Mostra rapporto',
+        'DE': 'Bericht anzeigen',
+        'TR': 'Raporu göster'
+      },
+      'notebooks.noNotebooks': {
+        'AR': 'لا توجد دفاتر',
+        'FR': 'Aucun cahier',
+        'EN': 'No notebooks',
+        'ES': 'No hay cuadernos',
+        'IT': 'Nessun quaderno',
+        'DE': 'Keine Hefte',
+        'TR': 'Defter yok'
+      },
+      'notebooks.modalTitle': {
+        'AR': 'إدارة الدفتر',
+        'FR': 'Gestion du cahier',
+        'EN': 'Notebook management',
+        'ES': 'Gestión del cuaderno',
+        'IT': 'Gestione quaderno',
+        'DE': 'Heftverwaltung',
+        'TR': 'Defter yönetimi'
+      },
+      'notebooks.editNotebook': {
+        'AR': 'تعديل الدفتر',
+        'FR': 'Modifier le cahier',
+        'EN': 'Edit notebook',
+        'ES': 'Editar cuaderno',
+        'IT': 'Modifica quaderno',
+        'DE': 'Heft bearbeiten',
+        'TR': 'Defteri düzenle'
+      },
+      'notebooks.addNotebookFull': {
+        'AR': 'إضافة دفتر جديد',
+        'FR': 'Ajouter un nouveau cahier',
+        'EN': 'Add new notebook',
+        'ES': 'Agregar nuevo cuaderno',
+        'IT': 'Aggiungi nuovo quaderno',
+        'DE': 'Neues Heft hinzufügen',
+        'TR': 'Yeni defter ekle'
+      },
+      'notebooks.titleLabel': {
+        'AR': 'العنوان *',
+        'FR': 'Titre *',
+        'EN': 'Title *',
+        'ES': 'Título *',
+        'IT': 'Titolo *',
+        'DE': 'Titel *',
+        'TR': 'Başlık *'
+      },
+      'notebooks.titlePlaceholder': {
+        'AR': 'أدخل عنوان الدفتر',
+        'FR': 'Entrez le titre du cahier',
+        'EN': 'Enter notebook title',
+        'ES': 'Ingrese el título del cuaderno',
+        'IT': 'Inserisci il titolo del quaderno',
+        'DE': 'Hefttitel eingeben',
+        'TR': 'Defter başlığını girin'
+      },
+      'notebooks.descriptionLabel': {
+        'AR': 'الوصف',
+        'FR': 'Description',
+        'EN': 'Description',
+        'ES': 'Descripción',
+        'IT': 'Descrizione',
+        'DE': 'Beschreibung',
+        'TR': 'Açıklama'
+      },
+      'notebooks.descriptionPlaceholder': {
+        'AR': 'أدخل وصف الدفتر',
+        'FR': 'Entrez la description du cahier',
+        'EN': 'Enter notebook description',
+        'ES': 'Ingrese la descripción del cuaderno',
+        'IT': 'Inserisci la descrizione del quaderno',
+        'DE': 'Heftbeschreibung eingeben',
+        'TR': 'Defter açıklamasını girin'
+      },
+      'notebooks.classLabel': {
+        'AR': 'القسم',
+        'FR': 'Classe',
+        'EN': 'Class',
+        'ES': 'Clase',
+        'IT': 'Classe',
+        'DE': 'Klasse',
+        'TR': 'Sınıf'
+      },
+      'notebooks.generalForAllClasses': {
+        'AR': 'عام (لجميع الأقسام)',
+        'FR': 'Général (pour toutes les classes)',
+        'EN': 'General (for all classes)',
+        'ES': 'General (para todas las clases)',
+        'IT': 'Generale (per tutte le classi)',
+        'DE': 'Allgemein (für alle Klassen)',
+        'TR': 'Genel (tüm sınıflar için)'
+      },
+      'notebooks.contentLabel': {
+        'AR': 'المحتوى',
+        'FR': 'Contenu',
+        'EN': 'Content',
+        'ES': 'Contenido',
+        'IT': 'Contenuto',
+        'DE': 'Inhalt',
+        'TR': 'İçerik'
+      },
+      'notebooks.contentPlaceholder': {
+        'AR': 'أدخل محتوى الدفتر...',
+        'FR': 'Entrez le contenu du cahier...',
+        'EN': 'Enter notebook content...',
+        'ES': 'Ingrese el contenido del cuaderno...',
+        'IT': 'Inserisci il contenuto del quaderno...',
+        'DE': 'Heftinhalt eingeben...',
+        'TR': 'Defter içeriğini girin...'
+      },
+      'notebooks.addButton': {
+        'AR': 'إضافة',
+        'FR': 'Ajouter',
+        'EN': 'Add',
+        'ES': 'Agregar',
+        'IT': 'Aggiungi',
+        'DE': 'Hinzufügen',
+        'TR': 'Ekle'
+      },
+      'notebooks.updateButton': {
+        'AR': 'تحديث',
+        'FR': 'Mettre à jour',
+        'EN': 'Update',
+        'ES': 'Actualizar',
+        'IT': 'Aggiorna',
+        'DE': 'Aktualisieren',
+        'TR': 'Güncelle'
+      },
+      'notebooks.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'notebooks.edit': {
+        'AR': 'تعديل',
+        'FR': 'Modifier',
+        'EN': 'Edit',
+        'ES': 'Editar',
+        'IT': 'Modifica',
+        'DE': 'Bearbeiten',
+        'TR': 'Düzenle'
+      },
+      'notebooks.delete': {
+        'AR': 'حذف',
+        'FR': 'Supprimer',
+        'EN': 'Delete',
+        'ES': 'Eliminar',
+        'IT': 'Elimina',
+        'DE': 'Löschen',
+        'TR': 'Sil'
+      },
+      'notebooks.courseModalTitle': {
+        'AR': 'إدارة الحصة',
+        'FR': 'Gestion de la séance',
+        'EN': 'Session management',
+        'ES': 'Gestión de la sesión',
+        'IT': 'Gestione lezione',
+        'DE': 'Stundenverwaltung',
+        'TR': 'Ders yönetimi'
+      },
+      'notebooks.editCourse': {
+        'AR': 'تعديل الحصة',
+        'FR': 'Modifier la séance',
+        'EN': 'Edit session',
+        'ES': 'Editar sesión',
+        'IT': 'Modifica lezione',
+        'DE': 'Stunde bearbeiten',
+        'TR': 'Dersi düzenle'
+      },
+      'notebooks.addCourse': {
+        'AR': 'إضافة حصة جديدة',
+        'FR': 'Ajouter une nouvelle séance',
+        'EN': 'Add new session',
+        'ES': 'Agregar nueva sesión',
+        'IT': 'Aggiungi nuova lezione',
+        'DE': 'Neue Stunde hinzufügen',
+        'TR': 'Yeni ders ekle'
+      },
+      'notebooks.courseTitleLabel': {
+        'AR': 'عنوان الحصة *',
+        'FR': 'Titre de la séance *',
+        'EN': 'Session title *',
+        'ES': 'Título de la sesión *',
+        'IT': 'Titolo lezione *',
+        'DE': 'Stundentitel *',
+        'TR': 'Ders başlığı *'
+      },
+      'notebooks.courseTitlePlaceholder': {
+        'AR': 'أدخل عنوان الحصة',
+        'FR': 'Entrez le titre de la séance',
+        'EN': 'Enter session title',
+        'ES': 'Ingrese el título de la sesión',
+        'IT': 'Inserisci il titolo della lezione',
+        'DE': 'Stundentitel eingeben',
+        'TR': 'Ders başlığını girin'
+      },
+      'notebooks.courseDateLabel': {
+        'AR': 'التاريخ *',
+        'FR': 'Date *',
+        'EN': 'Date *',
+        'ES': 'Fecha *',
+        'IT': 'Data *',
+        'DE': 'Datum *',
+        'TR': 'Tarih *'
+      },
+      'notebooks.courseStartTimeLabel': {
+        'AR': 'وقت البداية *',
+        'FR': 'Heure de début *',
+        'EN': 'Start time *',
+        'ES': 'Hora de inicio *',
+        'IT': 'Ora di inizio *',
+        'DE': 'Anfangszeit *',
+        'TR': 'Başlangıç saati *'
+      },
+      'notebooks.courseEndTimeLabel': {
+        'AR': 'وقت النهاية *',
+        'FR': 'Heure de fin *',
+        'EN': 'End time *',
+        'ES': 'Hora de fin *',
+        'IT': 'Ora di fine *',
+        'DE': 'Endzeit *',
+        'TR': 'Bitiş saati *'
+      },
+      'notebooks.selectOrCreateTopicLabel': {
+        'AR': 'اختر موضوع أو أنشئ موضوع جديد',
+        'FR': 'Choisissez un sujet ou créez un nouveau sujet',
+        'EN': 'Select a topic or create a new topic',
+        'ES': 'Seleccione un tema o cree un tema nuevo',
+        'IT': 'Seleziona un argomento o crea un nuovo argomento',
+        'DE': 'Wählen Sie ein Thema oder erstellen Sie ein neues Thema',
+        'TR': 'Bir konu seçin veya yeni bir konu oluşturun'
+      },
+      'notebooks.selectFromList': {
+        'AR': 'اختر من القائمة',
+        'FR': 'Choisissez dans la liste',
+        'EN': 'Select from list',
+        'ES': 'Seleccione de la lista',
+        'IT': 'Seleziona dall\'elenco',
+        'DE': 'Aus der Liste auswählen',
+        'TR': 'Listeden seçin'
+      },
+      'notebooks.newTopicButton': {
+        'AR': 'موضوع جديد',
+        'FR': 'Nouveau sujet',
+        'EN': 'New topic',
+        'ES': 'Nuevo tema',
+        'IT': 'Nuovo argomento',
+        'DE': 'Neues Thema',
+        'TR': 'Yeni konu'
+      },
+      'notebooks.cancelNewTopicButton': {
+        'AR': 'إلغاء الموضوع الجديد',
+        'FR': 'Annuler le nouveau sujet',
+        'EN': 'Cancel new topic',
+        'ES': 'Cancelar nuevo tema',
+        'IT': 'Annulla nuovo argomento',
+        'DE': 'Neues Thema abbrechen',
+        'TR': 'Yeni konuyu iptal et'
+      },
+      'notebooks.newTopicTitleLabel': {
+        'AR': 'عنوان الموضوع الجديد',
+        'FR': 'Titre du nouveau sujet',
+        'EN': 'New topic title',
+        'ES': 'Título del nuevo tema',
+        'IT': 'Titolo del nuovo argomento',
+        'DE': 'Neuer Thementitel',
+        'TR': 'Yeni konu başlığı'
+      },
+      'notebooks.newTopicSubtitleLabel': {
+        'AR': 'العنوان الفرعي',
+        'FR': 'Sous-titre',
+        'EN': 'Subtitle',
+        'ES': 'Subtítulo',
+        'IT': 'Sottotitolo',
+        'DE': 'Untertitel',
+        'TR': 'Alt başlık'
+      },
+      'notebooks.newTopicDescriptionLabel': {
+        'AR': 'وصف الموضوع',
+        'FR': 'Description du sujet',
+        'EN': 'Topic description',
+        'ES': 'Descripción del tema',
+        'IT': 'Descrizione argomento',
+        'DE': 'Themenbeschreibung',
+        'TR': 'Konu açıklaması'
+      },
+      'notebooks.descriptionCourseLabel': {
+        'AR': 'وصف الحصة *',
+        'FR': 'Description de la séance *',
+        'EN': 'Session description *',
+        'ES': 'Descripción de la sesión *',
+        'IT': 'Descrizione lezione *',
+        'DE': 'Stundenbeschreibung *',
+        'TR': 'Ders açıklaması *'
+      },
+      'notebooks.descriptionCoursePlaceholder': {
+        'AR': 'أدخل وصف الحصة',
+        'FR': 'Entrez la description de la séance',
+        'EN': 'Enter session description',
+        'ES': 'Ingrese la descripción de la sesión',
+        'IT': 'Inserisci la descrizione della lezione',
+        'DE': 'Stundenbeschreibung eingeben',
+        'TR': 'Ders açıklamasını girin'
+      },
+      'notebooks.markLabel': {
+        'AR': 'التنقيط / الملاحظة',
+        'FR': 'Note / remarque',
+        'EN': 'Mark / note',
+        'ES': 'Nota / observación',
+        'IT': 'Voto / nota',
+        'DE': 'Note / Bemerkung',
+        'TR': 'Not / açıklama'
+      },
+      'notebooks.noteLabel': {
+        'AR': 'ملاحظات إضافية',
+        'FR': 'Remarques supplémentaires',
+        'EN': 'Additional notes',
+        'ES': 'Notas adicionales',
+        'IT': 'Note aggiuntive',
+        'DE': 'Zusätzliche Bemerkungen',
+        'TR': 'Ek notlar'
+      },
+      'notebooks.enterTitleDescriptionError': {
+        'AR': 'يرجى إدخال العنوان والوصف',
+        'FR': 'Veuillez saisir le titre et la description',
+        'EN': 'Please enter the title and description',
+        'ES': 'Por favor ingrese el título y la descripción',
+        'IT': 'Inserisci il titolo e la descrizione',
+        'DE': 'Bitte geben Sie Titel und Beschreibung ein',
+        'TR': 'Lütfen başlık ve açıklamayı girin'
+      },
+      'notebooks.timeFormatError': {
+        'AR': 'خطأ في تنسيق الوقت. يرجى التأكد من إدخال الوقت بشكل صحيح',
+        'FR': 'Erreur de format de l\'heure. Veuillez vérifier la saisie.',
+        'EN': 'Time format error. Please make sure the time is entered correctly.',
+        'ES': 'Error en el formato de la hora. Asegúrese de que la hora esté introducida correctamente.',
+        'IT': 'Errore nel formato dell\'ora. Assicurati che l\'ora sia inserita correttamente.',
+        'DE': 'Fehler im Zeitformat. Bitte stellen Sie sicher, dass die Uhrzeit korrekt eingegeben ist.',
+        'TR': 'Saat formatı hatası. Lütfen saatin doğru girildiğinden emin olun.'
+      },
+      'notebooks.startBeforeEndError': {
+        'AR': 'يجب أن يكون وقت البداية قبل وقت النهاية',
+        'FR': 'L\'heure de début doit être avant l\'heure de fin',
+        'EN': 'Start time must be before end time',
+        'ES': 'La hora de inicio debe ser anterior a la hora de fin',
+        'IT': 'L\'ora di inizio deve essere precedente all\'ora di fine',
+        'DE': 'Die Anfangszeit muss vor der Endzeit liegen',
+        'TR': 'Başlangıç saati bitiş saatinden önce olmalıdır'
+      },
+      'notebooks.updateError': {
+        'AR': 'حدث خطأ أثناء تحديث الدفتر',
+        'FR': 'Une erreur s’est produite lors de la mise à jour du cahier',
+        'EN': 'An error occurred while updating the notebook',
+        'ES': 'Se produjo un error al actualizar el cuaderno',
+        'IT': 'Si è verificato un errore durante l’aggiornamento del quaderno',
+        'DE': 'Beim Aktualisieren des Heftes ist ein Fehler aufgetreten',
+        'TR': 'Defter güncellenirken bir hata oluştu'
+      },
+      'notebooks.createError': {
+        'AR': 'حدث خطأ أثناء إضافة الدفتر',
+        'FR': 'Une erreur s’est produite lors de l’ajout du cahier',
+        'EN': 'An error occurred while adding the notebook',
+        'ES': 'Se produjo un error al agregar el cuaderno',
+        'IT': 'Si è verificato un errore durante l’aggiunta del quaderno',
+        'DE': 'Beim Hinzufügen des Heftes ist ein Fehler aufgetreten',
+        'TR': 'Defter eklenirken bir hata oluştu'
+      },
+      'notebooks.deleteConfirm': {
+        'AR': 'هل أنت متأكد من حذف هذا الدفتر؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer ce cahier ?',
+        'EN': 'Are you sure you want to delete this notebook?',
+        'ES': '¿Está seguro de que desea eliminar este cuaderno?',
+        'IT': 'Sei sicuro di voler eliminare questo quaderno?',
+        'DE': 'Möchten Sie dieses Heft wirklich löschen?',
+        'TR': 'Bu defteri silmek istediğinizden emin misiniz?'
+      },
+      'notebooks.deleteError': {
+        'AR': 'حدث خطأ أثناء حذف الدفتر',
+        'FR': 'Une erreur s’est produite lors de la suppression du cahier',
+        'EN': 'An error occurred while deleting the notebook',
+        'ES': 'Se produjo un error al eliminar el cuaderno',
+        'IT': 'Si è verificato un errore durante l’eliminazione del quaderno',
+        'DE': 'Beim Löschen des Heftes ist ein Fehler aufgetreten',
+        'TR': 'Defter silinirken bir hata oluştu'
       },
 
       // Annual Distribution
@@ -4369,15 +8338,6 @@ export class LanguageService {
         'DE': 'Adresse',
         'TR': 'Adres'
       },
-      'teacherCard.photo': {
-        'AR': 'الصورة',
-        'FR': 'Photo',
-        'EN': 'Photo',
-        'ES': 'Foto',
-        'IT': 'Foto',
-        'DE': 'Foto',
-        'TR': 'Fotoğraf'
-      },
       'teacherCard.print': {
         'AR': 'طباعة البطاقة',
         'FR': 'Imprimer la carte',
@@ -4386,6 +8346,510 @@ export class LanguageService {
         'IT': 'Stampa scheda',
         'DE': 'Karte drucken',
         'TR': 'Kartı yazdır'
+      },
+      'teacherCard.description': {
+        'AR': 'قم بإدخال معلوماتك الشخصية و المهنية لحفظها و الرجوع إليها بسهولة.',
+        'FR': 'Entrez vos informations personnelles et professionnelles pour les sauvegarder et y accéder facilement.',
+        'EN': 'Enter your personal and professional information to save and access it easily.',
+        'ES': 'Ingrese su información personal y profesional para guardarla y acceder a ella fácilmente.',
+        'IT': 'Inserisci le tue informazioni personali e professionali per salvarle e accedervi facilmente.',
+        'DE': 'Geben Sie Ihre persönlichen und beruflichen Informationen ein, um sie zu speichern und einfach darauf zuzugreifen.',
+        'TR': 'Kişisel ve mesleki bilgilerinizi kolayca kaydetmek ve erişmek için girin.'
+      },
+      'teacherCard.save': {
+        'AR': 'حفظ البطاقة',
+        'FR': 'Enregistrer la carte',
+        'EN': 'Save card',
+        'ES': 'Guardar tarjeta',
+        'IT': 'Salva scheda',
+        'DE': 'Karte speichern',
+        'TR': 'Kartı kaydet'
+      },
+      'teacherCard.printPdf': {
+        'AR': 'طباعة البطاقة PDF',
+        'FR': 'Imprimer la carte PDF',
+        'EN': 'Print card PDF',
+        'ES': 'Imprimir tarjeta PDF',
+        'IT': 'Stampa scheda PDF',
+        'DE': 'Karte als PDF drucken',
+        'TR': 'Kartı PDF olarak yazdır'
+      },
+      'teacherCard.saved': {
+        'AR': 'تم حفظ البيانات بنجاح',
+        'FR': 'Données enregistrées avec succès',
+        'EN': 'Data saved successfully',
+        'ES': 'Datos guardados exitosamente',
+        'IT': 'Dati salvati con successo',
+        'DE': 'Daten erfolgreich gespeichert',
+        'TR': 'Veriler başarıyla kaydedildi'
+      },
+      'teacherCard.ministryHeader': {
+        'AR': 'الجمهورية الجزائرية الديمقراطية الشعبية',
+        'FR': 'République Algérienne Démocratique et Populaire',
+        'EN': 'People\'s Democratic Republic of Algeria',
+        'ES': 'República Argelina Democrática y Popular',
+        'IT': 'Repubblica Algerina Democratica e Popolare',
+        'DE': 'Demokratische Volksrepublik Algerien',
+        'TR': 'Cezayir Demokratik Halk Cumhuriyeti'
+      },
+      'teacherCard.ministry': {
+        'AR': 'وزارة التربية الوطنية',
+        'FR': 'Ministère de l\'Éducation Nationale',
+        'EN': 'Ministry of National Education',
+        'ES': 'Ministerio de Educación Nacional',
+        'IT': 'Ministero dell\'Educazione Nazionale',
+        'DE': 'Ministerium für Nationale Bildung',
+        'TR': 'Milli Eğitim Bakanlığı'
+      },
+      'teacherCard.infoCard': {
+        'AR': 'بطاقة معلومات',
+        'FR': 'Carte d\'information',
+        'EN': 'Information card',
+        'ES': 'Tarjeta de información',
+        'IT': 'Scheda informativa',
+        'DE': 'Informationskarte',
+        'TR': 'Bilgi kartı'
+      },
+      'teacherCard.directorate': {
+        'AR': 'المديرية / الولاية',
+        'FR': 'Direction / Wilaya',
+        'EN': 'Directorate / Wilaya',
+        'ES': 'Dirección / Wilaya',
+        'IT': 'Direzione / Wilaya',
+        'DE': 'Direktion / Wilaya',
+        'TR': 'Müdürlük / Vilayet'
+      },
+      'teacherCard.school': {
+        'AR': 'المؤسسة',
+        'FR': 'Établissement',
+        'EN': 'School',
+        'ES': 'Escuela',
+        'IT': 'Scuola',
+        'DE': 'Schule',
+        'TR': 'Okul'
+      },
+      'teacherCard.academicYear': {
+        'AR': 'السنة الدراسية',
+        'FR': 'Année scolaire',
+        'EN': 'Academic year',
+        'ES': 'Año académico',
+        'IT': 'Anno accademico',
+        'DE': 'Schuljahr',
+        'TR': 'Akademik yıl'
+      },
+      'teacherCard.photo': {
+        'AR': 'صورة الأستاذ',
+        'FR': 'Photo du professeur',
+        'EN': 'Teacher photo',
+        'ES': 'Foto del profesor',
+        'IT': 'Foto insegnante',
+        'DE': 'Lehrerfoto',
+        'TR': 'Öğretmen fotoğrafı'
+      },
+      'teacherCard.familyStatus': {
+        'AR': 'الحالة العائلية',
+        'FR': 'Situation familiale',
+        'EN': 'Family status',
+        'ES': 'Estado familiar',
+        'IT': 'Stato familiare',
+        'DE': 'Familienstand',
+        'TR': 'Aile durumu'
+      },
+      'teacherCard.select': {
+        'AR': 'اختر...',
+        'FR': 'Sélectionner...',
+        'EN': 'Select...',
+        'ES': 'Seleccionar...',
+        'IT': 'Seleziona...',
+        'DE': 'Auswählen...',
+        'TR': 'Seçin...'
+      },
+      'teacherCard.single': {
+        'AR': 'أعزب',
+        'FR': 'Célibataire',
+        'EN': 'Single',
+        'ES': 'Soltero',
+        'IT': 'Celibe',
+        'DE': 'Ledig',
+        'TR': 'Bekar'
+      },
+      'teacherCard.married': {
+        'AR': 'متزوج',
+        'FR': 'Marié',
+        'EN': 'Married',
+        'ES': 'Casado',
+        'IT': 'Sposato',
+        'DE': 'Verheiratet',
+        'TR': 'Evli'
+      },
+      'teacherCard.divorced': {
+        'AR': 'مطلق',
+        'FR': 'Divorcé',
+        'EN': 'Divorced',
+        'ES': 'Divorciado',
+        'IT': 'Divorziato',
+        'DE': 'Geschieden',
+        'TR': 'Boşanmış'
+      },
+      'teacherCard.widowed': {
+        'AR': 'أرمل',
+        'FR': 'Veuf',
+        'EN': 'Widowed',
+        'ES': 'Viudo',
+        'IT': 'Vedovo',
+        'DE': 'Verwitwet',
+        'TR': 'Dul'
+      },
+      'teacherCard.childrenCount': {
+        'AR': 'عدد الأولاد',
+        'FR': 'Nombre d\'enfants',
+        'EN': 'Number of children',
+        'ES': 'Número de hijos',
+        'IT': 'Numero di figli',
+        'DE': 'Anzahl der Kinder',
+        'TR': 'Çocuk sayısı'
+      },
+      'teacherCard.studyingChildren': {
+        'AR': 'المتمدرسون منهم',
+        'FR': 'Élèves parmi eux',
+        'EN': 'Studying children',
+        'ES': 'Hijos estudiando',
+        'IT': 'Figli che studiano',
+        'DE': 'Studierende Kinder',
+        'TR': 'Okuyan çocuklar'
+      },
+      'teacherCard.studyingInSchool': {
+        'AR': 'في المؤسسة',
+        'FR': 'Dans l\'établissement',
+        'EN': 'In the school',
+        'ES': 'En la escuela',
+        'IT': 'Nella scuola',
+        'DE': 'In der Schule',
+        'TR': 'Okulda'
+      },
+      'teacherCard.point': {
+        'AR': 'النقطة',
+        'FR': 'Point',
+        'EN': 'Point',
+        'ES': 'Punto',
+        'IT': 'Punto',
+        'DE': 'Punkt',
+        'TR': 'Puan'
+      },
+      'teacherCard.className': {
+        'AR': 'الصنف',
+        'FR': 'Classe',
+        'EN': 'Class',
+        'ES': 'Clase',
+        'IT': 'Classe',
+        'DE': 'Klasse',
+        'TR': 'Sınıf'
+      },
+      'teacherCard.rank': {
+        'AR': 'الرتبة',
+        'FR': 'Grade',
+        'EN': 'Rank',
+        'ES': 'Rango',
+        'IT': 'Grado',
+        'DE': 'Rang',
+        'TR': 'Rütbe'
+      },
+      'teacherCard.grade': {
+        'AR': 'الدرجة',
+        'FR': 'Niveau',
+        'EN': 'Grade',
+        'ES': 'Grado',
+        'IT': 'Livello',
+        'DE': 'Note',
+        'TR': 'Derece'
+      },
+      'teacherCard.promotionFrequency': {
+        'AR': 'وتيرة الترقية',
+        'FR': 'Fréquence de promotion',
+        'EN': 'Promotion frequency',
+        'ES': 'Frecuencia de promoción',
+        'IT': 'Frequenza di promozione',
+        'DE': 'Beförderungshäufigkeit',
+        'TR': 'Terfi sıklığı'
+      },
+      'teacherCard.workInstitution': {
+        'AR': 'مؤسسة العمل',
+        'FR': 'Institution de travail',
+        'EN': 'Work institution',
+        'ES': 'Institución de trabajo',
+        'IT': 'Istituzione di lavoro',
+        'DE': 'Arbeitsinstitution',
+        'TR': 'Çalışma kurumu'
+      },
+      'teacherCard.firstAppointmentDate': {
+        'AR': 'تاريخ أول تعيين',
+        'FR': 'Date de première nomination',
+        'EN': 'First appointment date',
+        'ES': 'Fecha de primer nombramiento',
+        'IT': 'Data di primo incarico',
+        'DE': 'Datum der ersten Ernennung',
+        'TR': 'İlk atama tarihi'
+      },
+      'teacherCard.tenureDate': {
+        'AR': 'تاريخ الترسيم',
+        'FR': 'Date de titularisation',
+        'EN': 'Tenure date',
+        'ES': 'Fecha de titularización',
+        'IT': 'Data di stabilizzazione',
+        'DE': 'Datum der Festanstellung',
+        'TR': 'Kadro tarihi'
+      },
+      'teacherCard.lastInspectionDate': {
+        'AR': 'تاريخ آخر زيارة تفتيشية',
+        'FR': 'Date de dernière visite d\'inspection',
+        'EN': 'Last inspection visit date',
+        'ES': 'Fecha de última visita de inspección',
+        'IT': 'Data dell\'ultima visita di ispezione',
+        'DE': 'Datum des letzten Inspektionsbesuchs',
+        'TR': 'Son teftiş ziyareti tarihi'
+      },
+      'teacherCard.qualification': {
+        'AR': 'المؤهل العلمي',
+        'FR': 'Qualification',
+        'EN': 'Qualification',
+        'ES': 'Calificación',
+        'IT': 'Qualifica',
+        'DE': 'Qualifikation',
+        'TR': 'Nitelik'
+      },
+      'teacherCard.graduationYear': {
+        'AR': 'سنة التخرج',
+        'FR': 'Année de diplôme',
+        'EN': 'Graduation year',
+        'ES': 'Año de graduación',
+        'IT': 'Anno di laurea',
+        'DE': 'Abschlussjahr',
+        'TR': 'Mezuniyet yılı'
+      },
+      'teacherCard.teachingSubject': {
+        'AR': 'مادة التدريس',
+        'FR': 'Matière enseignée',
+        'EN': 'Teaching subject',
+        'ES': 'Materia de enseñanza',
+        'IT': 'Materia insegnata',
+        'DE': 'Unterrichtsfach',
+        'TR': 'Öğretim konusu'
+      },
+      'teacherCard.socialSecurityNumber': {
+        'AR': 'رقم الضمان الاجتماعي',
+        'FR': 'Numéro de sécurité sociale',
+        'EN': 'Social security number',
+        'ES': 'Número de seguridad social',
+        'IT': 'Numero di previdenza sociale',
+        'DE': 'Sozialversicherungsnummer',
+        'TR': 'Sosyal güvenlik numarası'
+      },
+      'teacherCard.postalAccountNumber': {
+        'AR': 'رقم الحساب البريدي',
+        'FR': 'Numéro de compte postal',
+        'EN': 'Postal account number',
+        'ES': 'Número de cuenta postal',
+        'IT': 'Numero di conto postale',
+        'DE': 'Postkontonummer',
+        'TR': 'Posta hesap numarası'
+      },
+      'teacherCard.mutualNumber': {
+        'AR': 'رقم التعاضدية',
+        'FR': 'Numéro de mutuelle',
+        'EN': 'Mutual number',
+        'ES': 'Número de mutua',
+        'IT': 'Numero di mutua',
+        'DE': 'Versicherungsnummer',
+        'TR': 'Karşılıklı numara'
+      },
+      'teacherCard.effectiveFrom': {
+        'AR': 'تاريخ السريان من',
+        'FR': 'Date d\'entrée en vigueur à partir de',
+        'EN': 'Effective from',
+        'ES': 'Vigente desde',
+        'IT': 'Efficace da',
+        'DE': 'Gültig ab',
+        'TR': 'Geçerlilik başlangıcı'
+      },
+      'teacherCard.effectiveTo': {
+        'AR': 'إلى',
+        'FR': 'Jusqu\'à',
+        'EN': 'To',
+        'ES': 'Hasta',
+        'IT': 'Fino a',
+        'DE': 'Bis',
+        'TR': 'Bitiş'
+      },
+      'teacherCard.wilaya': {
+        'AR': 'ولاية',
+        'FR': 'Wilaya',
+        'EN': 'Wilaya',
+        'ES': 'Wilaya',
+        'IT': 'Wilaya',
+        'DE': 'Wilaya',
+        'TR': 'Vilayet'
+      },
+      'teacherCard.personalPhone': {
+        'AR': 'رقم الهاتف الشخصي',
+        'FR': 'Numéro de téléphone personnel',
+        'EN': 'Personal phone number',
+        'ES': 'Número de teléfono personal',
+        'IT': 'Numero di telefono personale',
+        'DE': 'Persönliche Telefonnummer',
+        'TR': 'Kişisel telefon numarası'
+      },
+      'teacherCard.idOrLicenseNumber': {
+        'AR': 'رقم بطاقة التعريف / رخصة السياقة',
+        'FR': 'Numéro de carte d\'identité / permis de conduire',
+        'EN': 'ID card / driving license number',
+        'ES': 'Número de DNI / licencia de conducir',
+        'IT': 'Numero carta d\'identità / patente',
+        'DE': 'Ausweisnummer / Führerscheinnummer',
+        'TR': 'Kimlik kartı / ehliyet numarası'
+      },
+      'teacherCard.bloodType': {
+        'AR': 'الزمرة الدموية',
+        'FR': 'Groupe sanguin',
+        'EN': 'Blood type',
+        'ES': 'Tipo de sangre',
+        'IT': 'Gruppo sanguigno',
+        'DE': 'Blutgruppe',
+        'TR': 'Kan grubu'
+      },
+      'teacherCard.professionalInfo': {
+        'AR': 'معلومات الحالة المهنية والشهادات والمؤهلات',
+        'FR': 'Informations sur le statut professionnel, les diplômes et les qualifications',
+        'EN': 'Professional status, certificates and qualifications information',
+        'ES': 'Información sobre estado profesional, certificados y calificaciones',
+        'IT': 'Informazioni su stato professionale, certificati e qualifiche',
+        'DE': 'Informationen zu beruflichem Status, Zertifikaten und Qualifikationen',
+        'TR': 'Mesleki durum, sertifikalar ve nitelikler bilgisi'
+      },
+      'teacherCard.frame': {
+        'AR': 'الإطار',
+        'FR': 'Cadre',
+        'EN': 'Frame',
+        'ES': 'Marco',
+        'IT': 'Quadro',
+        'DE': 'Rahmen',
+        'TR': 'Çerçeve'
+      },
+      'teacherCard.status': {
+        'AR': 'الصفة',
+        'FR': 'Statut',
+        'EN': 'Status',
+        'ES': 'Estado',
+        'IT': 'Stato',
+        'DE': 'Status',
+        'TR': 'Durum'
+      },
+      'teacherCard.specialty': {
+        'AR': 'الاختصاص',
+        'FR': 'Spécialité',
+        'EN': 'Specialty',
+        'ES': 'Especialidad',
+        'IT': 'Specialità',
+        'DE': 'Spezialität',
+        'TR': 'Uzmanlık'
+      },
+      'teacherCard.currentSchoolAppointmentDate': {
+        'AR': 'تاريخ التعيين بالمؤسسة الحالية',
+        'FR': 'Date de nomination dans l\'établissement actuel',
+        'EN': 'Current school appointment date',
+        'ES': 'Fecha de nombramiento en la escuela actual',
+        'IT': 'Data di incarico nella scuola attuale',
+        'DE': 'Datum der Ernennung an der aktuellen Schule',
+        'TR': 'Mevcut okul atama tarihi'
+      },
+      'teacherCard.currentSchoolInstallationDate': {
+        'AR': 'تاريخ التنصيب بها',
+        'FR': 'Date d\'installation',
+        'EN': 'Installation date',
+        'ES': 'Fecha de instalación',
+        'IT': 'Data di installazione',
+        'DE': 'Installationsdatum',
+        'TR': 'Kurulum tarihi'
+      },
+      'teacherCard.currentGradeLevel': {
+        'AR': 'الدرجة الحالية',
+        'FR': 'Niveau actuel',
+        'EN': 'Current grade level',
+        'ES': 'Nivel de grado actual',
+        'IT': 'Livello attuale',
+        'DE': 'Aktuelles Niveau',
+        'TR': 'Mevcut derece seviyesi'
+      },
+      'teacherCard.currentGradeEffectiveDate': {
+        'AR': 'تاريخ سريان مفعولها',
+        'FR': 'Date d\'entrée en vigueur',
+        'EN': 'Effective date',
+        'ES': 'Fecha de vigencia',
+        'IT': 'Data di efficacia',
+        'DE': 'Gültigkeitsdatum',
+        'TR': 'Geçerlilik tarihi'
+      },
+      'teacherCard.lastInspectionScore': {
+        'AR': 'نقطة آخر تفتيش',
+        'FR': 'Note de la dernière inspection',
+        'EN': 'Last inspection score',
+        'ES': 'Puntuación de última inspección',
+        'IT': 'Punteggio ultima ispezione',
+        'DE': 'Punktzahl der letzten Inspektion',
+        'TR': 'Son teftiş puanı'
+      },
+      'teacherCard.degrees': {
+        'AR': 'الشهادات المتحصّل عليها',
+        'FR': 'Diplômes obtenus',
+        'EN': 'Degrees obtained',
+        'ES': 'Títulos obtenidos',
+        'IT': 'Titoli ottenuti',
+        'DE': 'Erworbene Abschlüsse',
+        'TR': 'Alınan dereceler'
+      },
+      'teacherCard.degree': {
+        'AR': 'الشهادة',
+        'FR': 'Diplôme',
+        'EN': 'Degree',
+        'ES': 'Título',
+        'IT': 'Titolo',
+        'DE': 'Abschluss',
+        'TR': 'Derece'
+      },
+      'teacherCard.institution': {
+        'AR': 'المؤسسة',
+        'FR': 'Institution',
+        'EN': 'Institution',
+        'ES': 'Institución',
+        'IT': 'Istituzione',
+        'DE': 'Institution',
+        'TR': 'Kurum'
+      },
+      'teacherCard.year': {
+        'AR': 'السنة',
+        'FR': 'Année',
+        'EN': 'Year',
+        'ES': 'Año',
+        'IT': 'Anno',
+        'DE': 'Jahr',
+        'TR': 'Yıl'
+      },
+      'teacherCard.directorateEducation': {
+        'AR': 'مديرية التربية لولاية',
+        'FR': 'Direction de l\'éducation de la wilaya',
+        'EN': 'Education directorate of wilaya',
+        'ES': 'Dirección de educación de la wilaya',
+        'IT': 'Direzione dell\'istruzione della wilaya',
+        'DE': 'Bildungsdirektion der Wilaya',
+        'TR': 'Vilayet eğitim müdürlüğü'
+      },
+      'teacherCard.firstAppointmentInEducation': {
+        'AR': 'تاريخ أول تعيين في التعليم',
+        'FR': 'Date de première nomination dans l\'enseignement',
+        'EN': 'First appointment date in education',
+        'ES': 'Fecha de primer nombramiento en educación',
+        'IT': 'Data di primo incarico nell\'istruzione',
+        'DE': 'Datum der ersten Ernennung im Bildungswesen',
+        'TR': 'Eğitimde ilk atama tarihi'
       },
 
       // Certificate Generator

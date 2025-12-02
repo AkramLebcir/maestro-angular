@@ -2,13 +2,13 @@
 <div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" *ngIf="showRoomSetup" dir="rtl">
   <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">تصميم القاعة</h2>
+      <h2 class="text-2xl font-bold text-gray-800">{{ translate('seatingChart.roomDesign') }}</h2>
       <button class="text-gray-400 hover:text-gray-600 text-2xl" (click)="closeRoomSetup()">×</button>
     </div>
     
     <div class="space-y-6">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">عدد الصفوف</label>
+        <label class="block text-sm font-medium text-gray-700 mb-2">{{ translate('seatingChart.numberOfRows') }}</label>
         <div class="flex gap-3">
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
@@ -16,7 +16,7 @@
             [class.bg-blue-50]="roomRows === 3"
             [class.border-gray-200]="roomRows !== 3"
             (click)="roomRows = 3">
-            3 صفوف
+            {{ translate('seatingChart.threeRows') }}
           </button>
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
@@ -24,13 +24,13 @@
             [class.bg-blue-50]="roomRows === 4"
             [class.border-gray-200]="roomRows !== 4"
             (click)="roomRows = 4">
-            4 صفوف
+            {{ translate('seatingChart.fourRows') }}
           </button>
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">نوع الطاولة</label>
+        <label class="block text-sm font-medium text-gray-700 mb-2">{{ translate('seatingChart.tableType') }}</label>
         <div class="flex gap-3">
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
@@ -39,8 +39,8 @@
             [class.border-gray-200]="tableType !== 'single'"
             (click)="tableType = 'single'">
             <div class="text-center">
-              <div class="text-lg font-semibold mb-1">طاولة فردية</div>
-              <div class="text-xs text-gray-500">تلميذ واحد</div>
+              <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.singleTable') }}</div>
+              <div class="text-xs text-gray-500">{{ translate('seatingChart.oneStudent') }}</div>
             </div>
           </button>
           <button 
@@ -50,8 +50,8 @@
             [class.border-gray-200]="tableType !== 'double'"
             (click)="tableType = 'double'">
             <div class="text-center">
-              <div class="text-lg font-semibold mb-1">طاولة مزدوجة</div>
-              <div class="text-xs text-gray-500">تلميذان</div>
+              <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.doubleTable') }}</div>
+              <div class="text-xs text-gray-500">{{ translate('seatingChart.twoStudents') }}</div>
             </div>
           </button>
         </div>
@@ -62,8 +62,8 @@
           class="w-full px-6 py-3 bg-blue-500 text-white rounded-xl font-semibold hover:bg-blue-600 transition"
           (click)="createClassroomLayout()"
           [disabled]="creatingLayout">
-          <span *ngIf="!creatingLayout">إنشاء التخطيط</span>
-          <span *ngIf="creatingLayout">... جاري الإنشاء</span>
+          <span *ngIf="!creatingLayout">{{ translate('seatingChart.createLayout') }}</span>
+          <span *ngIf="creatingLayout">{{ translate('seatingChart.creating') }}</span>
         </button>
       </div>
     </div>
@@ -78,52 +78,52 @@
       </div>
       <div>
         <p class="uppercase text-sm tracking-wider opacity-80">
-          <span *ngIf="layoutMode === 'workstations'">مخطط الحواسيب (المخبر)</span>
-          <span *ngIf="layoutMode === 'classroom'">مخطط الجلوس (القاعة)</span>
+          <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.computerLayout') }}</span>
+          <span *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.seatingLayout') }}</span>
         </p>
         <h1 class="text-3xl font-semibold">{{ currentClass!.name }}</h1>
         <p class="text-white/80">{{ currentClass!.subject }}</p>
         <div class="mt-2 flex gap-2 flex-wrap">
-          <span class="badge">المستوى: {{ currentClass!.level }}</span>
-          <span class="badge" *ngIf="layoutMode === 'workstations'">الفوج {{ selectedGroup }}</span>
-          <span class="badge" *ngIf="layoutMode === 'classroom'">جميع التلاميذ</span>
-          <span class="badge">عدد التلاميذ: {{ layoutMode === 'classroom' ? allClassStudents.length : (stats?.studentCount || '--') }}</span>
+          <span class="badge">{{ translate('seatingChart.level') }} {{ currentClass!.level }}</span>
+          <span class="badge" *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.group') }} {{ selectedGroup }}</span>
+          <span class="badge" *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.allStudents') }}</span>
+          <span class="badge">{{ translate('seatingChart.studentCount') }} {{ layoutMode === 'classroom' ? allClassStudents.length : (stats?.studentCount || '--') }}</span>
         </div>
       </div>
     </div>
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'workstations' && stats">
       <div class="stat-pill">
-        <p class="label">متوسط الحضور</p>
+        <p class="label">{{ translate('seatingChart.averageAttendance') }}</p>
         <p class="value">{{ stats.averageAttendance ?? 0 }}%</p>
       </div>
       <div class="stat-pill">
-        <p class="label">متوسط النقاط</p>
+        <p class="label">{{ translate('seatingChart.averageGrade') }}</p>
         <p class="value">{{ stats.averageGrade ?? 0 }}%</p>
       </div>
       <div class="stat-pill">
-        <p class="label text-green-100">السلوك الإيجابي</p>
+        <p class="label text-green-100">{{ translate('seatingChart.positiveBehavior') }}</p>
         <p class="value text-green-300">{{ stats.positiveBehaviorRate ?? 0 }}%</p>
       </div>
     </div>
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'classroom' && classroomLayout">
       <div class="stat-pill">
-        <p class="label">عدد الطاولات</p>
+        <p class="label">{{ translate('seatingChart.numberOfDesks') }}</p>
         <p class="value">{{ classroomLayout.desks?.length || 0 }}</p>
       </div>
       <div class="stat-pill">
-        <p class="label">عدد الصفوف</p>
+        <p class="label">{{ translate('seatingChart.numberOfRowsLabel') }}</p>
         <p class="value">{{ classroomLayout.layout?.rows || 0 }}</p>
       </div>
       <div class="stat-pill">
-        <p class="label text-green-100">نوع الطاولة</p>
-        <p class="value text-green-300">{{ classroomLayout.layout?.tableType === 'single' ? 'فردية' : 'مزدوجة' }}</p>
+        <p class="label text-green-100">{{ translate('seatingChart.tableType') }}</p>
+        <p class="value text-green-300">{{ classroomLayout.layout?.tableType === 'single' ? translate('seatingChart.single') : translate('seatingChart.double') }}</p>
       </div>
     </div>
   </div>
 
   <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-4 items-center">
     <div class="flex flex-col">
-      <label class="text-gray-500 text-sm mb-1">القسم</label>
+      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.class') }}</label>
       <select
         class="select-input"
         [value]="selectedClassId"
@@ -133,34 +133,34 @@
     </div>
 
     <div class="flex flex-col">
-      <label class="text-gray-500 text-sm mb-1">نوع المخطط</label>
+      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.layoutType') }}</label>
       <div class="flex gap-2">
         <button 
           class="group-switch" 
           [class.active]="layoutMode === 'workstations'" 
           (click)="toggleLayoutMode('workstations')">
-          مخطط الحواسيب (U)
+          {{ translate('seatingChart.computerLayoutU') }}
         </button>
         <button 
           class="group-switch" 
           [class.active]="layoutMode === 'classroom'" 
           (click)="toggleLayoutMode('classroom')">
-          مخطط الجلوس (قاعة)
+          {{ translate('seatingChart.seatingLayoutRoom') }}
         </button>
       </div>
     </div>
 
     <div class="flex flex-col" *ngIf="layoutMode === 'workstations'">
-      <label class="text-gray-500 text-sm mb-1">الفوج</label>
+      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.group') }}</label>
       <div class="flex gap-2">
-        <button class="group-switch" [class.active]="selectedGroup === 1" (click)="toggleGroup(1)">الفوج 1</button>
-        <button class="group-switch" [class.active]="selectedGroup === 2" (click)="toggleGroup(2)">الفوج 2</button>
+        <button class="group-switch" [class.active]="selectedGroup === 1" (click)="toggleGroup(1)">{{ translate('seatingChart.group') }} 1</button>
+        <button class="group-switch" [class.active]="selectedGroup === 2" (click)="toggleGroup(2)">{{ translate('seatingChart.group') }} 2</button>
       </div>
     </div>
 
     <div class="flex-1 min-w-[200px]">
-      <label class="text-gray-500 text-sm mb-1">بحث عن تلميذ</label>
-      <input class="search-input" placeholder="اكتب اسم التلميذ" [(ngModel)]="searchTerm" />
+      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.searchStudent') }}</label>
+      <input class="search-input" [placeholder]="translate('seatingChart.searchPlaceholder')" [(ngModel)]="searchTerm" />
     </div>
 
       <div class="flex gap-3 flex-wrap items-center ml-auto">
@@ -168,49 +168,49 @@
         class="ghost-btn btn-export-pdf"
         (click)="printSelectedWorkstationsAllClasses()"
         [disabled]="printLoading || selectedStationsForPrint.size === 0">
-        طباعة الحواسيب المحددة (جميع الأقسام)
+        {{ translate('seatingChart.printSelectedAllClasses') }}
       </button>
-      <button class="ghost-btn btn-export-pdf" (click)="print('group')" [disabled]="printLoading">طباعة الفوج</button>
-      <button class="ghost-btn btn-export-pdf" (click)="print('class')" [disabled]="printLoading">طباعة القسم</button>
-      <button class="ghost-btn btn-export-pdf" (click)="print('all')" [disabled]="printLoading">طباعة جميع الأقسام</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('group')" [disabled]="printLoading">{{ translate('seatingChart.printGroup') }}</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('class')" [disabled]="printLoading">{{ translate('seatingChart.printClass') }}</button>
+      <button class="ghost-btn btn-export-pdf" (click)="print('all')" [disabled]="printLoading">{{ translate('seatingChart.printAllClasses') }}</button>
     </div>
   </div>
 
   <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center text-sm text-gray-600">
     <button class="primary-outline" (click)="openRoomSetup()" *ngIf="layoutMode === 'classroom'">
-      <span *ngIf="!classroomLayout">إنشاء تخطيط قاعة</span>
-      <span *ngIf="classroomLayout">تعديل تخطيط القاعة</span>
+      <span *ngIf="!classroomLayout">{{ translate('seatingChart.createRoomLayout') }}</span>
+      <span *ngIf="classroomLayout">{{ translate('seatingChart.editRoomLayout') }}</span>
     </button>
     <button class="primary-outline" (click)="toggleReorganize()">
-      {{ isReorganizing ? 'إيقاف تنظيم التلاميذ' : 'تنظيم التلاميذ' }}
+      {{ isReorganizing ? translate('seatingChart.stopOrganizing') : translate('seatingChart.organizeStudents') }}
     </button>
     <button class="primary-outline" (click)="toggleStationEditing()">
-      <span *ngIf="layoutMode === 'workstations'">{{ editingStations ? 'إيقاف تحريك الحواسيب' : 'تحريك الحواسيب' }}</span>
-      <span *ngIf="layoutMode === 'classroom'">{{ editingStations ? 'إيقاف تحريك الطاولات' : 'تحريك الطاولات' }}</span>
+      <span *ngIf="layoutMode === 'workstations'">{{ editingStations ? translate('seatingChart.stopMovingComputers') : translate('seatingChart.moveComputers') }}</span>
+      <span *ngIf="layoutMode === 'classroom'">{{ editingStations ? translate('seatingChart.stopMovingDesks') : translate('seatingChart.moveDesks') }}</span>
     </button>
     <button class="primary-btn" (click)="layoutMode === 'classroom' ? saveClassroomAssignments() : saveAssignments()" [disabled]="saving || !isReorganizing">
-      <span *ngIf="!saving">حفظ توزيع التلاميذ</span>
-      <span *ngIf="saving">... جاري الحفظ</span>
+      <span *ngIf="!saving">{{ translate('seatingChart.saveStudentDistribution') }}</span>
+      <span *ngIf="saving">{{ translate('seatingChart.saving') }}</span>
     </button>
     <button class="primary-btn" (click)="layoutMode === 'classroom' ? saveClassroomDeskPositions() : saveLayoutPositions()" [disabled]="layoutSaving || !layoutDirty">
       <span *ngIf="!layoutSaving">
-        <span *ngIf="layoutMode === 'workstations'">حفظ أماكن الحواسيب</span>
-        <span *ngIf="layoutMode === 'classroom'">حفظ أماكن الطاولات</span>
+        <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.saveComputerPositions') }}</span>
+        <span *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.saveDeskPositions') }}</span>
       </span>
-      <span *ngIf="layoutSaving">... جاري الحفظ</span>
+      <span *ngIf="layoutSaving">{{ translate('seatingChart.saving') }}</span>
     </button>
     <button class="primary-btn btn-export-pdf" (click)="layoutMode === 'classroom' ? exportClassroomLayoutToPdf() : print('group')" [disabled]="printLoading">
-      <span *ngIf="!printLoading">تصدير PDF</span>
-      <span *ngIf="printLoading">... جاري التصدير</span>
+      <span *ngIf="!printLoading">{{ translate('seatingChart.exportPDF') }}</span>
+      <span *ngIf="printLoading">{{ translate('seatingChart.exporting') }}</span>
     </button>
-    <span class="text-red-500 font-semibold" *ngIf="layoutDirty">هناك تعديلات غير محفوظة</span>
+    <span class="text-red-500 font-semibold" *ngIf="layoutDirty">{{ translate('seatingChart.unsavedChanges') }}</span>
   </div>
 
   <div *ngIf="errorMessage" class="alert flex items-center justify-between gap-4">
     <span>{{ errorMessage }}</span>
     <div class="flex gap-2">
-      <button class="text-red-600 hover:text-red-800 underline text-sm" (click)="errorMessage = ''">إخفاء</button>
-      <button class="text-red-600 hover:text-red-800 underline text-sm" (click)="loadStudentsAndLayout()">إعادة المحاولة</button>
+      <button class="text-red-600 hover:text-red-800 underline text-sm" (click)="errorMessage = ''">{{ translate('seatingChart.hide') }}</button>
+      <button class="text-red-600 hover:text-red-800 underline text-sm" (click)="loadStudentsAndLayout()">{{ translate('seatingChart.retry') }}</button>
     </div>
   </div>
 
@@ -219,10 +219,10 @@
       <div class="bg-white rounded-3xl shadow-lg p-6 relative h-[640px] flex flex-col">
         <div class="flex items-center justify-between">
           <h3 class="section-title">
-            <span *ngIf="layoutMode === 'workstations'">مخطط الحواسيب (حرف U مقلوب)</span>
-            <span *ngIf="layoutMode === 'classroom'">مخطط الجلوس (القاعة الدراسية)</span>
+            <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.computerLayoutUInverted') }}</span>
+            <span *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.seatingLayoutClassroom') }}</span>
           </h3>
-          <span class="text-xs text-gray-400">يمكن تكبير العرض بالتمرير</span>
+          <span class="text-xs text-gray-400">{{ translate('seatingChart.zoomHint') }}</span>
         </div>
         <div class="seating-stage-wrapper mt-4">
           <div class="seating-stage" [class.classroom-layout]="layoutMode === 'classroom'" #stageRef>
@@ -245,7 +245,7 @@
                         (change)="toggleStationSelection(slot.workstationId, $any($event.target).checked)" />
                       {{ slot.label }}
                     </label>
-                    <span class="text-xs text-gray-500">سعة {{ slot.capacity }}</span>
+                    <span class="text-xs text-gray-500">{{ translate('seatingChart.capacity') }} {{ slot.capacity }}</span>
                   </div>
                 </div>
                 <div
@@ -273,7 +273,7 @@
                         <button class="remove-btn inline" type="button" (click)="clearSeat(slot, i)">✕</button>
                       </div>
                       <span class="text-xs text-gray-400" *ngIf="slot.capacity === 2">
-                        {{ i === 0 ? 'يسار' : 'يمين' }}
+                        {{ i === 0 ? translate('seatingChart.left') : translate('seatingChart.right') }}
                       </span>
                     </div>
                   </div>
@@ -281,10 +281,10 @@
                     *ngFor="let placeholder of getSeatPlaceholders(slot)"
                     class="seat-placeholder"
                     [class.disabled]="!isReorganizing">
-                    <span *ngIf="layoutMode === 'workstations'">اسحب تلميذين كحد أقصى لهذا الحاسوب</span>
+                    <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.dragMaxTwoStudents') }}</span>
                     <span *ngIf="layoutMode === 'classroom'">
-                      <span *ngIf="slot.capacity === 1">اسحب تلميذ واحد لهذه الطاولة</span>
-                      <span *ngIf="slot.capacity === 2">اسحب تلميذين لهذه الطاولة</span>
+                      <span *ngIf="slot.capacity === 1">{{ translate('seatingChart.dragOneStudent') }}</span>
+                      <span *ngIf="slot.capacity === 2">{{ translate('seatingChart.dragTwoStudents') }}</span>
                     </span>
                   </div>
                 </div>
@@ -292,13 +292,13 @@
             </div>
             <div *ngIf="loading" class="stage-overlay">
               <div class="spinner"></div>
-              <p>جاري تحميل المخطط...</p>
+              <p>{{ translate('seatingChart.loadingLayout') }}</p>
             </div>
             <div *ngIf="!loading && layoutMode === 'classroom' && !classroomLayout && workstationSlots.length === 0" class="stage-overlay" style="background: rgba(255, 255, 255, 0.95);">
               <div class="text-center">
-                <p class="text-lg font-semibold text-gray-700 mb-4">لا يوجد تخطيط قاعة</p>
-                <p class="text-sm text-gray-500 mb-6">يرجى إنشاء تخطيط جديد للقاعة</p>
-                <button class="primary-btn" (click)="openRoomSetup()">إنشاء تخطيط قاعة</button>
+                <p class="text-lg font-semibold text-gray-700 mb-4">{{ translate('seatingChart.noRoomLayout') }}</p>
+                <p class="text-sm text-gray-500 mb-6">{{ translate('seatingChart.createNewRoomLayout') }}</p>
+                <button class="primary-btn" (click)="openRoomSetup()">{{ translate('seatingChart.createRoomLayout') }}</button>
               </div>
             </div>
           </div>
@@ -311,24 +311,24 @@
             </div>
             <div class="popup-body">
               <div class="popup-field">
-                <label>الحضور</label>
+                <label>{{ translate('seatingChart.attendance') }}</label>
                 <select [(ngModel)]="activeSeat!.seat.attendanceStatus">
                   <option *ngFor="let option of attendanceOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
               </div>
               <div class="popup-field">
-                <label>السلوك</label>
+                <label>{{ translate('seatingChart.behavior') }}</label>
                 <select [(ngModel)]="activeSeat!.seat.behaviorStatus">
                   <option *ngFor="let option of behaviorOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
               </div>
               <div class="popup-field">
-                <label>ملاحظات</label>
+                <label>{{ translate('seatingChart.notes') }}</label>
                 <textarea rows="3" [(ngModel)]="activeSeat!.seat.behaviorNotes"></textarea>
               </div>
             </div>
             <div class="popup-actions">
-              <button class="primary-btn" type="button" (click)="closeSeatPopup()">تم</button>
+              <button class="primary-btn" type="button" (click)="closeSeatPopup()">{{ translate('seatingChart.done') }}</button>
             </div>
           </div>
         </div>
@@ -338,8 +338,8 @@
     <div class="col-span-12 xl:col-span-3">
       <div class="bg-white rounded-3xl shadow-lg p-6 flex flex-col h-full">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="section-title">التلاميذ المتاحون</h3>
-          <span class="text-sm text-gray-500">{{ studentPool.length }} تلميذاً</span>
+          <h3 class="section-title">{{ translate('seatingChart.availableStudents') }}</h3>
+          <span class="text-sm text-gray-500">{{ studentPool.length }} {{ translate('seatingChart.students') }}</span>
         </div>
         <div
           class="students-pool space-y-3 flex-1 overflow-auto"
@@ -361,18 +361,18 @@
             </ng-template>
             <div class="chip-info">
               <p>{{ seat.student.firstName }} {{ seat.student.lastName }}</p>
-              <span>الفوج {{ seat.student.group || 'غير محدد' }}</span>
+              <span>{{ translate('seatingChart.group') }} {{ seat.student.group || translate('seatingChart.groupUndefined') }}</span>
             </div>
           </div>
           <div *ngIf="!studentPool.length" class="text-center text-sm text-gray-400 pt-6">
-            <span *ngIf="layoutMode === 'workstations'">جميع تلاميذ الفوج تم توزيعهم</span>
-            <span *ngIf="layoutMode === 'classroom'">جميع التلاميذ تم توزيعهم</span>
+            <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.allStudentsAssigned') }}</span>
+            <span *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.allClassStudentsAssigned') }}</span>
           </div>
         </div>
         <div class="pt-4 border-t mt-4 text-sm text-gray-500" *ngIf="layoutMode === 'workstations'">
-          <p>اختيار الحواسيب للطباعة:</p>
-          <button class="ghost-btn mt-2 w-full" (click)="selectAllStations()">تحديد / إلغاء كل الحواسيب</button>
-          <p class="text-xs mt-2 text-gray-400">إذا لم تحدد شيئاً سيتم طباعة كل الحواسيب.</p>
+          <p>{{ translate('seatingChart.selectComputers') }}</p>
+          <button class="ghost-btn mt-2 w-full" (click)="selectAllStations()">{{ translate('seatingChart.selectAllStations') }}</button>
+          <p class="text-xs mt-2 text-gray-400">{{ translate('seatingChart.printAllIfNoneSelected') }}</p>
         </div>
       </div>
     </div>
@@ -386,19 +386,19 @@
       <div class="print-header workstation">
         <div>
           <h1>{{ page.label }}</h1>
-          <p>سعة {{ page.capacity }}</p>
+          <p>{{ translate('seatingChart.capacity') }} {{ page.capacity }}</p>
         </div>
         <div class="text-left">
-          <p class="text-sm text-white/80">يتضمن جميع الأقسام والفوجات</p>
+          <p class="text-sm text-white/80">{{ translate('seatingChart.includesAllClasses') }}</p>
         </div>
       </div>
       <div class="workstation-entries">
         <div class="workstation-entry-card" *ngFor="let entry of page.entries">
           <div class="entry-header">
             <p class="entry-title">
-              {{ entry.className }} - {{ entry.subject || 'بدون مادة' }}
+              {{ entry.className }} - {{ entry.subject || translate('seatingChart.noSubject') }}
             </p>
-            <span class="entry-group">الفوج {{ entry.group }}</span>
+            <span class="entry-group">{{ translate('seatingChart.group') }} {{ entry.group }}</span>
           </div>
           <div class="entry-body" *ngIf="entry.students.length">
             <div class="entry-student-row" *ngFor="let student of entry.students">
@@ -407,7 +407,7 @@
             </div>
           </div>
           <p class="text-center text-gray-400 text-sm py-2" *ngIf="!entry.students.length">
-            لا يوجد تلاميذ في هذا الحاسوب لهذا القسم.
+            {{ translate('seatingChart.noStudentsInComputer') }}
           </p>
         </div>
       </div>
@@ -425,8 +425,8 @@
           <p>{{ classBlock.class.subject }}</p>
         </div>
         <div class="text-left">
-          <p class="text-lg font-bold">الفوج {{ groupBlock.group }}</p>
-          <p class="text-sm">الحضور {{ groupBlock.stats.averageAttendance || 0 }}% | السلوك {{ groupBlock.stats.positiveBehaviorRate || 0 }}%</p>
+          <p class="text-lg font-bold">{{ translate('seatingChart.group') }} {{ groupBlock.group }}</p>
+          <p class="text-sm">{{ translate('seatingChart.attendance') }} {{ groupBlock.stats.averageAttendance || 0 }}% | {{ translate('seatingChart.behavior') }} {{ groupBlock.stats.positiveBehaviorRate || 0 }}%</p>
         </div>
       </div>
 
@@ -435,7 +435,7 @@
         <div *ngFor="let workstation of groupBlock.workstations" class="print-card">
           <div class="print-card-header">
             <span class="font-bold text-gray-800">{{ workstation.label }}</span>
-            <span class="text-xs text-gray-500">سعة {{ workstation.capacity }}</span>
+            <span class="text-xs text-gray-500">{{ translate('seatingChart.capacity') }} {{ workstation.capacity }}</span>
           </div>
           <div class="print-card-body">
             <ng-container *ngIf="workstation.assignments?.length; else emptyPrint">
@@ -447,7 +447,7 @@
               </div>
             </ng-container>
             <ng-template #emptyPrint>
-              <p class="text-gray-400 text-sm italic text-center py-2">فارغ</p>
+              <p class="text-gray-400 text-sm italic text-center py-2">{{ translate('seatingChart.empty') }}</p>
             </ng-template>
           </div>
         </div>
@@ -458,7 +458,7 @@
 
 <ng-template #emptyState>
   <div class="p-12 text-center text-gray-500">
-    لا توجد أقسام متاحة. يرجى إضافة قسم أولاً.
+    {{ translate('seatingChart.noClassesAvailable') }}
   </div>
 </ng-template>
 

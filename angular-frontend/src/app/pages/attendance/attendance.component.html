@@ -101,7 +101,7 @@
           }">
             {{ getAttendanceSummaryValue(status.value) || 0 }}
           </div>
-          <div class="text-sm text-gray-600">{{ status.labelAr }}</div>
+          <div class="text-sm text-gray-600">{{ translate(status.labelKey) }}</div>
         </div>
       </div>
     </div>
@@ -241,7 +241,7 @@
                     'bg-orange-100 border-orange-300': getAttendanceForStudentAndDate(student.id, day) === 'left_early',
                     'bg-gray-100 border-gray-300': !getAttendanceForStudentAndDate(student.id, day) || getAttendanceForStudentAndDate(student.id, day) === 'unrecorded'
                   }">
-                  <option *ngFor="let status of attendanceStatuses" [value]="status.value">{{ status.labelAr }}</option>
+                  <option *ngFor="let status of attendanceStatuses" [value]="status.value">{{ translate(status.labelKey) }}</option>
                 </select>
               </td>
             </tr>

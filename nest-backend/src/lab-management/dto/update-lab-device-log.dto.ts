@@ -5,3 +5,4 @@ export class UpdateLabDeviceLogDto extends PartialType(CreateLabDeviceLogDto) {}
 
 
 
+

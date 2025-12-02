@@ -60,3 +60,4 @@ async create(@CurrentUser() user: AuthUser, @Body() dto: CreateDto) {
 - تأكد من التحقق من ownerId عند التحقق من الـ relations (مثل Class, Lab)
 
 
+

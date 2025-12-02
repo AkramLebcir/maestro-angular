@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
+import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
@@ -140,12 +141,19 @@ export class NotebooksComponent implements OnInit {
   };
 
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private languageService: LanguageService
+  ) {}
 
   ngOnInit(): void {
     this.loadNotebooks();
     this.loadClasses();
     this.loadTopics();
+  }
+
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
   }
 
   loadNotebooks(): void {
@@ -341,7 +349,7 @@ export class NotebooksComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error updating notebook:', error);
-          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تحديث الدفتر';
+          const errorMessage = error?.error?.message || error?.message || this.translate('notebooks.updateError');
           alert(errorMessage);
         }
       });
@@ -358,7 +366,7 @@ export class NotebooksComponent implements OnInit {
                                ? error.error.error.join(', ') 
                                : error.error?.error) ||
                              error?.message || 
-                             'حدث خطأ أثناء إضافة الدفتر';
+                             this.translate('notebooks.createError');
           alert(errorMessage);
         }
       });
@@ -366,14 +374,14 @@ export class NotebooksComponent implements OnInit {
   }
 
   deleteNotebook(id: number): void {
-    if (confirm('هل أنت متأكد من حذف هذا الدفتر؟')) {
+    if (confirm(this.translate('notebooks.deleteConfirm'))) {
       this.apiService.delete(`/notebooks/${id}`).subscribe({
         next: () => {
           this.loadNotebooks();
         },
         error: (error) => {
           console.error('Error deleting notebook:', error);
-          alert('حدث خطأ أثناء حذف الدفتر');
+          alert(this.translate('notebooks.deleteError'));
         }
       });
     }
@@ -418,7 +426,9 @@ export class NotebooksComponent implements OnInit {
   formatDate(date: Date | string): string {
     if (!date) return '-';
     const d = typeof date === 'string' ? new Date(date) : date;
-    return d.toLocaleDateString('ar-EG');
+    const lang = this.languageService.getCurrentLanguage();
+    const locale = lang === 'AR' ? 'ar-EG' : (lang === 'FR' ? 'fr-FR' : 'en-US');
+    return d.toLocaleDateString(locale);
   }
 
   truncateText(text: string | undefined, maxLength: number = 100): string {
@@ -472,7 +482,7 @@ export class NotebooksComponent implements OnInit {
 
   saveCourse(): void {
     if (!this.courseFormData.title || !this.courseFormData.description) {
-      alert('يرجى إدخال العنوان والوصف');
+      alert(this.translate('notebooks.enterTitleDescriptionError'));
       return;
     }
 
@@ -495,7 +505,7 @@ export class NotebooksComponent implements OnInit {
     let endMinutes = this.timeToMinutes(normalizedEndTime);
     
     if (isNaN(startMinutes) || isNaN(endMinutes)) {
-      alert('خطأ في تنسيق الوقت. يرجى التأكد من إدخال الوقت بشكل صحيح');
+      alert(this.translate('notebooks.timeFormatError'));
       return;
     }
     
@@ -510,7 +520,7 @@ export class NotebooksComponent implements OnInit {
     }
     
     if (startMinutes >= endMinutes) {
-      alert('وقت البداية يجب أن يكون قبل وقت النهاية');
+      alert(this.translate('notebooks.startBeforeEndError'));
       return;
     }
 
