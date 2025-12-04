@@ -71,6 +71,14 @@ export class ClassesController {
   ): Promise<void> {
     return this.classesService.remove(user.id, id);
   }
+
+  @Get(':id/summary-report')
+  async getSummaryReport(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<any> {
+    return this.classesService.getClassSummaryReport(user.id, id);
+  }
 }
 
 

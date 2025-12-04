@@ -3619,6 +3619,15 @@ export class LanguageService {
         'DE': 'Gruppen verwalten',
         'TR': 'Grupları yönet'
       },
+      'classes.exportReport': {
+        'AR': 'تقرير ملخص القسم (PDF)',
+        'FR': 'Exporter le rapport de classe (PDF)',
+        'EN': 'Export class summary report (PDF)',
+        'ES': 'Exportar informe resumido de la clase (PDF)',
+        'IT': 'Esporta riepilogo classe (PDF)',
+        'DE': 'Klassenübersichtsbericht exportieren (PDF)',
+        'TR': 'Sınıf özet raporunu dışa aktar (PDF)'
+      },
       'classes.edit': {
         'AR': 'تعديل',
         'FR': 'Modifier',

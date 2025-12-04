@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
+import { createPage1, createPage2, createPage3, createPage4 } from './classes-pdf-export';
 
 export interface Student {
   id: number;
@@ -485,6 +488,103 @@ export class ClassesComponent implements OnInit {
 
   isStudentSelected(studentId: number): boolean {
     return this.selectedStudents.has(studentId);
+  }
+
+  async exportClassSummaryReport(classItem: Class): Promise<void> {
+    try {
+      const reportData = await this.apiService
+        .get<any>(`/classes/${classItem.id}/summary-report`)
+        .toPromise();
+
+      if (!reportData) {
+        alert('فشل في تحميل بيانات التقرير');
+        return;
+      }
+
+      const reportDate = new Date().toLocaleDateString('ar-EG', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      });
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const availableWidth = pageWidth - margin * 2;
+      const availableHeight = pageHeight - margin * 2;
+
+      // Helper function to capture and add a single page to PDF
+      const addPageToPdf = async (pageElement: HTMLElement, pageNumber: number) => {
+        const wrapper = document.createElement('div');
+        wrapper.style.position = 'absolute';
+        wrapper.style.left = '-9999px';
+        wrapper.style.top = '0';
+        wrapper.style.width = '210mm';
+        wrapper.style.backgroundColor = '#ffffff';
+        wrapper.style.fontFamily = 'Arial, "Helvetica Neue", Helvetica, sans-serif';
+        wrapper.style.direction = 'rtl';
+        wrapper.style.textAlign = 'right';
+
+        wrapper.appendChild(pageElement.cloneNode(true) as HTMLElement);
+        document.body.appendChild(wrapper);
+
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const canvas = await html2canvas(wrapper, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          width: wrapper.offsetWidth,
+          height: wrapper.offsetHeight,
+        });
+
+        document.body.removeChild(wrapper);
+
+        // Calculate dimensions for PDF
+        const imgWidth = availableWidth;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        if (pageNumber > 1) {
+          pdf.addPage();
+        }
+        
+        pdf.addImage(
+          canvas.toDataURL('image/png'),
+          'PNG',
+          margin,
+          margin,
+          imgWidth,
+          Math.min(imgHeight, availableHeight)
+        );
+      };
+
+      // PAGE 1: Student Roster
+      const page1 = createPage1(classItem, reportData, reportDate);
+      await addPageToPdf(page1, 1);
+
+      // PAGE 2: Attendance
+      const page2 = createPage2(classItem, reportData, reportDate);
+      await addPageToPdf(page2, 2);
+
+      // PAGE 3: Behavior
+      const page3 = createPage3(classItem, reportData, reportDate);
+      await addPageToPdf(page3, 3);
+
+      // PAGE 4: Gradebook
+      const page4 = createPage4(classItem, reportData, reportDate);
+      await addPageToPdf(page4, 4);
+
+      const fileName = `Class_Summary_Report_${classItem.name.replace(
+        /[^a-zA-Z0-9]/g,
+        '_',
+      )}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error exporting PDF:', error);
+      alert('حدث خطأ أثناء تصدير التقرير');
+    }
   }
 }
 
