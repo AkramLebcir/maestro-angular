@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 import { ApiService } from '../../services/api.service';
 import { CertificateService } from '../../services/certificate.service';
+import { AuthService } from '../../services/auth.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { firstValueFrom } from 'rxjs';
@@ -21,8 +22,13 @@ export class ReportsComponent {
     private router: Router,
     @Inject('LanguageService') public languageService: LanguageService,
     private apiService: ApiService,
-    private certificateService: CertificateService
+    private certificateService: CertificateService,
+    private authService: AuthService
   ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.isAdmin();
+  }
 
   translate(key: string): string {
     return this.languageService.translate(key);
@@ -40,6 +46,236 @@ export class ReportsComponent {
 
   navigateToStudents(): void {
     this.router.navigate(['/students']);
+  }
+
+  navigateToClassReport(): void {
+    this.router.navigate(['/classes'], {
+      queryParams: { openReport: '1' }
+    });
+  }
+
+  navigateToStudentReport(): void {
+    this.router.navigate(['/students'], {
+      queryParams: { openReport: '1' }
+    });
+  }
+
+  async navigateToUsersSubscriptionsReport(): Promise<void> {
+    await this.exportUsersSubscriptionsToPDF();
+  }
+
+  async exportUsersSubscriptionsToPDF(): Promise<void> {
+    if (this.isExportingPDF) {
+      return;
+    }
+
+    this.isExportingPDF = true;
+
+    try {
+      // Load users and subscriptions data
+      const [users, subscriptions, stats] = await Promise.all([
+        firstValueFrom(this.apiService.get<any[]>('/users')),
+        firstValueFrom(this.apiService.get<any[]>('/subscriptions')),
+        firstValueFrom(this.apiService.get<any>('/subscriptions/stats/overview'))
+      ]);
+
+      // Create export container
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = this.translate('reports.usersSubscriptionsReport');
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.fontSize = '12px';
+      dateInfo.style.color = '#6b7280';
+      dateInfo.style.marginBottom = '20px';
+      exportContainer.appendChild(dateInfo);
+
+      // Stats Section
+      if (stats) {
+        const statsTitle = document.createElement('h2');
+        statsTitle.textContent = 'نظرة عامة';
+        statsTitle.style.fontSize = '18px';
+        statsTitle.style.fontWeight = 'bold';
+        statsTitle.style.marginTop = '20px';
+        statsTitle.style.marginBottom = '10px';
+        statsTitle.style.color = '#1f2937';
+        exportContainer.appendChild(statsTitle);
+
+        const statsTable = document.createElement('table');
+        statsTable.style.width = '100%';
+        statsTable.style.borderCollapse = 'collapse';
+        statsTable.style.marginBottom = '20px';
+        statsTable.style.fontSize = '12px';
+        statsTable.style.border = '1px solid #d1d5db';
+
+        const statsRows = [
+          ['إجمالي الاشتراكات', stats.subscriptions?.total || 0],
+          ['الاشتراكات النشطة', stats.subscriptions?.active || 0],
+          ['الاشتراكات قيد الانتظار', stats.subscriptions?.pending || 0],
+          ['إجمالي الإيرادات', `${(stats.revenue?.total || 0).toFixed(2)} د.ج`]
+        ];
+
+        statsRows.forEach(([label, value]) => {
+          const row = document.createElement('tr');
+          const labelCell = document.createElement('td');
+          labelCell.textContent = label;
+          labelCell.style.padding = '8px';
+          labelCell.style.border = '1px solid #d1d5db';
+          labelCell.style.fontWeight = 'bold';
+          labelCell.style.backgroundColor = '#f3f4f6';
+          const valueCell = document.createElement('td');
+          valueCell.textContent = value.toString();
+          valueCell.style.padding = '8px';
+          valueCell.style.border = '1px solid #d1d5db';
+          valueCell.style.textAlign = 'center';
+          row.appendChild(labelCell);
+          row.appendChild(valueCell);
+          statsTable.appendChild(row);
+        });
+        exportContainer.appendChild(statsTable);
+      }
+
+      // Users and Subscriptions Table
+      const tableTitle = document.createElement('h2');
+      tableTitle.textContent = 'قائمة الاشتراكات';
+      tableTitle.style.fontSize = '18px';
+      tableTitle.style.fontWeight = 'bold';
+      tableTitle.style.marginTop = '20px';
+      tableTitle.style.marginBottom = '10px';
+      tableTitle.style.color = '#1f2937';
+      exportContainer.appendChild(tableTitle);
+
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.fontSize = '10px';
+      table.style.marginBottom = '20px';
+      table.style.border = '1px solid #d1d5db';
+
+      // Table Header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#f3f4f6';
+      
+      const headers = ['تاريخ الانتهاء', 'تاريخ البدء', 'الحالة', 'الباقة', 'المستخدم'];
+      
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #d1d5db';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table Body
+      const tbody = document.createElement('tbody');
+      subscriptions.forEach((subscription: any) => {
+        const row = document.createElement('tr');
+        
+        const user = users.find((u: any) => u.id === subscription.userId);
+        const userName = user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : 'غير معروف';
+        const userEmail = user?.email || '-';
+        
+        const statusText = subscription.status === 'active' ? 'نشط' :
+                          subscription.status === 'pending' ? 'قيد الانتظار' :
+                          subscription.status === 'expired' ? 'منتهي' :
+                          'ملغي';
+        
+        const planName = subscription.plan?.name || '-';
+        const startDate = subscription.startDate ? new Date(subscription.startDate).toLocaleDateString('ar-EG') : '-';
+        const endDate = subscription.endDate ? new Date(subscription.endDate).toLocaleDateString('ar-EG') : '-';
+        
+        const cells = [
+          endDate,
+          startDate,
+          statusText,
+          planName,
+          `${userName} (${userEmail})`
+        ];
+        
+        cells.forEach((cellText) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '6px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          row.appendChild(td);
+        });
+        
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      exportContainer.appendChild(table);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Calculate PDF dimensions
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const doc = new jsPDF('p', 'mm', 'a4');
+      let position = 0;
+
+      // Add first page
+      doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save PDF
+      const fileName = `تقرير_المستخدمين_والاشتراكات_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      this.isExportingPDF = false;
+    } catch (error) {
+      console.error('Error exporting users and subscriptions PDF:', error);
+      alert('حدث خطأ أثناء تصدير التقرير');
+      this.isExportingPDF = false;
+    }
   }
 
   navigateToTimetable(autoExport: boolean = false): void {

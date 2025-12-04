@@ -188,21 +188,66 @@
         </button>
       </div>
 
-      <!-- Students report (basic list / stats) -->
+      <!-- Class Summary Report -->
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>
           <h2 class="text-lg font-semibold text-gray-800 mb-1">
-            {{ translate('reports.students') }}
+            {{ translate('reports.classSummaryReport') }}
           </h2>
           <p class="text-sm text-gray-600 mb-3">
-            {{ translate('reports.studentsDesc') }}
+            {{ translate('reports.classSummaryReportDesc') }}
           </p>
         </div>
         <button
-          (click)="navigateToStudents()"
-          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+          (click)="navigateToClassReport()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center flex items-center justify-center gap-2"
         >
-          {{ translate('reports.openStudentsReports') }}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>{{ translate('reports.openAndExportPDF') }}</span>
+        </button>
+      </div>
+
+      <!-- Student Report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            {{ translate('reports.studentSummaryReport') }}
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            {{ translate('reports.studentSummaryReportDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToStudentReport()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>{{ translate('reports.openAndExportPDF') }}</span>
+        </button>
+      </div>
+
+      <!-- Users and Subscriptions Report -->
+      <div *ngIf="isAdmin" class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            {{ translate('reports.usersSubscriptionsReport') }}
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            {{ translate('reports.usersSubscriptionsReportDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToUsersSubscriptionsReport()"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center flex items-center justify-center gap-2"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <span>{{ translate('reports.openAndExportPDF') }}</span>
         </button>
       </div>
 

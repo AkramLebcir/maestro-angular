@@ -2533,6 +2533,69 @@ export class LanguageService {
         'DE': 'Schülerberichte öffnen',
         'TR': 'Öğrenci raporlarını aç'
       },
+      'reports.classSummaryReport': {
+        'AR': 'تقرير ملخص القسم',
+        'FR': 'Rapport récapitulatif de la classe',
+        'EN': 'Class summary report',
+        'ES': 'Informe resumen de la clase',
+        'IT': 'Rapporto riepilogativo della classe',
+        'DE': 'Klassenzusammenfassungsbericht',
+        'TR': 'Sınıf özet raporu'
+      },
+      'reports.classSummaryReportDesc': {
+        'AR': 'تصدير تقرير شامل عن القسم يتضمن الحضور والسلوك والدرجات',
+        'FR': 'Exporter un rapport complet sur la classe incluant la présence, le comportement et les notes',
+        'EN': 'Export a comprehensive report about the class including attendance, behavior, and grades',
+        'ES': 'Exportar un informe completo sobre la clase que incluye asistencia, comportamiento y calificaciones',
+        'IT': 'Esporta un rapporto completo sulla classe che include presenza, comportamento e voti',
+        'DE': 'Einen umfassenden Bericht über die Klasse exportieren, einschließlich Anwesenheit, Verhalten und Noten',
+        'TR': 'Sınıf hakkında devam, davranış ve notları içeren kapsamlı bir rapor dışa aktar'
+      },
+      'reports.studentSummaryReport': {
+        'AR': 'تقرير ملخص التلميذ',
+        'FR': 'Rapport récapitulatif de l\'élève',
+        'EN': 'Student summary report',
+        'ES': 'Informe resumen del estudiante',
+        'IT': 'Rapporto riepilogativo dello studente',
+        'DE': 'Schülerzusammenfassungsbericht',
+        'TR': 'Öğrenci özet raporu'
+      },
+      'reports.studentSummaryReportDesc': {
+        'AR': 'تصدير تقرير شامل عن التلميذ يتضمن الحضور والسلوك والدرجات',
+        'FR': 'Exporter un rapport complet sur l\'élève incluant la présence, le comportement et les notes',
+        'EN': 'Export a comprehensive report about the student including attendance, behavior, and grades',
+        'ES': 'Exportar un informe completo sobre el estudiante que incluye asistencia, comportamiento y calificaciones',
+        'IT': 'Esporta un rapporto completo sullo studente che include presenza, comportamento e voti',
+        'DE': 'Einen umfassenden Bericht über den Schüler exportieren, einschließlich Anwesenheit, Verhalten und Noten',
+        'TR': 'Öğrenci hakkında devam, davranış ve notları içeren kapsamlı bir rapor dışa aktar'
+      },
+      'reports.openAndExportPDF': {
+        'AR': 'فتح وتصدير PDF',
+        'FR': 'Ouvrir et exporter PDF',
+        'EN': 'Open and export PDF',
+        'ES': 'Abrir y exportar PDF',
+        'IT': 'Apri ed esporta PDF',
+        'DE': 'PDF öffnen und exportieren',
+        'TR': 'PDF aç ve dışa aktar'
+      },
+      'reports.usersSubscriptionsReport': {
+        'AR': 'تقرير المستخدمين والاشتراكات',
+        'FR': 'Rapport des utilisateurs et abonnements',
+        'EN': 'Users and subscriptions report',
+        'ES': 'Informe de usuarios y suscripciones',
+        'IT': 'Rapporto utenti e abbonamenti',
+        'DE': 'Benutzer- und Abonnementbericht',
+        'TR': 'Kullanıcılar ve abonelikler raporu'
+      },
+      'reports.usersSubscriptionsReportDesc': {
+        'AR': 'تصدير تقرير شامل عن المستخدمين واشتراكاتهم وحالة الاشتراكات',
+        'FR': 'Exporter un rapport complet sur les utilisateurs, leurs abonnements et l\'état des abonnements',
+        'EN': 'Export a comprehensive report about users, their subscriptions, and subscription status',
+        'ES': 'Exportar un informe completo sobre usuarios, sus suscripciones y el estado de las suscripciones',
+        'IT': 'Esporta un rapporto completo su utenti, i loro abbonamenti e lo stato degli abbonamenti',
+        'DE': 'Einen umfassenden Bericht über Benutzer, ihre Abonnements und den Abonnementstatus exportieren',
+        'TR': 'Kullanıcılar, abonelikleri ve abonelik durumu hakkında kapsamlı bir rapor dışa aktar'
+      },
       'reports.notebooks': {
         'AR': 'تقارير الدفاتر',
         'FR': 'Rapports des cahiers',

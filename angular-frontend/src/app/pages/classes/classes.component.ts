@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { createPage1, createPage2, createPage3, createPage4 } from './classes-pdf-export';
+import { ChartConfiguration, ChartOptions } from 'chart.js';
 
 export interface Student {
   id: number;
@@ -94,15 +95,88 @@ export interface Student {
   styleUrls: ['./classes.component.css']
 })
 export class ClassesComponent implements OnInit {
+  @ViewChild('classReportContent') classReportContent!: ElementRef;
+  
   classes: Class[] = [];
   labs: Lab[] = [];
   showModal = false;
   showLabModal = false;
   showGroupModal = false;
+  showClassReportModal = false;
   editingClass: Class | null = null;
   currentClassForGroups: Class | null = null;
+  currentClassForReport: Class | null = null;
+  classReportData: any = null;
   classStudents: Student[] = [];
   selectedStudents: Set<number> = new Set();
+  isExportingPDF = false;
+  
+  // Detailed report data
+  classReportStudents: any[] = [];
+  classReportAttendance: any[] = [];
+  classReportBehaviorEvents: any[] = [];
+  classReportGrades: any[] = [];
+  classReportAssessments: any[] = [];
+  allAssessments: any[] = []; // Store loaded assessments
+  allBehaviors: any[] = [];
+  
+  // Attendance Charts
+  attendanceDonutChartData: ChartConfiguration<'doughnut'>['data'] = {
+    labels: ['حاضر', 'غائب', 'معذور', 'متأخر', 'مغادر مبكراً'],
+    datasets: [{
+      data: [0, 0, 0, 0, 0],
+      backgroundColor: ['#22c55e', '#ef4444', '#2563eb', '#f97316', '#eab308'],
+      borderWidth: 1
+    }]
+  };
+  attendanceDonutChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right' }
+    }
+  };
+  
+  attendanceWeeklyChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [
+      { label: 'غائب', data: [], backgroundColor: '#ef4444' },
+      { label: 'معذور', data: [], backgroundColor: '#2563eb' },
+      { label: 'متأخر', data: [], backgroundColor: '#f97316' },
+      { label: 'حاضر', data: [], backgroundColor: '#22c55e' },
+      { label: 'مغادر مبكراً', data: [], backgroundColor: '#eab308' }
+    ]
+  };
+  attendanceWeeklyChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true },
+      y: { stacked: true, beginAtZero: true }
+    },
+    plugins: {
+      legend: { position: 'top' }
+    }
+  };
+  
+  // Behavior Charts
+  behaviorLineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [
+      { label: 'إيجابي', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', tension: 0.4 },
+      { label: 'سلبي', data: [], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4 }
+    ]
+  };
+  behaviorLineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { beginAtZero: true }
+    },
+    plugins: {
+      legend: { position: 'top' }
+    }
+  };
   formData: CreateClassDto = {
     level: '',
     name: '',
@@ -490,101 +564,645 @@ export class ClassesComponent implements OnInit {
     return this.selectedStudents.has(studentId);
   }
 
-  async exportClassSummaryReport(classItem: Class): Promise<void> {
+  async openClassReportModal(classItem: Class): Promise<void> {
+    this.currentClassForReport = classItem;
+    this.showClassReportModal = true;
+    
+    // Load all detailed data
+    await this.loadDetailedClassReportData();
+  }
+
+  async loadDetailedClassReportData(): Promise<void> {
+    if (!this.currentClassForReport) return;
+    
+    try {
+      // Load assessments first (async)
+      this.loadAssessments();
+      
+      // Load students
+      this.apiService.get<Student[]>(`/students?classId=${this.currentClassForReport.id}`).subscribe({
+        next: (students) => {
+          this.classReportStudents = students || [];
+          // Initialize average to 0 for all students
+          this.classReportStudents.forEach(s => {
+            s.average = 0;
+          });
+          // Load grades after students are loaded
+          this.loadClassReportGrades();
+        },
+        error: (error) => {
+          console.error('Error loading students:', error);
+          this.classReportStudents = [];
+        }
+      });
+      
+      // Load attendance
+      this.apiService.get<any[]>(`/attendance?classId=${this.currentClassForReport.id}`).subscribe({
+        next: (attendance) => {
+          this.classReportAttendance = attendance;
+          this.updateAttendanceCharts();
+          this.calculateTopAttendanceStudents();
+        },
+        error: (error) => {
+          console.error('Error loading attendance:', error);
+          this.classReportAttendance = [];
+        }
+      });
+      
+      // Load behavior events
+      this.apiService.get<any[]>(`/behavior-events?classId=${this.currentClassForReport.id}`).subscribe({
+        next: (events) => {
+          this.classReportBehaviorEvents = events;
+          this.loadBehaviors();
+          this.updateBehaviorCharts();
+          this.calculateTopBehaviorStudents();
+        },
+        error: (error) => {
+          console.error('Error loading behavior:', error);
+          this.classReportBehaviorEvents = [];
+        }
+      });
+      
+      // Load summary report data
     try {
       const reportData = await this.apiService
-        .get<any>(`/classes/${classItem.id}/summary-report`)
+          .get<any>(`/classes/${this.currentClassForReport.id}/summary-report`)
         .toPromise();
-
-      if (!reportData) {
-        alert('فشل في تحميل بيانات التقرير');
-        return;
+        this.classReportData = reportData;
+      } catch (error) {
+        console.error('Error loading summary report:', error);
+        // Continue without summary data
       }
+    } catch (error) {
+      console.error('Error loading report data:', error);
+      alert('حدث خطأ أثناء تحميل بيانات التقرير');
+    }
+  }
 
-      const reportDate = new Date().toLocaleDateString('ar-EG', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-      });
+  loadClassReportGrades(): void {
+    if (!this.currentClassForReport) return;
+    
+    this.apiService.get<any[]>(`/grades?classId=${this.currentClassForReport.id}`).subscribe({
+      next: (grades) => {
+        this.classReportGrades = grades || [];
+        // Wait a bit for assessments to load, then calculate
+        // Try multiple times to ensure assessments are loaded
+        let attempts = 0;
+        const maxAttempts = 5;
+        const calculateWithRetry = () => {
+          attempts++;
+          if (this.allAssessments.length > 0 || attempts >= maxAttempts) {
+            this.calculateStudentAverages();
+            this.calculateAssessmentStats();
+          } else {
+            setTimeout(calculateWithRetry, 100);
+          }
+        };
+        setTimeout(calculateWithRetry, 100);
+      },
+      error: (error) => {
+        console.error('Error loading grades:', error);
+        this.classReportGrades = [];
+        // Still calculate with empty grades
+        this.calculateStudentAverages();
+        this.calculateAssessmentStats();
+      }
+    });
+  }
 
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 10;
-      const availableWidth = pageWidth - margin * 2;
-      const availableHeight = pageHeight - margin * 2;
+  loadAssessments(): void {
+    this.apiService.get<any[]>('/assessments').subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.allAssessments = data;
+        } else {
+          this.allAssessments = [];
+        }
+        // Recalculate stats after loading assessments
+        if (this.classReportGrades.length > 0) {
+          this.calculateStudentAverages();
+          this.calculateAssessmentStats();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading assessments:', error);
+        this.allAssessments = [];
+        // Still calculate with empty assessments
+        if (this.classReportGrades.length > 0) {
+          this.calculateStudentAverages();
+          this.calculateAssessmentStats();
+        }
+      }
+    });
+  }
 
-      // Helper function to capture and add a single page to PDF
-      const addPageToPdf = async (pageElement: HTMLElement, pageNumber: number) => {
-        const wrapper = document.createElement('div');
-        wrapper.style.position = 'absolute';
-        wrapper.style.left = '-9999px';
-        wrapper.style.top = '0';
-        wrapper.style.width = '210mm';
-        wrapper.style.backgroundColor = '#ffffff';
-        wrapper.style.fontFamily = 'Arial, "Helvetica Neue", Helvetica, sans-serif';
-        wrapper.style.direction = 'rtl';
-        wrapper.style.textAlign = 'right';
+  loadBehaviors(): void {
+    this.apiService.get<any[]>('/behaviors').subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.allBehaviors = data;
+        } else {
+          this.allBehaviors = [
+            { id: 1, type: 'positive', nameAr: 'سلوك عام جيد' },
+            { id: 2, type: 'positive', nameAr: 'تقدم جيد' },
+            { id: 3, type: 'positive', nameAr: 'متعاون' },
+            { id: 4, type: 'positive', nameAr: 'إنجاز الواجب في الوقت المحدد' },
+            { id: 5, type: 'positive', nameAr: 'مشارك' },
+            { id: 6, type: 'negative', nameAr: 'سلوك عام سيء' },
+            { id: 7, type: 'negative', nameAr: 'استخدام الهاتف بشكل مفرط' },
+            { id: 8, type: 'negative', nameAr: 'شجار' },
+            { id: 9, type: 'negative', nameAr: 'مشاكل في الواجب' },
+            { id: 10, type: 'negative', nameAr: 'ثرثرة' }
+          ];
+        }
+      },
+      error: () => {
+        this.allBehaviors = [];
+      }
+    });
+  }
 
-        wrapper.appendChild(pageElement.cloneNode(true) as HTMLElement);
-        document.body.appendChild(wrapper);
+  closeClassReportModal(): void {
+    this.showClassReportModal = false;
+    this.currentClassForReport = null;
+    this.classReportData = null;
+    this.classReportStudents = [];
+    this.classReportAttendance = [];
+    this.classReportBehaviorEvents = [];
+    this.classReportGrades = [];
+    this.classReportAssessments = [];
+  }
+  
+  // Helper properties for template
+  get topAttendanceStudents() {
+    return this.calculateTopAttendanceStudents();
+  }
+  
+  get topBehaviorStudents() {
+    return this.calculateTopBehaviorStudents();
+  }
+  
+  get studentsAtRisk() {
+    return this.getStudentsAtRisk();
+  }
+  
+  get topPerformingStudents() {
+    return this.getTopPerformingStudents();
+  }
 
-        await new Promise((resolve) => setTimeout(resolve, 100));
+  getTotalPositiveBehavior(): number {
+    if (!this.topBehaviorStudents || !this.topBehaviorStudents.positive) {
+      return 0;
+    }
+    return this.topBehaviorStudents.positive.reduce((sum: number, s: { name: string, positive: number, negative: number }) => sum + (s.positive || 0), 0);
+  }
 
-        const canvas = await html2canvas(wrapper, {
+  getTotalNegativeBehavior(): number {
+    if (!this.topBehaviorStudents || !this.topBehaviorStudents.negative) {
+      return 0;
+    }
+    return this.topBehaviorStudents.negative.reduce((sum: number, s: { name: string, positive: number, negative: number }) => sum + (s.negative || 0), 0);
+  }
+
+  async exportClassReportToPDF(): Promise<void> {
+    if (!this.classReportContent || !this.currentClassForReport || !this.classReportData) {
+      alert('يرجى التأكد من تحميل بيانات التقرير');
+      return;
+    }
+
+    this.isExportingPDF = true;
+    const contentElement = this.classReportContent.nativeElement;
+    const exportButton = document.querySelector('[data-export-class-pdf]') as HTMLElement;
+    
+    // Disable export button temporarily
+    if (exportButton) {
+      (exportButton as HTMLButtonElement).disabled = true;
+    }
+
+    // Store original styles
+    const originalMaxHeight = contentElement.style.maxHeight;
+    const originalOverflow = contentElement.style.overflow;
+    const originalHeight = contentElement.style.height;
+
+    // Make content fully visible for capture
+    contentElement.style.maxHeight = 'none';
+    contentElement.style.overflow = 'visible';
+    contentElement.style.height = 'auto';
+
+    // Scroll to top
+    const scrollableContent = contentElement.querySelector('.overflow-y-auto');
+    if (scrollableContent) {
+      (scrollableContent as HTMLElement).scrollTop = 0;
+    }
+
+    // Wait a bit for the layout to update and charts to render
+    setTimeout(async () => {
+      try {
+        // Wait a bit more for charts to fully render
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(contentElement, {
           scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: '#ffffff',
-          width: wrapper.offsetWidth,
-          height: wrapper.offsetHeight,
+          windowWidth: contentElement.scrollWidth,
+          windowHeight: contentElement.scrollHeight,
+          scrollX: 0,
+          scrollY: 0,
+          allowTaint: true
         });
 
-        document.body.removeChild(wrapper);
+        // Restore original styles
+        contentElement.style.maxHeight = originalMaxHeight;
+        contentElement.style.overflow = originalOverflow;
+        contentElement.style.height = originalHeight;
 
-        // Calculate dimensions for PDF
-        const imgWidth = availableWidth;
+        // Enable the button again
+        if (exportButton) {
+          (exportButton as HTMLButtonElement).disabled = false;
+        }
+
+        this.isExportingPDF = false;
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
         const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        
-        if (pageNumber > 1) {
-          pdf.addPage();
+        let heightLeft = imgHeight;
+
+        const doc = new jsPDF('p', 'mm', 'a4');
+        let position = 0;
+
+        // Add first page
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Add additional pages if needed
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          doc.addPage();
+          doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        // Generate file name
+        if (!this.currentClassForReport) {
+          throw new Error('Missing class data');
         }
         
-        pdf.addImage(
-          canvas.toDataURL('image/png'),
-          'PNG',
-          margin,
-          margin,
-          imgWidth,
-          Math.min(imgHeight, availableHeight)
-        );
-      };
+        const className = this.currentClassForReport.name.replace(/\s+/g, '_');
+        const date = new Date().toISOString().split('T')[0];
+        const fileName = `تقرير_القسم_${className}_${date}.pdf`;
 
-      // PAGE 1: Student Roster
-      const page1 = createPage1(classItem, reportData, reportDate);
-      await addPageToPdf(page1, 1);
+        // Save the PDF
+        doc.save(fileName);
+      } catch (error) {
+        console.error('Error exporting to PDF:', error);
+        alert('حدث خطأ أثناء تصدير التقرير إلى PDF');
+        this.isExportingPDF = false;
+        
+        // Restore styles in case of error
+        contentElement.style.maxHeight = originalMaxHeight;
+        contentElement.style.overflow = originalOverflow;
+        contentElement.style.height = originalHeight;
+        if (exportButton) {
+          (exportButton as HTMLButtonElement).disabled = false;
+        }
+      }
+    }, 300);
+  }
 
-      // PAGE 2: Attendance
-      const page2 = createPage2(classItem, reportData, reportDate);
-      await addPageToPdf(page2, 2);
+  // Keep the old method for backward compatibility (if needed)
+  async exportClassSummaryReport(classItem: Class): Promise<void> {
+    // Redirect to modal view
+    await this.openClassReportModal(classItem);
+  }
 
-      // PAGE 3: Behavior
-      const page3 = createPage3(classItem, reportData, reportDate);
-      await addPageToPdf(page3, 3);
-
-      // PAGE 4: Gradebook
-      const page4 = createPage4(classItem, reportData, reportDate);
-      await addPageToPdf(page4, 4);
-
-      const fileName = `Class_Summary_Report_${classItem.name.replace(
-        /[^a-zA-Z0-9]/g,
-        '_',
-      )}_${new Date().toISOString().split('T')[0]}.pdf`;
-      pdf.save(fileName);
-    } catch (error) {
-      console.error('Error exporting PDF:', error);
-      alert('حدث خطأ أثناء تصدير التقرير');
+  calculateStudentAverages(): void {
+    if (!this.classReportStudents || this.classReportStudents.length === 0) return;
+    if (!this.classReportGrades || this.classReportGrades.length === 0) {
+      // No grades, set all averages to 0
+      this.classReportStudents.forEach(student => {
+        student.average = 0;
+      });
+      return;
     }
+    
+    // Calculate average for each student
+    this.classReportStudents.forEach(student => {
+      const studentGrades = this.classReportGrades.filter(g => g.studentId === student.id);
+      if (studentGrades.length > 0) {
+        let totalWeightedScore = 0;
+        let totalWeight = 0;
+        
+        studentGrades.forEach(grade => {
+          // Ensure we have valid numbers
+          const score = parseFloat(grade.score) || 0;
+          const maxScore = parseFloat(grade.maxScore) || 1;
+          
+          // Normalize score to 10
+          const normalizedScore = maxScore > 0 ? (score / maxScore) * 10 : 0;
+          
+          // Get weight from assessment, default to 1
+          const assessment = this.allAssessments.find(a => a.id === grade.assessmentId);
+          const weight = (assessment?.weight && assessment.weight > 0) ? assessment.weight : 1;
+          
+          totalWeightedScore += normalizedScore * weight;
+          totalWeight += weight;
+        });
+        
+        student.average = totalWeight > 0 ? (totalWeightedScore / totalWeight) : 0;
+      } else {
+        student.average = 0;
+      }
+    });
+    
+    // Sort students by average descending
+    this.classReportStudents.sort((a, b) => (b.average || 0) - (a.average || 0));
+  }
+
+  updateAttendanceCharts(): void {
+    // Calculate attendance counts
+    const counts = {
+      present: 0,
+      absent: 0,
+      excused: 0,
+      late: 0,
+      leftEarly: 0
+    };
+    
+    this.classReportAttendance.forEach(record => {
+      if (record.status === 'present') counts.present++;
+      else if (record.status === 'absent') counts.absent++;
+      else if (record.status === 'excused') counts.excused++;
+      else if (record.status === 'late') counts.late++;
+      else if (record.status === 'left_early') counts.leftEarly++;
+    });
+    
+    // Update donut chart
+    this.attendanceDonutChartData = {
+      ...this.attendanceDonutChartData,
+      datasets: [{
+        ...this.attendanceDonutChartData.datasets[0],
+        data: [counts.present, counts.absent, counts.excused, counts.late, counts.leftEarly]
+      }]
+    };
+    
+    // Update weekly chart
+    const weeklyData = this.calculateWeeklyAttendance();
+    this.attendanceWeeklyChartData = {
+      labels: weeklyData.labels,
+      datasets: [
+        { label: 'غائب', data: weeklyData.absent, backgroundColor: '#ef4444' },
+        { label: 'معذور', data: weeklyData.excused, backgroundColor: '#2563eb' },
+        { label: 'متأخر', data: weeklyData.late, backgroundColor: '#f97316' },
+        { label: 'حاضر', data: weeklyData.present, backgroundColor: '#22c55e' },
+        { label: 'مغادر مبكراً', data: weeklyData.leftEarly, backgroundColor: '#eab308' }
+      ]
+    };
+  }
+
+  calculateWeeklyAttendance(): any {
+    const periods: { [key: string]: { present: number, absent: number, excused: number, late: number, leftEarly: number } } = {};
+    const labels: string[] = [];
+    
+    const now = new Date();
+    for (let i = 15; i >= 0; i--) {
+      const periodStart = new Date(now);
+      periodStart.setDate(now.getDate() - (i * 7));
+      const periodEnd = new Date(periodStart);
+      periodEnd.setDate(periodStart.getDate() + 6);
+      
+      const label = this.formatDate(periodStart);
+      labels.push(label);
+      periods[label] = { present: 0, absent: 0, excused: 0, late: 0, leftEarly: 0 };
+      
+      this.classReportAttendance.forEach(record => {
+        const recordDate = new Date(record.date);
+        if (recordDate >= periodStart && recordDate <= periodEnd) {
+          if (record.status === 'present') periods[label].present++;
+          else if (record.status === 'absent') periods[label].absent++;
+          else if (record.status === 'excused') periods[label].excused++;
+          else if (record.status === 'late') periods[label].late++;
+          else if (record.status === 'left_early') periods[label].leftEarly++;
+        }
+      });
+    }
+    
+    return {
+      labels,
+      present: labels.map(l => periods[l].present),
+      absent: labels.map(l => periods[l].absent),
+      excused: labels.map(l => periods[l].excused),
+      late: labels.map(l => periods[l].late),
+      leftEarly: labels.map(l => periods[l].leftEarly)
+    };
+  }
+
+  calculateTopAttendanceStudents(): any {
+    const studentCounts: { [studentId: number]: { name: string, present: number, absent: number, excused: number, late: number, leftEarly: number } } = {};
+    
+    this.classReportAttendance.forEach(record => {
+      if (!studentCounts[record.studentId]) {
+        const student = this.classReportStudents.find(s => s.id === record.studentId);
+        studentCounts[record.studentId] = {
+          name: student ? `${student.firstName} ${student.lastName}` : `Student ${record.studentId}`,
+          present: 0,
+          absent: 0,
+          excused: 0,
+          late: 0,
+          leftEarly: 0
+        };
+      }
+      
+      if (record.status === 'present') studentCounts[record.studentId].present++;
+      else if (record.status === 'absent') studentCounts[record.studentId].absent++;
+      else if (record.status === 'excused') studentCounts[record.studentId].excused++;
+      else if (record.status === 'late') studentCounts[record.studentId].late++;
+      else if (record.status === 'left_early') studentCounts[record.studentId].leftEarly++;
+    });
+    
+    return {
+      present: Object.values(studentCounts).sort((a, b) => b.present - a.present).slice(0, 5),
+      absent: Object.values(studentCounts).sort((a, b) => b.absent - a.absent).slice(0, 5),
+      excused: Object.values(studentCounts).sort((a, b) => b.excused - a.excused).slice(0, 5),
+      late: Object.values(studentCounts).sort((a, b) => b.late - a.late).slice(0, 5),
+      leftEarly: Object.values(studentCounts).sort((a, b) => b.leftEarly - a.leftEarly).slice(0, 5)
+    };
+  }
+
+  updateBehaviorCharts(): void {
+    const weeklyData = this.calculateWeeklyBehavior();
+    this.behaviorLineChartData = {
+      labels: weeklyData.labels,
+      datasets: [
+        { 
+          label: 'إيجابي', 
+          data: weeklyData.positive, 
+          borderColor: '#22c55e', 
+          backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+          tension: 0.4 
+        },
+        { 
+          label: 'سلبي', 
+          data: weeklyData.negative, 
+          borderColor: '#ef4444', 
+          backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+          tension: 0.4 
+        }
+      ]
+    };
+  }
+
+  calculateWeeklyBehavior(): any {
+    const periods: { [key: string]: { positive: number, negative: number } } = {};
+    const labels: string[] = [];
+    
+    const now = new Date();
+    for (let i = 15; i >= 0; i--) {
+      const periodStart = new Date(now);
+      periodStart.setDate(now.getDate() - (i * 7));
+      const periodEnd = new Date(periodStart);
+      periodEnd.setDate(periodStart.getDate() + 6);
+      
+      const label = this.formatDate(periodStart);
+      labels.push(label);
+      periods[label] = { positive: 0, negative: 0 };
+      
+      this.classReportBehaviorEvents.forEach(event => {
+        const eventDate = new Date(event.date);
+        if (eventDate >= periodStart && eventDate <= periodEnd) {
+          const behavior = this.allBehaviors.find(b => b.id === event.behaviorId);
+          if (behavior?.type === 'positive') {
+            periods[label].positive++;
+          } else if (behavior?.type === 'negative') {
+            periods[label].negative++;
+          }
+        }
+      });
+    }
+    
+    return {
+      labels,
+      positive: labels.map(l => periods[l].positive),
+      negative: labels.map(l => periods[l].negative)
+    };
+  }
+
+  calculateTopBehaviorStudents(): any {
+    const studentCounts: { [studentId: number]: { name: string, positive: number, negative: number } } = {};
+    
+    this.classReportBehaviorEvents.forEach(event => {
+      if (!studentCounts[event.studentId]) {
+        const student = this.classReportStudents.find(s => s.id === event.studentId);
+        studentCounts[event.studentId] = {
+          name: student ? `${student.firstName} ${student.lastName}` : `Student ${event.studentId}`,
+          positive: 0,
+          negative: 0
+        };
+      }
+      
+      const behavior = this.allBehaviors.find(b => b.id === event.behaviorId);
+      if (behavior?.type === 'positive') {
+        studentCounts[event.studentId].positive++;
+      } else if (behavior?.type === 'negative') {
+        studentCounts[event.studentId].negative++;
+      }
+    });
+    
+    return {
+      positive: Object.values(studentCounts).sort((a, b) => b.positive - a.positive).slice(0, 5),
+      negative: Object.values(studentCounts).sort((a, b) => b.negative - a.negative).slice(0, 5)
+    };
+  }
+
+  calculateAssessmentStats(): void {
+    if (!this.classReportGrades || this.classReportGrades.length === 0) {
+      this.classReportAssessments = [];
+      return;
+    }
+    
+    // Group grades by assessmentId
+    const assessmentGroups: { [assessmentId: number]: { scores: number[], maxScore: number, name: string, weight: number } } = {};
+    
+    this.classReportGrades.forEach(grade => {
+      const assessmentId = grade.assessmentId;
+      if (!assessmentGroups[assessmentId]) {
+        const assessment = this.allAssessments.find(a => a.id === assessmentId);
+        assessmentGroups[assessmentId] = {
+          scores: [],
+          maxScore: parseFloat(grade.maxScore) || 10,
+          name: assessment?.nameAr || assessment?.name || `Assessment ${assessmentId}`,
+          weight: (assessment?.weight && assessment.weight > 0) ? assessment.weight : 0
+        };
+      }
+      
+      // Ensure we have valid numbers
+      const score = parseFloat(grade.score) || 0;
+      const maxScore = parseFloat(grade.maxScore) || 1;
+      
+      // Normalize score to 10
+      const normalizedScore = maxScore > 0 ? (score / maxScore) * 10 : 0;
+      assessmentGroups[assessmentId].scores.push(normalizedScore);
+    });
+    
+    // Calculate total weight for percentage calculation
+    const totalWeight = Object.values(assessmentGroups).reduce((sum, group) => sum + (group.weight || 0), 0);
+    
+    // Calculate stats for each assessment
+    this.classReportAssessments = Object.keys(assessmentGroups).map(assessmentId => {
+      const group = assessmentGroups[parseInt(assessmentId)];
+      const scores = group.scores;
+      
+      if (scores.length === 0) {
+        return {
+          id: parseInt(assessmentId),
+          name: group.name,
+          max: 0,
+          min: 0,
+          average: 0,
+          median: 0,
+          weight: 0,
+          weightPercent: 0
+        };
+      }
+      
+      const sorted = [...scores].sort((a, b) => a - b);
+      const weightPercent = totalWeight > 0 ? ((group.weight || 0) / totalWeight) * 100 : 0;
+      
+      return {
+        id: parseInt(assessmentId),
+        name: group.name,
+        max: Math.max(...scores),
+        min: Math.min(...scores),
+        average: scores.reduce((a, b) => a + b, 0) / scores.length,
+        median: sorted.length % 2 === 0 
+          ? (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2
+          : sorted[Math.floor(sorted.length / 2)],
+        weight: group.weight || 0,
+        weightPercent: weightPercent
+      };
+    });
+  }
+
+  getStudentsAtRisk(): any[] {
+    // Students with average below 5
+    return this.classReportStudents.filter(s => (s.average || 0) < 5).slice(0, 10);
+  }
+
+  getTopPerformingStudents(): any[] {
+    // Students with average above 8
+    return this.classReportStudents.filter(s => (s.average || 0) >= 8).slice(0, 10);
+  }
+
+  formatDate(date: Date | string): string {
+    if (!date) return '';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    return `${day}-${month}`;
   }
 }
 

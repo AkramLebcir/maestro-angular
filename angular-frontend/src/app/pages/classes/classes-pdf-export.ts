@@ -178,7 +178,7 @@ export function createPage2(classItem: any, reportData: any, reportDate: string)
   const overallTitle = document.createElement('h3');
   overallTitle.textContent = 'Overall Attendance';
   overallTitle.style.fontSize = '14px';
-  overallTitle.style.marginBottom = '10px';
+  overallTitle.style.marginBottom = '8px';
   page.appendChild(overallTitle);
 
   const attendance = reportData.attendance?.overall || {};
@@ -305,20 +305,24 @@ export function createPage2(classItem: any, reportData: any, reportDate: string)
   const weeklyTitle = document.createElement('h3');
   weeklyTitle.textContent = 'Weekly Distribution (Last 16 weeks)';
   weeklyTitle.style.fontSize = '12px';
-  weeklyTitle.style.marginTop = '20px';
-  weeklyTitle.style.marginBottom = '10px';
+  weeklyTitle.style.marginTop = '15px';
+  weeklyTitle.style.marginBottom = '12px';
   page.appendChild(weeklyTitle);
 
   // Stacked Bar Chart for Weekly Distribution
   const weeklyData = reportData.attendance?.weekly || [];
   if (weeklyData.length > 0) {
     const chartContainer = document.createElement('div');
-    chartContainer.style.marginBottom = '20px';
-    chartContainer.style.height = '200px';
+    chartContainer.style.marginBottom = '30px';
+    chartContainer.style.marginTop = '15px';
+    chartContainer.style.paddingTop = '15px';
+    chartContainer.style.paddingBottom = '15px';
+    chartContainer.style.height = '480px';
 
     // Legend
     const legend = document.createElement('div');
-    legend.style.marginBottom = '8px';
+    legend.style.marginBottom = '12px';
+    legend.style.marginTop = '5px';
     legend.style.display = 'flex';
     legend.style.gap = '10px';
     legend.style.flexWrap = 'wrap';
@@ -344,10 +348,12 @@ export function createPage2(classItem: any, reportData: any, reportDate: string)
     // Chart area
     const chartArea = document.createElement('div');
     chartArea.style.position = 'relative';
-    chartArea.style.height = '150px';
+    chartArea.style.height = '420px';
     chartArea.style.borderLeft = '2px solid #000';
     chartArea.style.borderBottom = '2px solid #000';
-    chartArea.style.paddingTop = '10px';
+    chartArea.style.paddingTop = '15px';
+    chartArea.style.paddingBottom = '10px';
+    chartArea.style.marginTop = '10px';
 
     // Y-axis labels
     const maxValue = Math.max(...weeklyData.map((w: any) => 
@@ -431,7 +437,7 @@ export function createPage2(classItem: any, reportData: any, reportDate: string)
   const top5Title = document.createElement('h3');
   top5Title.textContent = 'Top 5';
   top5Title.style.fontSize = '12px';
-  top5Title.style.marginTop = '20px';
+  top5Title.style.marginTop = '10px';
   top5Title.style.marginBottom = '10px';
   page.appendChild(top5Title);
 
@@ -514,6 +520,7 @@ export function createPage3(classItem: any, reportData: any, reportDate: string)
   page.style.direction = 'rtl';
   page.style.textAlign = 'right';
   page.style.boxSizing = 'border-box';
+  page.style.position = 'relative';
 
   // Header
   const header = document.createElement('div');
@@ -527,378 +534,238 @@ export function createPage3(classItem: any, reportData: any, reportDate: string)
   `;
   page.appendChild(header);
 
-  // Behavior Banner
-  const banner = document.createElement('div');
-  banner.style.backgroundColor = '#22c55e';
-  banner.style.color = '#ffffff';
-  banner.style.padding = '8px';
-  banner.style.marginBottom = '15px';
-  banner.textContent = 'Behavior';
-  page.appendChild(banner);
+  // Grades Title Section
+  const gradesTitleContainer = document.createElement('div');
+  gradesTitleContainer.style.marginBottom = '15px';
+  
+  const gradesTitle = document.createElement('h2');
+  gradesTitle.textContent = 'الدرجات';
+  gradesTitle.style.color = '#1f2937';
+  gradesTitle.style.fontSize = '18px';
+  gradesTitle.style.fontWeight = 'bold';
+  gradesTitle.style.margin = '0 0 5px 0';
+  gradesTitle.style.textAlign = 'right';
+  gradesTitleContainer.appendChild(gradesTitle);
+  
+  const gradesSubtitle = document.createElement('p');
+  gradesSubtitle.textContent = 'نظرة سريعة لكل بند قابل للتقييم';
+  gradesSubtitle.style.color = '#6b7280';
+  gradesSubtitle.style.fontSize = '12px';
+  gradesSubtitle.style.margin = '0';
+  gradesSubtitle.style.textAlign = 'right';
+  gradesTitleContainer.appendChild(gradesSubtitle);
+  
+  page.appendChild(gradesTitleContainer);
 
-  // Overall Behavior
-  const overallTitle = document.createElement('h3');
-  overallTitle.textContent = 'Overall Behavior';
-  overallTitle.style.fontSize = '14px';
-  overallTitle.style.marginBottom = '15px';
-  page.appendChild(overallTitle);
+  // Assessment Overview Table
+  const assessments = reportData.gradebook?.assessments || [];
+  const assessmentTable = document.createElement('table');
+  assessmentTable.style.width = '100%';
+  assessmentTable.style.borderCollapse = 'collapse';
+  assessmentTable.style.fontSize = '10px';
+  assessmentTable.style.marginBottom = '20px';
+  assessmentTable.style.border = '1px solid #d1d5db';
 
-  const behavior = reportData.behavior?.overall || {};
-  const buttonsDiv = document.createElement('div');
-  buttonsDiv.style.display = 'flex';
-  buttonsDiv.style.gap = '20px';
-  buttonsDiv.style.marginBottom = '20px';
-  buttonsDiv.style.justifyContent = 'center';
-
-  const positiveBtn = document.createElement('div');
-  positiveBtn.style.width = '80px';
-  positiveBtn.style.height = '40px';
-  positiveBtn.style.backgroundColor = '#22c55e';
-  positiveBtn.style.color = '#ffffff';
-  positiveBtn.style.display = 'flex';
-  positiveBtn.style.flexDirection = 'column';
-  positiveBtn.style.alignItems = 'center';
-  positiveBtn.style.justifyContent = 'center';
-  positiveBtn.style.fontSize = '20px';
-  positiveBtn.style.fontWeight = 'bold';
-  positiveBtn.style.borderRadius = '4px';
-  const positiveIcon = document.createElement('div');
-  positiveIcon.textContent = '✓';
-  positiveIcon.style.fontSize = '18px';
-  const positiveCount = document.createElement('div');
-  positiveCount.textContent = `${behavior.positive || 0}`;
-  positiveCount.style.fontSize = '16px';
-  positiveBtn.appendChild(positiveIcon);
-  positiveBtn.appendChild(positiveCount);
-  buttonsDiv.appendChild(positiveBtn);
-
-  const negativeBtn = document.createElement('div');
-  negativeBtn.style.width = '80px';
-  negativeBtn.style.height = '40px';
-  negativeBtn.style.backgroundColor = '#ef4444';
-  negativeBtn.style.color = '#ffffff';
-  negativeBtn.style.display = 'flex';
-  negativeBtn.style.flexDirection = 'column';
-  negativeBtn.style.alignItems = 'center';
-  negativeBtn.style.justifyContent = 'center';
-  negativeBtn.style.fontSize = '20px';
-  negativeBtn.style.fontWeight = 'bold';
-  negativeBtn.style.borderRadius = '4px';
-  const negativeIcon = document.createElement('div');
-  negativeIcon.textContent = '✗';
-  negativeIcon.style.fontSize = '18px';
-  const negativeCount = document.createElement('div');
-  negativeCount.textContent = `${behavior.negative || 0}`;
-  negativeCount.style.fontSize = '16px';
-  negativeBtn.appendChild(negativeIcon);
-  negativeBtn.appendChild(negativeCount);
-  buttonsDiv.appendChild(negativeBtn);
-
-  page.appendChild(buttonsDiv);
-
-  // Weekly Distribution Line Chart
-  const weeklyTitle = document.createElement('h3');
-  weeklyTitle.textContent = 'Weekly Distribution (Last 16 weeks)';
-  weeklyTitle.style.fontSize = '12px';
-  weeklyTitle.style.marginTop = '20px';
-  weeklyTitle.style.marginBottom = '10px';
-  page.appendChild(weeklyTitle);
-
-  const weeklyData = reportData.behavior?.weekly || [];
-  if (weeklyData.length > 0) {
-    const chartContainer = document.createElement('div');
-    chartContainer.style.marginBottom = '20px';
-    chartContainer.style.height = '180px';
-    chartContainer.style.position = 'relative';
-
-    // Legend
-    const legend = document.createElement('div');
-    legend.style.marginBottom = '8px';
-    legend.style.display = 'flex';
-    legend.style.gap = '15px';
-    legend.style.fontSize = '9px';
-    
-    const positiveLegend = document.createElement('div');
-    positiveLegend.style.display = 'flex';
-    positiveLegend.style.alignItems = 'center';
-    const posLine = document.createElement('span');
-    posLine.style.width = '20px';
-    posLine.style.height = '2px';
-    posLine.style.backgroundColor = '#22c55e';
-    posLine.style.marginLeft = '5px';
-    posLine.style.display = 'inline-block';
-    const posLabel = document.createElement('span');
-    posLabel.textContent = 'Positive';
-    positiveLegend.appendChild(posLine);
-    positiveLegend.appendChild(posLabel);
-
-    const negativeLegend = document.createElement('div');
-    negativeLegend.style.display = 'flex';
-    negativeLegend.style.alignItems = 'center';
-    const negLine = document.createElement('span');
-    negLine.style.width = '20px';
-    negLine.style.height = '2px';
-    negLine.style.backgroundColor = '#ef4444';
-    negLine.style.marginLeft = '5px';
-    negLine.style.display = 'inline-block';
-    const negLabel = document.createElement('span');
-    negLabel.textContent = 'Negative';
-    negativeLegend.appendChild(negLine);
-    negativeLegend.appendChild(negLabel);
-
-    legend.appendChild(positiveLegend);
-    legend.appendChild(negativeLegend);
-    chartContainer.appendChild(legend);
-
-    // Chart area
-    const chartArea = document.createElement('div');
-    chartArea.style.position = 'relative';
-    chartArea.style.height = '140px';
-    chartArea.style.borderLeft = '2px solid #000';
-    chartArea.style.borderBottom = '2px solid #000';
-    chartArea.style.paddingTop = '5px';
-    chartArea.style.paddingRight = '10px';
-
-    // Y-axis labels
-    const maxValue = Math.max(
-      ...weeklyData.map((w: any) => Math.max(w.positive || 0, w.negative || 0)),
-      1
-    );
-    const yAxisLabels = document.createElement('div');
-    yAxisLabels.style.position = 'absolute';
-    yAxisLabels.style.left = '-25px';
-    yAxisLabels.style.top = '0';
-    yAxisLabels.style.height = '100%';
-    yAxisLabels.style.display = 'flex';
-    yAxisLabels.style.flexDirection = 'column';
-    yAxisLabels.style.justifyContent = 'space-between';
-    yAxisLabels.style.fontSize = '8px';
-    for (let i = 0; i <= 5; i++) {
-      const label = document.createElement('div');
-      label.textContent = Math.round((maxValue * i) / 5).toString();
-      yAxisLabels.appendChild(label);
-    }
-    chartArea.appendChild(yAxisLabels);
-
-    // SVG for line chart
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('width', '100%');
-    svg.setAttribute('height', '100%');
-    svg.style.position = 'absolute';
-    svg.style.top = '0';
-    svg.style.left = '0';
-    svg.style.pointerEvents = 'none';
-
-    const chartWidth = 500; // Approximate width
-    const chartHeight = 130;
-    const padding = 20;
-    const plotWidth = chartWidth - padding * 2;
-    const plotHeight = chartHeight - padding * 2;
-    const pointCount = Math.min(weeklyData.length, 8);
-
-    // Positive line
-    const positivePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    let posPathData = '';
-    weeklyData.slice(0, pointCount).forEach((week: any, index: number) => {
-      const x = padding + (index / (pointCount - 1 || 1)) * plotWidth;
-      const y = padding + plotHeight - ((week.positive || 0) / maxValue) * plotHeight;
-      if (index === 0) {
-        posPathData += `M ${x} ${y}`;
-      } else {
-        posPathData += ` L ${x} ${y}`;
-      }
-    });
-    positivePath.setAttribute('d', posPathData);
-    positivePath.setAttribute('stroke', '#22c55e');
-    positivePath.setAttribute('stroke-width', '2');
-    positivePath.setAttribute('fill', 'none');
-    svg.appendChild(positivePath);
-
-    // Negative line
-    const negativePath = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    let negPathData = '';
-    weeklyData.slice(0, pointCount).forEach((week: any, index: number) => {
-      const x = padding + (index / (pointCount - 1 || 1)) * plotWidth;
-      const y = padding + plotHeight - ((week.negative || 0) / maxValue) * plotHeight;
-      if (index === 0) {
-        negPathData += `M ${x} ${y}`;
-      } else {
-        negPathData += ` L ${x} ${y}`;
-      }
-    });
-    negativePath.setAttribute('d', negPathData);
-    negativePath.setAttribute('stroke', '#ef4444');
-    negativePath.setAttribute('stroke-width', '2');
-    negativePath.setAttribute('fill', 'none');
-    svg.appendChild(negativePath);
-
-    // Points
-    weeklyData.slice(0, pointCount).forEach((week: any, index: number) => {
-      const x = padding + (index / (pointCount - 1 || 1)) * plotWidth;
-      const posY = padding + plotHeight - ((week.positive || 0) / maxValue) * plotHeight;
-      const negY = padding + plotHeight - ((week.negative || 0) / maxValue) * plotHeight;
-
-      const posCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      posCircle.setAttribute('cx', x.toString());
-      posCircle.setAttribute('cy', posY.toString());
-      posCircle.setAttribute('r', '3');
-      posCircle.setAttribute('fill', '#22c55e');
-      svg.appendChild(posCircle);
-
-      const negCircle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      negCircle.setAttribute('cx', x.toString());
-      negCircle.setAttribute('cy', negY.toString());
-      negCircle.setAttribute('r', '3');
-      negCircle.setAttribute('fill', '#ef4444');
-      svg.appendChild(negCircle);
-    });
-
-    chartArea.appendChild(svg);
-
-    // X-axis labels
-    const xAxisLabels = document.createElement('div');
-    xAxisLabels.style.display = 'flex';
-    xAxisLabels.style.justifyContent = 'space-between';
-    xAxisLabels.style.paddingLeft = '20px';
-    xAxisLabels.style.paddingRight = '10px';
-    xAxisLabels.style.fontSize = '7px';
-    xAxisLabels.style.marginTop = '5px';
-    weeklyData.slice(0, pointCount).forEach((week: any) => {
-      const label = document.createElement('div');
-      const weekDate = week.weekStart ? new Date(week.weekStart).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '';
-      label.textContent = weekDate;
-      xAxisLabels.appendChild(label);
-    });
-    chartArea.appendChild(xAxisLabels);
-    chartContainer.appendChild(chartArea);
-    page.appendChild(chartContainer);
-  } else {
-    // Fallback: simple bar chart if no weekly data
-    const totalBehaviors = (behavior.positive || 0) + (behavior.negative || 0);
-    if (totalBehaviors > 0) {
-      const chartContainer = document.createElement('div');
-      chartContainer.style.marginBottom = '20px';
-
-      const chartLabel = document.createElement('div');
-      chartLabel.textContent = 'Behavior Distribution';
-      chartLabel.style.fontSize = '10px';
-      chartLabel.style.marginBottom = '4px';
-      chartContainer.appendChild(chartLabel);
-
-      const barWrapper = document.createElement('div');
-      barWrapper.style.width = '60%';
-      barWrapper.style.height = '14px';
-      barWrapper.style.display = 'flex';
-      barWrapper.style.overflow = 'hidden';
-      barWrapper.style.borderRadius = '4px';
-      barWrapper.style.border = '1px solid #e5e7eb';
-
-      const positivePercent = ((behavior.positive || 0) / totalBehaviors) * 100;
-      const negativePercent = ((behavior.negative || 0) / totalBehaviors) * 100;
-
-      const positiveSeg = document.createElement('div');
-      positiveSeg.style.width = `${positivePercent}%`;
-      positiveSeg.style.backgroundColor = '#22c55e';
-      positiveSeg.title = `Positive: ${behavior.positive || 0} (${positivePercent.toFixed(1)}%)`;
-
-    const negativeSeg = document.createElement('div');
-    negativeSeg.style.width = `${negativePercent}%`;
-    negativeSeg.style.backgroundColor = '#ef4444';
-    negativeSeg.title = `Negative: ${behavior.negative || 0} (${negativePercent.toFixed(1)}%)`;
-
-    barWrapper.appendChild(positiveSeg);
-    barWrapper.appendChild(negativeSeg);
-    chartContainer.appendChild(barWrapper);
-    page.appendChild(chartContainer);
-  }
-}
-
-  // Top 5 Table
-  const top5Title = document.createElement('h3');
-  top5Title.textContent = 'Top 5';
-  top5Title.style.fontSize = '12px';
-  top5Title.style.marginTop = '20px';
-  top5Title.style.marginBottom = '10px';
-  page.appendChild(top5Title);
-
-  const behaviorTop5 = reportData.behavior?.top5 || {};
-  const top5Table = document.createElement('table');
-  top5Table.style.width = '100%';
-  top5Table.style.borderCollapse = 'collapse';
-  top5Table.style.fontSize = '8px';
-
+  // Table Header
+  const thead = document.createElement('thead');
   const headerRow = document.createElement('tr');
-  const th1 = document.createElement('th');
-  th1.textContent = 'Positive';
-  th1.style.backgroundColor = '#22c55e';
-  th1.style.color = '#ffffff';
-  th1.style.border = '1px solid #000';
-  th1.style.padding = '4px';
-  th1.style.width = '50%';
-  headerRow.appendChild(th1);
+  headerRow.style.backgroundColor = '#f3f4f6';
+  
+  const headers = ['الأهمية (%)', 'الوسيط', 'المتوسط', 'الحد الأدنى', 'الحد الأقصى', 'البند'];
+  headers.forEach(headerText => {
+    const th = document.createElement('th');
+    th.textContent = headerText;
+    th.style.padding = '8px';
+    th.style.border = '1px solid #d1d5db';
+    th.style.textAlign = 'right';
+    th.style.fontWeight = 'bold';
+    th.style.fontSize = '10px';
+    headerRow.appendChild(th);
+  });
+  thead.appendChild(headerRow);
+  assessmentTable.appendChild(thead);
 
-  const th2 = document.createElement('th');
-  th2.textContent = 'Negative';
-  th2.style.backgroundColor = '#ef4444';
-  th2.style.color = '#ffffff';
-  th2.style.border = '1px solid #000';
-  th2.style.padding = '4px';
-  th2.style.width = '50%';
-  headerRow.appendChild(th2);
-  top5Table.appendChild(headerRow);
-
-  for (let i = 0; i < 5; i++) {
+  // Table Body
+  const tbody = document.createElement('tbody');
+  assessments.forEach((assessment: any) => {
     const row = document.createElement('tr');
     
-    const td1 = document.createElement('td');
-    const positiveData = behaviorTop5.positive || [];
-    if (positiveData[i]) {
-      const nameDiv = document.createElement('div');
-      nameDiv.textContent = positiveData[i].name || '';
-      nameDiv.style.textAlign = 'right';
-      nameDiv.style.marginBottom = '2px';
-      nameDiv.style.fontSize = '8px';
-      
-      const countDiv = document.createElement('div');
-      countDiv.textContent = `${positiveData[i].count || 0}`;
-      countDiv.style.textAlign = 'left';
-      countDiv.style.fontSize = '8px';
-      countDiv.style.fontWeight = 'bold';
-      
-      td1.appendChild(nameDiv);
-      td1.appendChild(countDiv);
-    }
-    td1.style.border = '1px solid #000';
-    td1.style.padding = '4px';
-    td1.style.minHeight = '20px';
-    row.appendChild(td1);
+    // Calculate importance percentage
+    const totalWeight = assessments.reduce((sum: number, a: any) => sum + (a.totalWeight || 0), 0);
+    const importancePercent = totalWeight > 0 ? ((assessment.totalWeight || 0) / totalWeight) * 100 : 0;
+    
+    // Convert average, max, min, median from percentage to 10-scale
+    const max = (assessment.max || 0) / 10;
+    const min = (assessment.min || 0) / 10;
+    const average = (assessment.average || 0) / 10;
+    const median = (assessment.median || 0) / 10;
+    
+    const cells = [
+      importancePercent.toFixed(2) + '%',
+      median.toFixed(2),
+      average.toFixed(2),
+      min.toFixed(2),
+      max.toFixed(2),
+      assessment.nameAr || assessment.name || `البند ${assessment.id}`
+    ];
+    
+    cells.forEach((cellText, index) => {
+      const td = document.createElement('td');
+      td.textContent = cellText;
+      td.style.padding = '6px';
+      td.style.border = '1px solid #d1d5db';
+      td.style.textAlign = 'right';
+      row.appendChild(td);
+    });
+    
+    tbody.appendChild(row);
+  });
+  assessmentTable.appendChild(tbody);
+  page.appendChild(assessmentTable);
 
-    const td2 = document.createElement('td');
-    const negativeData = behaviorTop5.negative || [];
-    if (negativeData[i]) {
-      const nameDiv = document.createElement('div');
-      nameDiv.textContent = negativeData[i].name || '';
-      nameDiv.style.textAlign = 'right';
-      nameDiv.style.marginBottom = '2px';
-      nameDiv.style.fontSize = '8px';
-      
-      const countDiv = document.createElement('div');
-      countDiv.textContent = `${negativeData[i].count || 0}`;
-      countDiv.style.textAlign = 'left';
-      countDiv.style.fontSize = '8px';
-      countDiv.style.fontWeight = 'bold';
-      
-      td2.appendChild(nameDiv);
-      td2.appendChild(countDiv);
-    }
-    td2.style.border = '1px solid #000';
-    td2.style.padding = '4px';
-    td2.style.minHeight = '20px';
-    row.appendChild(td2);
+  // Student Performance Panels Container
+  const panelsContainer = document.createElement('div');
+  panelsContainer.style.display = 'flex';
+  panelsContainer.style.gap = '15px';
+  panelsContainer.style.marginTop = '20px';
+  panelsContainer.style.marginBottom = '20px';
 
-    top5Table.appendChild(row);
+  // Outstanding Students Panel (Left - Blue)
+  const outstandingPanel = document.createElement('div');
+  outstandingPanel.style.flex = '1';
+  outstandingPanel.style.backgroundColor = '#3b82f6';
+  outstandingPanel.style.padding = '12px';
+  outstandingPanel.style.borderRadius = '4px';
+  outstandingPanel.style.minHeight = '200px';
+
+  const outstandingTitle = document.createElement('h3');
+  outstandingTitle.textContent = 'الطلاب المتفوقون (متوسط 8 أو أكثر)';
+  outstandingTitle.style.color = '#ffffff';
+  outstandingTitle.style.fontSize = '12px';
+  outstandingTitle.style.fontWeight = 'bold';
+  outstandingTitle.style.margin = '0 0 10px 0';
+  outstandingTitle.style.textAlign = 'right';
+  outstandingPanel.appendChild(outstandingTitle);
+
+  const outstandingList = document.createElement('div');
+  outstandingList.style.display = 'flex';
+  outstandingList.style.flexDirection = 'column';
+  outstandingList.style.gap = '6px';
+  
+  const students = reportData.students || [];
+  // Convert averageGrade from percentage (0-100) to 10-scale for filtering and display
+  const outstandingStudents = students
+    .map((s: any) => ({ ...s, averageGrade10: (s.averageGrade || 0) / 10 }))
+    .filter((s: any) => s.averageGrade10 >= 8)
+    .sort((a: any, b: any) => (b.averageGrade10 || 0) - (a.averageGrade10 || 0))
+    .slice(0, 10);
+  
+  if (outstandingStudents.length === 0) {
+    const noData = document.createElement('div');
+    noData.textContent = 'لا يوجد طلاب';
+    noData.style.color = '#ffffff';
+    noData.style.fontSize = '10px';
+    noData.style.textAlign = 'right';
+    outstandingList.appendChild(noData);
+  } else {
+    outstandingStudents.forEach((student: any) => {
+      const studentItem = document.createElement('div');
+      studentItem.style.display = 'flex';
+      studentItem.style.justifyContent = 'space-between';
+      studentItem.style.alignItems = 'center';
+      studentItem.style.padding = '4px 0';
+      studentItem.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
+      
+      const studentName = document.createElement('span');
+      studentName.textContent = `${student.firstName || ''} ${student.lastName || ''}`.trim() || `Student ${student.id}`;
+      studentName.style.color = '#ffffff';
+      studentName.style.fontSize = '10px';
+      studentName.style.textAlign = 'right';
+      
+      const studentScore = document.createElement('span');
+      studentScore.textContent = `(${(student.averageGrade10 || 0).toFixed(2)})`;
+      studentScore.style.color = '#ffffff';
+      studentScore.style.fontSize = '10px';
+      studentScore.style.fontWeight = 'bold';
+      studentScore.style.marginRight = '8px';
+      
+      studentItem.appendChild(studentName);
+      studentItem.appendChild(studentScore);
+      outstandingList.appendChild(studentItem);
+    });
   }
-  page.appendChild(top5Table);
+  
+  outstandingPanel.appendChild(outstandingList);
+  panelsContainer.appendChild(outstandingPanel);
+
+  // At-Risk Students Panel (Right - Red)
+  const atRiskPanel = document.createElement('div');
+  atRiskPanel.style.flex = '1';
+  atRiskPanel.style.backgroundColor = '#ef4444';
+  atRiskPanel.style.padding = '12px';
+  atRiskPanel.style.borderRadius = '4px';
+  atRiskPanel.style.minHeight = '200px';
+
+  const atRiskTitle = document.createElement('h3');
+  atRiskTitle.textContent = 'الطلاب المعرضون للخطر (متوسط أقل من 5)';
+  atRiskTitle.style.color = '#ffffff';
+  atRiskTitle.style.fontSize = '12px';
+  atRiskTitle.style.fontWeight = 'bold';
+  atRiskTitle.style.margin = '0 0 10px 0';
+  atRiskTitle.style.textAlign = 'right';
+  atRiskPanel.appendChild(atRiskTitle);
+
+  const atRiskList = document.createElement('div');
+  atRiskList.style.display = 'flex';
+  atRiskList.style.flexDirection = 'column';
+  atRiskList.style.gap = '6px';
+  
+  // Convert averageGrade from percentage (0-100) to 10-scale for filtering and display
+  const atRiskStudents = students
+    .map((s: any) => ({ ...s, averageGrade10: (s.averageGrade || 0) / 10 }))
+    .filter((s: any) => s.averageGrade10 < 5)
+    .sort((a: any, b: any) => (a.averageGrade10 || 0) - (b.averageGrade10 || 0))
+    .slice(0, 10);
+  
+  if (atRiskStudents.length === 0) {
+    const noData = document.createElement('div');
+    noData.textContent = 'لا يوجد طلاب';
+    noData.style.color = '#ffffff';
+    noData.style.fontSize = '10px';
+    noData.style.textAlign = 'right';
+    atRiskList.appendChild(noData);
+  } else {
+    atRiskStudents.forEach((student: any) => {
+      const studentItem = document.createElement('div');
+      studentItem.style.display = 'flex';
+      studentItem.style.justifyContent = 'space-between';
+      studentItem.style.alignItems = 'center';
+      studentItem.style.padding = '4px 0';
+      studentItem.style.borderBottom = '1px solid rgba(255, 255, 255, 0.2)';
+      
+      const studentName = document.createElement('span');
+      studentName.textContent = `${student.firstName || ''} ${student.lastName || ''}`.trim() || `Student ${student.id}`;
+      studentName.style.color = '#ffffff';
+      studentName.style.fontSize = '10px';
+      studentName.style.textAlign = 'right';
+      
+      const studentScore = document.createElement('span');
+      studentScore.textContent = `(${(student.averageGrade10 || 0).toFixed(2)})`;
+      studentScore.style.color = '#ffffff';
+      studentScore.style.fontSize = '10px';
+      studentScore.style.fontWeight = 'bold';
+      studentScore.style.marginRight = '8px';
+      
+      studentItem.appendChild(studentName);
+      studentItem.appendChild(studentScore);
+      atRiskList.appendChild(studentItem);
+    });
+  }
+  
+  atRiskPanel.appendChild(atRiskList);
+  panelsContainer.appendChild(atRiskPanel);
+  
+  page.appendChild(panelsContainer);
 
   // Footer
   const footer = document.createElement('div');

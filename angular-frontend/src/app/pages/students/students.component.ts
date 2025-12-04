@@ -1,7 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import * as XLSX from 'xlsx';
+import { ChartConfiguration, ChartOptions, ChartData } from 'chart.js';
+import { jsPDF } from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export interface Student {
   id: number;
@@ -56,6 +59,8 @@ export interface Class {
   styleUrls: ['./students.component.css']
 })
 export class StudentsComponent implements OnInit {
+  @ViewChild('reportContent') reportContent!: ElementRef;
+  
   students: Student[] = [];
   filteredStudents: Student[] = [];
   classes: Class[] = [];
@@ -98,6 +103,119 @@ export class StudentsComponent implements OnInit {
   selectedHeaderRow: { [sheetName: string]: number } = {};
   detectedHeaderRow: { [sheetName: string]: number } = {};
 
+  // Student Report Modal
+  showReportModal: boolean = false;
+  reportStudent: Student | null = null;
+  reportSelectedClass: Class | null = null;
+  reportStudentClasses: Class[] = []; // All classes the student belongs to
+  isExportingPDF: boolean = false;
+  
+  // Report Data
+  reportAttendance: any[] = [];
+  reportBehaviorEvents: any[] = [];
+  reportGrades: any[] = [];
+  reportOverallGrade: number = 0;
+  reportSubject: string = '';
+  allBehaviors: any[] = [];
+  
+  // Attendance Chart
+  attendanceDonutChartData: ChartConfiguration<'doughnut'>['data'] = {
+    labels: ['حاضر', 'غائب', 'معذور', 'متأخر', 'مغادر مبكراً'],
+    datasets: [{
+      data: [0, 0, 0, 0, 0],
+      backgroundColor: ['#22c55e', '#ef4444', '#2563eb', '#f97316', '#eab308'],
+      borderWidth: 1
+    }]
+  };
+  attendanceDonutChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right'
+      }
+    }
+  };
+  
+  // Attendance Bi-weekly Chart
+  attendanceBiWeeklyChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [
+      { label: 'غائب', data: [], backgroundColor: '#ef4444' },
+      { label: 'معذور', data: [], backgroundColor: '#2563eb' },
+      { label: 'متأخر', data: [], backgroundColor: '#f97316' },
+      { label: 'حاضر', data: [], backgroundColor: '#22c55e' },
+      { label: 'مريض', data: [], backgroundColor: '#eab308' }
+    ]
+  };
+  attendanceBiWeeklyChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      x: { stacked: true },
+      y: { stacked: true, beginAtZero: true }
+    },
+    plugins: {
+      legend: { position: 'top' }
+    }
+  };
+  
+  // Behavior Line Chart
+  behaviorLineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [
+      { label: 'إيجابي', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34, 197, 94, 0.1)', tension: 0.4 },
+      { label: 'سلبي', data: [], borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, 0.1)', tension: 0.4 }
+    ]
+  };
+  behaviorLineChartOptions: ChartOptions<'line'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { beginAtZero: true }
+    },
+    plugins: {
+      legend: { position: 'top' }
+    }
+  };
+  
+  // Grades Bar Chart
+  gradesBarChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [{
+      label: 'الدرجة',
+      data: [],
+      backgroundColor: '#2563eb',
+      borderColor: '#1e40af',
+      borderWidth: 1
+    }]
+  };
+  gradesBarChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    scales: {
+      y: { beginAtZero: true, max: 10 }
+    }
+  };
+  
+  // Weighted Items Pie Chart
+  weightedItemsChartData: ChartConfiguration<'pie'>['data'] = {
+    labels: [],
+    datasets: [{
+      data: [],
+      backgroundColor: [
+        '#a855f7', '#22c55e', '#ef4444', '#2563eb', '#f97316', '#06b6d4', '#6b7280'
+      ]
+    }]
+  };
+  weightedItemsChartOptions: ChartOptions<'pie'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { position: 'right' }
+    }
+  };
+
   constructor(
     private apiService: ApiService,
     public languageService: LanguageService
@@ -110,6 +228,48 @@ export class StudentsComponent implements OnInit {
   ngOnInit(): void {
     this.loadStudents();
     this.loadClasses();
+    this.loadBehaviors();
+  }
+
+  loadBehaviors(): void {
+    // Load behavior definitions to properly categorize positive/negative
+    this.apiService.get<any[]>('/behaviors').subscribe({
+      next: (data) => {
+        if (data && data.length > 0) {
+          this.allBehaviors = data;
+        } else {
+          // Fallback to predefined behaviors
+          this.allBehaviors = [
+            { id: 1, type: 'positive', name: 'Good General Behavior', nameAr: 'سلوك عام جيد' },
+            { id: 2, type: 'positive', name: 'Good Progress', nameAr: 'تقدم جيد' },
+            { id: 3, type: 'positive', name: 'Helpful', nameAr: 'متعاون' },
+            { id: 4, type: 'positive', name: 'Homework done on time', nameAr: 'إنجاز الواجب في الوقت المحدد' },
+            { id: 5, type: 'positive', name: 'Participating', nameAr: 'مشارك' },
+            { id: 6, type: 'negative', name: 'Generally Bad Behavior', nameAr: 'سلوك عام سيء' },
+            { id: 7, type: 'negative', name: 'Uses Mobile Phones Excessively', nameAr: 'استخدام الهاتف بشكل مفرط' },
+            { id: 8, type: 'negative', name: 'Fighting', nameAr: 'شجار' },
+            { id: 9, type: 'negative', name: 'Homework Issues', nameAr: 'مشاكل في الواجب' },
+            { id: 10, type: 'negative', name: 'Chatting', nameAr: 'ثرثرة' }
+          ];
+        }
+      },
+      error: (error) => {
+        console.error('Error loading behaviors:', error);
+        // Fallback to predefined behaviors
+        this.allBehaviors = [
+          { id: 1, type: 'positive', name: 'Good General Behavior', nameAr: 'سلوك عام جيد' },
+          { id: 2, type: 'positive', name: 'Good Progress', nameAr: 'تقدم جيد' },
+          { id: 3, type: 'positive', name: 'Helpful', nameAr: 'متعاون' },
+          { id: 4, type: 'positive', name: 'Homework done on time', nameAr: 'إنجاز الواجب في الوقت المحدد' },
+          { id: 5, type: 'positive', name: 'Participating', nameAr: 'مشارك' },
+          { id: 6, type: 'negative', name: 'Generally Bad Behavior', nameAr: 'سلوك عام سيء' },
+          { id: 7, type: 'negative', name: 'Uses Mobile Phones Excessively', nameAr: 'استخدام الهاتف بشكل مفرط' },
+          { id: 8, type: 'negative', name: 'Fighting', nameAr: 'شجار' },
+          { id: 9, type: 'negative', name: 'Homework Issues', nameAr: 'مشاكل في الواجب' },
+          { id: 10, type: 'negative', name: 'Chatting', nameAr: 'ثرثرة' }
+        ];
+      }
+    });
   }
 
   loadStudents(): void {
@@ -1068,6 +1228,504 @@ export class StudentsComponent implements OnInit {
       console.error('Error exporting to Excel:', error);
       alert('حدث خطأ أثناء تصدير البيانات إلى Excel');
     }
+  }
+
+  openReportModal(student: Student): void {
+    this.reportStudent = student;
+    this.showReportModal = true;
+    this.loadStudentClasses();
+  }
+
+  loadStudentClasses(): void {
+    if (!this.reportStudent) return;
+    
+    // Get all classes the student belongs to (from grades and attendance)
+    const classIds = new Set<number>();
+    
+    // Add the student's main class if exists
+    if (this.reportStudent.classId) {
+      classIds.add(this.reportStudent.classId);
+    }
+    
+    // Load grades to find all classes
+    this.apiService.get<any[]>(`/grades?studentId=${this.reportStudent.id}`).subscribe({
+      next: (grades) => {
+        grades.forEach(grade => {
+          if (grade.classId) {
+            classIds.add(grade.classId);
+          }
+        });
+        
+        // Load attendance to find more classes
+        this.apiService.get<any[]>(`/attendance?studentId=${this.reportStudent!.id}`).subscribe({
+          next: (attendance) => {
+            attendance.forEach(record => {
+              if (record.classId) {
+                classIds.add(record.classId);
+              }
+            });
+            
+            // Filter classes to only those the student belongs to
+            this.reportStudentClasses = this.classes.filter(c => classIds.has(c.id));
+            
+            // Set default selected class
+            if (this.reportStudentClasses.length > 0) {
+              if (this.reportStudent!.classId) {
+                this.reportSelectedClass = this.reportStudentClasses.find(c => c.id === this.reportStudent!.classId) || this.reportStudentClasses[0];
+              } else {
+                this.reportSelectedClass = this.reportStudentClasses[0];
+              }
+              this.loadReportData();
+            } else {
+              this.reportSelectedClass = null;
+            }
+          },
+          error: (error) => {
+            console.error('Error loading attendance:', error);
+            // Use classes from grades only
+            this.reportStudentClasses = this.classes.filter(c => classIds.has(c.id));
+            if (this.reportStudentClasses.length > 0) {
+              this.reportSelectedClass = this.reportStudentClasses[0];
+              this.loadReportData();
+            }
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading grades:', error);
+        // Try with attendance only
+        this.apiService.get<any[]>(`/attendance?studentId=${this.reportStudent!.id}`).subscribe({
+          next: (attendance) => {
+            attendance.forEach(record => {
+              if (record.classId) {
+                classIds.add(record.classId);
+              }
+            });
+            this.reportStudentClasses = this.classes.filter(c => classIds.has(c.id));
+            if (this.reportStudentClasses.length > 0) {
+              this.reportSelectedClass = this.reportStudentClasses[0];
+              this.loadReportData();
+            }
+          },
+          error: () => {
+            // Fallback to main class only
+            if (this.reportStudent!.classId) {
+              const mainClass = this.classes.find(c => c.id === this.reportStudent!.classId);
+              if (mainClass) {
+                this.reportStudentClasses = [mainClass];
+                this.reportSelectedClass = mainClass;
+                this.loadReportData();
+              }
+            }
+          }
+        });
+      }
+    });
+  }
+
+  closeReportModal(): void {
+    this.showReportModal = false;
+    this.reportStudent = null;
+    this.reportSelectedClass = null;
+    this.reportStudentClasses = [];
+    this.reportAttendance = [];
+    this.reportBehaviorEvents = [];
+    this.reportGrades = [];
+  }
+
+  onReportClassChange(): void {
+    if (this.reportStudent && this.reportSelectedClass) {
+      this.loadReportData();
+    }
+  }
+
+  loadReportData(): void {
+    if (!this.reportStudent || !this.reportSelectedClass) return;
+    
+    this.reportSubject = this.reportSelectedClass.name;
+    
+    // Load attendance
+    this.apiService.get<any[]>(`/attendance?studentId=${this.reportStudent.id}&classId=${this.reportSelectedClass.id}`).subscribe({
+      next: (data) => {
+        this.reportAttendance = data;
+        this.updateAttendanceCharts();
+      },
+      error: (error) => {
+        console.error('Error loading attendance:', error);
+        this.reportAttendance = [];
+      }
+    });
+    
+    // Load behavior events
+    this.apiService.get<any[]>(`/behavior-events?studentId=${this.reportStudent.id}&classId=${this.reportSelectedClass.id}`).subscribe({
+      next: (data) => {
+        this.reportBehaviorEvents = data;
+        this.updateBehaviorCharts();
+      },
+      error: (error) => {
+        console.error('Error loading behavior:', error);
+        this.reportBehaviorEvents = [];
+      }
+    });
+    
+    // Load grades
+    this.apiService.get<any[]>(`/grades?classId=${this.reportSelectedClass.id}`).subscribe({
+      next: (data) => {
+        // Filter grades for this student
+        this.reportGrades = data.filter(g => g.studentId === this.reportStudent!.id);
+        this.updateGradesCharts();
+        this.calculateOverallGrade();
+      },
+      error: (error) => {
+        console.error('Error loading grades:', error);
+        this.reportGrades = [];
+      }
+    });
+  }
+
+  updateAttendanceCharts(): void {
+    // Calculate attendance counts
+    const counts = {
+      present: 0,
+      absent: 0,
+      excused: 0,
+      late: 0,
+      leftEarly: 0
+    };
+    
+    this.reportAttendance.forEach(record => {
+      if (record.status === 'present') counts.present++;
+      else if (record.status === 'absent') counts.absent++;
+      else if (record.status === 'excused') counts.excused++;
+      else if (record.status === 'late') counts.late++;
+      else if (record.status === 'left_early') counts.leftEarly++;
+    });
+    
+    // Update donut chart
+    this.attendanceDonutChartData = {
+      ...this.attendanceDonutChartData,
+      datasets: [{
+        ...this.attendanceDonutChartData.datasets[0],
+        data: [counts.present, counts.absent, counts.excused, counts.late, counts.leftEarly]
+      }]
+    };
+    
+    // Update bi-weekly chart
+    const biWeeklyData = this.calculateBiWeeklyAttendance();
+    this.attendanceBiWeeklyChartData = {
+      labels: biWeeklyData.labels,
+      datasets: [
+        { label: 'غائب', data: biWeeklyData.absent, backgroundColor: '#ef4444' },
+        { label: 'معذور', data: biWeeklyData.excused, backgroundColor: '#2563eb' },
+        { label: 'متأخر', data: biWeeklyData.late, backgroundColor: '#f97316' },
+        { label: 'حاضر', data: biWeeklyData.present, backgroundColor: '#22c55e' },
+        { label: 'مغادر مبكراً', data: biWeeklyData.leftEarly, backgroundColor: '#eab308' }
+      ]
+    };
+  }
+
+  calculateBiWeeklyAttendance(): any {
+    // Group attendance by bi-weekly periods (last 16 weeks = 8 periods)
+    const periods: { [key: string]: { present: number, absent: number, excused: number, late: number, leftEarly: number } } = {};
+    const labels: string[] = [];
+    
+    // Get last 16 weeks
+    const now = new Date();
+    for (let i = 7; i >= 0; i--) {
+      const periodStart = new Date(now);
+      periodStart.setDate(now.getDate() - (i * 14));
+      const periodEnd = new Date(periodStart);
+      periodEnd.setDate(periodStart.getDate() + 13);
+      
+      const label = this.formatDate(periodStart);
+      labels.push(label);
+      periods[label] = { present: 0, absent: 0, excused: 0, late: 0, leftEarly: 0 };
+      
+      this.reportAttendance.forEach(record => {
+        const recordDate = new Date(record.date);
+        if (recordDate >= periodStart && recordDate <= periodEnd) {
+          if (record.status === 'present') periods[label].present++;
+          else if (record.status === 'absent') periods[label].absent++;
+          else if (record.status === 'excused') periods[label].excused++;
+          else if (record.status === 'late') periods[label].late++;
+          else if (record.status === 'left_early') periods[label].leftEarly++;
+        }
+      });
+    }
+    
+    return {
+      labels,
+      present: labels.map(l => periods[l].present),
+      absent: labels.map(l => periods[l].absent),
+      excused: labels.map(l => periods[l].excused),
+      late: labels.map(l => periods[l].late),
+      leftEarly: labels.map(l => periods[l].leftEarly)
+    };
+  }
+
+  updateBehaviorCharts(): void {
+    // Group behavior by bi-weekly periods
+    const biWeeklyData = this.calculateBiWeeklyBehavior();
+    this.behaviorLineChartData = {
+      labels: biWeeklyData.labels,
+      datasets: [
+        { 
+          label: 'إيجابي', 
+          data: biWeeklyData.positive, 
+          borderColor: '#22c55e', 
+          backgroundColor: 'rgba(34, 197, 94, 0.1)', 
+          tension: 0.4 
+        },
+        { 
+          label: 'سلبي', 
+          data: biWeeklyData.negative, 
+          borderColor: '#ef4444', 
+          backgroundColor: 'rgba(239, 68, 68, 0.1)', 
+          tension: 0.4 
+        }
+      ]
+    };
+  }
+
+  calculateBiWeeklyBehavior(): any {
+    const periods: { [key: string]: { positive: number, negative: number } } = {};
+    const labels: string[] = [];
+    
+    const now = new Date();
+    for (let i = 3; i >= 0; i--) {
+      const periodStart = new Date(now);
+      periodStart.setDate(now.getDate() - (i * 14));
+      const periodEnd = new Date(periodStart);
+      periodEnd.setDate(periodStart.getDate() + 13);
+      
+      const label = this.formatDate(periodStart);
+      labels.push(label);
+      periods[label] = { positive: 0, negative: 0 };
+      
+      this.reportBehaviorEvents.forEach(event => {
+        const eventDate = new Date(event.date);
+        if (eventDate >= periodStart && eventDate <= periodEnd) {
+          const behavior = this.allBehaviors.find(b => b.id === event.behaviorId);
+          if (behavior?.type === 'positive') {
+            periods[label].positive++;
+          } else if (behavior?.type === 'negative') {
+            periods[label].negative++;
+          }
+        }
+      });
+    }
+    
+    return {
+      labels,
+      positive: labels.map(l => periods[l].positive),
+      negative: labels.map(l => periods[l].negative)
+    };
+  }
+
+  updateGradesCharts(): void {
+    // Get assessment names and scores
+    // We'll need to load assessments to get names
+    const gradeItems: { name: string, score: number, maxScore: number, weight: number }[] = [];
+    
+    // For now, use assessmentId as name placeholder
+    // In a real implementation, you'd fetch assessment details
+    this.reportGrades.forEach(grade => {
+      gradeItems.push({
+        name: `Assessment ${grade.assessmentId}`,
+        score: grade.score,
+        maxScore: grade.maxScore,
+        weight: 0 // Will be calculated if we have assessment weights
+      });
+    });
+    
+    // Update bar chart
+    this.gradesBarChartData = {
+      labels: gradeItems.map(item => item.name),
+      datasets: [{
+        label: 'الدرجة',
+        data: gradeItems.map(item => (item.score / item.maxScore) * 10), // Normalize to 10
+        backgroundColor: '#2563eb',
+        borderColor: '#1e40af',
+        borderWidth: 1
+      }]
+    };
+    
+    // Update weighted pie chart (if we have weights)
+    // For now, use equal distribution
+    const totalWeight = gradeItems.length || 1;
+    this.weightedItemsChartData = {
+      labels: gradeItems.map(item => item.name),
+      datasets: [{
+        data: gradeItems.map(() => (100 / totalWeight)),
+        backgroundColor: [
+          '#a855f7', '#22c55e', '#ef4444', '#2563eb', '#f97316', '#06b6d4', '#6b7280'
+        ]
+      }]
+    };
+  }
+
+  calculateOverallGrade(): void {
+    if (this.reportGrades.length === 0) {
+      this.reportOverallGrade = 0;
+      return;
+    }
+    
+    // Calculate weighted average
+    let totalWeightedScore = 0;
+    let totalWeight = 0;
+    
+    this.reportGrades.forEach(grade => {
+      const normalizedScore = (grade.score / grade.maxScore) * 10;
+      const weight = 1; // Default weight, should come from assessment
+      totalWeightedScore += normalizedScore * weight;
+      totalWeight += weight;
+    });
+    
+    this.reportOverallGrade = totalWeight > 0 ? (totalWeightedScore / totalWeight) : 0;
+  }
+
+  getBehaviorDetails(): { positive: any[], negative: any[] } {
+    const positive: any[] = [];
+    const negative: any[] = [];
+    
+    // Sort by date, get latest
+    const sorted = [...this.reportBehaviorEvents].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    sorted.forEach(event => {
+      const behavior = this.allBehaviors.find(b => b.id === event.behaviorId);
+      if (behavior?.type === 'positive') {
+        if (positive.length < 3) {
+          positive.push({ ...event, behaviorName: behavior.nameAr || behavior.name });
+        }
+      } else if (behavior?.type === 'negative') {
+        if (negative.length < 3) {
+          negative.push({ ...event, behaviorName: behavior.nameAr || behavior.name });
+        }
+      }
+    });
+    
+    return { positive, negative };
+  }
+
+  getGradeLetter(grade: number): string {
+    if (grade >= 90) return 'A';
+    if (grade >= 80) return 'B';
+    if (grade >= 70) return 'C';
+    if (grade >= 60) return 'D';
+    return 'F';
+  }
+
+  async exportReportToPDF(): Promise<void> {
+    if (!this.reportContent || !this.reportStudent || !this.reportSelectedClass) {
+      alert('يرجى التأكد من اختيار الطالب والمادة');
+      return;
+    }
+
+    this.isExportingPDF = true;
+    const contentElement = this.reportContent.nativeElement;
+    const exportButton = document.querySelector('[data-export-pdf]') as HTMLElement;
+    
+    // Disable export button temporarily
+    if (exportButton) {
+      (exportButton as HTMLButtonElement).disabled = true;
+    }
+
+    // Store original styles
+    const originalMaxHeight = contentElement.style.maxHeight;
+    const originalOverflow = contentElement.style.overflow;
+    const originalHeight = contentElement.style.height;
+
+    // Make content fully visible for capture
+    contentElement.style.maxHeight = 'none';
+    contentElement.style.overflow = 'visible';
+    contentElement.style.height = 'auto';
+
+    // Scroll to top
+    const scrollableContent = contentElement.querySelector('.overflow-y-auto');
+    if (scrollableContent) {
+      (scrollableContent as HTMLElement).scrollTop = 0;
+    }
+
+    // Wait a bit for the layout to update and charts to render
+    setTimeout(async () => {
+      try {
+        // Wait a bit more for charts to fully render
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(contentElement, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff',
+          windowWidth: contentElement.scrollWidth,
+          windowHeight: contentElement.scrollHeight,
+          scrollX: 0,
+          scrollY: 0,
+          allowTaint: true
+        });
+
+        // Restore original styles
+        contentElement.style.maxHeight = originalMaxHeight;
+        contentElement.style.overflow = originalOverflow;
+        contentElement.style.height = originalHeight;
+
+        // Enable the button again
+        if (exportButton) {
+          (exportButton as HTMLButtonElement).disabled = false;
+        }
+
+        this.isExportingPDF = false;
+
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
+
+        const doc = new jsPDF('p', 'mm', 'a4');
+        let position = 0;
+
+        // Add first page
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+
+        // Add additional pages if needed
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          doc.addPage();
+          doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+
+        // Generate file name
+        if (!this.reportStudent || !this.reportSelectedClass) {
+          throw new Error('Missing student or class data');
+        }
+        
+        const studentName = `${this.reportStudent.firstName}_${this.reportStudent.lastName}`;
+        const className = this.reportSelectedClass.name.replace(/\s+/g, '_');
+        const date = new Date().toISOString().split('T')[0];
+        const fileName = `تقرير_${studentName}_${className}_${date}.pdf`;
+
+        // Save the PDF
+        doc.save(fileName);
+      } catch (error) {
+        console.error('Error exporting to PDF:', error);
+        alert('حدث خطأ أثناء تصدير التقرير إلى PDF');
+        this.isExportingPDF = false;
+        
+        // Restore styles in case of error
+        contentElement.style.maxHeight = originalMaxHeight;
+        contentElement.style.overflow = originalOverflow;
+        contentElement.style.height = originalHeight;
+        if (exportButton) {
+          (exportButton as HTMLButtonElement).disabled = false;
+        }
+      }
+    }, 300);
   }
 }
 
