@@ -3824,14 +3824,14 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       // Title
       pdf.setFontSize(18);
       pdf.setTextColor(0, 0, 0);
-      pdf.text('تقرير مراقبة النقاط', pageWidth / 2, yPosition, { align: 'center' });
+      pdf.text(this.translate('reports.gradeMonitoring'), pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 10;
 
       // Date
       pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
       const date = new Date().toLocaleDateString('ar-EG');
-      pdf.text(`تاريخ التقرير: ${date}`, pageWidth / 2, yPosition, { align: 'center' });
+      pdf.text(`${this.translate('report.reportDate')} ${date}`, pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 10;
 
       // Summary

@@ -83,23 +83,52 @@ export class ProgressTrackingComponent implements OnInit {
 
   ngOnInit(): void {
     // تحميل بيانات الأستاذ من البطاقة الفنية المخزنة في localStorage (خاصة بالمستخدم الحالي)
+    this.loadTeacherDataFromCard();
+    this.loadData();
+  }
+
+  private loadTeacherDataFromCard(): void {
     const user = this.authService.getCurrentUser();
-    const storageKey = user ? `teacherCard_${user.id}` : 'teacherCard';
+    if (!user) {
+      this.teacherFullName = '';
+      this.teachingSubject = '';
+      return;
+    }
+
+    // محاولة جلب البيانات من البطاقة الفنية باستخدام مفتاح المستخدم
+    const storageKey = `teacherCard_${user.id}`;
     const stored = localStorage.getItem(storageKey);
+    
     if (stored) {
       try {
         const card = JSON.parse(stored);
-        const first = card.firstName || '';
-        const last = card.lastName || '';
-        this.teacherFullName = `${first} ${last}`.trim();
+        // جلب الاسم الأول واللقب من البطاقة الفنية
+        const firstName = card.firstName || '';
+        const lastName = card.lastName || '';
+        this.teacherFullName = `${firstName} ${lastName}`.trim();
         this.teachingSubject = card.teachingSubject || '';
-      } catch {
-        this.teacherFullName = '';
+        
+        // إذا لم يكن هناك اسم في البطاقة الفنية، استخدم بيانات المستخدم كبديل
+        if (!this.teacherFullName) {
+          const userFirstName = user.firstName || '';
+          const userLastName = user.lastName || '';
+          this.teacherFullName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
+        }
+      } catch (error) {
+        console.error('Error parsing teacher card data:', error);
+        // في حالة الخطأ، استخدم بيانات المستخدم كبديل
+        const userFirstName = user.firstName || '';
+        const userLastName = user.lastName || '';
+        this.teacherFullName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
         this.teachingSubject = '';
       }
+    } else {
+      // إذا لم تكن البطاقة الفنية موجودة، استخدم بيانات المستخدم
+      const userFirstName = user.firstName || '';
+      const userLastName = user.lastName || '';
+      this.teacherFullName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
+      this.teachingSubject = '';
     }
-
-    this.loadData();
   }
 
   loadData(): void {

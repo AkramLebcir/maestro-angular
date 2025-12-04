@@ -10269,6 +10269,15 @@ export class LanguageService {
         'DE': 'Datum:',
         'TR': 'Tarih:'
       },
+      'report.reportDate': {
+        'AR': 'تاريخ التقرير:',
+        'FR': 'Date du rapport:',
+        'EN': 'Report date:',
+        'ES': 'Fecha del informe:',
+        'IT': 'Data del rapporto:',
+        'DE': 'Berichtsdatum:',
+        'TR': 'Rapor tarihi:'
+      },
       'report.additionalNotes': {
         'AR': 'ملاحظات إضافية:',
         'FR': 'Notes supplémentaires:',
