@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
-  <div class="bg-white rounded-lg shadow-lg p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('notebooks.title') }}</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('notebooks.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -17,36 +17,36 @@
     <!-- Search and Filter Section -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.search') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.search') }}</label>
         <input 
           type="text"
           [(ngModel)]="searchTerm"
           (input)="onSearchChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('notebooks.searchPlaceholder')">
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.filterByClass') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.filterByClass') }}</label>
         <select 
           [(ngModel)]="selectedClassFilter"
           (change)="onClassFilterChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
           <option [ngValue]="null">{{ translate('notebooks.allClasses') }}</option>
           <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
         </select>
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">
+    <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-4">
       {{ translate('notebooks.listTitle', { count: filteredNotebooks.length.toString() }) }}
     </h2>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       <div 
         *ngFor="let notebook of filteredNotebooks" 
-        class="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition">
+        class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 hover:shadow-lg dark:shadow-gray-900/50 transition">
         <div class="flex justify-between items-start mb-2">
-          <h3 class="text-lg font-semibold text-gray-800 cursor-pointer" (click)="openEditModal(notebook)">{{ notebook.title }}</h3>
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 cursor-pointer" (click)="openEditModal(notebook)">{{ notebook.title }}</h3>
           <button 
             (click)="deleteNotebook(notebook.id); $event.stopPropagation()"
             class="text-red-600 hover:text-red-800 p-1">
@@ -55,8 +55,8 @@
             </svg>
           </button>
         </div>
-        <p class="text-sm text-gray-600 mb-2 cursor-pointer" (click)="openEditModal(notebook)">{{ truncateText(notebook.description) }}</p>
-        <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2 cursor-pointer" (click)="openEditModal(notebook)">{{ truncateText(notebook.description) }}</p>
+        <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400 mb-2">
           <span *ngIf="notebook.classId">{{ translate('notebooks.classLabel') }}: {{ getClassName(notebook.classId) }}</span>
           <span *ngIf="!notebook.classId">{{ translate('notebooks.general') }}</span>
           <span *ngIf="notebook.courseEntries">
@@ -65,9 +65,9 @@
         </div>
         <!-- Course Titles List -->
         <div *ngIf="notebook.courseEntries && notebook.courseEntries.length > 0" class="mb-2">
-          <div class="text-xs font-semibold text-gray-700 mb-1">{{ translate('notebooks.sessionTitles') }}</div>
+          <div class="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.sessionTitles') }}</div>
           <div class="space-y-1 max-h-20 overflow-y-auto">
-            <div *ngFor="let course of notebook.courseEntries" class="text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded">
+            <div *ngFor="let course of notebook.courseEntries" class="text-xs text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 px-2 py-1 rounded">
               • {{ course.title }}
             </div>
           </div>
@@ -88,7 +88,7 @@
           {{ formatDate(notebook.updatedAt) }}
         </div>
       </div>
-      <div *ngIf="filteredNotebooks.length === 0" class="col-span-full text-center text-gray-500 py-8">
+      <div *ngIf="filteredNotebooks.length === 0" class="col-span-full text-center text-gray-500 dark:text-gray-400 py-8">
         {{ translate('notebooks.noNotebooks') }}
       </div>
     </div>
@@ -98,18 +98,18 @@
 <!-- Notebook Modal -->
 <div 
   *ngIf="showModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-60 overflow-y-auto"
   (click)="closeModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-3xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-3xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ editingNotebook ? translate('notebooks.editNotebook') : translate('notebooks.addNotebookFull') }}
       </h3>
       <button 
         (click)="closeModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -118,44 +118,44 @@
 
     <form #notebookForm="ngForm" (ngSubmit)="saveNotebook()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.titleLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.titleLabel') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.title"
           name="title"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('notebooks.titlePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.descriptionLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.descriptionLabel') }}</label>
         <textarea 
           [(ngModel)]="formData.description"
           name="description"
           rows="2"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('notebooks.descriptionPlaceholder')"></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.classLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.classLabel') }}</label>
         <select 
           [(ngModel)]="formData.classId"
           name="classId"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
           <option [ngValue]="undefined">{{ translate('notebooks.generalForAllClasses') }}</option>
           <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
         </select>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.contentLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.contentLabel') }}</label>
         <textarea 
           [(ngModel)]="formData.content"
           name="content"
           rows="10"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
           [placeholder]="translate('notebooks.contentPlaceholder')"></textarea>
       </div>
 
@@ -169,7 +169,7 @@
         <button 
           type="button"
           (click)="closeModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('notebooks.cancel') }}
         </button>
       </div>
@@ -180,21 +180,21 @@
 <!-- Course Entry Modal -->
 <div 
   *ngIf="showCourseModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-60 overflow-y-auto"
   (click)="closeCourseModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-2xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ editingCourse ? 'تعديل الحصة' : 'إضافة حصة جديدة' }}
-        <span *ngIf="currentNotebookForCourse" class="text-sm font-normal text-gray-600">
+        <span *ngIf="currentNotebookForCourse" class="text-sm font-normal text-gray-600 dark:text-gray-400">
           - {{ currentNotebookForCourse.title }}
         </span>
       </h3>
       <button 
         (click)="closeCourseModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -204,56 +204,56 @@
     <form #courseForm="ngForm" (ngSubmit)="saveCourse()" class="space-y-4">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.courseTitleLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.courseTitleLabel') }}</label>
           <input 
             type="text"
             [(ngModel)]="courseFormData.title"
             name="title"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             [placeholder]="translate('notebooks.courseTitlePlaceholder')">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.courseDateLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.courseDateLabel') }}</label>
           <input 
             type="date"
             [(ngModel)]="courseFormData.date"
             name="date"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.courseStartTimeLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.courseStartTimeLabel') }}</label>
           <input 
             type="time"
             [(ngModel)]="courseFormData.startTime"
             name="startTime"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.courseEndTimeLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.courseEndTimeLabel') }}</label>
           <input 
             type="time"
             [(ngModel)]="courseFormData.endTime"
             name="endTime"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.selectOrCreateTopicLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.selectOrCreateTopicLabel') }}</label>
         <div class="flex gap-2 mb-2">
           <select 
             [(ngModel)]="courseFormData.topicId"
             name="topicId"
             (change)="onTopicChange()"
             [disabled]="showNewTopicForm"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100">
+            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 dark:bg-gray-800">
             <option [ngValue]="undefined">{{ translate('notebooks.selectFromList') }}</option>
             <option *ngFor="let topic of topics" [ngValue]="topic.id">{{ topic.title }}</option>
           </select>
@@ -267,34 +267,34 @@
         </div>
         
         <!-- New Topic Form -->
-        <div *ngIf="showNewTopicForm" class="p-4 bg-green-50 border border-green-200 rounded-lg mb-2">
+        <div *ngIf="showNewTopicForm" class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-lg mb-2">
           <h4 class="font-semibold text-green-800 mb-3">{{ translate('notebooks.addCourse') }}</h4>
           <div class="space-y-3">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.newTopicTitleLabel') }}</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.newTopicTitleLabel') }}</label>
               <input 
                 type="text"
                 [(ngModel)]="newTopicData.title"
                 name="newTopicTitle"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="أدخل عنوان الموضوع">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.newTopicSubtitleLabel') }}</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.newTopicSubtitleLabel') }}</label>
               <input 
                 type="text"
                 [(ngModel)]="newTopicData.subtitle"
                 name="newTopicSubtitle"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="أدخل العنوان الفرعي">
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.newTopicDescriptionLabel') }}</label>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.newTopicDescriptionLabel') }}</label>
               <textarea 
                 [(ngModel)]="newTopicData.description"
                 name="newTopicDescription"
                 rows="2"
-                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="أدخل وصف الموضوع"></textarea>
             </div>
             <button 
@@ -309,9 +309,9 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.descriptionCourseLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.descriptionCourseLabel') }}</label>
         <!-- Show selected topic info -->
-        <div *ngIf="courseFormData.topicId" class="mb-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+        <div *ngIf="courseFormData.topicId" class="mb-2 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg">
           <div class="font-semibold text-blue-800 mb-1">{{ getTopicTitle(courseFormData.topicId) }}</div>
           <div *ngIf="getTopicSubtitle(courseFormData.topicId)" class="font-medium text-blue-700 text-sm mb-2">{{ getTopicSubtitle(courseFormData.topicId) }}</div>
           <div *ngIf="getTopicElements(courseFormData.topicId).length > 0" class="mt-2">
@@ -326,31 +326,31 @@
           name="description"
           required
           rows="4"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="courseFormData.topicId ? translate('notebooks.descriptionCoursePlaceholder') : translate('notebooks.descriptionCoursePlaceholder')"></textarea>
-        <p *ngIf="courseFormData.topicId" class="text-xs text-gray-500 mt-1">
+        <p *ngIf="courseFormData.topicId" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
           {{ translate('notebooks.noteLabel') }}
         </p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.markLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.markLabel') }}</label>
           <input 
             type="text"
             [(ngModel)]="courseFormData.mark"
             name="mark"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="أدخل الإمضاء أو العلامة">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('notebooks.noteLabel') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('notebooks.noteLabel') }}</label>
           <input 
             type="text"
             [(ngModel)]="courseFormData.note"
             name="note"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="أدخل ملاحظة">
         </div>
       </div>
@@ -365,7 +365,7 @@
         <button 
           type="button"
           (click)="closeCourseModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('notebooks.cancel') }}
         </button>
       </div>
@@ -376,13 +376,13 @@
 <!-- Report Modal -->
 <div 
   *ngIf="showReportModal && selectedNotebookForReport"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-40 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-40 overflow-y-auto"
   (click)="closeReportModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8 max-h-[90vh] overflow-y-auto"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-6xl my-8 max-h-[90vh] overflow-y-auto"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         تقرير: {{ selectedNotebookForReport.title }}
       </h3>
       <div class="flex gap-2">
@@ -393,7 +393,7 @@
         </button>
         <button 
           (click)="closeReportModal()"
-          class="text-gray-500 hover:text-gray-700">
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -412,34 +412,34 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let course of getCourseEntriesForReport(selectedNotebookForReport)" class="border-b border-gray-200 hover:bg-gray-50">
-            <td class="border border-gray-300 p-3 text-gray-800 w-32">
+          <tr *ngFor="let course of getCourseEntriesForReport(selectedNotebookForReport)" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+            <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200 w-32">
               {{ formatDateForReport(course.date) }}
             </td>
-            <td class="border border-gray-300 p-3 text-gray-800 w-36">
+            <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200 w-36">
               <div class="text-sm">من {{ course.startTime }}</div>
               <div class="text-sm">إلى {{ course.endTime }}</div>
             </td>
-            <td class="border border-gray-300 p-3 text-gray-800">
+            <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">
               <!-- Topic Title with asterisk - Show after course title if topic exists -->
               <div *ngIf="course.topic && course.topic.title" class="mb-2">
                 <div class="text-base font-bold text-blue-800">{{ course.topic.title }} *</div>
               </div>
               <!-- Topic Subtitle - Show after topic title if topic exists -->
               <div *ngIf="course.topic && course.topic.subtitle" class="mb-2">
-                <div class="text-sm font-semibold text-gray-700">{{ course.topic.subtitle }}</div>
+                <div class="text-sm font-semibold text-gray-700 dark:text-gray-300">{{ course.topic.subtitle }}</div>
               </div>
               <!-- Course Description - Show after titles -->
               <div *ngIf="course.description" class="mb-2">
-                <div class="text-sm text-gray-600 whitespace-pre-line">{{ course.description }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">{{ course.description }}</div>
               </div>
               <!-- Topic Description - Show after course description if topic exists -->
               <div *ngIf="course.topic && course.topic.description" class="mb-2">
-                <div class="text-sm text-gray-600 whitespace-pre-line">{{ course.topic.description }}</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400 whitespace-pre-line">{{ course.topic.description }}</div>
               </div>
               <!-- Topic Elements - Show after description if topic exists -->
               <div *ngIf="course.topic && course.topic.elements && course.topic.elements.length > 0" class="mt-2">
-                <ul class="list-disc list-inside text-xs text-gray-600 space-y-0.5">
+                <ul class="list-disc list-inside text-xs text-gray-600 dark:text-gray-400 space-y-0.5">
                   <li *ngFor="let element of course.topic.elements">{{ element.content }}</li>
                 </ul>
               </div>
@@ -456,14 +456,14 @@
                 </button>
               </div>
             </td>
-            <td class="border border-gray-300 p-3 text-gray-800 w-24">
+            <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200 w-24">
               <div *ngIf="course.mark" class="text-sm font-semibold mb-1">{{ course.mark }}</div>
-              <div *ngIf="course.note" class="text-xs text-gray-600">{{ course.note }}</div>
+              <div *ngIf="course.note" class="text-xs text-gray-600 dark:text-gray-400">{{ course.note }}</div>
               <div *ngIf="!course.mark && !course.note" class="text-gray-400 text-xs">-</div>
             </td>
           </tr>
           <tr *ngIf="getCourseEntriesForReport(selectedNotebookForReport).length === 0">
-            <td colspan="4" class="border border-gray-300 p-8 text-center text-gray-500">
+            <td colspan="4" class="border border-gray-300 dark:border-gray-600 p-8 text-center text-gray-500 dark:text-gray-400">
               لا توجد حصص مسجلة
             </td>
           </tr>
@@ -479,7 +479,7 @@
       </button>
       <button 
         (click)="closeReportModal()"
-        class="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+        class="bg-gray-200 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
         إغلاق
       </button>
     </div>

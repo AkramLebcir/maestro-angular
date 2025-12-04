@@ -5,6 +5,7 @@ module.exports = {
   content: [
     "./src/**/*.{html,ts}",
   ],
+  darkMode: 'class', // Enable dark mode with class strategy
   theme: {
     extend: {
       // إعادة تعريف لون "الأخضر" ليستخدم لوحة الأزرق

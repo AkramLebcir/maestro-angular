@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { LanguageService, LanguageCode } from '../../services/language.service';
 import { AuthService, User } from '../../services/auth.service';
 import { NotificationService, Notification, NotificationStats } from '../../services/notification.service';
+import { ThemeService, ThemeMode } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -24,6 +25,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   isLanguageMenuOpen = false;
   private languageSubscription?: Subscription;
   private userSubscription?: Subscription;
+  
+  // إعدادات المظهر (Dark/Light Mode)
+  currentTheme: ThemeMode = 'light';
+  private themeSubscription?: Subscription;
 
   // إعدادات الإشعارات
   notifications: Notification[] = [];
@@ -37,7 +42,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
     public languageService: LanguageService,
     private authService: AuthService,
     private router: Router,
-    public notificationService: NotificationService
+    public notificationService: NotificationService,
+    public themeService: ThemeService
   ) {}
 
   toggleLanguageMenu(): void {
@@ -59,6 +65,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentLanguageCode = lang;
     });
     this.currentLanguageCode = this.languageService.getCurrentLanguage();
+
+    // الاشتراك في تغييرات المظهر
+    this.themeSubscription = this.themeService.currentTheme$.subscribe((theme: ThemeMode) => {
+      this.currentTheme = theme;
+    });
+    this.currentTheme = this.themeService.getCurrentTheme();
 
     // الاشتراك في تغييرات المستخدم
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
@@ -93,6 +105,13 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.userSubscription) {
       this.userSubscription.unsubscribe();
     }
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  toggleTheme(): void {
+    this.themeService.toggleTheme();
   }
 
   toggleUserMenu(): void {

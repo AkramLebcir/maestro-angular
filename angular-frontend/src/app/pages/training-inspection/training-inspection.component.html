@@ -1,51 +1,51 @@
 <div class="flex-1 pt-2 pb-4 px-3 md:px-4">
-  <div class="bg-white rounded-xl shadow-md p-5 md:p-6 mb-4 border border-blue-100">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/50 p-5 md:p-6 mb-4 border border-blue-100">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-1">
           {{ translate('trainingInspection.title') }}
         </h1>
-        <p class="text-sm text-gray-500">
+        <p class="text-sm text-gray-500 dark:text-gray-400">
           {{ translate('trainingInspection.description') }}
         </p>
       </div>
     </div>
 
     <!-- Tabs -->
-    <div class="border-b border-gray-200 mb-4 flex gap-4 overflow-x-auto">
+    <div class="border-b border-gray-200 dark:border-gray-700 mb-4 flex gap-4 overflow-x-auto">
       <button
         (click)="setTab('training')"
         [class]="activeTab === 'training'
           ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
-          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.trainingLog') }}
       </button>
       <button
         (click)="setTab('inspection')"
         [class]="activeTab === 'inspection'
           ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
-          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.inspectorVisits') }}
       </button>
       <button
         (click)="setTab('daily')"
         [class]="activeTab === 'daily'
           ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
-          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.dailyNotes') }}
       </button>
       <button
         (click)="setTab('seminars')"
         [class]="activeTab === 'seminars'
           ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
-          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.educationalSeminars') }}
       </button>
       <button
         (click)="setTab('pedagogical')"
         [class]="activeTab === 'pedagogical'
           ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
-          : 'px-4 py-2 text-sm font-medium text-gray-600 hover:text-blue-600'">
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.pedagogicalVisits') }}
       </button>
     </div>
@@ -55,28 +55,28 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.trainingDate') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.trainingDate') }}</label>
             <input
               class="col-span-2 input-field"
               type="date"
               [(ngModel)]="newTraining.date" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.trainingTopic') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.trainingTopic') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newTraining.topic" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.organizer') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.organizer') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newTraining.organizer" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.location') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.location') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
@@ -85,19 +85,19 @@
         </div>
         <div class="space-y-3">
           <div class="grid grid-cols-1 gap-2">
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.instructions') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.instructions') }}</label>
             <textarea
               class="input-field min-h-[96px]"
               [(ngModel)]="newTraining.notes"></textarea>
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.trainingFile') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.trainingFile') }}</label>
             <div class="col-span-2 flex items-center gap-2">
               <input
                 type="file"
                 (change)="onTrainingFileSelected($event)"
                 class="text-xs" />
-              <span class="text-xs text-gray-500 truncate" *ngIf="newTraining.fileName">
+              <span class="text-xs text-gray-500 dark:text-gray-400 truncate" *ngIf="newTraining.fileName">
                 {{ newTraining.fileName }}
               </span>
             </div>
@@ -114,7 +114,7 @@
 
       <div class="mt-4">
           <div class="flex items-center justify-between mb-2">
-          <h2 class="text-sm font-semibold text-gray-800">{{ translate('trainingInspection.savedTrainingLog') }}</h2>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.savedTrainingLog') }}</h2>
           <button
             (click)="exportTrainingPdf()"
             class="btn-export-pdf px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
@@ -122,18 +122,18 @@
           </button>
         </div>
         <div #trainingPrint>
-          <div class="text-center font-semibold text-gray-800 mb-3">
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
             {{ translate('trainingInspection.trainingReport') }}
           </div>
-          <div *ngIf="trainingList.length === 0" class="text-xs text-gray-500">
+          <div *ngIf="trainingList.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ translate('trainingInspection.noTrainingRecords') }}
           </div>
           <div class="space-y-2">
             <div
               *ngFor="let t of trainingList; let i = index"
-              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-1">
               <div class="flex justify-between items-center">
-                <div class="font-semibold text-gray-800">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ t.topic }} - {{ t.date | date:'yyyy/MM/dd' }}
                 </div>
                 <button
@@ -142,14 +142,14 @@
                   حذف
                 </button>
               </div>
-              <div class="text-gray-700">
+              <div class="text-gray-700 dark:text-gray-300">
                 {{ translate('trainingInspection.organizerShort') }} {{ t.organizer || translate('trainingInspection.unspecified') }}
                 – {{ translate('trainingInspection.locationShort') }} {{ t.location || translate('trainingInspection.unspecified') }}
               </div>
-              <div class="text-gray-600" *ngIf="t.notes">
+              <div class="text-gray-600 dark:text-gray-400" *ngIf="t.notes">
                 {{ translate('trainingInspection.notesLabel') }} {{ t.notes }}
               </div>
-              <div class="text-gray-500 text-xs" *ngIf="t.fileName">
+              <div class="text-gray-500 dark:text-gray-400 text-xs" *ngIf="t.fileName">
                 {{ translate('trainingInspection.uploadedFile') }} {{ t.fileName }}
               </div>
             </div>
@@ -163,14 +163,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.visitDate') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.visitDate') }}</label>
             <input
               class="col-span-2 input-field"
               type="date"
               [(ngModel)]="newInspection.date" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.visitType') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.visitType') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
@@ -180,13 +180,13 @@
         </div>
         <div class="space-y-3">
           <div>
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.inspectorNotes') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.inspectorNotes') }}</label>
             <textarea
               class="input-field min-h-[80px]"
               [(ngModel)]="newInspection.notes"></textarea>
           </div>
           <div>
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.recommendations') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.recommendations') }}</label>
             <textarea
               class="input-field min-h-[80px]"
               [(ngModel)]="newInspection.recommendations"></textarea>
@@ -203,7 +203,7 @@
 
       <div class="mt-4">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-sm font-semibold text-gray-800">{{ translate('trainingInspection.inspectorReport') }}</h2>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.inspectorReport') }}</h2>
           <button
             (click)="exportInspectionPdf()"
             class="btn-export-pdf px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
@@ -211,18 +211,18 @@
           </button>
         </div>
         <div #inspectionPrint>
-          <div class="text-center font-semibold text-gray-800 mb-3">
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
             {{ translate('trainingInspection.inspectorReport') }}
           </div>
-          <div *ngIf="inspectionList.length === 0" class="text-xs text-gray-500">
+          <div *ngIf="inspectionList.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ translate('trainingInspection.noInspections') }}
           </div>
           <div class="space-y-2">
             <div
               *ngFor="let v of inspectionList; let i = index"
-              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-1">
               <div class="flex justify-between items-center">
-                <div class="font-semibold text-gray-800">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ v.type }} - {{ v.date | date:'yyyy/MM/dd' }}
                 </div>
                 <button
@@ -231,10 +231,10 @@
                   {{ translate('common.delete') }}
                 </button>
               </div>
-              <div class="text-gray-700" *ngIf="v.notes">
+              <div class="text-gray-700 dark:text-gray-300" *ngIf="v.notes">
                 {{ translate('trainingInspection.inspectorNotes') }} {{ v.notes }}
               </div>
-              <div class="text-gray-700" *ngIf="v.recommendations">
+              <div class="text-gray-700 dark:text-gray-300" *ngIf="v.recommendations">
                 {{ translate('trainingInspection.recommendations') }} {{ v.recommendations }}
               </div>
             </div>
@@ -247,14 +247,14 @@
     <div *ngIf="activeTab === 'daily'" class="space-y-4">
       <div class="space-y-3">
         <div class="grid grid-cols-3 items-center gap-2 max-w-xs">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.noteDate') }}</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.noteDate') }}</label>
           <input
             class="col-span-2 input-field"
             type="date"
             [(ngModel)]="newDailyNote.date" />
         </div>
         <div>
-          <label class="text-sm text-gray-700">{{ translate('trainingInspection.noteContent') }}</label>
+          <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.noteContent') }}</label>
           <textarea
             class="input-field min-h-[140px]"
             [placeholder]="translate('trainingInspection.notePlaceholder')"
@@ -271,7 +271,7 @@
 
       <div class="mt-4">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-sm font-semibold text-gray-800">{{ translate('trainingInspection.notesNotebook') }}</h2>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.notesNotebook') }}</h2>
           <button
             (click)="exportDailyNotesPdf()"
             class="btn-export-pdf px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
@@ -279,18 +279,18 @@
           </button>
         </div>
         <div #dailyPrint>
-          <div class="text-center font-semibold text-gray-800 mb-3">
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
             {{ translate('trainingInspection.dailyNotesReport') }}
           </div>
-          <div *ngIf="dailyNotes.length === 0" class="text-xs text-gray-500">
+          <div *ngIf="dailyNotes.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ translate('trainingInspection.noDailyNotes') }}
           </div>
           <div class="space-y-2">
             <div
               *ngFor="let n of dailyNotes; let i = index"
-              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-1">
               <div class="flex justify-between items-center">
-                <div class="font-semibold text-gray-800">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ n.date | date:'yyyy/MM/dd' }}
                 </div>
                 <button
@@ -299,7 +299,7 @@
                   {{ translate('common.delete') }}
                 </button>
               </div>
-              <div class="text-gray-700 whitespace-pre-line">
+              <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line">
                 {{ n.content }}
               </div>
             </div>
@@ -313,35 +313,35 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarStartDate') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarStartDate') }}</label>
             <input
               class="col-span-2 input-field"
               type="date"
               [(ngModel)]="newSeminar.startDate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarEndDate') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarEndDate') }}</label>
             <input
               class="col-span-2 input-field"
               type="date"
               [(ngModel)]="newSeminar.endDate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarTitle') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarTitle') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newSeminar.title" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.organizer') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.organizer') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newSeminar.organizer" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarDuration') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarDuration') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
@@ -351,34 +351,34 @@
         </div>
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarLocation') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarLocation') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newSeminar.location" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarTrainer') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarTrainer') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newSeminar.trainer" />
           </div>
           <div>
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.seminarSummary') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarSummary') }}</label>
             <textarea
               class="input-field min-h-[120px]"
               [(ngModel)]="newSeminar.summary"></textarea>
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.seminarAttachments') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.seminarAttachments') }}</label>
             <div class="col-span-2 flex items-center gap-2">
               <input
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.png"
                 (change)="onSeminarAttachmentSelected($event)"
                 class="text-xs" />
-              <span class="text-xs text-gray-500 truncate" *ngIf="newSeminar.attachmentName">
+              <span class="text-xs text-gray-500 dark:text-gray-400 truncate" *ngIf="newSeminar.attachmentName">
                 {{ newSeminar.attachmentName }}
               </span>
             </div>
@@ -395,7 +395,7 @@
 
       <div class="mt-4">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-sm font-semibold text-gray-800">{{ translate('trainingInspection.seminarReport') }}</h2>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.seminarReport') }}</h2>
           <button
             (click)="exportSeminarsPdf()"
             class="btn-export-pdf px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
@@ -403,18 +403,18 @@
           </button>
         </div>
         <div #seminarPrint>
-          <div class="text-center font-semibold text-gray-800 mb-3">
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
             {{ translate('trainingInspection.seminarReport') }}
           </div>
-          <div *ngIf="seminarList.length === 0" class="text-xs text-gray-500">
+          <div *ngIf="seminarList.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ translate('trainingInspection.noSeminars') }}
           </div>
           <div class="space-y-2">
             <div
               *ngFor="let s of seminarList; let i = index"
-              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-1">
               <div class="flex justify-between items-center">
-                <div class="font-semibold text-gray-800">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ s.title || 'ندوة بدون عنوان' }}
                   -
                   {{ s.startDate || 'بدون تاريخ' }}
@@ -426,18 +426,18 @@
                   حذف
                 </button>
               </div>
-              <div class="text-gray-700">
+              <div class="text-gray-700 dark:text-gray-300">
                 {{ translate('trainingInspection.organizerLabel') }} {{ s.organizer || translate('trainingInspection.unspecified') }}
                 – {{ translate('trainingInspection.seminarDuration') }} {{ s.duration || translate('trainingInspection.unspecified') }}
               </div>
-              <div class="text-gray-700">
+              <div class="text-gray-700 dark:text-gray-300">
                 {{ translate('trainingInspection.seminarLocation') }} {{ s.location || translate('trainingInspection.unspecified') }}
                 – {{ translate('trainingInspection.seminarTrainer') }} {{ s.trainer || translate('trainingInspection.unspecified') }}
               </div>
-              <div class="text-gray-600 whitespace-pre-line" *ngIf="s.summary">
+              <div class="text-gray-600 dark:text-gray-400 whitespace-pre-line" *ngIf="s.summary">
                 {{ translate('trainingInspection.seminarSummary') }} {{ s.summary }}
               </div>
-              <div class="text-gray-500 text-xs" *ngIf="s.attachmentName">
+              <div class="text-gray-500 dark:text-gray-400 text-xs" *ngIf="s.attachmentName">
                 {{ translate('trainingInspection.seminarAttachments') }} {{ s.attachmentName }}
               </div>
             </div>
@@ -451,14 +451,14 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.visitDateTime') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.visitDateTime') }}</label>
             <input
               class="col-span-2 input-field"
               type="datetime-local"
               [(ngModel)]="newPedagogicalVisit.dateTime" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.visitType') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.visitType') }}</label>
             <select
               class="col-span-2 input-field"
               [(ngModel)]="newPedagogicalVisit.type">
@@ -470,14 +470,14 @@
             </select>
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.visitorName') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.visitorName') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="newPedagogicalVisit.visitorName" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('trainingInspection.classLevel') }}</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.classLevel') }}</label>
             <input
               class="col-span-2 input-field"
               type="text"
@@ -487,13 +487,13 @@
         </div>
         <div class="space-y-3">
           <div>
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.pedagogicalNotes') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.pedagogicalNotes') }}</label>
             <textarea
               class="input-field min-h-[120px]"
               [(ngModel)]="newPedagogicalVisit.notes"></textarea>
           </div>
           <div>
-            <label class="text-sm text-gray-700">{{ translate('trainingInspection.pedagogicalFollowUp') }}</label>
+            <label class="text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.pedagogicalFollowUp') }}</label>
             <textarea
               class="input-field min-h-[100px]"
               [(ngModel)]="newPedagogicalVisit.followUp"></textarea>
@@ -510,7 +510,7 @@
 
       <div class="mt-4">
         <div class="flex items-center justify-between mb-2">
-          <h2 class="text-sm font-semibold text-gray-800">{{ translate('trainingInspection.pedagogicalReport') }}</h2>
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.pedagogicalReport') }}</h2>
           <button
             (click)="exportPedagogicalVisitsPdf()"
             class="btn-export-pdf px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 transition">
@@ -518,18 +518,18 @@
           </button>
         </div>
         <div #pedagogicalVisitPrint>
-          <div class="text-center font-semibold text-gray-800 mb-3">
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
             {{ translate('trainingInspection.pedagogicalReport') }}
           </div>
-          <div *ngIf="pedagogicalVisits.length === 0" class="text-xs text-gray-500">
+          <div *ngIf="pedagogicalVisits.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
             {{ translate('trainingInspection.noPedagogicalVisits') }}
           </div>
           <div class="space-y-2">
             <div
               *ngFor="let v of pedagogicalVisits; let i = index"
-              class="border border-gray-200 rounded-lg p-3 text-sm bg-gray-50 flex flex-col gap-1">
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-1">
               <div class="flex justify-between items-center">
-                <div class="font-semibold text-gray-800">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
                   {{ v.type || 'زيارة' }} -
                   {{ v.dateTime ? (v.dateTime | date:'yyyy/MM/dd HH:mm') : 'بدون تاريخ' }}
                 </div>
@@ -539,14 +539,14 @@
                   {{ translate('common.delete') }}
                 </button>
               </div>
-              <div class="text-gray-700">
+              <div class="text-gray-700 dark:text-gray-300">
                 {{ translate('trainingInspection.visitor') }}: {{ v.visitorName || translate('trainingInspection.unspecified') }}
                 – {{ translate('trainingInspection.classLevel') }} {{ v.classLevel || translate('trainingInspection.unspecified') }}
               </div>
-              <div class="text-gray-700 whitespace-pre-line" *ngIf="v.notes">
+              <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line" *ngIf="v.notes">
                 {{ translate('trainingInspection.pedagogicalNotes') }} {{ v.notes }}
               </div>
-              <div class="text-gray-700 whitespace-pre-line" *ngIf="v.followUp">
+              <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line" *ngIf="v.followUp">
                 {{ translate('trainingInspection.pedagogicalFollowUp') }} {{ v.followUp }}
               </div>
             </div>

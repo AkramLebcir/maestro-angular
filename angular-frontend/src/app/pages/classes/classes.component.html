@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
-  <div class="bg-white rounded-lg shadow-lg p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('classes.title') }}</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('classes.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -14,32 +14,32 @@
       </div>
     </div>
 
-    <h2 class="text-xl font-bold text-gray-700 mb-4">{{ translate('classes.list') }}</h2>
+    <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-4">{{ translate('classes.list') }}</h2>
 
     <div class="overflow-x-auto">
       <table class="w-full border-collapse">
         <thead>
-          <tr class="bg-gray-100 border-b-2 border-gray-300">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.name') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.level') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.studentCount') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.lab') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.weeklySessions') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('classes.actions') }}</th>
+          <tr class="bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.name') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.level') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.studentCount') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.lab') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.weeklySessions') }}</th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.actions') }}</th>
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let classItem of classes" class="border-b border-gray-200 hover:bg-gray-50">
-            <td class="py-3 px-4 text-gray-800">{{ classItem.name }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ getLevelLabel(classItem.level) }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ classItem.studentCount }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ getLabName(classItem.labId) }}</td>
-            <td class="py-3 px-4 text-gray-800">{{ classItem.weeklySessions }}</td>
+          <tr *ngFor="let classItem of classes" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.name }}</td>
+            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ getLevelLabel(classItem.level) }}</td>
+            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.studentCount }}</td>
+            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ getLabName(classItem.labId) }}</td>
+            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.weeklySessions }}</td>
             <td class="py-3 px-4">
               <div class="flex items-center gap-2">
                 <button 
                   (click)="openClassReportModal(classItem)"
-                  class="p-2 text-green-600 hover:bg-green-50 rounded transition"
+                  class="p-2 text-green-600 hover:bg-green-50 dark:bg-green-900/20 rounded transition"
                   [title]="translate('classes.exportReport')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -47,7 +47,7 @@
                 </button>
                 <button 
                   (click)="openGroupModal(classItem)"
-                  class="p-2 text-purple-600 hover:bg-purple-50 rounded transition"
+                  class="p-2 text-purple-600 hover:bg-purple-50 dark:bg-purple-900/20 rounded transition"
                   [title]="translate('classes.manageGroups')">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -55,14 +55,14 @@
                 </button>
                 <button 
                   (click)="openEditModal(classItem)"
-                  class="p-2 text-blue-600 hover:bg-blue-50 rounded transition">
+                  class="p-2 text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded transition">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                   </svg>
                 </button>
                 <button 
                   (click)="deleteClass(classItem.id)"
-                  class="p-2 text-red-600 hover:bg-red-50 rounded transition">
+                  class="p-2 text-red-600 hover:bg-red-50 dark:bg-red-900/20 rounded transition">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                   </svg>
@@ -71,7 +71,7 @@
             </td>
           </tr>
           <tr *ngIf="classes.length === 0">
-            <td colspan="6" class="py-8 text-center text-gray-500">{{ translate('classes.noData') }}</td>
+            <td colspan="6" class="py-8 text-center text-gray-500 dark:text-gray-400">{{ translate('classes.noData') }}</td>
           </tr>
         </tbody>
       </table>
@@ -82,18 +82,18 @@
 <!-- Modal -->
 <div 
   *ngIf="showModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ editingClass ? translate('classes.formTitleEdit') : translate('classes.formTitleAdd') }}
       </h3>
       <button 
         (click)="closeModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -102,46 +102,46 @@
 
     <form #classForm="ngForm" (ngSubmit)="saveClass()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.level') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.level') }}</label>
         <select 
           [(ngModel)]="formData.level"
           name="level"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
           <option value="">{{ translate('classes.selectLevel') }}</option>
           <option *ngFor="let level of classLevels" [value]="level.value">{{ level.label }}</option>
         </select>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.name') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.name') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.name"
           name="name"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('classes.namePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.subject') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.subject') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.subject"
           name="subject"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('classes.subjectPlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.lab') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.lab') }}</label>
         <div class="flex gap-2">
           <select 
             [(ngModel)]="formData.labId"
             name="labId"
-            class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option [ngValue]="undefined">{{ translate('classes.noLabOption') }}</option>
             <option *ngFor="let lab of labs" [ngValue]="lab.id">{{ lab.name }}</option>
           </select>
@@ -155,7 +155,7 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.weeklySessions') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.weeklySessions') }}</label>
         <input 
           type="number"
           [(ngModel)]="formData.weeklySessions"
@@ -163,7 +163,7 @@
           required
           min="0"
           max="20"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('classes.weeklySessionsPlaceholder')">
       </div>
 
@@ -177,7 +177,7 @@
         <button 
           type="button"
           (click)="closeModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('common.cancel') }}
         </button>
       </div>
@@ -188,16 +188,16 @@
 <!-- Lab Creation Modal -->
 <div 
   *ngIf="showLabModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeLabModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">{{ translate('classes.addLabTitle') }}</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ translate('classes.addLabTitle') }}</h3>
       <button 
         (click)="closeLabModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -206,33 +206,33 @@
 
     <form #labForm="ngForm" (ngSubmit)="saveLab()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labNameLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.labNameLabel') }}</label>
         <input 
           type="text"
           [(ngModel)]="labFormData.name"
           name="name"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('classes.labNamePlaceholder')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labDescriptionLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.labDescriptionLabel') }}</label>
         <textarea 
           [(ngModel)]="labFormData.description"
           name="description"
           rows="3"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('classes.labDescriptionPlaceholder')"></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('classes.labLocationLabel') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('classes.labLocationLabel') }}</label>
         <input 
           type="text"
           [(ngModel)]="labFormData.location"
           name="location"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           [placeholder]="translate('classes.labLocationPlaceholder')">
       </div>
 
@@ -242,8 +242,8 @@
           [(ngModel)]="labFormData.isAvailable"
           name="isAvailable"
           id="isAvailable"
-          class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-        <label for="isAvailable" class="text-sm font-medium text-gray-700">{{ translate('classes.labAvailable') }}</label>
+          class="w-4 h-4 text-green-600 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500">
+        <label for="isAvailable" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ translate('classes.labAvailable') }}</label>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -256,7 +256,7 @@
         <button 
           type="button"
           (click)="closeLabModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('common.cancel') }}
         </button>
       </div>
@@ -268,18 +268,18 @@
 <!-- Group Management Modal -->
 <div 
   *ngIf="showGroupModal && currentClassForGroups"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto"
   (click)="closeGroupModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-6xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ translate('classes.manageGroupsTitle') }} - {{ currentClassForGroups.name }}
       </h3>
       <button 
         (click)="closeGroupModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -287,8 +287,8 @@
     </div>
 
     <!-- Automatic Division Buttons -->
-    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-      <h4 class="text-lg font-semibold text-gray-700 mb-3">{{ translate('classes.autoAssignTitle') }}</h4>
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+      <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">{{ translate('classes.autoAssignTitle') }}</h4>
       <div class="flex flex-wrap gap-3">
         <button 
           (click)="divideByFirstName()"
@@ -309,10 +309,10 @@
     </div>
 
     <!-- Manual Assignment Section -->
-    <div class="mb-6 p-4 bg-yellow-50 rounded-lg">
-      <h4 class="text-lg font-semibold text-gray-700 mb-3">{{ translate('classes.manualAssignTitle') }}</h4>
+    <div class="mb-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+      <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">{{ translate('classes.manualAssignTitle') }}</h4>
       <div class="flex gap-3 items-center">
-        <span class="text-sm text-gray-600">{{ translate('classes.selectionCount', { count: selectedStudents.size.toString() }) }}</span>
+        <span class="text-sm text-gray-600 dark:text-gray-400">{{ translate('classes.selectionCount', { count: selectedStudents.size.toString() }) }}</span>
         <button 
           (click)="assignSelectedToGroup(1)"
           [disabled]="selectedStudents.size === 0"
@@ -331,21 +331,21 @@
     <!-- Students List -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <!-- Ungrouped Students -->
-      <div class="border-2 border-gray-200 rounded-lg p-4">
-        <h4 class="text-lg font-semibold text-gray-700 mb-3">
+      <div class="border-2 border-gray-200 dark:border-gray-700 rounded-lg p-4">
+        <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-3">
           {{ translate('classes.unassigned') }} ({{ getUngroupedStudents().length }})
         </h4>
         <div class="space-y-2 max-h-96 overflow-y-auto">
           <div 
             *ngFor="let student of getUngroupedStudents()" 
-            class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer"
+            class="flex items-center gap-2 p-2 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900 rounded cursor-pointer"
             (click)="toggleStudentSelection(student.id)">
             <input 
               type="checkbox"
               [checked]="isStudentSelected(student.id)"
               (click)="$event.stopPropagation()"
               (change)="toggleStudentSelection(student.id)"
-              class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+              class="w-4 h-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
             <span class="flex-1 text-sm">{{ student.lastName }} {{ student.firstName }}</span>
           </div>
           <div *ngIf="getUngroupedStudents().length === 0" class="text-gray-400 text-sm text-center py-4">
@@ -355,7 +355,7 @@
       </div>
 
       <!-- Group 1 -->
-      <div class="border-2 border-green-300 rounded-lg p-4 bg-green-50">
+      <div class="border-2 border-green-300 rounded-lg p-4 bg-green-50 dark:bg-green-900/20">
         <h4 class="text-lg font-semibold text-green-700 mb-3">
           {{ translate('classes.group1') }} ({{ getGroup1Students().length }})
         </h4>
@@ -369,7 +369,7 @@
               [checked]="isStudentSelected(student.id)"
               (click)="$event.stopPropagation()"
               (change)="toggleStudentSelection(student.id)"
-              class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
+              class="w-4 h-4 text-green-600 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500">
             <span class="flex-1 text-sm">{{ student.lastName }} {{ student.firstName }}</span>
             <button 
               (click)="removeFromGroup(student.id); $event.stopPropagation()"
@@ -384,7 +384,7 @@
       </div>
 
       <!-- Group 2 -->
-      <div class="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+      <div class="border-2 border-purple-300 rounded-lg p-4 bg-purple-50 dark:bg-purple-900/20">
         <h4 class="text-lg font-semibold text-purple-700 mb-3">
           {{ translate('classes.group2') }} ({{ getGroup2Students().length }})
         </h4>
@@ -398,7 +398,7 @@
               [checked]="isStudentSelected(student.id)"
               (click)="$event.stopPropagation()"
               (change)="toggleStudentSelection(student.id)"
-              class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
+              class="w-4 h-4 text-purple-600 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500">
             <span class="flex-1 text-sm">{{ student.lastName }} {{ student.firstName }}</span>
             <button 
               (click)="removeFromGroup(student.id); $event.stopPropagation()"
@@ -416,7 +416,7 @@
     <div class="flex justify-end gap-3 mt-6">
       <button 
         (click)="closeGroupModal()"
-        class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition">
+        class="px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition">
         {{ translate('classes.close') }}
       </button>
     </div>
@@ -426,16 +426,16 @@
 <!-- Class Summary Report Modal -->
 <div 
   *ngIf="showClassReportModal && currentClassForReport"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto p-4"
   (click)="closeClassReportModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl w-full max-w-6xl my-8 max-h-[95vh] overflow-y-auto"
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 w-full max-w-6xl my-8 max-h-[95vh] overflow-y-auto"
     (click)="$event.stopPropagation()">
     <!-- Header -->
-    <div class="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-start z-10">
+    <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start z-10">
       <div class="flex-1">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">تقرير ملخص القسم</h2>
-        <p class="text-gray-600" *ngIf="currentClassForReport">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">تقرير ملخص القسم</h2>
+        <p class="text-gray-600 dark:text-gray-400" *ngIf="currentClassForReport">
           <strong>القسم:</strong> {{ currentClassForReport.name }} - {{ currentClassForReport.subject }}
         </p>
       </div>
@@ -457,7 +457,7 @@
         </button>
         <button 
           (click)="closeClassReportModal()"
-          class="text-gray-500 hover:text-gray-700">
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -469,41 +469,41 @@
     <div #classReportContent class="p-6" *ngIf="classReportData">
       <!-- Loading State -->
       <div *ngIf="!classReportData" class="text-center py-8">
-        <p class="text-gray-500">جاري تحميل بيانات التقرير...</p>
+        <p class="text-gray-500 dark:text-gray-400">جاري تحميل بيانات التقرير...</p>
       </div>
 
       <!-- Report Preview -->
       <div class="space-y-6" *ngIf="classReportStudents.length > 0">
         <!-- Students List Sorted by Grades -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">جميع الطلاب مرتبين حسب درجاتهم تنازلياً</h3>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">جميع الطلاب مرتبين حسب درجاتهم تنازلياً</h3>
           <div class="bg-green-600 text-white p-2 mb-4 rounded">
             <span class="font-semibold">عدد الطلاب: {{ classReportStudents.length }}</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full border-collapse text-sm">
               <thead>
-                <tr class="bg-gray-100">
-                  <th class="border border-gray-300 px-3 py-2 text-right">#</th>
-                  <th class="border border-gray-300 px-3 py-2 text-right">الاسم</th>
-                  <th class="border border-gray-300 px-3 py-2 text-right">اللقب</th>
-                  <th class="border border-gray-300 px-3 py-2 text-right">المتوسط</th>
-                  <th class="border border-gray-300 px-3 py-2 text-right">المجموعة</th>
+                <tr class="bg-gray-100 dark:bg-gray-800">
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">#</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الاسم</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">اللقب</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المتوسط</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المجموعة</th>
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let student of classReportStudents; let i = index" class="hover:bg-gray-50">
-                  <td class="border border-gray-300 px-3 py-2">{{ i + 1 }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ student.firstName }}</td>
-                  <td class="border border-gray-300 px-3 py-2">{{ student.lastName }}</td>
-                  <td class="border border-gray-300 px-3 py-2 font-semibold">
+                <tr *ngFor="let student of classReportStudents; let i = index" class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+                  <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ i + 1 }}</td>
+                  <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ student.firstName }}</td>
+                  <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ student.lastName }}</td>
+                  <td class="border border-gray-300 dark:border-gray-600 px-3 py-2 font-semibold">
                     <span [class.text-green-600]="(student.average || 0) >= 8" 
                           [class.text-yellow-600]="(student.average || 0) >= 5 && (student.average || 0) < 8"
                           [class.text-red-600]="(student.average || 0) < 5">
                       {{ (student.average || 0).toFixed(2) }}
                     </span>
                   </td>
-                  <td class="border border-gray-300 px-3 py-2">
+                  <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">
                     <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">المجموعة 1</span>
                     <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">المجموعة 2</span>
                     <span *ngIf="!student.group" class="text-gray-400">-</span>
@@ -515,13 +515,13 @@
         </div>
 
         <!-- Attendance Section -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6" *ngIf="classReportAttendance.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">التوزيع العام للحضور</h3>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportAttendance.length > 0">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">التوزيع العام للحضور</h3>
           
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Donut Chart -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-gray-700 mb-2">التوزيع العام</h4>
+            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع العام</h4>
               <div class="h-64">
                 <canvas baseChart
                   [type]="'doughnut'"
@@ -532,8 +532,8 @@
             </div>
             
             <!-- Weekly Distribution -->
-            <div class="bg-gray-50 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-gray-700 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
+            <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
               <div class="h-64">
                 <canvas baseChart
                   [type]="'bar'"
@@ -546,7 +546,7 @@
           
           <!-- Top 5 Students by Attendance Type -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div class="bg-green-50 p-4 rounded-lg">
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-green-700 mb-2">أفضل 5 - حاضر</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.present; let i = index" class="text-xs">
@@ -556,7 +556,7 @@
               </div>
             </div>
             
-            <div class="bg-red-50 p-4 rounded-lg">
+            <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-red-700 mb-2">أفضل 5 - غائب</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.absent; let i = index" class="text-xs">
@@ -566,7 +566,7 @@
               </div>
             </div>
             
-            <div class="bg-orange-50 p-4 rounded-lg">
+            <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-orange-700 mb-2">أفضل 5 - متأخر</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.late; let i = index" class="text-xs">
@@ -576,7 +576,7 @@
               </div>
             </div>
             
-            <div class="bg-blue-50 p-4 rounded-lg">
+            <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-blue-700 mb-2">أفضل 5 - معذور</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.excused; let i = index" class="text-xs">
@@ -586,7 +586,7 @@
               </div>
             </div>
             
-            <div class="bg-yellow-50 p-4 rounded-lg">
+            <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-yellow-700 mb-2">أفضل 5 - مغادر مبكراً</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.leftEarly; let i = index" class="text-xs">
@@ -599,24 +599,24 @@
         </div>
 
         <!-- Behavior Section -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6" *ngIf="classReportBehaviorEvents.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">السلوك العام</h3>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportBehaviorEvents.length > 0">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">السلوك العام</h3>
           
           <!-- Overall Counts -->
           <div class="grid grid-cols-2 gap-4 mb-6">
-            <div class="bg-green-50 p-4 rounded-lg text-center">
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
               <div class="text-2xl font-bold text-green-600">{{ getTotalPositiveBehavior() }}</div>
-              <div class="text-sm text-gray-600">إيجابي</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">إيجابي</div>
             </div>
-            <div class="bg-red-50 p-4 rounded-lg text-center">
+            <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-center">
               <div class="text-2xl font-bold text-red-600">{{ getTotalNegativeBehavior() }}</div>
-              <div class="text-sm text-gray-600">سلبي</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">سلبي</div>
             </div>
           </div>
           
           <!-- Weekly Distribution -->
-          <div class="bg-gray-50 p-4 rounded-lg mb-6">
-            <h4 class="text-sm font-semibold text-gray-700 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
+          <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'line'"
@@ -628,7 +628,7 @@
           
           <!-- Top 5 Students -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-green-50 p-4 rounded-lg">
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-green-700 mb-2">أفضل 5 - إيجابي</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topBehaviorStudents.positive; let i = index" class="text-xs">
@@ -638,7 +638,7 @@
               </div>
             </div>
             
-            <div class="bg-red-50 p-4 rounded-lg">
+            <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
               <h4 class="text-sm font-semibold text-red-700 mb-2">أفضل 5 - سلبي</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topBehaviorStudents.negative; let i = index" class="text-xs">
@@ -651,32 +651,32 @@
         </div>
 
         <!-- Grades Section -->
-        <div class="bg-white border border-gray-200 rounded-lg p-6" *ngIf="classReportGrades.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 mb-4">الدرجات</h3>
+        <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportGrades.length > 0">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">الدرجات</h3>
           
           <!-- Assessment Statistics -->
           <div class="mb-6">
-            <h4 class="text-lg font-semibold text-gray-700 mb-4">نظرة سريعة لكل بند قابل للتقييم</h4>
+            <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">نظرة سريعة لكل بند قابل للتقييم</h4>
             <div class="overflow-x-auto">
               <table class="w-full border-collapse text-sm">
                 <thead>
-                  <tr class="bg-gray-100">
-                    <th class="border border-gray-300 px-3 py-2 text-right">البند</th>
-                    <th class="border border-gray-300 px-3 py-2 text-right">الحد الأقصى</th>
-                    <th class="border border-gray-300 px-3 py-2 text-right">الحد الأدنى</th>
-                    <th class="border border-gray-300 px-3 py-2 text-right">المتوسط</th>
-                    <th class="border border-gray-300 px-3 py-2 text-right">الوسيط</th>
-                    <th class="border border-gray-300 px-3 py-2 text-right">الأهمية (%)</th>
+                  <tr class="bg-gray-100 dark:bg-gray-800">
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">البند</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الحد الأقصى</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الحد الأدنى</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المتوسط</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الوسيط</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الأهمية (%)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr *ngFor="let assessment of classReportAssessments" class="hover:bg-gray-50">
-                    <td class="border border-gray-300 px-3 py-2">{{ assessment.name }}</td>
-                    <td class="border border-gray-300 px-3 py-2 font-semibold text-green-600">{{ assessment.max.toFixed(2) }}</td>
-                    <td class="border border-gray-300 px-3 py-2 font-semibold text-red-600">{{ assessment.min.toFixed(2) }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ assessment.average.toFixed(2) }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ assessment.median.toFixed(2) }}</td>
-                    <td class="border border-gray-300 px-3 py-2">{{ (assessment.weightPercent || 0).toFixed(2) }}%</td>
+                  <tr *ngFor="let assessment of classReportAssessments" class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ assessment.name }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2 font-semibold text-green-600">{{ assessment.max.toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2 font-semibold text-red-600">{{ assessment.min.toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ assessment.average.toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ assessment.median.toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">{{ (assessment.weightPercent || 0).toFixed(2) }}%</td>
                   </tr>
                 </tbody>
               </table>
@@ -685,7 +685,7 @@
           
           <!-- Students at Risk and Top Performers -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="bg-red-50 p-4 rounded-lg">
+            <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
               <h4 class="text-lg font-semibold text-red-700 mb-3">الطلاب المعرضون للخطر (متوسط أقل من 5)</h4>
               <div class="space-y-2">
                 <div *ngFor="let student of studentsAtRisk; let i = index" class="text-sm">
@@ -696,7 +696,7 @@
               </div>
             </div>
             
-            <div class="bg-green-50 p-4 rounded-lg">
+            <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
               <h4 class="text-lg font-semibold text-green-700 mb-3">الطلاب المتفوقون (متوسط 8 أو أكثر)</h4>
               <div class="space-y-2">
                 <div *ngFor="let student of topPerformingStudents; let i = index" class="text-sm">
@@ -712,7 +712,7 @@
     </div>
 
     <!-- Loading Message -->
-    <div class="p-6 text-center text-gray-500" *ngIf="!classReportData">
+    <div class="p-6 text-center text-gray-500 dark:text-gray-400" *ngIf="!classReportData">
       <p>جاري تحميل بيانات التقرير...</p>
     </div>
   </div>

@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
-  <div class="bg-white rounded-lg shadow-lg p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-4">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('labs.title') }}</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('labs.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="openAddModal()"
@@ -15,7 +15,7 @@
     </div>
 
     <!-- Tabs -->
-    <div class="mb-4 border-b border-gray-200 flex gap-4 flex-wrap">
+    <div class="mb-4 border-b border-gray-200 dark:border-gray-700 flex gap-4 flex-wrap">
       <button
         class="pb-2 text-sm font-semibold"
         [class.text-green-700]="activeTab === 'labs'"
@@ -84,23 +84,23 @@
 
     <!-- Labs tab -->
     <div *ngIf="activeTab === 'labs'">
-      <h2 class="text-xl font-bold text-gray-700 mb-4">{{ translate('labs.labsList') }}</h2>
+      <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-4">{{ translate('labs.labsList') }}</h2>
       <div class="overflow-x-auto">
         <table class="w-full border-collapse">
           <thead>
-            <tr class="bg-gray-100 border-b-2 border-gray-300">
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.labName') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.description') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.location') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.status') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700">{{ translate('labs.actions') }}</th>
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('labs.labName') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('labs.description') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('labs.location') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('labs.status') }}</th>
+              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('labs.actions') }}</th>
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let lab of labs" class="border-b border-gray-200 hover:bg-gray-50">
-              <td class="py-3 px-4 text-gray-800">{{ lab.name }}</td>
-              <td class="py-3 px-4 text-gray-800">{{ lab.description || '-' }}</td>
-              <td class="py-3 px-4 text-gray-800">{{ lab.location || '-' }}</td>
+            <tr *ngFor="let lab of labs" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ lab.name }}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ lab.description || '-' }}</td>
+              <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ lab.location || '-' }}</td>
               <td class="py-3 px-4">
                 <span 
                   [class]="lab.isAvailable 
@@ -113,14 +113,14 @@
                 <div class="flex items-center gap-2">
                   <button 
                     (click)="openEditModal(lab)"
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded transition">
+                    class="p-2 text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
                   <button 
                     (click)="deleteLab(lab.id)"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded transition">
+                    class="p-2 text-red-600 hover:bg-red-50 dark:bg-red-900/20 rounded transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
@@ -129,7 +129,7 @@
               </td>
             </tr>
             <tr *ngIf="labs.length === 0">
-              <td colspan="5" class="py-8 text-center text-gray-500">{{ translate('labs.noLabs') }}</td>
+              <td colspan="5" class="py-8 text-center text-gray-500 dark:text-gray-400">{{ translate('labs.noLabs') }}</td>
             </tr>
           </tbody>
         </table>
@@ -139,7 +139,7 @@
     <!-- Device logs tab -->
     <div *ngIf="activeTab === 'deviceLogs'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.deviceExitEntryLog') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.deviceExitEntryLog') }}</h2>
         <button
           (click)="exportDeviceLogsToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -149,7 +149,7 @@
 
       <form (ngSubmit)="saveDeviceLog()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.teacherFullName') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.teacherFullName') }}</label>
           <input 
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.teacherName"
@@ -158,7 +158,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.equipmentTypeFromLab') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.equipmentTypeFromLab') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.equipmentType"
@@ -172,7 +172,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.inventoryNumber') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.inventoryNumber') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.inventoryNumber"
@@ -186,7 +186,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.movementDate') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.movementDate') }}</label>
           <input 
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -196,7 +196,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.operationType') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.operationType') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogOperation"
@@ -208,7 +208,7 @@
           </select>
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.equipmentStatus') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.equipmentStatus') }}</label>
           <select
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceStatus"
@@ -220,7 +220,7 @@
           </select>
         </div>
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notes') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.notes') }}</label>
           <input 
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="deviceLogForm.notes"
@@ -237,7 +237,7 @@
       <div id="device-logs-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">#</th>
               <th class="p-2">{{ translate('labs.exitDate') }}</th>
               <th class="p-2">{{ translate('labs.teacher') }}</th>
@@ -262,7 +262,7 @@
               <td class="p-2">{{ log.notes || '-' }}</td>
             </tr>
             <tr *ngIf="deviceLogs.length === 0">
-              <td colspan="9" class="py-6 text-center text-gray-500">{{ translate('labs.noDeviceLogs') }}</td>
+              <td colspan="9" class="py-6 text-center text-gray-500 dark:text-gray-400">{{ translate('labs.noDeviceLogs') }}</td>
             </tr>
           </tbody>
         </table>
@@ -272,7 +272,7 @@
     <!-- Lab equipment tab -->
     <div *ngIf="activeTab === 'equipment'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabEquipment') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.computerLabEquipment') }}</h2>
         <button
           (click)="exportEquipmentToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -282,7 +282,7 @@
 
       <form (ngSubmit)="saveEquipment()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceName') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.deviceName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="equipmentForm.itemName"
@@ -291,7 +291,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.model') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.model') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="equipmentForm.model"
@@ -299,7 +299,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.totalCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.totalCount') }}</label>
           <input
             type="number"
             min="0"
@@ -310,7 +310,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.workingCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.workingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -320,7 +320,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notWorkingCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.notWorkingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -339,7 +339,7 @@
       <div id="equipment-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">#</th>
               <th class="p-2">{{ translate('labs.deviceName') }}</th>
               <th class="p-2">{{ translate('labs.model') }}</th>
@@ -358,7 +358,7 @@
               <td class="p-2 text-center text-red-700 font-semibold">{{ eq.notWorkingCount }}</td>
             </tr>
             <tr *ngIf="equipmentItems.length === 0">
-              <td colspan="6" class="py-6 text-center text-gray-500">
+              <td colspan="6" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noEquipmentData') }}
               </td>
             </tr>
@@ -370,7 +370,7 @@
     <!-- Lab software tab -->
     <div *ngIf="activeTab === 'software'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.labComputerSoftware') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.labComputerSoftware') }}</h2>
         <button
           (click)="exportSoftwareToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -380,7 +380,7 @@
 
       <form (ngSubmit)="saveSoftware()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.programName') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.programName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="softwareForm.programName"
@@ -389,7 +389,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.versionInstalled') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.versionInstalled') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="softwareForm.version"
@@ -406,7 +406,7 @@
       <div id="software-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">#</th>
               <th class="p-2">{{ translate('labs.program') }}</th>
               <th class="p-2">{{ translate('labs.installedVersion') }}</th>
@@ -419,7 +419,7 @@
               <td class="p-2">{{ sw.version || '-' }}</td>
             </tr>
             <tr *ngIf="softwareItems.length === 0">
-              <td colspan="3" class="py-6 text-center text-gray-500">
+              <td colspan="3" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noSoftwareData') }}
               </td>
             </tr>
@@ -431,7 +431,7 @@
     <!-- Lab furniture tab -->
     <div *ngIf="activeTab === 'furniture'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabFurniture') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.computerLabFurniture') }}</h2>
         <button
           (click)="exportFurnitureToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -441,7 +441,7 @@
 
       <form (ngSubmit)="saveFurniture()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.furnitureName') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.furnitureName') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="furnitureForm.itemName"
@@ -450,7 +450,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.modelDescription') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.modelDescription') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="furnitureForm.model"
@@ -458,7 +458,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.totalCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.totalCount') }}</label>
           <input
             type="number"
             min="0"
@@ -469,7 +469,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.workingCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.workingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -479,7 +479,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notWorkingCount') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.notWorkingCount') }}</label>
           <input
             type="number"
             min="0"
@@ -498,7 +498,7 @@
       <div id="furniture-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">#</th>
               <th class="p-2">{{ translate('labs.furnitureName') }}</th>
               <th class="p-2">{{ translate('labs.model') }}</th>
@@ -517,7 +517,7 @@
               <td class="p-2 text-center text-red-700 font-semibold">{{ f.notWorkingCount }}</td>
             </tr>
             <tr *ngIf="furnitureItems.length === 0">
-              <td colspan="6" class="py-6 text-center text-gray-500">
+              <td colspan="6" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noFurnitureData') }}
               </td>
             </tr>
@@ -529,7 +529,7 @@
     <!-- Lab inventory tab -->
     <div *ngIf="activeTab === 'inventory'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.labEquipmentFurnitureInventory') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.labEquipmentFurnitureInventory') }}</h2>
         <button
           (click)="exportInventoryToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -539,7 +539,7 @@
 
       <form (ngSubmit)="saveInventory()" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.category') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.category') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.category"
@@ -548,7 +548,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceDescription') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.deviceDescription') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.label"
@@ -557,7 +557,7 @@
           />
         </div>
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.inventoryNumber') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.inventoryNumber') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="inventoryForm.inventoryNumber"
@@ -575,7 +575,7 @@
       <div id="inventory-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">#</th>
               <th class="p-2">{{ translate('labs.category') }}</th>
               <th class="p-2">{{ translate('labs.device') }}</th>
@@ -590,7 +590,7 @@
               <td class="p-2 text-center font-semibold">{{ inv.inventoryNumber }}</td>
             </tr>
             <tr *ngIf="inventoryItems.length === 0">
-              <td colspan="4" class="py-6 text-center text-gray-500">
+              <td colspan="4" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noInventoryNumbers') }}
               </td>
             </tr>
@@ -602,7 +602,7 @@
     <!-- Hardware / software checklist tab -->
     <div *ngIf="activeTab === 'checklist'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.hardwareSoftwareChecklist') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.hardwareSoftwareChecklist') }}</h2>
         <button
           (click)="exportChecklistToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -612,7 +612,7 @@
 
       <form (ngSubmit)="saveChecklist()" class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.deviceNumberRange') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.deviceNumberRange') }}</label>
           <input
             type="number"
             min="1"
@@ -670,7 +670,7 @@
         </div>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.checkDate') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.checkDate') }}</label>
           <input
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -681,7 +681,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.notes') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.notes') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="checklistForm.notes"
@@ -699,7 +699,7 @@
       <div id="checklist-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">{{ translate('labs.deviceNumber') }}</th>
               <th class="p-2">{{ translate('labs.systemUnit') }}</th>
               <th class="p-2">{{ translate('labs.monitor') }}</th>
@@ -734,7 +734,7 @@
               <td class="p-2">{{ c.notes || '-' }}</td>
             </tr>
             <tr *ngIf="checklistItems.length === 0">
-              <td colspan="14" class="py-6 text-center text-gray-500">
+              <td colspan="14" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noCheckRecords') }}
               </td>
             </tr>
@@ -746,7 +746,7 @@
     <!-- Lab cleaning tab -->
     <div *ngIf="activeTab === 'cleaning'">
       <div class="flex items-center justify-between mb-4">
-        <h2 class="text-xl font-bold text-gray-700">{{ translate('labs.computerLabCleaning') }}</h2>
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('labs.computerLabCleaning') }}</h2>
         <button
           (click)="exportCleaningToPDF()"
           class="btn-export-pdf bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition">
@@ -755,7 +755,7 @@
       </div>
 
       <form (ngSubmit)="saveCleaning()" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <label class="block text-xs text-gray-600 mb-1 md:col-span-3">{{ translate('labs.cleaningStatuses') }}</label>
+        <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1 md:col-span-3">{{ translate('labs.cleaningStatuses') }}</label>
         <select
           class="border p-2 rounded text-sm"
           [(ngModel)]="cleaningForm.deviceCleanliness"
@@ -793,7 +793,7 @@
         </select>
 
         <div>
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.checkDate') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.checkDate') }}</label>
           <input
             type="date"
             class="border p-2 rounded text-sm w-full"
@@ -804,7 +804,7 @@
         </div>
 
         <div class="md:col-span-2">
-          <label class="block text-xs text-gray-600 mb-1">{{ translate('labs.generalNotes') }}</label>
+          <label class="block text-xs text-gray-600 dark:text-gray-400 mb-1">{{ translate('labs.generalNotes') }}</label>
           <input
             class="border p-2 rounded text-sm w-full"
             [(ngModel)]="cleaningForm.notes"
@@ -822,7 +822,7 @@
       <div id="cleaning-table" class="overflow-x-auto">
         <table class="w-full border-collapse text-xs md:text-sm">
           <thead>
-            <tr class="bg-gray-100 border-b text-center md:text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 border-b text-center md:text-center">
               <th class="p-2">{{ translate('labs.checkDate') }}</th>
               <th class="p-2">{{ translate('labs.deviceCleanliness') }}</th>
               <th class="p-2">{{ translate('labs.desktopCleanliness') }}</th>
@@ -851,7 +851,7 @@
               </td>
             </tr>
             <tr *ngIf="cleaningEntries.length === 0">
-              <td colspan="6" class="py-6 text-center text-gray-500">
+              <td colspan="6" class="py-6 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('labs.noCleaningRecords') }}
               </td>
             </tr>
@@ -865,18 +865,18 @@
 <!-- Modal -->
 <div 
   *ngIf="showModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ editingLab ? translate('labs.editLab') : translate('labs.addNewLab') }}
       </h3>
       <button 
         (click)="closeModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -885,33 +885,33 @@
 
     <form #labForm="ngForm" (ngSubmit)="saveLab()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.labName') }} *</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('labs.labName') }} *</label>
         <input 
           type="text"
           [(ngModel)]="formData.name"
           name="name"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           [placeholder]="translate('labs.enterLabName')">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.description') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('labs.description') }}</label>
         <textarea 
           [(ngModel)]="formData.description"
           name="description"
           rows="3"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           [placeholder]="translate('labs.enterLabDescription')"></textarea>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('labs.location') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('labs.location') }}</label>
         <input 
           type="text"
           [(ngModel)]="formData.location"
           name="location"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           [placeholder]="translate('labs.enterLabLocation')">
       </div>
 
@@ -921,8 +921,8 @@
           [(ngModel)]="formData.isAvailable"
           name="isAvailable"
           id="isAvailable"
-          class="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500">
-        <label for="isAvailable" class="text-sm font-medium text-gray-700">{{ translate('labs.labAvailable') }}</label>
+          class="w-4 h-4 text-green-600 border-gray-300 dark:border-gray-600 rounded focus:ring-green-500">
+        <label for="isAvailable" class="text-sm font-medium text-gray-700 dark:text-gray-300">{{ translate('labs.labAvailable') }}</label>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -935,7 +935,7 @@
         <button 
           type="button"
           (click)="closeModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('labs.cancel') }}
         </button>
       </div>

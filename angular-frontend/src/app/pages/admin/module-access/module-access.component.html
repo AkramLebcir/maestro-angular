@@ -14,7 +14,7 @@
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
     <!-- Users List -->
     <div>
-      <h3 class="text-lg font-semibold text-gray-700 mb-4">
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">
         {{ translate('moduleAccess.selectTeacher') }}
       </h3>
       <div *ngIf="isLoading" class="text-center py-8">
@@ -26,18 +26,18 @@
           (click)="selectUser(user)"
           [class]="selectedUser?.id === user.id 
             ? 'p-4 border-2 border-blue-500 bg-blue-50 rounded-lg cursor-pointer' 
-            : 'p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 hover:bg-gray-50'"
+            : 'p-4 border border-gray-200 rounded-lg cursor-pointer hover:border-blue-300 hover:bg-gray-50 dark:bg-gray-900'"
         >
-          <div class="font-medium text-gray-900">
+          <div class="font-medium text-gray-900 dark:text-gray-100">
             {{ (user.firstName || '') + ' ' + (user.lastName || '') || user.email }}
           </div>
-          <div class="text-sm text-gray-500">{{ user.email }}</div>
+          <div class="text-sm text-gray-500 dark:text-gray-400">{{ user.email }}</div>
           <div class="text-xs text-gray-400 mt-1">
             {{ (user.allowedModules?.length || 0) }}
             {{ translate('moduleAccess.enabledModulesCount') }}
           </div>
         </div>
-        <div *ngIf="users.length === 0" class="text-center py-8 text-gray-500">
+        <div *ngIf="users.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
           {{ translate('moduleAccess.noTeachers') }}
         </div>
       </div>
@@ -46,7 +46,7 @@
     <!-- Modules List -->
     <div *ngIf="selectedUser">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-700">
+        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">
           {{ translate('moduleAccess.permissionsFor') }}:
           {{ (selectedUser.firstName || '') + ' ' + (selectedUser.lastName || '') || selectedUser.email }}
         </h3>
@@ -59,7 +59,7 @@
           </button>
           <button
             (click)="deselectAllModules()"
-            class="text-sm text-gray-600 hover:text-gray-800"
+            class="text-sm text-gray-600 dark:text-gray-400 hover:text-gray-800"
           >
             {{ translate('moduleAccess.disableAll') }}
           </button>
@@ -79,13 +79,13 @@
                   [checked]="isModuleEnabled(module.key)"
                   (change)="toggleModule(module.key)"
                   [disabled]="isLoading"
-                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
                 />
-                <label class="font-medium text-gray-900 cursor-pointer">
+                <label class="font-medium text-gray-900 dark:text-gray-100 cursor-pointer">
                   {{ translate('moduleAccess.module.' + module.key + '.name') }}
                 </label>
               </div>
-              <p class="text-sm text-gray-500 mt-1 mr-6">
+              <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 mr-6">
                 {{ translate('moduleAccess.module.' + module.key + '.description') }}
               </p>
             </div>
@@ -96,7 +96,7 @@
 
     <!-- No Selection Message -->
     <div *ngIf="!selectedUser" class="lg:col-span-1">
-      <div class="text-center py-12 text-gray-500">
+      <div class="text-center py-12 text-gray-500 dark:text-gray-400">
         <p>{{ translate('moduleAccess.selectTeacherHint') }}</p>
       </div>
     </div>

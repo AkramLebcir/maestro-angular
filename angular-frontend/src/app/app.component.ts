@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { LanguageService, LanguageCode } from './services/language.service';
 import { AuthService } from './services/auth.service';
+import { ThemeService } from './services/theme.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -21,8 +22,11 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(
     private languageService: LanguageService,
     private router: Router,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    private themeService: ThemeService
+  ) {
+    // Initialize theme service - it will apply theme on construction
+  }
 
   ngOnInit(): void {
     // تهيئة اللغة عند بدء التطبيق - العربية هي اللغة الافتراضية

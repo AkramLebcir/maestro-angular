@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
-  <div class="bg-white rounded-lg shadow-lg p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('timetable.title') }}</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('timetable.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="exportToPDF()"
@@ -28,27 +28,27 @@
         (click)="setViewMode('weekly')"
         [class]="viewMode === 'weekly' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
-          : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
+          : 'px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300'">
         {{ translate('timetable.weekly') }}
       </button>
       <button 
         (click)="setViewMode('daily')"
         [class]="viewMode === 'daily' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
-          : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
+          : 'px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300'">
         {{ translate('timetable.daily') }}
       </button>
       <button 
         (click)="setViewMode('monthly')"
         [class]="viewMode === 'monthly' 
           ? 'px-4 py-2 bg-blue-600 text-white rounded-lg' 
-          : 'px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300'">
+          : 'px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300'">
         {{ translate('timetable.monthly') }}
       </button>
     </div>
 
     <!-- Conflict Alerts -->
-    <div *ngIf="conflicts.length > 0" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+    <div *ngIf="conflicts.length > 0" class="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg">
       <h3 class="text-lg font-semibold text-red-800 mb-2">⚠️ {{ translate('timetable.conflictAlerts') }}</h3>
       <div class="space-y-2">
         <div *ngFor="let conflict of conflicts" class="text-sm text-red-700">
@@ -63,15 +63,15 @@
       <div class="mb-4 flex justify-between items-center">
         <button 
           (click)="navigateWeek('prev')"
-          class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+          class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
           ← {{ translate('timetable.previousWeek') }}
         </button>
-        <h2 class="text-xl font-bold text-gray-800">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
           {{ translate('timetable.week') }}: {{ formatDate(getWeekStart(currentDate)) }}
         </h2>
         <button 
           (click)="navigateWeek('next')"
-          class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+          class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
           {{ translate('timetable.nextWeek') }} →
         </button>
         <button 
@@ -84,20 +84,20 @@
       <table class="w-full border-collapse">
         <thead>
           <tr>
-            <th class="border border-gray-300 p-2 bg-gray-100 font-semibold text-gray-700">{{ translate('timetable.time') }}</th>
-            <th *ngFor="let day of workingDays" class="border border-gray-300 p-2 bg-gray-100 font-semibold text-gray-700">
+            <th class="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-800 font-semibold text-gray-700 dark:text-gray-300">{{ translate('timetable.time') }}</th>
+            <th *ngFor="let day of workingDays" class="border border-gray-300 dark:border-gray-600 p-2 bg-gray-100 dark:bg-gray-800 font-semibold text-gray-700 dark:text-gray-300">
               {{ day.label }}
             </th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let timeSlot of timeSlots; let i = index">
-            <td class="border border-gray-300 p-2 text-center text-sm font-medium text-gray-700">
+            <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-sm font-medium text-gray-700 dark:text-gray-300">
               {{ timeSlotLabels[i] }}
             </td>
             <td *ngFor="let day of workingDays" 
-                class="border border-gray-300 p-1 min-w-[150px] h-16 align-top"
-                [class.bg-green-50]="dragOverDay === day.value && dragOverTime === timeSlot"
+                class="border border-gray-300 dark:border-gray-600 p-1 min-w-[150px] h-16 align-top"
+                [class.bg-green-50 dark:bg-green-900/20]="dragOverDay === day.value && dragOverTime === timeSlot"
                 (dragover)="onDragOver(day.value, timeSlot, $event)"
                 (dragleave)="onDragLeave()"
                 (drop)="onDrop(day.value, timeSlot, $event)">
@@ -133,10 +133,10 @@
       <div class="mb-4 flex justify-between items-center">
         <button 
           (click)="navigateDay('prev')"
-          class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+          class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
           ← {{ translate('timetable.previousDay') }}
         </button>
-        <h2 class="text-xl font-bold text-gray-800">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
           {{ formatDate(selectedDate) }}
         </h2>
         <div class="flex gap-2">
@@ -147,7 +147,7 @@
           </button>
           <button 
             (click)="navigateDay('next')"
-            class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+            class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
             {{ translate('timetable.nextDay') }} →
           </button>
         </div>
@@ -155,7 +155,7 @@
 
       <div class="space-y-2">
         <div *ngFor="let entry of getEntriesForDate(selectedDate)" 
-             class="bg-blue-50 border border-blue-200 rounded-lg p-4 hover:bg-blue-100 cursor-pointer"
+             class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 hover:bg-blue-100 cursor-pointer"
              (click)="openEditModal(entry)">
           <div class="flex justify-between items-start">
             <div class="flex-1">
@@ -168,7 +168,7 @@
                 <span *ngIf="entry.labId">{{ translate('timetable.labLabel') }}: {{ getLabName(entry.labId) }}</span>
                 <span *ngIf="entry.classroom">{{ translate('timetable.roomLabel') }}: {{ entry.classroom }}</span>
               </div>
-              <p *ngIf="entry.notes" class="text-gray-600 text-sm mt-2">{{ entry.notes }}</p>
+              <p *ngIf="entry.notes" class="text-gray-600 dark:text-gray-400 text-sm mt-2">{{ entry.notes }}</p>
             </div>
             <button 
               (click)="deleteEntry(entry.id); $event.stopPropagation()"
@@ -190,10 +190,10 @@
       <div class="mb-4 flex justify-between items-center">
         <button 
           (click)="navigateMonth('prev')"
-          class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+          class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
           ← {{ translate('timetable.previousMonth') }}
         </button>
-        <h2 class="text-xl font-bold text-gray-800">
+        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-200">
           {{ formatMonthYear(currentDate) }}
         </h2>
         <div class="flex gap-2">
@@ -204,7 +204,7 @@
           </button>
           <button 
             (click)="navigateMonth('next')"
-            class="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+            class="px-3 py-1 bg-gray-200 text-gray-700 dark:text-gray-300 rounded hover:bg-gray-300">
             {{ translate('timetable.nextMonth') }} →
           </button>
         </div>
@@ -212,19 +212,19 @@
 
       <div class="grid grid-cols-7 gap-1">
         <!-- Day headers -->
-        <div *ngFor="let day of workingDays" class="p-2 text-center font-semibold text-gray-700 bg-gray-100">
+        <div *ngFor="let day of workingDays" class="p-2 text-center font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">
           {{ day.short }}
         </div>
-        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">{{ translate('timetable.fridayShort') }}</div>
-        <div class="p-2 text-center font-semibold text-gray-700 bg-gray-100">{{ translate('timetable.saturdayShort') }}</div>
+        <div class="p-2 text-center font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">{{ translate('timetable.fridayShort') }}</div>
+        <div class="p-2 text-center font-semibold text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-800">{{ translate('timetable.saturdayShort') }}</div>
 
         <!-- Calendar days -->
         <div *ngFor="let date of getMonthDays()" 
              [class]="date.getMonth() !== currentDate.getMonth() 
-               ? 'border border-gray-200 p-2 min-h-[100px] bg-gray-50 text-gray-400' 
+               ? 'border border-gray-200 dark:border-gray-700 p-2 min-h-[100px] bg-gray-50 dark:bg-gray-900 text-gray-400' 
                : isToday(date)
-               ? 'border border-blue-300 p-2 min-h-[100px] bg-blue-50' 
-               : 'border border-gray-200 p-2 min-h-[100px] bg-white'">
+               ? 'border border-blue-300 p-2 min-h-[100px] bg-blue-50 dark:bg-blue-900/20' 
+               : 'border border-gray-200 dark:border-gray-700 p-2 min-h-[100px] bg-white dark:bg-gray-800'">
           <div class="font-semibold mb-1">{{ date.getDate() }}</div>
           <div class="space-y-1">
             <div *ngFor="let entry of getEntriesForDate(date)" 
@@ -244,18 +244,18 @@
 <!-- Timetable Entry Modal -->
 <div 
   *ngIf="showModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto"
   (click)="closeModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-2xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ editingEntry ? translate('timetable.editLesson') : translate('timetable.addNewLesson') }}
       </h3>
       <button 
         (click)="closeModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -266,60 +266,60 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <!-- Day of Week -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.dayOfWeek') }} *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.dayOfWeek') }} *</label>
           <select 
             [(ngModel)]="formData.dayOfWeek"
             name="dayOfWeek"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option *ngFor="let day of workingDays" [value]="day.value">{{ day.label }}</option>
           </select>
         </div>
 
         <!-- Subject -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.subject') }} *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.subject') }} *</label>
           <input 
             type="text"
             [(ngModel)]="formData.subject"
             name="subject"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             [placeholder]="translate('timetable.enterSubject')">
         </div>
 
         <!-- Start Time -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.startTime') }} *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.startTime') }} *</label>
           <input 
             type="time"
             [(ngModel)]="formData.startTime"
             name="startTime"
             step="1800"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <!-- End Time -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.endTime') }} *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.endTime') }} *</label>
           <input 
             type="time"
             [(ngModel)]="formData.endTime"
             name="endTime"
             step="1800"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
         </div>
 
         <!-- Class -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.class') }} *</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.class') }} *</label>
           <select 
             [(ngModel)]="formData.classId"
             name="classId"
             required
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option [ngValue]="0">{{ translate('timetable.selectClass') }}</option>
             <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
           </select>
@@ -327,11 +327,11 @@
 
         <!-- Lab -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.lab') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.lab') }}</label>
           <select 
             [(ngModel)]="formData.labId"
             name="labId"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
             <option [ngValue]="undefined">{{ translate('timetable.none') }}</option>
             <option *ngFor="let lab of labs" [ngValue]="lab.id">{{ lab.name }}</option>
           </select>
@@ -339,24 +339,24 @@
 
         <!-- Classroom -->
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.room') }}</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.room') }}</label>
           <input 
             type="text"
             [(ngModel)]="formData.classroom"
             name="classroom"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             [placeholder]="translate('timetable.enterRoom')">
         </div>
       </div>
 
       <!-- Notes -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('timetable.notes') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('timetable.notes') }}</label>
         <textarea 
           [(ngModel)]="formData.notes"
           name="notes"
           rows="3"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('timetable.enterNotes')"></textarea>
       </div>
 
@@ -370,7 +370,7 @@
         <button 
           type="button"
           (click)="closeModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           {{ translate('timetable.cancel') }}
         </button>
       </div>

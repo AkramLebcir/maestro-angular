@@ -1,7 +1,7 @@
 <div class="flex-1 p-6">
-  <div class="bg-white rounded-lg shadow-lg p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold text-gray-800">{{ translate('gradebook.title') }}</h1>
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('gradebook.title') }}</h1>
       <div class="flex gap-3">
         <button 
           (click)="viewMode = 'reports'; openReportModal()"
@@ -17,65 +17,65 @@
     <!-- Class, Term and Date Selection -->
     <div class="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('gradebook.class') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.class') }}</label>
         <select 
           [(ngModel)]="selectedClass"
           (change)="onClassChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
           <option [ngValue]="null">{{ translate('gradebook.selectClass') }}</option>
           <option *ngFor="let classItem of classes" [ngValue]="classItem">{{ classItem.name }}</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('gradebook.term') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.term') }}</label>
         <select 
           [(ngModel)]="selectedTerm"
           (change)="onTermChange()"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
           <option [ngValue]="1">{{ translate('gradebook.term1') }}</option>
           <option [ngValue]="2">{{ translate('gradebook.term2') }}</option>
           <option [ngValue]="3">{{ translate('gradebook.term3') }}</option>
         </select>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('gradebook.date') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.date') }}</label>
         <input 
           type="date"
           [value]="formatDateForAPI(selectedDate)"
           (change)="onDateChange($event)"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
       </div>
     </div>
 
     <!-- View Mode Tabs -->
-    <div class="flex gap-2 mb-4 border-b border-gray-200">
+    <div class="flex gap-2 mb-4 border-b border-gray-200 dark:border-gray-700">
       <button 
         (click)="viewMode = 'entry'"
-        [class]="viewMode === 'entry' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        [class]="viewMode === 'entry' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.entry') }}
       </button>
       <button 
         (click)="viewMode = 'grades'"
-        [class]="viewMode === 'grades' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        [class]="viewMode === 'grades' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.viewGrades') }}
       </button>
       <button 
         (click)="onAnalysisTabClick()"
-        [class]="viewMode === 'analysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        [class]="viewMode === 'analysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.analysis') }}
       </button>
       <button 
         (click)="viewMode = 'excelImport'"
-        [class]="viewMode === 'excelImport' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        [class]="viewMode === 'excelImport' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.enhancedImport') }}
       </button>
       <button 
         (click)="onExcelAnalysisTabClick()"
-        [class]="viewMode === 'excelAnalysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'"
+        [class]="viewMode === 'excelAnalysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.excelAnalysis') }}
       </button>
@@ -84,7 +84,7 @@
     <!-- Grade Entry View -->
     <div *ngIf="viewMode === 'entry' && selectedClass">
       <div class="mb-4 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">
           {{ translate('gradebook.entry') }}
         </h2>
         <div class="flex gap-2">
@@ -102,7 +102,7 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300 text-sm">
+        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
           <thead>
             <tr class="bg-blue-600 text-white">
               <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
@@ -147,67 +147,67 @@
           <tbody>
             <tr 
               *ngFor="let student of students; let i = index" 
-              class="border-b border-gray-200 hover:bg-gray-50"
-              [class.bg-red-50]="(student.averages?.termAverage || 0) < 10">
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">{{ i + 1 }}</td>
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
+              [class.bg-red-50 dark:bg-red-900/20]="(student.averages?.termAverage || 0) < 10">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">{{ i + 1 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ student.idNumber || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200">
                 {{ student.firstName }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200">
                 {{ student.lastName }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ formatDateOfBirth(student.dateOfBirth) }}
               </td>
               <!-- تصحيح الدفتر -->
-              <td class="border border-gray-300 p-2">
+              <td class="border border-gray-300 dark:border-gray-600 p-2">
                 <input 
                   type="number"
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('notebook_correction'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
-                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
                   min="0"
                   max="5"
                   step="0.5"
                   placeholder="0">
               </td>
               <!-- الواجب -->
-              <td class="border border-gray-300 p-2">
+              <td class="border border-gray-300 dark:border-gray-600 p-2">
                 <input 
                   type="number"
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('duty'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
-                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
                   min="0"
                   max="5"
                   step="0.5"
                   placeholder="0">
               </td>
               <!-- الحضور (تلقائي من إدارة الحضور) -->
-              <td class="border border-gray-300 p-2 text-center font-semibold bg-gray-50">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900">
                 {{ (student.calculatedGrades?.attendance || 0).toFixed(2) }}
               </td>
               <!-- السلوك (تلقائي من إدارة السلوك) -->
-              <td class="border border-gray-300 p-2 text-center font-semibold bg-gray-50">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900">
                 {{ (student.calculatedGrades?.behavior || 0).toFixed(2) }}
               </td>
               <!-- التقييم المستمر (محسوب تلقائياً) -->
-              <td class="border border-gray-300 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
                 {{ (student.calculatedGrades?.continuousAssessment || 0).toFixed(2) }}
               </td>
                <!-- التعبير الشفهي/العمل العملي (عمود واحد) -->
-               <td class="border border-gray-300 p-2">
+               <td class="border border-gray-300 dark:border-gray-600 p-2">
                  <input 
                    type="number"
                    [value]="getGradeForStudent(student.id, getAssessmentIdByType('oral_expression'))?.score || ''"
                    (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('oral_expression'))"
                    (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('oral_expression'))"
-                   class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                   class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
                    min="0"
                    max="20"
                    step="0.5"
@@ -215,80 +215,80 @@
                    [title]="translate('gradebook.oralExpression')">
                </td>
               <!-- الفرض -->
-              <td class="border border-gray-300 p-2">
+              <td class="border border-gray-300 dark:border-gray-600 p-2">
                 <input 
                   type="number"
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('assignment'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('assignment'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('assignment'))"
-                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
                   min="0"
                   max="20"
                   step="0.5"
                   placeholder="0">
               </td>
               <!-- الاختبار -->
-              <td class="border border-gray-300 p-2">
+              <td class="border border-gray-300 dark:border-gray-600 p-2">
                 <input 
                   type="number"
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('test'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('test'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('test'))"
-                  class="w-16 px-1 py-1 border border-gray-300 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
                   min="0"
                   max="20"
                   step="0.5"
                   placeholder="0">
               </td>
               <!-- معدل الفصل المحدد -->
-              <td class="border border-gray-300 p-2 text-center font-semibold bg-blue-50"
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-blue-50 dark:bg-blue-900/20"
                   [class.text-red-600]="(student.averages?.termAverage || 0) < 10"
                   [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
               <!-- التقديرات -->
-              <td class="border border-gray-300 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
                 {{ getGradeRating(student) }}
               </td>
               <!-- الإرشادات -->
-              <td class="border border-gray-300 p-2 text-gray-800 text-right" style="min-width: 200px;">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-right" style="min-width: 200px;">
                 {{ getGuidance(student) }}
               </td>
               <!-- الترتيب -->
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.ranking || '-' }}
               </td>
             </tr>
             <tr *ngIf="students.length === 0">
-              <td colspan="19" class="border border-gray-300 p-8 text-center text-gray-500">
+              <td colspan="19" class="border border-gray-300 dark:border-gray-600 p-8 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('gradebook.noStudents') }}
               </td>
             </tr>
           </tbody>
           <tfoot>
-            <tr class="bg-gray-100 font-semibold">
-              <td colspan="17" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.classAverage') }}</td>
-              <td class="border border-gray-300 p-2 text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 font-semibold">
+              <td colspan="17" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.classAverage') }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ calculateClassAverage().toFixed(2) }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
-            <tr class="bg-blue-50">
-              <td colspan="16" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
-              <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
+            <tr class="bg-blue-50 dark:bg-blue-900/20">
+              <td colspan="16" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
-            <tr class="bg-red-50">
-              <td colspan="16" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
-              <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
+            <tr class="bg-red-50 dark:bg-red-900/20">
+              <td colspan="16" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
           </tfoot>
         </table>
@@ -298,7 +298,7 @@
     <!-- Grades View -->
     <div *ngIf="viewMode === 'grades' && selectedClass">
       <div class="mb-4 flex justify-between items-center">
-        <h2 class="text-xl font-semibold text-gray-800">{{ translate('gradebook.classResults') }}</h2>
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ translate('gradebook.classResults') }}</h2>
         <button 
           (click)="exportGradesToPDF()"
           class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition">
@@ -310,7 +310,7 @@
       </div>
 
       <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300 text-sm">
+        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
           <thead>
             <tr class="bg-blue-600 text-white">
               <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
@@ -355,91 +355,91 @@
           <tbody>
             <tr 
               *ngFor="let student of students; let i = index" 
-              class="border-b border-gray-200 hover:bg-gray-50"
-              [class.bg-red-50]="(student.averages?.termAverage || 0) < 10">
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">{{ i + 1 }}</td>
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
+              [class.bg-red-50 dark:bg-red-900/20]="(student.averages?.termAverage || 0) < 10">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">{{ i + 1 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ student.idNumber || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200">
                 {{ student.firstName }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200">
                 {{ student.lastName }}
               </td>
-              <td class="border border-gray-300 p-2 text-gray-800 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ formatDateOfBirth(student.dateOfBirth) }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.duty?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.attendance?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.behavior?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.continuousAssessment?.toFixed(2) || '-' }}
               </td>
-                <td class="border border-gray-300 p-2 text-center">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                  {{ student.calculatedGrades?.oralExpression?.toFixed(2) || '-' }}
                </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.assignment?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.calculatedGrades?.test?.toFixed(2) || '-' }}
               </td>
               <!-- معدل الفصل المحدد -->
-              <td class="border border-gray-300 p-2 text-center font-semibold bg-blue-50"
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-blue-50 dark:bg-blue-900/20"
                   [class.text-red-600]="(student.averages?.termAverage || 0) < 10"
                   [class.text-green-600]="(student.averages?.termAverage || 0) >= 10">
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
               <!-- التقديرات -->
-              <td class="border border-gray-300 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
                 {{ getGradeRating(student) }}
               </td>
               <!-- الإرشادات -->
-              <td class="border border-gray-300 p-2 text-gray-800 text-right" style="min-width: 200px;">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-right" style="min-width: 200px;">
                 {{ getGuidance(student) }}
               </td>
-              <td class="border border-gray-300 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ student.ranking || '-' }}
               </td>
             </tr>
           </tbody>
           <tfoot>
-            <tr class="bg-gray-100 font-semibold">
-              <td colspan="14" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.classAverage') }}:</td>
-              <td class="border border-gray-300 p-2 text-center">
+            <tr class="bg-gray-100 dark:bg-gray-800 font-semibold">
+              <td colspan="14" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.classAverage') }}:</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
                 {{ calculateClassAverage().toFixed(2) }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
-            <tr class="bg-blue-50">
-              <td colspan="15" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
-              <td class="border border-gray-300 p-2 text-center text-green-600 font-semibold">
+            <tr class="bg-blue-50 dark:bg-blue-900/20">
+              <td colspan="15" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.studentsWithAverage10InTerm') }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-green-600 font-semibold">
                 {{ getStudentsAbove10() }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
-            <tr class="bg-red-50">
-              <td colspan="15" class="border border-gray-300 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
-              <td class="border border-gray-300 p-2 text-center text-red-600 font-semibold">
+            <tr class="bg-red-50 dark:bg-red-900/20">
+              <td colspan="15" class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ translate('gradebook.studentsWithAverageBelow10InTerm') }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-red-600 font-semibold">
                 {{ getStudentsBelow10() }}
               </td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
-              <td class="border border-gray-300 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
+              <td class="border border-gray-300 dark:border-gray-600 p-2"></td>
             </tr>
           </tfoot>
         </table>
@@ -449,15 +449,15 @@
     <!-- Data Analysis View -->
     <div *ngIf="viewMode === 'analysis' && selectedClass">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ translate('gradebook.dataAnalysis') }}</h2>
-        <p class="text-gray-600 mb-6">{{ translate('gradebook.comprehensiveAnalysis') }}</p>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.dataAnalysis') }}</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">{{ translate('gradebook.comprehensiveAnalysis') }}</p>
       </div>
 
       <!-- Charts Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Grade Distribution Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.gradeDistributionByRange') }}</h3>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.gradeDistributionByRange') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="gradeDistributionChartType"
@@ -468,8 +468,8 @@
         </div>
 
         <!-- Grade Range Distribution Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.studentDistributionByCategory') }}</h3>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.studentDistributionByCategory') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="gradeRangeChartType"
@@ -480,8 +480,8 @@
         </div>
 
         <!-- Gender Comparison Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.comparisonByGender') }}</h3>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.comparisonByGender') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="genderChartType"
@@ -492,8 +492,8 @@
         </div>
 
         <!-- Term Comparison Chart -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
-          <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.comparisonByTerm') }}</h3>
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.comparisonByTerm') }}</h3>
           <div class="h-80">
             <canvas baseChart
               [type]="termComparisonChartType"
@@ -505,8 +505,8 @@
       </div>
 
       <!-- Assessment Performance Chart -->
-      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
-        <h3 class="text-xl font-semibold text-gray-800 mb-4">{{ translate('gradebook.studentPerformanceByType') }}</h3>
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50 mb-6">
+        <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.studentPerformanceByType') }}</h3>
         <div class="h-96">
           <canvas baseChart
             [type]="assessmentChartType"
@@ -518,15 +518,15 @@
 
       <!-- Summary Statistics Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-blue-50 p-6 rounded-lg border border-blue-200">
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-6 rounded-lg border border-blue-200">
           <div class="text-3xl font-bold text-blue-700 mb-2">{{ calculateClassAverage().toFixed(2) }}</div>
           <div class="text-sm text-blue-600">{{ translate('gradebook.classAverage') }}</div>
         </div>
-        <div class="bg-green-50 p-6 rounded-lg border border-green-200">
+        <div class="bg-green-50 dark:bg-green-900/20 p-6 rounded-lg border border-green-200">
           <div class="text-3xl font-bold text-green-700 mb-2">{{ getStudentsAbove10() }}</div>
           <div class="text-sm text-green-600">{{ translate('gradebook.studentsWithAverage10') }}</div>
         </div>
-        <div class="bg-red-50 p-6 rounded-lg border border-red-200">
+        <div class="bg-red-50 dark:bg-red-900/20 p-6 rounded-lg border border-red-200">
           <div class="text-3xl font-bold text-red-700 mb-2">{{ getStudentsBelow10() }}</div>
           <div class="text-sm text-red-600">{{ translate('gradebook.studentsWithAverageBelow10') }}</div>
         </div>
@@ -536,11 +536,11 @@
     <!-- Excel Import with Auto Observations/Guidance View -->
     <div *ngIf="viewMode === 'excelImport'">
       <div class="mb-6">
-        <h2 class="text-2xl font-bold text-gray-800 mb-4">{{ translate('gradebook.excelImportWithAutoNotes') }}</h2>
-        <p class="text-gray-600 mb-6">{{ translate('gradebook.excelImportDescription') }}</p>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.excelImportWithAutoNotes') }}</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">{{ translate('gradebook.excelImportDescription') }}</p>
       </div>
 
-      <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50 mb-6">
         <button 
           (click)="openEnhancedImportModal()"
           class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition flex items-center gap-2">
@@ -552,9 +552,9 @@
       </div>
 
       <!-- Processed Data Preview -->
-      <div *ngIf="processedExcelData && processedExcelData.length > 0" class="bg-white p-6 rounded-lg shadow-md">
+      <div *ngIf="processedExcelData && processedExcelData.length > 0" class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
         <div class="flex justify-between items-center mb-4">
-          <h3 class="text-xl font-semibold text-gray-800">{{ translate('gradebook.processedDataPreview') }}</h3>
+          <h3 class="text-xl font-semibold text-gray-800 dark:text-gray-200">{{ translate('gradebook.processedDataPreview') }}</h3>
           <div class="flex gap-2">
             <button 
               (click)="openGradeMonitoringModal()"
@@ -575,12 +575,12 @@
           </div>
         </div>
 
-        <div *ngIf="processedSheetsData && processedSheetsData.length > 1" class="mb-4 text-sm text-gray-600">
+        <div *ngIf="processedSheetsData && processedSheetsData.length > 1" class="mb-4 text-sm text-gray-600 dark:text-gray-400">
           <p>{{ translate('gradebook.processedSheetsCount') }} {{ processedSheetsData.length }}</p>
         </div>
         
         <div class="overflow-x-auto">
-          <table class="w-full border-collapse border border-gray-300 text-sm">
+          <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
             <thead>
               <tr class="bg-blue-600 text-white">
                 <th class="border border-blue-700 p-2 text-right font-semibold">#</th>
@@ -601,31 +601,31 @@
             <tbody>
               <tr 
                 *ngFor="let row of processedExcelData; let i = index" 
-                class="border-b border-gray-200 hover:bg-gray-50">
-                <td class="border border-gray-300 p-2 text-center">{{ i + 1 }}</td>
-                <td class="border border-gray-300 p-2 text-center" *ngIf="processedSheetsData && processedSheetsData.length > 1">
+                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">{{ i + 1 }}</td>
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center" *ngIf="processedSheetsData && processedSheetsData.length > 1">
                   {{ row.sheetName || '-' }}
                 </td>
-                <td class="border border-gray-300 p-2">{{ row.firstName || '-' }}</td>
-                <td class="border border-gray-300 p-2">{{ row.lastName || '-' }}</td>
+                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ row.firstName || '-' }}</td>
+                <td class="border border-gray-300 dark:border-gray-600 p-2">{{ row.lastName || '-' }}</td>
                 <!-- Grade columns with coloring -->
                 <td 
                   *ngFor="let header of getAllGradeColumnHeaders()" 
-                  class="border border-gray-300 p-2 text-center font-semibold"
+                  class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold"
                   [ngClass]="getGradeCellColor(getGradeValueForColumn(row, header))"
                   [style.background-color]="getGradeCellBgColor(getGradeValueForColumn(row, header))"
                   [style.color]="getGradeCellTextColor(getGradeValueForColumn(row, header))">
                   {{ getGradeValueForColumn(row, header) !== null && getGradeValueForColumn(row, header) !== undefined && getGradeValueForColumn(row, header) !== '' ? getGradeValueForColumn(row, header) : '-' }}
                 </td>
-                <td class="border border-gray-300 p-2 text-center font-semibold"
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold"
                     [class.text-red-600]="row.average < 10"
                     [class.text-green-600]="row.average >= 10">
                   {{ row.average?.toFixed(2) || '-' }}
                 </td>
-                <td class="border border-gray-300 p-2 text-right" style="min-width: 200px;">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="min-width: 200px;">
                   {{ row.observation || '-' }}
                 </td>
-                <td class="border border-gray-300 p-2 text-right" style="min-width: 200px;">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="min-width: 200px;">
                   {{ row.guidance || '-' }}
                 </td>
               </tr>
@@ -640,8 +640,8 @@
       <div class="mb-6">
         <div class="flex justify-between items-center mb-4">
           <div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ translate('gradebook.excelAnalysisTitle') }}</h2>
-            <p class="text-gray-600">{{ translate('gradebook.detailedChartsPerSheet') }}</p>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ translate('gradebook.excelAnalysisTitle') }}</h2>
+            <p class="text-gray-600 dark:text-gray-400">{{ translate('gradebook.detailedChartsPerSheet') }}</p>
           </div>
           <button 
             *ngIf="processedSheetsData && processedSheetsData.length > 0"
@@ -657,24 +657,24 @@
 
       <div *ngIf="processedSheetsData && processedSheetsData.length > 0">
         <div *ngFor="let sheetInfo of processedSheetsData; let sheetIndex = index" class="mb-8">
-          <div class="bg-white p-6 rounded-lg shadow-md">
-            <h3 class="text-xl font-bold text-gray-800 mb-4">{{ sheetInfo.sheetName }}</h3>
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ sheetInfo.sheetName }}</h3>
             
             <!-- Statistics Cards -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-              <div class="bg-blue-50 p-4 rounded-lg border border-blue-200">
+              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200">
                 <div class="text-2xl font-bold text-blue-700 mb-1">{{ calculateSheetAverage(sheetInfo.data).toFixed(2) }}</div>
                 <div class="text-sm text-blue-600">{{ translate('gradebook.sheetAverage') }}</div>
               </div>
-              <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+              <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200">
                 <div class="text-2xl font-bold text-green-700 mb-1">{{ getStudentsAbove10Count(sheetInfo.data) }}</div>
                 <div class="text-sm text-green-600">{{ translate('gradebook.studentsWithAverage10') }}</div>
               </div>
-              <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+              <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200">
                 <div class="text-2xl font-bold text-red-700 mb-1">{{ getStudentsBelow10Count(sheetInfo.data) }}</div>
                 <div class="text-sm text-red-600">{{ translate('gradebook.studentsWithAverageBelow10') }}</div>
               </div>
-              <div class="bg-purple-50 p-4 rounded-lg border border-purple-200">
+              <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200">
                 <div class="text-2xl font-bold text-purple-700 mb-1">{{ sheetInfo.data.length }}</div>
                 <div class="text-sm text-purple-600">{{ translate('gradebook.totalStudents') }}</div>
               </div>
@@ -683,16 +683,16 @@
             <!-- Charts Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <!-- Grade Distribution Chart -->
-              <div class="bg-white p-4 rounded-lg border border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.gradeDistribution') }}</h4>
+              <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.gradeDistribution') }}</h4>
                 <div class="h-64">
                   <canvas [attr.id]="'gradeDistChart_' + sheetIndex"></canvas>
                 </div>
               </div>
 
               <!-- Grade Range Chart -->
-              <div class="bg-white p-4 rounded-lg border border-gray-200">
-                <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.distributionByCategory') }}</h4>
+              <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
+                <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.distributionByCategory') }}</h4>
                 <div class="h-64">
                   <canvas [attr.id]="'gradeRangeChart_' + sheetIndex"></canvas>
                 </div>
@@ -702,7 +702,7 @@
         </div>
       </div>
 
-      <div *ngIf="!processedSheetsData || processedSheetsData.length === 0" class="text-center text-gray-500 py-12">
+      <div *ngIf="!processedSheetsData || processedSheetsData.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-12">
         <p class="mb-4">{{ translate('gradebook.noProcessedData') }}</p>
         <button 
           (click)="viewMode = 'excelImport'"
@@ -712,7 +712,7 @@
       </div>
     </div>
 
-    <div *ngIf="!selectedClass" class="text-center text-gray-500 py-12">
+    <div *ngIf="!selectedClass" class="text-center text-gray-500 dark:text-gray-400 py-12">
         {{ translate('gradebook.selectClassFirst') }}
     </div>
   </div>
@@ -721,18 +721,18 @@
 <!-- Grade Entry Modal -->
 <div 
   *ngIf="showGradeModal && selectedAssessment"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeGradeModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
         {{ translate('gradebook.enterGrade') }}: {{ selectedAssessment.nameAr }}
       </h3>
       <button 
         (click)="closeGradeModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -741,7 +741,7 @@
 
     <form #gradeForm="ngForm" (ngSubmit)="saveGrade()" class="space-y-4">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('gradebook.grade') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.grade') }}</label>
         <input 
           type="number"
           [(ngModel)]="formData.score"
@@ -750,37 +750,37 @@
           min="0"
           [max]="formData.maxScore"
           step="0.5"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">من</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">من</label>
         <input 
           type="number"
           [(ngModel)]="formData.maxScore"
           name="maxScore"
           required
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">الإمضاء / العلامة</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الإمضاء / العلامة</label>
           <input 
             type="text"
             [(ngModel)]="formData.mark"
             name="mark"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="أدخل الإمضاء أو العلامة">
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">ملاحظات</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ملاحظات</label>
           <textarea 
             [(ngModel)]="formData.notes"
             name="notes"
             rows="3"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
             placeholder="أدخل ملاحظات..."></textarea>
         </div>
       </div>
@@ -795,7 +795,7 @@
         <button 
           type="button"
           (click)="closeGradeModal()"
-          class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
           إلغاء
         </button>
       </div>
@@ -806,16 +806,16 @@
 <!-- Excel Import Modal -->
 <div 
   *ngIf="showImportModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeImportModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-md"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">استيراد من Excel</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">استيراد من Excel</h3>
       <button 
         (click)="closeImportModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -823,31 +823,31 @@
     </div>
 
     <div class="space-y-4">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         {{ translate('gradebook.excelImportNote') }}
       </p>
       
       <!-- Import Mode Selection -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الاستيراد</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع الاستيراد</label>
         <select 
           [(ngModel)]="importMode"
           (change)="selectedAssessment = null"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
           <option value="single">استيراد نوع تقييم واحد</option>
           <option value="multiple">استيراد جميع أنواع التقييم دفعة واحدة</option>
         </select>
-        <p class="text-xs text-gray-500 mt-1">
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
           <span *ngIf="importMode === 'multiple'">سيتم استيراد: التقييم المستمر، التعبير الشفهي/العمل العملي، الفرض، الاختبار</span>
         </p>
       </div>
       
       <!-- Identifier Type Selection -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">طريقة التعرف على الطالب</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">طريقة التعرف على الطالب</label>
         <select 
           [(ngModel)]="importIdentifier"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
           <option value="name">بالاسم</option>
           <option value="idNumber">برقم الهوية/الكود</option>
         </select>
@@ -855,10 +855,10 @@
       
       <!-- Assessment Type Selection (only for single mode) -->
       <div *ngIf="importMode === 'single'">
-        <label class="block text-sm font-medium text-gray-700 mb-1">نوع التقييم</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع التقييم</label>
         <select 
           [(ngModel)]="selectedAssessment"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
           <option [ngValue]="null">اختر نوع التقييم</option>
           <option *ngFor="let assessment of assessments" [ngValue]="assessment">
             {{ assessment.nameAr }}
@@ -868,17 +868,17 @@
       
       <!-- File Input -->
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">اختر ملف Excel</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">اختر ملف Excel</label>
         <input 
           type="file"
           accept=".xlsx,.xls"
           (change)="onExcelFileSelected($event)"
           [disabled]="importMode === 'single' && !selectedAssessment"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:bg-gray-100 dark:bg-gray-800 disabled:cursor-not-allowed">
       </div>
       
       <!-- Help Text -->
-      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
         <p class="font-semibold mb-2">تعليمات الاستيراد:</p>
         <ul class="list-disc list-inside space-y-1 mb-2">
           <li *ngIf="importIdentifier === 'name'">يجب أن يحتوي ملف Excel على عمود "الاسم" أو "Name"</li>
@@ -909,16 +909,16 @@
 <!-- Enhanced Excel Import Modal -->
 <div 
   *ngIf="showEnhancedImportModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
   (click)="closeEnhancedImportModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-2xl"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">استيراد محسّن من Excel</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">استيراد محسّن من Excel</h3>
       <button 
         (click)="closeEnhancedImportModal()"
-        class="text-gray-500 hover:text-gray-700">
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
@@ -926,16 +926,16 @@
     </div>
 
     <div class="space-y-4">
-      <p class="text-sm text-gray-600">
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         {{ translate('gradebook.excelImportDescription') }}
       </p>
 
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">الطور</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الطور</label>
           <select 
             [(ngModel)]="selectedLevel"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
             <option value="primary">ابتدائي</option>
             <option value="middle">متوسط</option>
             <option value="secondary">ثانوي</option>
@@ -943,10 +943,10 @@
         </div>
 
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">اللغة</label>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">اللغة</label>
           <select 
             [(ngModel)]="selectedLanguage"
-            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
             <option value="AR">العربية</option>
             <option value="FR">الفرنسية</option>
             <option value="EN">الإنجليزية</option>
@@ -960,24 +960,24 @@
           id="autoObsCons"
           type="checkbox"
           [(ngModel)]="autoGenerateObsCons"
-          class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-        <label for="autoObsCons" class="text-sm text-gray-700 cursor-pointer">
+          class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
+        <label for="autoObsCons" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
           تطبيق الملاحظات (obs) والإرشادات (cons) تلقائياً اعتماداً على المعدل
         </label>
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">اختر ملف Excel</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">اختر ملف Excel</label>
         <input 
           type="file"
           accept=".xlsx,.xls"
           (change)="onEnhancedExcelFileSelected($event)"
-          class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
       </div>
 
       <div *ngIf="isProcessing" class="text-center py-4">
         <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p class="mt-2 text-sm text-gray-600">جاري المعالجة...</p>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">جاري المعالجة...</p>
       </div>
     </div>
   </div>
@@ -986,13 +986,13 @@
 <!-- Reports Modal -->
 <div 
   *ngIf="showReportModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto"
   (click)="closeReportModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-6xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">تقارير الدرجات</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">تقارير الدرجات</h3>
       <div class="flex gap-2">
         <button 
           (click)="exportReportToPDF()"
@@ -1001,7 +1001,7 @@
         </button>
         <button 
           (click)="closeReportModal()"
-          class="text-gray-500 hover:text-gray-700">
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -1011,9 +1011,9 @@
 
     <!-- Grade Statistics Table -->
     <div class="mb-6">
-      <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.gradeDistribution') }}</h4>
+      <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.gradeDistribution') }}</h4>
       <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300">
+        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600">
           <thead>
             <tr class="bg-blue-600 text-white">
               <th class="border border-blue-700 p-3 text-right font-semibold">النطاق</th>
@@ -1022,59 +1022,59 @@
             </tr>
           </thead>
           <tbody>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">أقل من 4</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().lessThan4 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">أقل من 4</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().lessThan4 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().lessThan4 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">4 - 6</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between4and6 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">4 - 6</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between4and6 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between4and6 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">6 - 8</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between6and8 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">6 - 8</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between6and8 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between6and8 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">8 - 10</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between8and10 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">8 - 10</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between8and10 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between8and10 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">10 - 12</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between10and12 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">10 - 12</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between10and12 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between10and12 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">12 - 14</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between12and14 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">12 - 14</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between12and14 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between12and14 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">14 - 16</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().between14and16 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">14 - 16</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().between14and16 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().between14and16 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
-            <tr class="border-b border-gray-200">
-              <td class="border border-gray-300 p-3 text-gray-800">أكبر من 16</td>
-              <td class="border border-gray-300 p-3 text-center">{{ getGradeStatistics().greaterThan16 }}</td>
-              <td class="border border-gray-300 p-3 text-center">
+            <tr class="border-b border-gray-200 dark:border-gray-700">
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-gray-800 dark:text-gray-200">أكبر من 16</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">{{ getGradeStatistics().greaterThan16 }}</td>
+              <td class="border border-gray-300 dark:border-gray-600 p-3 text-center">
                 {{ (getGradeStatistics().greaterThan16 / getGradeStatistics().total * 100).toFixed(1) }}%
               </td>
             </tr>
@@ -1085,18 +1085,18 @@
 
     <!-- Gender Distribution -->
     <div class="mb-6">
-      <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.gradeByGender') }}</h4>
+      <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.gradeByGender') }}</h4>
       <div class="grid grid-cols-2 gap-4">
         <div>
-          <h5 class="font-semibold text-gray-700 mb-2">الذكور</h5>
-          <div class="text-sm text-gray-600">
+          <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">الذكور</h5>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             <div>معدل ≥ 10: {{ getGenderDistribution().male.total - (getGenderDistribution().male.lessThan4 + getGenderDistribution().male.between4and6 + getGenderDistribution().male.between6and8 + getGenderDistribution().male.between8and10) }}</div>
             <div>معدل < 10: {{ getGenderDistribution().male.lessThan4 + getGenderDistribution().male.between4and6 + getGenderDistribution().male.between6and8 + getGenderDistribution().male.between8and10 }}</div>
           </div>
         </div>
         <div>
-          <h5 class="font-semibold text-gray-700 mb-2">الإناث</h5>
-          <div class="text-sm text-gray-600">
+          <h5 class="font-semibold text-gray-700 dark:text-gray-300 mb-2">الإناث</h5>
+          <div class="text-sm text-gray-600 dark:text-gray-400">
             <div>معدل ≥ 10: {{ getGenderDistribution().female.total - (getGenderDistribution().female.lessThan4 + getGenderDistribution().female.between4and6 + getGenderDistribution().female.between6and8 + getGenderDistribution().female.between8and10) }}</div>
             <div>معدل < 10: {{ getGenderDistribution().female.lessThan4 + getGenderDistribution().female.between4and6 + getGenderDistribution().female.between6and8 + getGenderDistribution().female.between8and10 }}</div>
           </div>
@@ -1106,7 +1106,7 @@
 
     <!-- Grade Range Distribution -->
     <div class="mb-6">
-      <h4 class="text-lg font-semibold text-gray-800 mb-3">{{ translate('gradebook.studentDistribution') }}</h4>
+      <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.studentDistribution') }}</h4>
       <div class="grid grid-cols-5 gap-4">
         <div class="text-center p-4 bg-green-100 rounded-lg">
           <div class="font-bold text-green-800 text-lg">{{ getGradeRangeDistribution().congratulations }}</div>
@@ -1120,9 +1120,9 @@
           <div class="font-bold text-purple-800 text-lg">{{ getGradeRangeDistribution().honorRoll }}</div>
           <div class="text-sm text-purple-700">قائمة الشرف (12-14)</div>
         </div>
-        <div class="text-center p-4 bg-gray-100 rounded-lg">
-          <div class="font-bold text-gray-800 text-lg">{{ getGradeRangeDistribution().none }}</div>
-          <div class="text-sm text-gray-700">عادي (10-12)</div>
+        <div class="text-center p-4 bg-gray-100 dark:bg-gray-800 rounded-lg">
+          <div class="font-bold text-gray-800 dark:text-gray-200 text-lg">{{ getGradeRangeDistribution().none }}</div>
+          <div class="text-sm text-gray-700 dark:text-gray-300">عادي (10-12)</div>
         </div>
         <div class="text-center p-4 bg-red-100 rounded-lg">
           <div class="font-bold text-red-800 text-lg">{{ getGradeRangeDistribution().remarks }}</div>
@@ -1133,14 +1133,14 @@
 
     <!-- Highest and Lowest Grades -->
     <div class="grid grid-cols-2 gap-4 mb-6">
-      <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+      <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-lg">
         <h5 class="font-semibold text-green-800 mb-2">أعلى درجة</h5>
         <div *ngIf="getHighestGrade()" class="text-sm">
           <div class="font-bold">{{ getHighestGrade()!.student.lastName }} {{ getHighestGrade()!.student.firstName }}</div>
           <div class="text-green-600 text-lg font-bold">{{ getHighestGrade()!.grade.toFixed(2) }}</div>
         </div>
       </div>
-      <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg">
         <h5 class="font-semibold text-red-800 mb-2">أقل درجة</h5>
         <div *ngIf="getLowestGrade()" class="text-sm">
           <div class="font-bold">{{ getLowestGrade()!.student.lastName }} {{ getLowestGrade()!.student.firstName }}</div>
@@ -1151,15 +1151,15 @@
 
     <!-- Summary Statistics -->
     <div class="grid grid-cols-3 gap-4">
-      <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg text-center">
+      <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg text-center">
         <div class="text-2xl font-bold text-blue-700">{{ calculateClassAverage().toFixed(2) }}</div>
         <div class="text-sm text-blue-600">معدل القسم</div>
       </div>
-      <div class="p-4 bg-green-50 border border-green-200 rounded-lg text-center">
+      <div class="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 rounded-lg text-center">
         <div class="text-2xl font-bold text-green-700">{{ getStudentsAbove10() }}</div>
         <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
       </div>
-      <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
+      <div class="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 rounded-lg text-center">
         <div class="text-2xl font-bold text-red-700">{{ getStudentsBelow10() }}</div>
         <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
       </div>
@@ -1170,13 +1170,13 @@
 <!-- Grade Monitoring Report Modal -->
 <div 
   *ngIf="showGradeMonitoringModal"
-  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto"
   (click)="closeGradeMonitoringModal()">
   <div 
-    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-6xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800">{{ translate('reports.gradeMonitoring') }}</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ translate('reports.gradeMonitoring') }}</h3>
       <div class="flex gap-2">
         <button 
           (click)="exportGradeMonitoringPDF()"
@@ -1196,7 +1196,7 @@
         </button>
         <button 
           (click)="closeGradeMonitoringModal()"
-          class="text-gray-500 hover:text-gray-700">
+          class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -1207,13 +1207,13 @@
     <div id="gradeMonitoringReport" class="print:block">
       <!-- Report Header -->
       <div class="mb-6 text-center print:mb-4">
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">{{ translate('reports.gradeMonitoring') }}</h2>
-        <p class="text-sm text-gray-600">{{ translate('report.reportDate') }} {{ getReportDate() }}</p>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ translate('reports.gradeMonitoring') }}</h2>
+        <p class="text-sm text-gray-600 dark:text-gray-400">{{ translate('report.reportDate') }} {{ getReportDate() }}</p>
       </div>
 
       <!-- Summary -->
-      <div class="mb-6 p-4 bg-blue-50 rounded-lg print:mb-4">
-        <p class="text-lg font-semibold text-gray-800">
+      <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg print:mb-4">
+        <p class="text-lg font-semibold text-gray-800 dark:text-gray-200">
           عدد التلاميذ الذين لديهم أخطاء: 
           <span class="text-red-600 font-bold">{{ getStudentsWithGradeErrors().length }}</span>
         </p>
@@ -1221,7 +1221,7 @@
 
       <!-- Errors Table -->
       <div *ngIf="getStudentsWithGradeErrors().length > 0" class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300 text-sm print:text-xs">
+        <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm print:text-xs">
           <thead>
             <tr class="bg-blue-600 text-white print:bg-gray-800">
               <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">#</th>
@@ -1236,24 +1236,24 @@
             <ng-container *ngFor="let student of getStudentsWithGradeErrors(); let studentIndex = index">
               <tr 
                 *ngFor="let error of student.errors; let errorIndex = index"
-                [class.bg-gray-50]="(studentIndex + errorIndex) % 2 === 0"
-                class="border-b border-gray-200">
-                <td class="border border-gray-300 p-2 text-center print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
+                [class.bg-gray-50 dark:bg-gray-900]="(studentIndex + errorIndex) % 2 === 0"
+                class="border-b border-gray-200 dark:border-gray-700">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
                   {{ studentIndex + 1 }}
                 </td>
-                <td class="border border-gray-300 p-2 print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
                   {{ student.firstName }} {{ student.lastName }}
                 </td>
-                <td class="border border-gray-300 p-2 text-center print:p-1" *ngIf="processedSheetsData && processedSheetsData.length > 1 && errorIndex === 0" [attr.rowspan]="student.errors.length">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center print:p-1" *ngIf="processedSheetsData && processedSheetsData.length > 1 && errorIndex === 0" [attr.rowspan]="student.errors.length">
                   {{ student.sheetName }}
                 </td>
-                <td class="border border-gray-300 p-2 print:p-1">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 print:p-1">
                   {{ error.columnHeader }}
                 </td>
-                <td class="border border-gray-300 p-2 text-center print:p-1">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center print:p-1">
                   {{ error.value !== null && error.value !== undefined && error.value !== '' ? error.value : '-' }}
                 </td>
-                <td class="border border-gray-300 p-2 print:p-1 text-red-600 font-semibold">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 print:p-1 text-red-600 font-semibold">
                   {{ error.error }}
                 </td>
               </tr>
@@ -1264,7 +1264,7 @@
 
       <!-- No Errors Message -->
       <div *ngIf="getStudentsWithGradeErrors().length === 0" class="text-center py-8">
-        <div class="inline-block p-6 bg-green-50 rounded-lg border border-green-200">
+        <div class="inline-block p-6 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200">
           <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>

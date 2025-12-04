@@ -18,13 +18,25 @@
   background: #f1f1f1;
 }
 
+.dark ::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
 ::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 4px;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
 ::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
 }
 
 /* Line clamp utilities */
@@ -73,5 +85,41 @@ button.btn-export-excel {
 button.btn-export-excel:hover {
   background-color: #166534 !important;
   border-color: #166534 !important;
+}
+
+/* Dark mode support for common UI elements */
+.dark select {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.dark option {
+  background-color: #374151;
+  color: #f9fafb;
+}
+
+.dark input[type="text"],
+.dark input[type="password"],
+.dark input[type="email"],
+.dark input[type="number"],
+.dark textarea {
+  background-color: #374151;
+  color: #f9fafb;
+  border-color: #4b5563;
+}
+
+.dark input[type="text"]:focus,
+.dark input[type="password"]:focus,
+.dark input[type="email"]:focus,
+.dark input[type="number"]:focus,
+.dark textarea:focus {
+  border-color: #3b82f6;
+  background-color: #374151;
+}
+
+/* Dark mode modal overlay */
+.dark .modal-overlay {
+  background-color: rgba(0, 0, 0, 0.75);
 }
 

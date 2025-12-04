@@ -1,9 +1,9 @@
 <div class="flex-1 pt-2 pb-4 px-3 md:px-4">
-  <div class="bg-white rounded-xl shadow-md p-5 md:p-6 mb-4 border border-blue-100">
+  <div class="bg-white dark:bg-gray-800 rounded-xl shadow-md dark:shadow-gray-900/50 p-5 md:p-6 mb-4 border border-blue-100">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 mb-1">{{ translate('teacherCard.title') }}</h1>
-        <p class="text-sm text-gray-500">
+        <h1 class="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-200 mb-1">{{ translate('teacherCard.title') }}</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-400">
           {{ translate('teacherCard.description') }}
         </p>
       </div>
@@ -20,7 +20,7 @@
         </button>
         <span
           *ngIf="isSaved"
-          class="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-full px-3 py-1">
+          class="text-xs text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 rounded-full px-3 py-1">
           {{ translate('teacherCard.saved') }}
         </span>
       </div>
@@ -32,21 +32,21 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.directorate') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.directorate') }} :</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="teacherCard.wilayaDirectorate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.school') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.school') }} :</label>
             <input
               class="col-span-2 input-field"
               type="text"
               [(ngModel)]="teacherCard.schoolName" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.academicYear') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.academicYear') }} :</label>
             <input
               class="col-span-2 input-field"
               type="text"
@@ -54,7 +54,7 @@
           </div>
         </div>
         <div class="flex flex-col items-center justify-center gap-3">
-          <div class="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 bg-gray-50">
+          <div class="w-32 h-40 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">
             <ng-container *ngIf="teacherCard.photoDataUrl; else photoPlaceholder">
               <img [src]="teacherCard.photoDataUrl" [alt]="translate('teacherCard.photo')" class="w-full h-full object-cover" />
             </ng-container>
@@ -69,7 +69,7 @@
         <!-- العمود الأول -->
         <div class="space-y-3">
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.lastName') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.lastName') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -77,7 +77,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.firstName') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.firstName') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -85,7 +85,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.birthDate') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.birthDate') }} :</label>
           <input
             class="col-span-2 input-field"
             type="date"
@@ -93,7 +93,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.birthPlace') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.birthPlace') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -101,7 +101,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.familyStatus') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.familyStatus') }} :</label>
           <select
             class="col-span-2 input-field"
             [(ngModel)]="teacherCard.familyStatus">
@@ -114,7 +114,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.childrenCount') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.childrenCount') }} :</label>
           <input
             class="col-span-2 input-field"
             type="number"
@@ -123,7 +123,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.studyingChildren') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.studyingChildren') }} :</label>
           <input
             class="col-span-2 input-field"
             type="number"
@@ -132,7 +132,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.studyingInSchool') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.studyingInSchool') }} :</label>
           <input
             class="col-span-2 input-field"
             type="number"
@@ -141,7 +141,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.point') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.point') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -149,7 +149,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.className') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.className') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -157,7 +157,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.rank') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.rank') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -165,7 +165,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.grade') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.grade') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -173,7 +173,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.promotionFrequency') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.promotionFrequency') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -184,7 +184,7 @@
       <!-- العمود الثاني -->
       <div class="space-y-3">
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.workInstitution') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.workInstitution') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -192,7 +192,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.firstAppointmentDate') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.firstAppointmentDate') }} :</label>
           <input
             class="col-span-2 input-field"
             type="date"
@@ -200,7 +200,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.tenureDate') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.tenureDate') }} :</label>
           <input
             class="col-span-2 input-field"
             type="date"
@@ -208,7 +208,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.lastInspectionDate') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.lastInspectionDate') }} :</label>
           <input
             class="col-span-2 input-field"
             type="date"
@@ -216,7 +216,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.qualification') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.qualification') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -224,7 +224,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.graduationYear') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.graduationYear') }} :</label>
           <input
             class="col-span-2 input-field"
             type="number"
@@ -234,7 +234,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.teachingSubject') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.teachingSubject') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -242,7 +242,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.socialSecurityNumber') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.socialSecurityNumber') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -250,7 +250,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.postalAccountNumber') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.postalAccountNumber') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -258,7 +258,7 @@
         </div>
 
         <div class="grid grid-cols-3 items-center gap-2">
-          <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.mutualNumber') }} :</label>
+          <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.mutualNumber') }} :</label>
           <input
             class="col-span-2 input-field"
             type="text"
@@ -270,7 +270,7 @@
     <!-- سطر تواريخ السريان و الاتصال -->
     <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="grid grid-cols-3 items-center gap-2">
-        <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.effectiveFrom') }} :</label>
+        <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.effectiveFrom') }} :</label>
         <input
           class="col-span-2 input-field"
           type="date"
@@ -278,7 +278,7 @@
       </div>
 
       <div class="grid grid-cols-3 items-center gap-2">
-        <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.effectiveTo') }} :</label>
+        <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.effectiveTo') }} :</label>
         <input
           class="col-span-2 input-field"
           type="date"
@@ -288,7 +288,7 @@
 
     <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="grid grid-cols-3 items-center gap-2">
-        <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.address') }} :</label>
+        <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.address') }} :</label>
         <input
           class="col-span-2 input-field"
           type="text"
@@ -296,7 +296,7 @@
       </div>
 
       <div class="grid grid-cols-3 items-center gap-2">
-        <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.wilaya') }} :</label>
+        <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.wilaya') }} :</label>
         <input
           class="col-span-2 input-field"
           type="text"
@@ -304,7 +304,7 @@
       </div>
 
       <div class="grid grid-cols-3 items-center gap-2">
-        <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.phone') }} :</label>
+        <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.phone') }} :</label>
         <input
           class="col-span-2 input-field"
           type="tel"
@@ -314,49 +314,49 @@
 
     <!-- معلومات الحالة المهنية والشهادات -->
     <div class="mt-6 space-y-4">
-      <h2 class="text-base font-semibold text-gray-800">{{ translate('teacherCard.professionalInfo') }}</h2>
+      <h2 class="text-base font-semibold text-gray-800 dark:text-gray-200">{{ translate('teacherCard.professionalInfo') }}</h2>
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.frame') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.frame') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.frame" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.status') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.status') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.status" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.specialty') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.specialty') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.specialty" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.currentSchoolAppointmentDate') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.currentSchoolAppointmentDate') }} :</label>
             <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentSchoolAppointmentDate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.currentSchoolInstallationDate') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.currentSchoolInstallationDate') }} :</label>
             <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentSchoolInstallationDate" />
           </div>
         </div>
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.currentGradeLevel') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.currentGradeLevel') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.currentGradeLevel" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.currentGradeEffectiveDate') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.currentGradeEffectiveDate') }} :</label>
             <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.currentGradeEffectiveDate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.idOrLicenseNumber') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.idOrLicenseNumber') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.idOrLicenseNumber" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.personalPhone') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.personalPhone') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.personalPhone" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.bloodType') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.bloodType') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.bloodType" />
           </div>
         </div>
@@ -365,18 +365,18 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="space-y-3">
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.lastInspectionDate') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.lastInspectionDate') }} :</label>
             <input class="col-span-2 input-field" type="date" [(ngModel)]="teacherCard.lastInspectionDate" />
           </div>
           <div class="grid grid-cols-3 items-center gap-2">
-            <label class="col-span-1 text-sm text-gray-700">{{ translate('teacherCard.lastInspectionScore') }} :</label>
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('teacherCard.lastInspectionScore') }} :</label>
             <input class="col-span-2 input-field" type="text" [(ngModel)]="teacherCard.lastInspectionScore" />
           </div>
         </div>
       </div>
 
       <div class="space-y-3">
-        <h3 class="text-sm font-semibold text-gray-800">{{ translate('teacherCard.degrees') }}</h3>
+        <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('teacherCard.degrees') }}</h3>
         <div class="space-y-2">
           <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
             <input class="input-field" [placeholder]="translate('teacherCard.degree') + ' 1'" [(ngModel)]="teacherCard.degree1" />
@@ -401,7 +401,7 @@
     <div style="position: absolute; left: -9999px; top: -9999px;">
       <div
         #printCard
-        class="print-card bg-white">
+        class="print-card bg-white dark:bg-gray-800">
       <!-- رأس الصفحة -->
       <div class="print-header">
         <div class="print-header-left">

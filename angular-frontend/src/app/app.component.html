@@ -1,11 +1,11 @@
-<div class="min-h-screen" [dir]="dir" [ngClass]="showLayout ? 'bg-gray-100 flex flex-col pt-16' : ''">
+<div class="min-h-screen" [dir]="dir" [ngClass]="showLayout ? 'bg-gray-100 dark:bg-gray-900 flex flex-col pt-16' : 'bg-white dark:bg-gray-900'">
   <app-header *ngIf="showLayout" (toggleMenu)="isSidebarOpen = !isSidebarOpen"></app-header>
 
   <div *ngIf="showLayout" class="flex flex-1 relative">
     <!-- خلفية شفافة لإغلاق القائمة على الشاشات الصغيرة -->
     <div
       *ngIf="isSidebarOpen"
-      class="fixed inset-x-0 top-16 bottom-0 bg-black/30 z-20 md:hidden"
+      class="fixed inset-x-0 top-16 bottom-0 bg-black/30 dark:bg-black/50 z-20 md:hidden"
       (click)="isSidebarOpen = false"
     ></div>
 

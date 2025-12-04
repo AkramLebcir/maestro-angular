@@ -1,28 +1,28 @@
 <!-- Room Setup Modal -->
-<div class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" *ngIf="showRoomSetup" dir="rtl">
-  <div class="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
+<div class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 z-50 flex items-center justify-center" *ngIf="showRoomSetup" dir="rtl">
+  <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-8 max-w-md w-full mx-4">
     <div class="flex items-center justify-between mb-6">
-      <h2 class="text-2xl font-bold text-gray-800">{{ translate('seatingChart.roomDesign') }}</h2>
-      <button class="text-gray-400 hover:text-gray-600 text-2xl" (click)="closeRoomSetup()">×</button>
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ translate('seatingChart.roomDesign') }}</h2>
+      <button class="text-gray-400 hover:text-gray-600 dark:text-gray-400 text-2xl" (click)="closeRoomSetup()">×</button>
     </div>
     
     <div class="space-y-6">
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">{{ translate('seatingChart.numberOfRows') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ translate('seatingChart.numberOfRows') }}</label>
         <div class="flex gap-3">
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
             [class.border-blue-500]="roomRows === 3"
-            [class.bg-blue-50]="roomRows === 3"
-            [class.border-gray-200]="roomRows !== 3"
+            [class.bg-blue-50 dark:bg-blue-900/20]="roomRows === 3"
+            [class.border-gray-200 dark:border-gray-700]="roomRows !== 3"
             (click)="roomRows = 3">
             {{ translate('seatingChart.threeRows') }}
           </button>
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
             [class.border-blue-500]="roomRows === 4"
-            [class.bg-blue-50]="roomRows === 4"
-            [class.border-gray-200]="roomRows !== 4"
+            [class.bg-blue-50 dark:bg-blue-900/20]="roomRows === 4"
+            [class.border-gray-200 dark:border-gray-700]="roomRows !== 4"
             (click)="roomRows = 4">
             {{ translate('seatingChart.fourRows') }}
           </button>
@@ -30,28 +30,28 @@
       </div>
 
       <div>
-        <label class="block text-sm font-medium text-gray-700 mb-2">{{ translate('seatingChart.tableType') }}</label>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ translate('seatingChart.tableType') }}</label>
         <div class="flex gap-3">
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
             [class.border-blue-500]="tableType === 'single'"
-            [class.bg-blue-50]="tableType === 'single'"
-            [class.border-gray-200]="tableType !== 'single'"
+            [class.bg-blue-50 dark:bg-blue-900/20]="tableType === 'single'"
+            [class.border-gray-200 dark:border-gray-700]="tableType !== 'single'"
             (click)="tableType = 'single'">
             <div class="text-center">
               <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.singleTable') }}</div>
-              <div class="text-xs text-gray-500">{{ translate('seatingChart.oneStudent') }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.oneStudent') }}</div>
             </div>
           </button>
           <button 
             class="flex-1 px-4 py-3 rounded-xl border-2 transition"
             [class.border-blue-500]="tableType === 'double'"
-            [class.bg-blue-50]="tableType === 'double'"
-            [class.border-gray-200]="tableType !== 'double'"
+            [class.bg-blue-50 dark:bg-blue-900/20]="tableType === 'double'"
+            [class.border-gray-200 dark:border-gray-700]="tableType !== 'double'"
             (click)="tableType = 'double'">
             <div class="text-center">
               <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.doubleTable') }}</div>
-              <div class="text-xs text-gray-500">{{ translate('seatingChart.twoStudents') }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.twoStudents') }}</div>
             </div>
           </button>
         </div>
@@ -73,7 +73,7 @@
 <div class="p-6 space-y-6" *ngIf="currentClass; else emptyState" dir="rtl">
   <div class="bg-gradient-to-r from-blue-500 to-blue-400 text-white rounded-3xl p-6 shadow flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
     <div class="flex items-center gap-4">
-      <div class="w-20 h-20 rounded-2xl bg-white/20 flex items-center justify-center text-3xl font-bold">
+      <div class="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800/20 flex items-center justify-center text-3xl font-bold">
         {{ currentClass!.name.charAt(0) || 'C' }}
       </div>
       <div>
@@ -121,9 +121,9 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-4 items-center">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 flex flex-wrap gap-4 items-center">
     <div class="flex flex-col">
-      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.class') }}</label>
+      <label class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ translate('seatingChart.class') }}</label>
       <select
         class="select-input"
         [value]="selectedClassId"
@@ -133,7 +133,7 @@
     </div>
 
     <div class="flex flex-col">
-      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.layoutType') }}</label>
+      <label class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ translate('seatingChart.layoutType') }}</label>
       <div class="flex gap-2">
         <button 
           class="group-switch" 
@@ -151,7 +151,7 @@
     </div>
 
     <div class="flex flex-col" *ngIf="layoutMode === 'workstations'">
-      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.group') }}</label>
+      <label class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ translate('seatingChart.group') }}</label>
       <div class="flex gap-2">
         <button class="group-switch" [class.active]="selectedGroup === 1" (click)="toggleGroup(1)">{{ translate('seatingChart.group') }} 1</button>
         <button class="group-switch" [class.active]="selectedGroup === 2" (click)="toggleGroup(2)">{{ translate('seatingChart.group') }} 2</button>
@@ -159,7 +159,7 @@
     </div>
 
     <div class="flex-1 min-w-[200px]">
-      <label class="text-gray-500 text-sm mb-1">{{ translate('seatingChart.searchStudent') }}</label>
+      <label class="text-gray-500 dark:text-gray-400 text-sm mb-1">{{ translate('seatingChart.searchStudent') }}</label>
       <input class="search-input" [placeholder]="translate('seatingChart.searchPlaceholder')" [(ngModel)]="searchTerm" />
     </div>
 
@@ -176,7 +176,7 @@
     </div>
   </div>
 
-  <div class="bg-white rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center text-sm text-gray-600">
+  <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-sm p-4 flex flex-wrap gap-3 items-center text-sm text-gray-600 dark:text-gray-400">
     <button class="primary-outline" (click)="openRoomSetup()" *ngIf="layoutMode === 'classroom'">
       <span *ngIf="!classroomLayout">{{ translate('seatingChart.createRoomLayout') }}</span>
       <span *ngIf="classroomLayout">{{ translate('seatingChart.editRoomLayout') }}</span>
@@ -216,7 +216,7 @@
 
   <div class="grid grid-cols-12 gap-6">
     <div class="col-span-12 xl:col-span-9">
-      <div class="bg-white rounded-3xl shadow-lg p-6 relative h-[640px] flex flex-col">
+      <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg dark:shadow-gray-900/50 p-6 relative h-[640px] flex flex-col">
         <div class="flex items-center justify-between">
           <h3 class="section-title">
             <span *ngIf="layoutMode === 'workstations'">{{ translate('seatingChart.computerLayoutUInverted') }}</span>
@@ -238,14 +238,14 @@
               <div class="workstation-card" [class.editing]="editingStations" [attr.data-capacity]="slot.capacity">
                 <div class="card-header">
                   <div class="card-meta">
-                    <label class="flex items-center gap-2 text-sm text-gray-600">
+                    <label class="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                       <input
                         type="checkbox"
                         [checked]="selectedStationsForPrint.has(slot.workstationId)"
                         (change)="toggleStationSelection(slot.workstationId, $any($event.target).checked)" />
                       {{ slot.label }}
                     </label>
-                    <span class="text-xs text-gray-500">{{ translate('seatingChart.capacity') }} {{ slot.capacity }}</span>
+                    <span class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.capacity') }} {{ slot.capacity }}</span>
                   </div>
                 </div>
                 <div
@@ -296,8 +296,8 @@
             </div>
             <div *ngIf="!loading && layoutMode === 'classroom' && !classroomLayout && workstationSlots.length === 0" class="stage-overlay" style="background: rgba(255, 255, 255, 0.95);">
               <div class="text-center">
-                <p class="text-lg font-semibold text-gray-700 mb-4">{{ translate('seatingChart.noRoomLayout') }}</p>
-                <p class="text-sm text-gray-500 mb-6">{{ translate('seatingChart.createNewRoomLayout') }}</p>
+                <p class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ translate('seatingChart.noRoomLayout') }}</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">{{ translate('seatingChart.createNewRoomLayout') }}</p>
                 <button class="primary-btn" (click)="openRoomSetup()">{{ translate('seatingChart.createRoomLayout') }}</button>
               </div>
             </div>
@@ -336,10 +336,10 @@
     </div>
 
     <div class="col-span-12 xl:col-span-3">
-      <div class="bg-white rounded-3xl shadow-lg p-6 flex flex-col h-full">
+      <div class="bg-white dark:bg-gray-800 rounded-3xl shadow-lg dark:shadow-gray-900/50 p-6 flex flex-col h-full">
         <div class="flex items-center justify-between mb-4">
           <h3 class="section-title">{{ translate('seatingChart.availableStudents') }}</h3>
-          <span class="text-sm text-gray-500">{{ studentPool.length }} {{ translate('seatingChart.students') }}</span>
+          <span class="text-sm text-gray-500 dark:text-gray-400">{{ studentPool.length }} {{ translate('seatingChart.students') }}</span>
         </div>
         <div
           class="students-pool space-y-3 flex-1 overflow-auto"
@@ -369,7 +369,7 @@
             <span *ngIf="layoutMode === 'classroom'">{{ translate('seatingChart.allClassStudentsAssigned') }}</span>
           </div>
         </div>
-        <div class="pt-4 border-t mt-4 text-sm text-gray-500" *ngIf="layoutMode === 'workstations'">
+        <div class="pt-4 border-t mt-4 text-sm text-gray-500 dark:text-gray-400" *ngIf="layoutMode === 'workstations'">
           <p>{{ translate('seatingChart.selectComputers') }}</p>
           <button class="ghost-btn mt-2 w-full" (click)="selectAllStations()">{{ translate('seatingChart.selectAllStations') }}</button>
           <p class="text-xs mt-2 text-gray-400">{{ translate('seatingChart.printAllIfNoneSelected') }}</p>
@@ -434,14 +434,14 @@
       <div class="print-grid">
         <div *ngFor="let workstation of groupBlock.workstations" class="print-card">
           <div class="print-card-header">
-            <span class="font-bold text-gray-800">{{ workstation.label }}</span>
-            <span class="text-xs text-gray-500">{{ translate('seatingChart.capacity') }} {{ workstation.capacity }}</span>
+            <span class="font-bold text-gray-800 dark:text-gray-200">{{ workstation.label }}</span>
+            <span class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.capacity') }} {{ workstation.capacity }}</span>
           </div>
           <div class="print-card-body">
             <ng-container *ngIf="workstation.assignments?.length; else emptyPrint">
               <div *ngFor="let assignment of workstation.assignments" class="print-student-row">
                 <span class="font-semibold">{{ assignment.student.firstName }} {{ assignment.student.lastName }}</span>
-                <span class="text-xs text-gray-500">
+                <span class="text-xs text-gray-500 dark:text-gray-400">
                   ({{ getAttendanceLabel(assignment.attendanceStatus) }}، {{ getBehaviorLabel(assignment.behaviorStatus) }})
                 </span>
               </div>
@@ -457,7 +457,7 @@
 </ng-template>
 
 <ng-template #emptyState>
-  <div class="p-12 text-center text-gray-500">
+  <div class="p-12 text-center text-gray-500 dark:text-gray-400">
     {{ translate('seatingChart.noClassesAvailable') }}
   </div>
 </ng-template>

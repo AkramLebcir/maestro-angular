@@ -14,14 +14,14 @@
   </div>
 
   <!-- Tabs -->
-  <div class="bg-white rounded-lg shadow-sm mb-6">
-    <div class="border-b border-gray-200">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm mb-6">
+    <div class="border-b border-gray-200 dark:border-gray-700">
       <nav class="flex -mb-px">
         <button
           (click)="setActiveSection('stats')"
           [class]="activeSection === 'stats' 
             ? 'border-blue-500 text-blue-600 font-semibold' 
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'"
           class="px-6 py-4 border-b-2 transition-colors"
         >
           {{ translate('subscriptionManagement.stats') }}
@@ -30,7 +30,7 @@
           (click)="setActiveSection('plans')"
           [class]="activeSection === 'plans' 
             ? 'border-blue-500 text-blue-600 font-semibold' 
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'"
           class="px-6 py-4 border-b-2 transition-colors"
         >
           {{ translate('subscriptionManagement.plans') }}
@@ -39,7 +39,7 @@
           (click)="setActiveSection('subscriptions')"
           [class]="activeSection === 'subscriptions' 
             ? 'border-blue-500 text-blue-600 font-semibold' 
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'"
           class="px-6 py-4 border-b-2 transition-colors"
         >
           {{ translate('subscriptionManagement.subscriptions') }}
@@ -48,7 +48,7 @@
           (click)="setActiveSection('payments')"
           [class]="activeSection === 'payments' 
             ? 'border-blue-500 text-blue-600 font-semibold' 
-            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'"
+            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300 hover:border-gray-300 dark:border-gray-600'"
           class="px-6 py-4 border-b-2 transition-colors"
         >
           {{ translate('subscriptionManagement.payments') }}
@@ -58,10 +58,10 @@
   </div>
 
   <!-- Stats Section -->
-  <div *ngIf="activeSection === 'stats'" class="bg-white rounded-lg shadow-sm p-6">
+  <div *ngIf="activeSection === 'stats'" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <h3 class="text-xl font-bold text-gray-800 mb-6">{{ translate('subscriptionManagement.overview') }}</h3>
     <div *ngIf="stats" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <div class="bg-blue-50 p-4 rounded-lg">
+      <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
         <div class="text-sm text-gray-600">{{ translate('subscriptionManagement.totalSubscriptions') }}</div>
         <div class="text-2xl font-bold text-blue-600">{{ stats.subscriptions.total }}</div>
       </div>
@@ -69,11 +69,11 @@
         <div class="text-sm text-gray-600">{{ translate('subscriptionManagement.activeSubscriptions') }}</div>
         <div class="text-2xl font-bold text-green-600">{{ stats.subscriptions.active }}</div>
       </div>
-      <div class="bg-yellow-50 p-4 rounded-lg">
+      <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
         <div class="text-sm text-gray-600">{{ translate('subscriptionManagement.pendingSubscriptions') }}</div>
         <div class="text-2xl font-bold text-yellow-600">{{ stats.subscriptions.pending }}</div>
       </div>
-      <div class="bg-purple-50 p-4 rounded-lg">
+      <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
         <div class="text-sm text-gray-600">{{ translate('subscriptionManagement.totalRevenue') }}</div>
         <div class="text-2xl font-bold text-purple-600">{{ formatCurrency(stats.revenue.total) }}</div>
       </div>
@@ -81,7 +81,7 @@
   </div>
 
   <!-- Plans Section -->
-  <div *ngIf="activeSection === 'plans'" class="bg-white rounded-lg shadow-sm p-6">
+  <div *ngIf="activeSection === 'plans'" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-gray-800">{{ translate('subscriptionManagement.plans') }}</h3>
       <button
@@ -92,42 +92,42 @@
       </button>
     </div>
 
-    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">{{ translate('common.loading') }}</div>
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500 dark:text-gray-400">{{ translate('common.loading') }}</div>
 
-    <div *ngIf="!isLoading && plans.length === 0" class="text-center py-8 text-gray-500">
+    <div *ngIf="!isLoading && plans.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
       {{ translate('subscriptionManagement.noPlans') }}
     </div>
 
     <div *ngIf="!isLoading && plans.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead class="bg-gray-50 dark:bg-gray-900">
           <tr>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.name') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.planType') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.planPrice') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.planDuration') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.status') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.actions') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.name') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.planType') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.planPrice') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.planDuration') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.status') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.actions') }}</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let plan of plans" class="hover:bg-gray-50">
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+          <tr *ngFor="let plan of plans" class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ plan.name }}</div>
-              <div class="text-sm text-gray-500">{{ plan.nameEn }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ plan.name }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">{{ plan.nameEn }}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
               {{ plan.type === 'semester' ? translate('subscriptionManagement.planTypeSemester') : translate('subscriptionManagement.planTypeAnnual') }}
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(plan.price) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ plan.durationMonths }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ formatCurrency(plan.price) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ plan.durationMonths }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <span [class]="plan.isActive ? 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800'">
+              <span [class]="plan.isActive ? 'px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800' : 'px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 dark:bg-gray-800 text-gray-800'">
                 {{ plan.isActive ? translate('subscriptionManagement.statusActive') : translate('common.inactive') }}
               </span>
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-              <button (click)="openEditPlanForm(plan)" class="text-blue-600 hover:text-blue-900">{{ translate('common.edit') }}</button>
+              <button (click)="openEditPlanForm(plan)" class="text-blue-600 hover:text-blue-900 dark:text-blue-100">{{ translate('common.edit') }}</button>
               <button (click)="deletePlan(plan)" class="text-red-600 hover:text-red-900">{{ translate('common.delete') }}</button>
             </td>
           </tr>
@@ -137,48 +137,48 @@
   </div>
 
   <!-- Subscriptions Section -->
-  <div *ngIf="activeSection === 'subscriptions'" class="bg-white rounded-lg shadow-sm p-6">
+  <div *ngIf="activeSection === 'subscriptions'" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-gray-800">{{ translate('subscriptionManagement.subscriptions') }}</h3>
     </div>
 
-    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">{{ translate('common.loading') }}</div>
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500 dark:text-gray-400">{{ translate('common.loading') }}</div>
 
-    <div *ngIf="!isLoading && subscriptions.length === 0" class="text-center py-8 text-gray-500">
+    <div *ngIf="!isLoading && subscriptions.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
       {{ translate('subscriptionManagement.noSubscriptions') }}
     </div>
 
     <div *ngIf="!isLoading && subscriptions.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead class="bg-gray-50 dark:bg-gray-900">
           <tr>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.teacher') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.plan') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.status') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.startDate') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.endDate') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.actions') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.teacher') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.plan') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.status') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.startDate') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.endDate') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.actions') }}</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let subscription of subscriptions" class="hover:bg-gray-50">
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+          <tr *ngFor="let subscription of subscriptions" class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {{ subscription.user ? (subscription.user.firstName || '') + ' ' + (subscription.user.lastName || '') : translate('subscriptionManagement.unknown') }}
               </div>
-              <div class="text-sm text-gray-500">{{ subscription.user?.email }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">{{ subscription.user?.email }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">{{ subscription.plan?.name }}</div>
-              <div class="text-sm text-gray-500">{{ formatCurrency(subscription.plan?.price || 0) }}</div>
+              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ subscription.plan?.name }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">{{ formatCurrency(subscription.plan?.price || 0) }}</div>
             </td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [class]="getSubscriptionStatusClass(subscription.status)">
                 {{ getSubscriptionStatusText(subscription.status) }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(subscription.startDate) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(subscription.endDate) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ formatDate(subscription.startDate) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ formatDate(subscription.endDate) }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
               <button
                 *ngIf="subscription.status === 'pending'"
@@ -202,7 +202,7 @@
   </div>
 
   <!-- Payments Section -->
-  <div *ngIf="activeSection === 'payments'" class="bg-white rounded-lg shadow-sm p-6">
+  <div *ngIf="activeSection === 'payments'" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-gray-800">{{ translate('subscriptionManagement.payments') }}</h3>
       <button
@@ -213,42 +213,42 @@
       </button>
     </div>
 
-    <div *ngIf="isLoading" class="text-center py-8 text-gray-500">{{ translate('common.loading') }}</div>
+    <div *ngIf="isLoading" class="text-center py-8 text-gray-500 dark:text-gray-400">{{ translate('common.loading') }}</div>
 
-    <div *ngIf="!isLoading && payments.length === 0" class="text-center py-8 text-gray-500">
+    <div *ngIf="!isLoading && payments.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
       {{ translate('subscriptionManagement.noPayments') }}
     </div>
 
     <div *ngIf="!isLoading && payments.length > 0" class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
+        <thead class="bg-gray-50 dark:bg-gray-900">
           <tr>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.teacher') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.amount') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.paymentMethod') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.status') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('subscriptionManagement.paymentDate') }}</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">{{ translate('common.actions') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.teacher') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.amount') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.paymentMethod') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.status') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('subscriptionManagement.paymentDate') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ translate('common.actions') }}</th>
           </tr>
         </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <tr *ngFor="let payment of payments" class="hover:bg-gray-50">
+        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
+          <tr *ngFor="let payment of payments" class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
             <td class="px-6 py-4 whitespace-nowrap">
-              <div class="text-sm font-medium text-gray-900">
+              <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
                 {{ payment.user ? (payment.user.firstName || '') + ' ' + (payment.user.lastName || '') : translate('subscriptionManagement.unknown') }}
               </div>
-              <div class="text-sm text-gray-500">{{ payment.user?.email }}</div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">{{ payment.user?.email }}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ formatCurrency(payment.amount) }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ getPaymentMethodText(payment.method) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">{{ formatCurrency(payment.amount) }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ getPaymentMethodText(payment.method) }}</td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span [class]="getPaymentStatusClass(payment.status)">
                 {{ getPaymentStatusText(payment.status) }}
               </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatDate(payment.paidAt || '') }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ formatDate(payment.paidAt || '') }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-              <button (click)="openUpdatePaymentModal(payment)" class="text-blue-600 hover:text-blue-900">{{ translate('common.edit') }}</button>
+              <button (click)="openUpdatePaymentModal(payment)" class="text-blue-600 hover:text-blue-900 dark:text-blue-100">{{ translate('common.edit') }}</button>
             </td>
           </tr>
         </tbody>
@@ -257,52 +257,52 @@
   </div>
 
   <!-- Plan Form Modal -->
-  <div *ngIf="showPlanForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePlanForm()">
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+  <div *ngIf="showPlanForm" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50" (click)="closePlanForm()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
       <h3 class="text-xl font-bold text-gray-800 mb-4">{{ editingPlan ? translate('subscriptionManagement.editPlan') : translate('subscriptionManagement.addNewPlan') }}</h3>
       <form (ngSubmit)="savePlan()">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planName') }}</label>
-            <input type="text" [(ngModel)]="planForm.name" name="name" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planName') }}</label>
+            <input type="text" [(ngModel)]="planForm.name" name="name" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planNameEn') }}</label>
-            <input type="text" [(ngModel)]="planForm.nameEn" name="nameEn" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planNameEn') }}</label>
+            <input type="text" [(ngModel)]="planForm.nameEn" name="nameEn" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planType') }}</label>
-            <select [(ngModel)]="planForm.type" name="type" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planType') }}</label>
+            <select [(ngModel)]="planForm.type" name="type" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
               <option value="semester">{{ translate('subscriptionManagement.planTypeSemester') }}</option>
               <option value="annual">{{ translate('subscriptionManagement.planTypeAnnual') }}</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planPrice') }}</label>
-            <input type="number" [(ngModel)]="planForm.price" name="price" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="0" step="0.01">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planPrice') }}</label>
+            <input type="number" [(ngModel)]="planForm.price" name="price" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required min="0" step="0.01">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planDuration') }}</label>
-            <input type="number" [(ngModel)]="planForm.durationMonths" name="durationMonths" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="1">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planDuration') }}</label>
+            <input type="number" [(ngModel)]="planForm.durationMonths" name="durationMonths" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required min="1">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('common.status') }}</label>
-            <select [(ngModel)]="planForm.isActive" name="isActive" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('common.status') }}</label>
+            <select [(ngModel)]="planForm.isActive" name="isActive" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
               <option [value]="true">{{ translate('subscriptionManagement.statusActive') }}</option>
               <option [value]="false">{{ translate('common.inactive') }}</option>
             </select>
           </div>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planDescription') }}</label>
-          <textarea [(ngModel)]="planForm.description" name="description" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planDescription') }}</label>
+          <textarea [(ngModel)]="planForm.description" name="description" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planDescriptionEn') }}</label>
-          <textarea [(ngModel)]="planForm.descriptionEn" name="descriptionEn" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planDescriptionEn') }}</label>
+          <textarea [(ngModel)]="planForm.descriptionEn" name="descriptionEn" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
         </div>
         <div class="flex justify-end space-x-3">
-          <button type="button" (click)="closePlanForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ translate('common.cancel') }}</button>
+          <button type="button" (click)="closePlanForm()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
           <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">{{ translate('common.save') }}</button>
         </div>
       </form>
@@ -310,20 +310,20 @@
   </div>
 
   <!-- Activate Subscription Modal -->
-  <div *ngIf="showActivateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closeActivateModal()">
-    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
+  <div *ngIf="showActivateModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50" (click)="closeActivateModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full mx-4" (click)="$event.stopPropagation()">
       <h3 class="text-xl font-bold text-gray-800 mb-4">{{ translate('subscriptionManagement.activateSubscriptionTitle') }}</h3>
       <form (ngSubmit)="activateSubscription()">
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.startDate') }}</label>
-          <input type="date" [(ngModel)]="activateForm.startDate" name="startDate" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.startDate') }}</label>
+          <input type="date" [(ngModel)]="activateForm.startDate" name="startDate" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
-          <textarea [(ngModel)]="activateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
+          <textarea [(ngModel)]="activateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
         </div>
         <div class="flex justify-end space-x-3">
-          <button type="button" (click)="closeActivateModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ translate('common.cancel') }}</button>
+          <button type="button" (click)="closeActivateModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
           <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">{{ translate('subscriptionManagement.activate') }}</button>
         </div>
       </form>
@@ -331,14 +331,14 @@
   </div>
 
   <!-- Payment Form Modal -->
-  <div *ngIf="showPaymentForm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePaymentForm()">
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+  <div *ngIf="showPaymentForm" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50" (click)="closePaymentForm()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
       <h3 class="text-xl font-bold text-gray-800 mb-4">{{ translate('subscriptionManagement.addNewPayment') }}</h3>
       <form (ngSubmit)="savePayment()">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.subscriptions') }}</label>
-            <select [(ngModel)]="paymentForm.subscriptionId" name="subscriptionId" class="w-full border border-gray-300 rounded-lg px-3 py-2" required>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.subscriptions') }}</label>
+            <select [(ngModel)]="paymentForm.subscriptionId" name="subscriptionId" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
               <option [value]="0">{{ translate('subscriptionManagement.selectSubscription') }}</option>
               <option *ngFor="let sub of subscriptions" [value]="sub.id">
                 {{ sub.user ? (sub.user.firstName || '') + ' ' + (sub.user.lastName || '') : translate('subscriptionManagement.unknown') }} - {{ sub.plan?.name }}
@@ -346,36 +346,36 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.planPrice') }}</label>
-            <input type="number" [(ngModel)]="paymentForm.amount" name="amount" class="w-full border border-gray-300 rounded-lg px-3 py-2" required min="0" step="0.01">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.planPrice') }}</label>
+            <input type="number" [(ngModel)]="paymentForm.amount" name="amount" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required min="0" step="0.01">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.paymentMethod') }}</label>
-            <select [(ngModel)]="paymentForm.method" name="method" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.paymentMethod') }}</label>
+            <select [(ngModel)]="paymentForm.method" name="method" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
               <option value="manual">{{ translate('subscriptionManagement.paymentMethodManual') }}</option>
               <option value="card">{{ translate('subscriptionManagement.paymentMethodCard') }}</option>
               <option value="other">{{ translate('subscriptionManagement.paymentMethodOther') }}</option>
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.paymentDate') }}</label>
-            <input type="date" [(ngModel)]="paymentForm.paidAt" name="paidAt" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.paymentDate') }}</label>
+            <input type="date" [(ngModel)]="paymentForm.paidAt" name="paidAt" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.transactionId') }}</label>
-            <input type="text" [(ngModel)]="paymentForm.transactionId" name="transactionId" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.transactionId') }}</label>
+            <input type="text" [(ngModel)]="paymentForm.transactionId" name="transactionId" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.receiptNumber') }}</label>
-            <input type="text" [(ngModel)]="paymentForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.receiptNumber') }}</label>
+            <input type="text" [(ngModel)]="paymentForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
-          <textarea [(ngModel)]="paymentForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
+          <textarea [(ngModel)]="paymentForm.notes" name="notes" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
         </div>
         <div class="flex justify-end space-x-3">
-          <button type="button" (click)="closePaymentForm()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ translate('common.cancel') }}</button>
+          <button type="button" (click)="closePaymentForm()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
           <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">{{ translate('common.save') }}</button>
         </div>
       </form>
@@ -383,14 +383,14 @@
   </div>
 
   <!-- Payment Update Modal -->
-  <div *ngIf="showPaymentUpdateModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" (click)="closePaymentUpdateModal()">
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+  <div *ngIf="showPaymentUpdateModal" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50" (click)="closePaymentUpdateModal()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
       <h3 class="text-xl font-bold text-gray-800 mb-4">{{ translate('subscriptionManagement.updatePayment') }}</h3>
       <form (ngSubmit)="updatePayment()">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('common.status') }}</label>
-            <select [(ngModel)]="paymentUpdateForm.status" name="status" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('common.status') }}</label>
+            <select [(ngModel)]="paymentUpdateForm.status" name="status" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
               <option value="pending">{{ translate('subscriptionManagement.statusPending') }}</option>
               <option value="completed">{{ translate('subscriptionManagement.statusCompleted') }}</option>
               <option value="failed">{{ translate('subscriptionManagement.statusFailed') }}</option>
@@ -398,24 +398,24 @@
             </select>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.paymentDate') }}</label>
-            <input type="date" [(ngModel)]="paymentUpdateForm.paidAt" name="paidAt" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.paymentDate') }}</label>
+            <input type="date" [(ngModel)]="paymentUpdateForm.paidAt" name="paidAt" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.transactionId') }}</label>
-            <input type="text" [(ngModel)]="paymentUpdateForm.transactionId" name="transactionId" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.transactionId') }}</label>
+            <input type="text" [(ngModel)]="paymentUpdateForm.transactionId" name="transactionId" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.receiptNumber') }}</label>
-            <input type="text" [(ngModel)]="paymentUpdateForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.receiptNumber') }}</label>
+            <input type="text" [(ngModel)]="paymentUpdateForm.receiptNumber" name="receiptNumber" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2">
           </div>
         </div>
         <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
-          <textarea [(ngModel)]="paymentUpdateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2"></textarea>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
+          <textarea [(ngModel)]="paymentUpdateForm.notes" name="notes" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
         </div>
         <div class="flex justify-end space-x-3">
-          <button type="button" (click)="closePaymentUpdateModal()" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">{{ translate('common.cancel') }}</button>
+          <button type="button" (click)="closePaymentUpdateModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
           <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">{{ translate('common.save') }}</button>
         </div>
       </form>

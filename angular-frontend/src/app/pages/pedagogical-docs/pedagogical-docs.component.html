@@ -13,8 +13,8 @@
   </div>
 
   <!-- Upload form -->
-  <section class="bg-white rounded-lg shadow p-4 space-y-4">
-    <h2 class="text-lg font-semibold text-gray-700">{{ translate('pedagogicalDocs.addDocument') }}</h2>
+  <section class="bg-white dark:bg-gray-800 rounded-lg shadow p-4 space-y-4">
+    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">{{ translate('pedagogicalDocs.addDocument') }}</h2>
     <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
       <div class="flex flex-col">
         <label class="text-xs text-gray-500 mb-1">{{ translate('pedagogicalDocs.titleLabel') }}</label>
@@ -69,7 +69,7 @@
           class="text-xs"
           accept=".pdf,.png,.jpg,.jpeg,.doc,.docx"
         />
-        <span *ngIf="newDoc.file" class="text-xs text-gray-600">
+        <span *ngIf="newDoc.file" class="text-xs text-gray-600 dark:text-gray-400">
           {{ newDoc.file.name }}
         </span>
       </div>
@@ -115,7 +115,7 @@
     <div class="flex-1"></div>
     <div class="text-xs text-gray-500">
       {{ translate('pedagogicalDocs.documentsCount') }}
-      <span class="font-semibold text-gray-700">{{ docs.length }}</span>
+      <span class="font-semibold text-gray-700 dark:text-gray-300">{{ docs.length }}</span>
     </div>
   </section>
 
@@ -127,7 +127,7 @@
   <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
     <div
       *ngFor="let doc of docs"
-      class="bg-white rounded-xl shadow hover:shadow-lg transition cursor-pointer flex flex-col"
+      class="bg-white dark:bg-gray-800 rounded-xl shadow hover:shadow-lg dark:shadow-gray-900/50 transition cursor-pointer flex flex-col"
       (click)="openDoc(doc)"
     >
       <div class="relative h-40 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-t-xl overflow-hidden">
@@ -150,22 +150,22 @@
           </div>
         </div>
         <!-- Simple flip effect decoration -->
-        <div class="absolute inset-y-0 left-0 w-6 bg-white bg-opacity-10 backdrop-blur-sm transform -skew-x-6 origin-left"></div>
+        <div class="absolute inset-y-0 left-0 w-6 bg-white dark:bg-gray-800 bg-opacity-10 backdrop-blur-sm transform -skew-x-6 origin-left"></div>
       </div>
 
       <div class="p-3 flex-1 flex flex-col text-sm">
         <div class="flex items-center justify-between mb-1">
-          <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-700">
+          <span class="px-2 py-0.5 rounded-full text-xs bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
             المستوى: {{ doc.level }}
           </span>
-          <span *ngIf="doc.subject" class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 text-emerald-700">
+          <span *ngIf="doc.subject" class="px-2 py-0.5 rounded-full text-xs bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700">
             {{ doc.subject }}
           </span>
         </div>
         <div class="text-xs text-gray-400 mb-2">
           {{ doc.originalFileName }}
         </div>
-        <div class="mt-auto flex justify-between items-center pt-2 border-t border-gray-100">
+        <div class="mt-auto flex justify-between items-center pt-2 border-t border-gray-100 dark:border-gray-700">
           <span class="text-[11px] text-gray-400">
             {{ doc.createdAt | date:'yyyy/MM/dd HH:mm' }}
           </span>
@@ -186,7 +186,7 @@
   <!-- Preview modal -->
   <div
     *ngIf="selectedDoc"
-    class="fixed inset-0 bg-black bg-opacity-80 z-40"
+    class="fixed inset-0 bg-black bg-opacity-80 dark:bg-black dark:bg-opacity-75 z-40"
   >
     <!-- زر الإغلاق فوق الإطار -->
     <button
@@ -200,14 +200,14 @@
     <iframe
       *ngIf="selectedDoc && isPdf(selectedDoc)"
       [src]="getViewerUrl(selectedDoc) | safeUrl"
-      class="w-screen h-screen border-0 bg-white"
+      class="w-screen h-screen border-0 bg-white dark:bg-gray-800"
     ></iframe>
 
     <!-- عرض الصور / الملفات غير PDF بالحجم الكامل تقريبًا -->
     <img
       *ngIf="selectedDoc && !isPdf(selectedDoc)"
       [src]="getViewerUrl(selectedDoc)"
-      class="w-screen h-screen object-contain bg-white"
+      class="w-screen h-screen object-contain bg-white dark:bg-gray-800"
       alt="preview"
     />
   </div>
