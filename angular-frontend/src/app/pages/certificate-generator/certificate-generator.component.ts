@@ -2,8 +2,10 @@ import {
   Component,
   ElementRef,
   Input,
+  OnDestroy,
   OnInit,
   ViewChild,
+  Inject,
 } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { CertificateService, CertificateTemplate } from '../../services/certificate.service';
@@ -28,7 +30,7 @@ interface StudentOption {
   templateUrl: './certificate-generator.component.html',
   styleUrls: ['./certificate-generator.component.css'],
 })
-export class CertificateGeneratorComponent implements OnInit {
+export class CertificateGeneratorComponent implements OnInit, OnDestroy {
   @ViewChild('certificatePreview', { static: false })
   certificatePreview?: ElementRef<HTMLDivElement>;
   @Input()
@@ -54,12 +56,13 @@ export class CertificateGeneratorComponent implements OnInit {
   errorMessage = '';
 
   availableTemplates: CertificateTemplate[] = [];
+  private languageSubscription?: any;
 
   constructor(
     private certificateService: CertificateService,
     private apiService: ApiService,
     private authService: AuthService,
-    public languageService: LanguageService,
+    @Inject('LanguageService') public languageService: LanguageService,
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -76,6 +79,26 @@ export class CertificateGeneratorComponent implements OnInit {
       : '';
     this.loadClasses();
     this.loadTemplates();
+    
+    // Subscribe to language changes to update certificate content
+    this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
+      // Update content when language changes if a template is selected
+      if (this.selectedTemplateId) {
+        const template = this.availableTemplates.find((tpl) => tpl.id === this.selectedTemplateId);
+        if (template) {
+          const translatedMainText = this.getTranslatedMainText(template.name, template.defaultMainText);
+          const translatedReason = this.getTranslatedReason(template.name, template.defaultReason);
+          this.mainText = this.replaceStudentPlaceholder(translatedMainText);
+          this.reason = translatedReason;
+        }
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.languageSubscription) {
+      this.languageSubscription.unsubscribe();
+    }
   }
 
   private buildAcademicYear(): string {
@@ -145,10 +168,44 @@ export class CertificateGeneratorComponent implements OnInit {
     }
     this.selectedTemplateId = template.id;
     this.selectedTemplateName = template.name;
-    this.mainText = this.replaceStudentPlaceholder(template.defaultMainText);
-    this.reason = template.defaultReason;
+    
+    // Translate default main text and reason based on template type
+    const translatedMainText = this.getTranslatedMainText(template.name, template.defaultMainText);
+    const translatedReason = this.getTranslatedReason(template.name, template.defaultReason);
+    
+    this.mainText = this.replaceStudentPlaceholder(translatedMainText);
+    this.reason = translatedReason;
     this.academicYear = template.defaultAcademicYear;
     this.signatureName = template.defaultSignatureLabel;
+  }
+
+  private getTranslatedMainText(templateName: string, defaultText: string): string {
+    const student = this.students.find((item) => item.id === this.selectedStudentId);
+    const studentName = student ? `${student.firstName} ${student.lastName ?? ''}`.trim() : this.translate('certificate.student');
+    
+    // Check template type and return translated text
+    if (templateName.includes('تفوق دراسي') || templateName.includes('Academic Excellence')) {
+      return this.translate('certificate.defaultMainTextAcademicExcellence', { student: studentName });
+    } else if (templateName.includes('حسن سلوك') || templateName.includes('Good Conduct')) {
+      return this.translate('certificate.defaultMainTextGoodConduct', { student: studentName });
+    } else if (templateName.includes('مشاركة فعالة') || templateName.includes('Active Participation')) {
+      return this.translate('certificate.defaultMainTextActiveParticipation', { student: studentName });
+    }
+    // For other templates, use the default text
+    return defaultText;
+  }
+
+  private getTranslatedReason(templateName: string, defaultReason: string): string {
+    // Check template type and return translated reason
+    if (templateName.includes('تفوق دراسي') || templateName.includes('Academic Excellence')) {
+      return this.translate('certificate.defaultReasonAcademicExcellence');
+    } else if (templateName.includes('حسن سلوك') || templateName.includes('Good Conduct')) {
+      return this.translate('certificate.defaultReasonGoodConduct');
+    } else if (templateName.includes('مشاركة فعالة') || templateName.includes('Active Participation')) {
+      return this.translate('certificate.defaultReasonActiveParticipation');
+    }
+    // For other templates, use the default reason
+    return defaultReason;
   }
 
   private replaceStudentPlaceholder(text: string): string {
@@ -163,7 +220,9 @@ export class CertificateGeneratorComponent implements OnInit {
     }
     const template = this.availableTemplates.find((tpl) => tpl.id === this.selectedTemplateId);
     if (template) {
-      this.mainText = this.replaceStudentPlaceholder(template.defaultMainText);
+      // Translate default main text based on template type
+      const translatedMainText = this.getTranslatedMainText(template.name, template.defaultMainText);
+      this.mainText = this.replaceStudentPlaceholder(translatedMainText);
     }
   }
 
@@ -267,6 +326,23 @@ export class CertificateGeneratorComponent implements OnInit {
     if (this.selectedTemplateName.includes('تفوق دراسي')) return 'theme-modern';
     if (this.selectedTemplateName.includes('مشاركة فعالة')) return 'theme-creative';
     return 'theme-classic';
+  }
+
+  getTemplateKey(templateName: string): string {
+    const templateMap: Record<string, string> = {
+      'تقدير تفوق دراسي': 'certificate.templateAcademicExcellence',
+      'تقدير حسن سلوك': 'certificate.templateGoodConduct',
+      'تقدير مشاركة فعالة': 'certificate.templateActiveParticipation'
+    };
+    return templateMap[templateName] || '';
+  }
+
+  getTemplateTranslation(templateName: string): string {
+    const key = this.getTemplateKey(templateName);
+    if (key) {
+      return this.translate(key);
+    }
+    return templateName;
   }
 
   get selectedStudent() {

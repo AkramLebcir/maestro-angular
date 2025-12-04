@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
@@ -169,16 +169,16 @@ export class DashboardComponent implements OnInit {
 
   // Attendance doughnut chart
   attendanceChartData: ChartConfiguration<'doughnut'>['data'] = {
-    labels: ['حاضر', 'غائب', 'مرخَّص', 'متأخر', 'مريض'],
+    labels: ['', '', '', '', ''],
     datasets: [
       {
         data: [0, 0, 0, 0, 0],
         backgroundColor: [
-          '#22c55e', // green - حاضر
-          '#ef4444', // red - غائب
-          '#2563eb', // blue - مرخَّص
-          '#f97316', // orange - متأخر
-          '#eab308'  // yellow - مريض
+          '#22c55e', // green - present
+          '#ef4444', // red - absent
+          '#2563eb', // blue - excused
+          '#f97316', // orange - late
+          '#eab308'  // yellow - sick
         ],
         borderWidth: 1
       }
@@ -196,15 +196,15 @@ export class DashboardComponent implements OnInit {
 
   // Behavior bar chart
   behaviorChartData: ChartConfiguration<'bar'>['data'] = {
-    labels: ['السلوك'],
+    labels: [''],
     datasets: [
       {
-        label: 'إيجابي',
+        label: '',
         data: [0],
         backgroundColor: '#22c55e'
       },
       {
-        label: 'سلبي',
+        label: '',
         data: [0],
         backgroundColor: '#ef4444'
       }
@@ -224,12 +224,12 @@ export class DashboardComponent implements OnInit {
     }
   };
 
-  // Grade distribution bar chart (توزيع حسب النطاقات)
+  // Grade distribution bar chart
   gradeDistributionChartData: ChartConfiguration<'bar'>['data'] = {
     labels: ['<10', '10-12', '12-14', '14-16', '>16'],
     datasets: [
       {
-        label: 'عدد التلاميذ',
+        label: '',
         data: [0, 0, 0, 0, 0],
         backgroundColor: '#2563eb'
       }
@@ -247,7 +247,7 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    public languageService: LanguageService,
+    @Inject('LanguageService') public languageService: LanguageService,
     public notificationService: NotificationService
   ) {}
 
@@ -256,20 +256,59 @@ export class DashboardComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // تاريخ اليوم بالعربية
-    const today = new Date();
-    this.todayLabel = today.toLocaleDateString('ar-EG', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
+    this.updateTodayLabel();
+    this.updateChartLabels();
+    
+    // Subscribe to language changes
+    this.languageService.currentLanguage$.subscribe(() => {
+      this.updateTodayLabel();
+      this.updateChartLabels();
     });
 
     this.loadDashboardData();
     this.loadSubjectProgramProgress();
     this.loadLabStatus();
-    // إنشاء إشعارات جديدة
     this.generateNotifications();
+  }
+
+  private updateTodayLabel(): void {
+    const today = new Date();
+    const lang = this.languageService.getCurrentLanguage();
+    const localeMap: { [key: string]: string } = {
+      'AR': 'ar-EG',
+      'FR': 'fr-FR',
+      'EN': 'en-US',
+      'ES': 'es-ES',
+      'IT': 'it-IT',
+      'DE': 'de-DE',
+      'TR': 'tr-TR'
+    };
+    const locale = localeMap[lang] || 'ar-EG';
+    this.todayLabel = today.toLocaleDateString(locale, {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+
+  private updateChartLabels(): void {
+    // Update attendance chart labels
+    this.attendanceChartData.labels = [
+      this.translate('dashboard.present'),
+      this.translate('dashboard.absent'),
+      this.translate('dashboard.excused'),
+      this.translate('dashboard.late'),
+      this.translate('dashboard.sick')
+    ];
+    
+    // Update behavior chart labels
+    this.behaviorChartData.labels = [this.translate('dashboard.behavior')];
+    this.behaviorChartData.datasets[0].label = this.translate('dashboard.behaviorPositive');
+    this.behaviorChartData.datasets[1].label = this.translate('dashboard.behaviorNegative');
+    
+    // Update grade distribution chart label
+    this.gradeDistributionChartData.datasets[0].label = this.translate('dashboard.numberOfStudents');
   }
 
   /** المعدل العام على 20 بدل النسبة المئوية */
@@ -616,7 +655,7 @@ export class DashboardComponent implements OnInit {
     this.averageAttendance =
       totalRecords > 0 ? (summary.present / totalRecords) * 100 : 0;
 
-    // تحديث رسم الحضور
+    // Update attendance chart data
     this.attendanceChartData = {
       ...this.attendanceChartData,
       datasets: [
@@ -632,6 +671,8 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
+    // Ensure labels are translated
+    this.updateChartLabels();
   }
 
   /**
@@ -665,6 +706,8 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
+    // Ensure labels are translated
+    this.updateChartLabels();
   }
 
   /**
@@ -679,6 +722,7 @@ export class DashboardComponent implements OnInit {
         ...this.gradeDistributionChartData,
         datasets: [{ ...this.gradeDistributionChartData.datasets[0], data: [0, 0, 0, 0, 0] }]
       };
+      this.updateChartLabels();
       return;
     }
 
@@ -714,6 +758,7 @@ export class DashboardComponent implements OnInit {
         ...this.gradeDistributionChartData,
         datasets: [{ ...this.gradeDistributionChartData.datasets[0], data: [0, 0, 0, 0, 0] }]
       };
+      this.updateChartLabels();
       return;
     }
 
@@ -793,6 +838,8 @@ export class DashboardComponent implements OnInit {
         }
       ]
     };
+    // Ensure labels are translated
+    this.updateChartLabels();
   }
 
   /**

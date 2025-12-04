@@ -124,12 +124,13 @@ export class ProgressTrackingComponent implements OnInit {
           // عرض رسالة خطأ أكثر تفصيلاً
           let errorMessage = 'خطأ في جلب بيانات التقدم';
           
-          if (err?.error?.message) {
-            errorMessage += `: ${err.error.message}`;
-          } else if (err?.message) {
-            errorMessage += `: ${err.message}`;
-          } else if (err?.status === 401) {
+          // Handle 401 Unauthorized - token expired or invalid
+          if (err?.status === 401) {
             errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى';
+            // Optionally redirect to login after a delay
+            setTimeout(() => {
+              this.authService.logout();
+            }, 2000);
           } else if (err?.status === 403) {
             errorMessage = 'ليس لديك صلاحية للوصول إلى هذه البيانات';
           } else if (err?.status === 404) {
@@ -138,6 +139,16 @@ export class ProgressTrackingComponent implements OnInit {
             errorMessage = 'خطأ في الخادم. يرجى المحاولة لاحقاً';
           } else if (err?.status === 0) {
             errorMessage = 'لا يمكن الاتصال بالخادم. تحقق من الاتصال بالإنترنت';
+          } else if (err?.error?.message) {
+            // Check if the message is just "Unauthorized" and replace it
+            const backendMessage = err.error.message;
+            if (backendMessage === 'Unauthorized' || backendMessage.includes('Unauthorized')) {
+              errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى';
+            } else {
+              errorMessage += `: ${backendMessage}`;
+            }
+          } else if (err?.message) {
+            errorMessage += `: ${err.message}`;
           }
           
           this.error = errorMessage;

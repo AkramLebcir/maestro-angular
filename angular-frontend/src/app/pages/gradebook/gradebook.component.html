@@ -555,14 +555,24 @@
       <div *ngIf="processedExcelData && processedExcelData.length > 0" class="bg-white p-6 rounded-lg shadow-md">
         <div class="flex justify-between items-center mb-4">
           <h3 class="text-xl font-semibold text-gray-800">{{ translate('gradebook.processedDataPreview') }}</h3>
-          <button 
-            (click)="downloadProcessedExcel()"
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            <span>{{ translate('gradebook.downloadProcessedFile') }}</span>
-          </button>
+          <div class="flex gap-2">
+            <button 
+              (click)="openGradeMonitoringModal()"
+              class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>تقرير مراقبة النقاط</span>
+            </button>
+            <button 
+              (click)="downloadProcessedExcel()"
+              class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>{{ translate('gradebook.downloadProcessedFile') }}</span>
+            </button>
+          </div>
         </div>
 
         <div *ngIf="processedSheetsData && processedSheetsData.length > 1" class="mb-4 text-sm text-gray-600">
@@ -577,6 +587,12 @@
                 <th class="border border-blue-700 p-2 text-right font-semibold" *ngIf="processedSheetsData && processedSheetsData.length > 1">{{ translate('gradebook.sheet') }}</th>
                 <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.firstName') }}</th>
                 <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.lastName') }}</th>
+                <!-- Grade columns headers -->
+                <th 
+                  *ngFor="let header of getAllGradeColumnHeaders()" 
+                  class="border border-blue-700 p-2 text-right font-semibold">
+                  {{ header }}
+                </th>
                 <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.average') }}</th>
                 <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.notes') }}</th>
                 <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.guidanceCons') }}</th>
@@ -592,6 +608,15 @@
                 </td>
                 <td class="border border-gray-300 p-2">{{ row.firstName || '-' }}</td>
                 <td class="border border-gray-300 p-2">{{ row.lastName || '-' }}</td>
+                <!-- Grade columns with coloring -->
+                <td 
+                  *ngFor="let header of getAllGradeColumnHeaders()" 
+                  class="border border-gray-300 p-2 text-center font-semibold"
+                  [ngClass]="getGradeCellColor(getGradeValueForColumn(row, header))"
+                  [style.background-color]="getGradeCellBgColor(getGradeValueForColumn(row, header))"
+                  [style.color]="getGradeCellTextColor(getGradeValueForColumn(row, header))">
+                  {{ getGradeValueForColumn(row, header) !== null && getGradeValueForColumn(row, header) !== undefined && getGradeValueForColumn(row, header) !== '' ? getGradeValueForColumn(row, header) : '-' }}
+                </td>
                 <td class="border border-gray-300 p-2 text-center font-semibold"
                     [class.text-red-600]="row.average < 10"
                     [class.text-green-600]="row.average >= 10">
@@ -801,11 +826,82 @@
       <p class="text-sm text-gray-600">
         {{ translate('gradebook.excelImportNote') }}
       </p>
-      <input 
-        type="file"
-        accept=".xlsx,.xls"
-        (change)="onExcelFileSelected($event)"
-        class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+      
+      <!-- Import Mode Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">نوع الاستيراد</label>
+        <select 
+          [(ngModel)]="importMode"
+          (change)="selectedAssessment = null"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <option value="single">استيراد نوع تقييم واحد</option>
+          <option value="multiple">استيراد جميع أنواع التقييم دفعة واحدة</option>
+        </select>
+        <p class="text-xs text-gray-500 mt-1">
+          <span *ngIf="importMode === 'multiple'">سيتم استيراد: التقييم المستمر، التعبير الشفهي/العمل العملي، الفرض، الاختبار</span>
+        </p>
+      </div>
+      
+      <!-- Identifier Type Selection -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">طريقة التعرف على الطالب</label>
+        <select 
+          [(ngModel)]="importIdentifier"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <option value="name">بالاسم</option>
+          <option value="idNumber">برقم الهوية/الكود</option>
+        </select>
+      </div>
+      
+      <!-- Assessment Type Selection (only for single mode) -->
+      <div *ngIf="importMode === 'single'">
+        <label class="block text-sm font-medium text-gray-700 mb-1">نوع التقييم</label>
+        <select 
+          [(ngModel)]="selectedAssessment"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+          <option [ngValue]="null">اختر نوع التقييم</option>
+          <option *ngFor="let assessment of assessments" [ngValue]="assessment">
+            {{ assessment.nameAr }}
+          </option>
+        </select>
+      </div>
+      
+      <!-- File Input -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">اختر ملف Excel</label>
+        <input 
+          type="file"
+          accept=".xlsx,.xls"
+          (change)="onExcelFileSelected($event)"
+          [disabled]="importMode === 'single' && !selectedAssessment"
+          class="w-full px-3 py-2 border border-gray-300 rounded-lg disabled:bg-gray-100 disabled:cursor-not-allowed">
+      </div>
+      
+      <!-- Help Text -->
+      <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
+        <p class="font-semibold mb-2">تعليمات الاستيراد:</p>
+        <ul class="list-disc list-inside space-y-1 mb-2">
+          <li *ngIf="importIdentifier === 'name'">يجب أن يحتوي ملف Excel على عمود "الاسم" أو "Name"</li>
+          <li *ngIf="importIdentifier === 'idNumber'">يجب أن يحتوي ملف Excel على عمود "رقم الهوية" أو "رقم التعريف" أو "Code" أو "رقم"</li>
+          <li *ngIf="importMode === 'single'">يجب أن يحتوي ملف Excel على عمود "الدرجة" أو "Score"</li>
+          <li *ngIf="importMode === 'multiple'">
+            <strong>للاستيراد المتعدد:</strong> يجب أن يحتوي ملف Excel على أعمدة للدرجات بأسماء:
+            <ul class="list-disc list-inside mt-1 mr-4">
+              <li>التقييم المستمر (أو Continuous Assessment)</li>
+              <li>التعبير الشفهي أو التعبير الشفهي/العمل العملي (أو Oral Expression)</li>
+              <li>الفرض أو معدل الفروض (أو Assignment)</li>
+              <li>الاختبار (أو Test)</li>
+            </ul>
+          </li>
+        </ul>
+        <p *ngIf="importMode === 'multiple'" class="mt-2 pt-2 border-t border-blue-300">
+          <strong>ملاحظة:</strong> يمكن استيراد جميع النقاط دفعة واحدة من ملف Excel واحد يحتوي على جميع الأعمدة المذكورة أعلاه.
+        </p>
+      </div>
+      
+      <p *ngIf="importMode === 'single' && !selectedAssessment" class="text-xs text-red-600">
+        يرجى اختيار نوع التقييم قبل اختيار الملف
+      </p>
     </div>
   </div>
 </div>
@@ -856,6 +952,18 @@
             <option value="EN">الإنجليزية</option>
           </select>
         </div>
+      </div>
+
+      <!-- اختيار تطبيق الملاحظات والإرشادات تلقائياً أو لا -->
+      <div class="flex items-center gap-2 mt-2">
+        <input 
+          id="autoObsCons"
+          type="checkbox"
+          [(ngModel)]="autoGenerateObsCons"
+          class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+        <label for="autoObsCons" class="text-sm text-gray-700 cursor-pointer">
+          تطبيق الملاحظات (obs) والإرشادات (cons) تلقائياً اعتماداً على المعدل
+        </label>
       </div>
 
       <div>
@@ -1054,6 +1162,115 @@
       <div class="p-4 bg-red-50 border border-red-200 rounded-lg text-center">
         <div class="text-2xl font-bold text-red-700">{{ getStudentsBelow10() }}</div>
         <div class="text-sm text-red-600">عدد التلاميذ بمعدل < 10</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Grade Monitoring Report Modal -->
+<div 
+  *ngIf="showGradeMonitoringModal"
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="closeGradeMonitoringModal()">
+  <div 
+    class="bg-white rounded-lg shadow-xl p-6 w-full max-w-6xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800">تقرير مراقبة النقاط</h3>
+      <div class="flex gap-2">
+        <button 
+          (click)="exportGradeMonitoringPDF()"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>تصدير PDF</span>
+        </button>
+        <button 
+          (click)="printGradeMonitoringReport()"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>طباعة</span>
+        </button>
+        <button 
+          (click)="closeGradeMonitoringModal()"
+          class="text-gray-500 hover:text-gray-700">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div id="gradeMonitoringReport" class="print:block">
+      <!-- Report Header -->
+      <div class="mb-6 text-center print:mb-4">
+        <h2 class="text-2xl font-bold text-gray-800 mb-2">تقرير مراقبة النقاط</h2>
+        <p class="text-sm text-gray-600">تاريخ التقرير: {{ getReportDate() }}</p>
+      </div>
+
+      <!-- Summary -->
+      <div class="mb-6 p-4 bg-blue-50 rounded-lg print:mb-4">
+        <p class="text-lg font-semibold text-gray-800">
+          عدد التلاميذ الذين لديهم أخطاء: 
+          <span class="text-red-600 font-bold">{{ getStudentsWithGradeErrors().length }}</span>
+        </p>
+      </div>
+
+      <!-- Errors Table -->
+      <div *ngIf="getStudentsWithGradeErrors().length > 0" class="overflow-x-auto">
+        <table class="w-full border-collapse border border-gray-300 text-sm print:text-xs">
+          <thead>
+            <tr class="bg-blue-600 text-white print:bg-gray-800">
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">#</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">الاسم</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2" *ngIf="processedSheetsData && processedSheetsData.length > 1">الصفحة</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">العمود</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">القيمة</th>
+              <th class="border border-blue-700 p-3 text-right font-semibold print:p-2">الخطأ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let student of getStudentsWithGradeErrors(); let studentIndex = index">
+              <tr 
+                *ngFor="let error of student.errors; let errorIndex = index"
+                [class.bg-gray-50]="(studentIndex + errorIndex) % 2 === 0"
+                class="border-b border-gray-200">
+                <td class="border border-gray-300 p-2 text-center print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
+                  {{ studentIndex + 1 }}
+                </td>
+                <td class="border border-gray-300 p-2 print:p-1" *ngIf="errorIndex === 0" [attr.rowspan]="student.errors.length">
+                  {{ student.firstName }} {{ student.lastName }}
+                </td>
+                <td class="border border-gray-300 p-2 text-center print:p-1" *ngIf="processedSheetsData && processedSheetsData.length > 1 && errorIndex === 0" [attr.rowspan]="student.errors.length">
+                  {{ student.sheetName }}
+                </td>
+                <td class="border border-gray-300 p-2 print:p-1">
+                  {{ error.columnHeader }}
+                </td>
+                <td class="border border-gray-300 p-2 text-center print:p-1">
+                  {{ error.value !== null && error.value !== undefined && error.value !== '' ? error.value : '-' }}
+                </td>
+                <td class="border border-gray-300 p-2 print:p-1 text-red-600 font-semibold">
+                  {{ error.error }}
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- No Errors Message -->
+      <div *ngIf="getStudentsWithGradeErrors().length === 0" class="text-center py-8">
+        <div class="inline-block p-6 bg-green-50 rounded-lg border border-green-200">
+          <svg class="w-16 h-16 text-green-600 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <p class="text-xl font-semibold text-green-800">لا توجد أخطاء في النقاط</p>
+          <p class="text-sm text-green-600 mt-2">جميع النقاط صحيحة وتنتمي إلى المجال من 0 إلى 20</p>
+        </div>
       </div>
     </div>
   </div>

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
@@ -75,10 +75,35 @@ export class ReportGeneratorComponent implements OnInit {
     ]
   };
 
+  private reasonKeyMap: Record<string, string> = {
+    // Academic
+    'ضعف في استيعاب المفاهيم الأساسية': 'reportReason.academic.weakConcepts',
+    'تراجع ملحوظ في النتائج': 'reportReason.academic.declineResults',
+    'إهمال الواجبات المنزلية بصفة متكررة': 'reportReason.academic.neglectedHomework',
+    'عدم المشاركة داخل القسم': 'reportReason.academic.noParticipation',
+    'تفوق ملحوظ ومشاركة فعالة': 'reportReason.academic.excellence',
+    // Behavioral
+    'ملاحظة تدني في الانضباط': 'reportReason.behavioral.discipline',
+    'التشويش المستمر داخل القسم': 'reportReason.behavioral.disruption',
+    'عدم إحضار اللوازم المدرسية': 'reportReason.behavioral.noSupplies',
+    'استعمال الهاتف النقال': 'reportReason.behavioral.phoneUse',
+    'سلوك عدواني مع الزملاء': 'reportReason.behavioral.aggressive',
+    'مشاركة إيجابية وسلوك مثالي': 'reportReason.behavioral.exemplary',
+    // Follow-up
+    'غياب متكرر دون مبرر': 'reportReason.followup.repeatedAbsence',
+    'تأخرات صباحية متكررة': 'reportReason.followup.lateness',
+    'استدعاء ولي الأمر للأهمية': 'reportReason.followup.summonParent',
+    'متابعة ملف صحي/اجتماعي': 'reportReason.followup.healthSocial',
+    // Cheating
+    'محاولة غش في الفرض المحروس': 'reportReason.cheating.attempt',
+    'نقل الواجب المنزلي من الزملاء': 'reportReason.cheating.homeworkCopy',
+    'ضبط وسيلة غش أثناء الامتحان': 'reportReason.cheating.examDevice'
+  };
+
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    public languageService: LanguageService
+    @Inject('LanguageService') public languageService: LanguageService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -136,6 +161,28 @@ export class ReportGeneratorComponent implements OnInit {
     return this.reasonsMap[this.reportType] || [];
   }
 
+  getTranslatedReason(reason: string): string {
+    const key = this.reasonKeyMap[reason];
+    if (key) {
+      return this.translate(key);
+    }
+    return reason;
+  }
+
+  getOriginalReason(translatedReason: string | undefined): string {
+    if (!translatedReason) {
+      return '';
+    }
+    // Find the Arabic reason that matches the translated reason
+    for (const [arabicReason, key] of Object.entries(this.reasonKeyMap)) {
+      if (this.translate(key) === translatedReason) {
+        return arabicReason;
+      }
+    }
+    // If not found, return the reason as-is (might be already in Arabic)
+    return translatedReason;
+  }
+
   generateContent() {
     if (!this.selectedStudentId || !this.reportReason) {
       this.generatedContent = '';
@@ -145,28 +192,34 @@ export class ReportGeneratorComponent implements OnInit {
     const student = this.students.find(s => s.id == this.selectedStudentId);
     const studentName = student ? `${student.firstName} ${student.lastName}` : this.translate('report.student');
 
-    let template = '';
+    // Translate the reason for use in the template
+    const translatedReason = this.getTranslatedReason(this.reportReason);
+
+    let templateKey = '';
 
     switch (this.reportType) {
       case 'BEHAVIORAL':
-        template = `بناءً على متابعتنا المستمرة للتلميذ(ة) ${studentName}، تم تسجيل ملاحظة سلوكية تتعلق بـ "${this.reportReason}". 
-نود إحاطتكم علماً بأن هذا السلوك يؤثر سلباً على السير الحسن للدرس وعلى تركيز التلميذ وزملائه. وعليه، فإننا نؤكد على ضرورة الالتزام بالنظام الداخلي للمؤسسة.`;
+        templateKey = 'report.template.behavioral';
         break;
       case 'ACADEMIC':
-        template = `من خلال تقييمنا للمسار الدراسي للتلميذ(ة) ${studentName}، لاحظنا ${this.reportReason}. 
-هذا الأمر يستدعي تضافر الجهود بين المدرسة والمنزل لتدارك النقائص وتعزيز المكتسبات، لضمان تحقيق نتائج أفضل في المستقبل.`;
+        templateKey = 'report.template.academic';
         break;
       case 'CHEATING':
-        template = `يؤسفنا إبلاغكم بأنه تم ضبط التلميذ(ة) ${studentName} في حالة مخالفة لقواعد النزاهة الأكاديمية، والمتمثلة في ${this.reportReason}. 
-يعتبر هذا التصرف مخالفاً للقانون الداخلي ويستوجب إجراءات تأديبية لضمان تكافؤ الفرص بين الجميع.`;
+        templateKey = 'report.template.cheating';
         break;
       case 'FOLLOW_UP':
-        template = `في إطار المتابعة التربوية للتلميذ(ة) ${studentName}، نلفت انتباهكم إلى ${this.reportReason}. 
-نرجو منكم الحضور أو التواصل مع إدارة المؤسسة في أقرب وقت لمناقشة الوضع واتخاذ التدابير اللازمة.`;
+        templateKey = 'report.template.followUp';
         break;
     }
 
-    this.generatedContent = template;
+    if (templateKey) {
+      this.generatedContent = this.translate(templateKey, {
+        student: studentName,
+        reason: translatedReason
+      });
+    } else {
+      this.generatedContent = '';
+    }
   }
 
   getReportTitle(): string {
@@ -197,13 +250,16 @@ export class ReportGeneratorComponent implements OnInit {
     this.message = '';
     this.errorMessage = '';
 
+    // Convert translated reason back to Arabic for backend storage
+    const originalReason = this.reportReason ? this.getOriginalReason(this.reportReason) : undefined;
+
     // 1. Save to Backend
     const payload = {
       studentId: this.selectedStudentId,
       classId: this.selectedClassId,
       date: this.reportDate,
       type: this.reportType,
-      reason: this.reportReason,
+      reason: originalReason,
       description: this.generatedContent + (this.additionalDetails ? `\n\n${this.translate('report.additionalNotes')}: ${this.additionalDetails}` : ''),
       recommendations: this.recommendations
     };

@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CertificateService } from '../../services/certificate.service';
@@ -75,7 +75,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
     private apiService: ApiService,
     private certificateService: CertificateService,
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    @Inject('LanguageService') public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
@@ -136,7 +136,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
         }
       },
       error: () => {
-        this.errorMessage = 'تعذر تحميل قائمة الأقسام';
+        this.errorMessage = this.translate('common.error') + ': ' + this.translate('certificate.class');
       },
     });
   }
@@ -171,12 +171,12 @@ export class AchievementsPenaltiesComponent implements OnInit {
             studentName: this.buildStudentLabel(event.student),
             className: event.class?.name,
             date: new Date(event.date).toLocaleDateString('ar-EG'),
-            description: event.description || 'لا يوجد تفاصيل إضافية',
+            description: event.description || this.translate('achievementsPenalties.noAdditionalDetails'),
           }));
           this.isLoadingReports = false;
         },
         error: () => {
-          this.errorMessage = 'تعذر تحميل تقارير السلوك';
+          this.errorMessage = this.translate('achievementsPenalties.errorLoadingBehaviorReports');
           this.behaviorReports = [];
           this.isLoadingReports = false;
         },
@@ -198,13 +198,13 @@ export class AchievementsPenaltiesComponent implements OnInit {
           id: cert.id,
           studentName: `${cert.student.firstName} ${cert.student.lastName}`,
           className: cert.className || '',
-          templateName: cert.template?.name || 'شهادة',
+          templateName: cert.template?.name || this.translate('achievementsPenalties.certificate'),
           issueDate: new Date(cert.issueDate).toLocaleDateString('ar-EG')
         }));
         this.isLoadingCertificates = false;
       },
       error: () => {
-        this.errorMessage = 'تعذر تحميل سجل الشهادات';
+        this.errorMessage = this.translate('achievementsPenalties.errorLoadingCertificates');
         this.certificateHistory = [];
         this.isLoadingCertificates = false;
       }
@@ -213,10 +213,10 @@ export class AchievementsPenaltiesComponent implements OnInit {
 
   private buildStudentLabel(student?: { firstName?: string; lastName?: string }): string {
     if (!student) {
-      return 'طالب غير معروف';
+      return this.translate('achievementsPenalties.unknownStudent');
     }
     const fullName = `${student.firstName ?? ''} ${student.lastName ?? ''}`.trim();
-    return fullName || 'طالب غير معروف';
+    return fullName || this.translate('achievementsPenalties.unknownStudent');
   }
 
   async exportPenaltiesToPDF(): Promise<void> {
@@ -229,7 +229,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       }
 
       if (this.classes.length === 0) {
-        alert('لا توجد أقسام متاحة');
+        alert(this.translate('achievementsPenalties.noClassesAvailable'));
         this.isExportingPdf = false;
         return;
       }
@@ -245,7 +245,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
                 studentName: this.buildStudentLabel(event.student),
                 className: cls.name,
                 date: new Date(event.date).toLocaleDateString('ar-EG'),
-                description: event.description || 'لا يوجد تفاصيل إضافية'
+                description: event.description || this.translate('achievementsPenalties.noAdditionalDetails')
               },
               className: cls.name
             });
@@ -256,7 +256,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       }
 
       if (allBehaviorReports.length === 0) {
-        alert('لا توجد تقارير لتصديرها');
+        alert(this.translate('achievementsPenalties.noReportsToExport'));
         this.isExportingPdf = false;
         return;
       }
@@ -275,7 +275,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
 
       // Add title
       const title = document.createElement('h1');
-      title.textContent = 'تقرير العقوبات والتقارير';
+      title.textContent = this.translate('achievementsPenalties.penaltiesReportTitle');
       title.style.textAlign = 'center';
       title.style.fontSize = '28px';
       title.style.fontWeight = 'bold';
@@ -350,7 +350,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
         studentName.style.color = '#111827';
 
         const classInfo = document.createElement('small');
-        classInfo.textContent = report.className || 'غير محدد';
+        classInfo.textContent = report.className || this.translate('common.notSpecified');
         classInfo.style.color = '#6b7280';
         classInfo.style.fontSize = '14px';
         classInfo.style.display = 'block';
@@ -437,7 +437,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting to PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF');
+      alert(this.translate('achievementsPenalties.errorExportingPDF'));
     } finally {
       this.isExportingPdf = false;
     }
@@ -453,7 +453,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       }
 
       if (this.classes.length === 0) {
-        alert('لا توجد أقسام متاحة');
+        alert(this.translate('achievementsPenalties.noClassesAvailable'));
         this.isExportingCertificatesPdf = false;
         return;
       }
@@ -472,7 +472,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       }
 
       if (allCertificates.length === 0) {
-        alert('لا توجد شهادات لتصديرها');
+        alert(this.translate('achievementsPenalties.noCertificatesToExport'));
         this.isExportingCertificatesPdf = false;
         return;
       }
@@ -491,7 +491,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
 
       // Add title
       const title = document.createElement('h1');
-      title.textContent = 'تقرير الشهادات';
+      title.textContent = this.translate('achievementsPenalties.certificatesReportTitle');
       title.style.textAlign = 'center';
       title.style.fontSize = '28px';
       title.style.fontWeight = 'bold';
@@ -545,7 +545,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
         const thead = document.createElement('thead');
         const headerRow = document.createElement('tr');
         headerRow.style.backgroundColor = '#f3f4f6';
-        ['اسم التلميذ', 'نوع الشهادة', 'تاريخ الإصدار'].forEach(headerText => {
+        [this.translate('achievementsPenalties.studentName'), this.translate('achievementsPenalties.certificateType'), this.translate('achievementsPenalties.issueDate')].forEach(headerText => {
           const th = document.createElement('th');
           th.textContent = headerText;
           th.style.padding = '12px';
@@ -564,7 +564,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
           row.style.borderBottom = '1px solid #e5e7eb';
           
           const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
-          const templateName = cert.template?.name || 'شهادة';
+          const templateName = cert.template?.name || this.translate('achievementsPenalties.certificate');
           const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
           
           [studentName, templateName, issueDate].forEach(cellText => {
@@ -635,7 +635,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       pdf.save(fileName);
     } catch (error) {
       console.error('Error exporting certificates to PDF:', error);
-      alert('حدث خطأ أثناء تصدير PDF');
+      alert(this.translate('achievementsPenalties.errorExportingPDF'));
     } finally {
       this.isExportingCertificatesPdf = false;
     }

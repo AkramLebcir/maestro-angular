@@ -29,6 +29,7 @@ import { CertificateGeneratorComponent } from './pages/certificate-generator/cer
 import { AchievementsPenaltiesComponent } from './pages/achievements-penalties/achievements-penalties.component';
 import { SafeUrlPipe } from './pipes/safe-url.pipe';
 import { NgChartsModule } from 'ng2-charts';
+import { LanguageService } from './services/language.service';
 import { LoginComponent } from './pages/login/login.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { UsersManagementComponent } from './pages/admin/users-management/users-management.component';
@@ -83,7 +84,12 @@ import { ReportGeneratorComponent } from './pages/report-generator/report-genera
     AppRoutingModule,
     NgChartsModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: 'LanguageService',
+      useExisting: LanguageService
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -36,7 +36,7 @@
         <label>{{ translate('report.reason') }}</label>
         <select class="form-control" [(ngModel)]="reportReason" (change)="generateContent()">
           <option [ngValue]="undefined" disabled>{{ translate('report.selectReason') }}</option>
-          <option *ngFor="let reason of getReasons()" [value]="reason">{{ reason }}</option>
+          <option *ngFor="let reason of getReasons()" [value]="reason">{{ getTranslatedReason(reason) }}</option>
         </select>
       </div>
 

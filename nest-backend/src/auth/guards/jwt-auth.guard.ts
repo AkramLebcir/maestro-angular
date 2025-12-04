@@ -24,7 +24,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   handleRequest(err: unknown, user: any) {
     if (err || !user) {
-      throw err || new UnauthorizedException();
+      if (err) {
+        throw err;
+      }
+      // Provide a more descriptive error message
+      throw new UnauthorizedException('غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى');
     }
     return user;
   }

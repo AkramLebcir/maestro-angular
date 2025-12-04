@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { environment } from '../../../environments/environment';
@@ -71,7 +71,7 @@ export class PedagogicalDocsComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    public languageService: LanguageService
+    @Inject('LanguageService') public languageService: LanguageService
   ) {}
 
   translate(key: string): string {

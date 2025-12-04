@@ -332,6 +332,24 @@
         </button>
       </div>
 
+      <!-- Grade monitoring report -->
+      <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 mb-1">
+            {{ translate('reports.gradeMonitoring') }}
+          </h2>
+          <p class="text-sm text-gray-600 mb-3">
+            {{ translate('reports.gradeMonitoringDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToGradeMonitoring()"
+          class="mt-2 btn-export-pdf text-white px-4 py-2 rounded-lg text-sm transition w-full text-center"
+        >
+          {{ translate('reports.openGradeMonitoring') }}
+        </button>
+      </div>
+
       <!-- Annual distribution report -->
       <div class="border rounded-lg p-4 flex flex-col justify-between hover:shadow-md transition">
         <div>

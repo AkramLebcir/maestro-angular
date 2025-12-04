@@ -178,7 +178,7 @@
             </div>
           </div>
           <div class="w-28 text-right text-xs text-gray-700 mr-3">
-            أجهزة تعمل
+            {{ translate('dashboard.labDevicesWorking') }}
           </div>
         </div>
 
@@ -221,7 +221,7 @@
 
         <!-- حالة التحميل -->
         <div *ngIf="!subjectProgressLoaded" class="text-xs text-gray-400 text-center py-4">
-          جاري تحميل بيانات التقدّم...
+          {{ translate('dashboard.loadingProgress') }}
         </div>
 
         <!-- عند اكتمال التحميل -->

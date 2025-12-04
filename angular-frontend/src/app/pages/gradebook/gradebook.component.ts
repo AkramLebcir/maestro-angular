@@ -1,4 +1,5 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit, Inject } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import * as XLSX from 'xlsx';
@@ -155,13 +156,20 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   showReportModal = false;
   showImportModal = false;
   showEnhancedImportModal = false;
+  showGradeMonitoringModal = false;
   
   // Enhanced import variables
   selectedLevel: 'primary' | 'middle' | 'secondary' = 'primary';
   selectedLanguage: 'AR' | 'FR' | 'EN' = 'AR';
+  // التحكم في توليد الملاحظات (obs) والإرشادات (cons) تلقائياً عند الاستيراد المحسّن
+  autoGenerateObsCons: boolean = true;
   processedExcelData: any[] = [];
   processedSheetsData: { sheetName: string; data: any[] }[] = [];
   isProcessing = false;
+  
+  // Import options
+  importMode: 'single' | 'multiple' = 'single'; // استيراد نوع واحد أو جميع الأنواع
+  importIdentifier: 'name' | 'idNumber' = 'name'; // البحث بالاسم أو رقم الهوية
   
   // Excel Analysis Charts
   excelAnalysisCharts: { sheetName: string; charts: any }[] = [];
@@ -319,7 +327,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   constructor(
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
-    public languageService: LanguageService
+    private route: ActivatedRoute,
+    @Inject('LanguageService') public languageService: LanguageService
   ) {}
 
   translate(key: string): string {
@@ -329,6 +338,17 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.loadClasses();
     this.loadAssessments();
+
+    // دعم الفتح من صفحة التقارير مع فتح تقرير مراقبة النقاط
+    this.route.queryParams.subscribe((params) => {
+      const openGradeMonitoring = params['openGradeMonitoring'] === '1';
+      if (openGradeMonitoring) {
+        // انتظر قليلاً لتحميل البيانات ثم افتح الـ modal
+        setTimeout(() => {
+          this.openGradeMonitoringModal();
+        }, 500);
+      }
+    });
   }
 
   loadClasses(): void {
@@ -1375,8 +1395,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   processExcelData(data: any[]): void {
-    if (!this.selectedClass || !this.selectedAssessment) {
-      alert('يرجى اختيار القسم ونوع التقييم أولاً');
+    if (!this.selectedClass) {
+      alert('يرجى اختيار القسم أولاً');
       return;
     }
 
@@ -1387,6 +1407,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       if (Array.isArray(row) && row.some((cell: any) => 
         String(cell).toLowerCase().includes('name') || 
         String(cell).toLowerCase().includes('اسم') ||
+        String(cell).toLowerCase().includes('id') ||
+        String(cell).toLowerCase().includes('رقم') ||
+        String(cell).toLowerCase().includes('code') ||
+        String(cell).toLowerCase().includes('كود') ||
         String(cell).toLowerCase().includes('score') ||
         String(cell).toLowerCase().includes('درجة')
       )) {
@@ -1396,72 +1420,314 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }
 
     const headers = data[headerRow] || [];
-    const nameColIndex = headers.findIndex((h: any) => 
-      String(h).toLowerCase().includes('name') || 
-      String(h).toLowerCase().includes('اسم')
-    );
-    const scoreColIndex = headers.findIndex((h: any) => 
-      String(h).toLowerCase().includes('score') || 
-      String(h).toLowerCase().includes('درجة') ||
-      String(h).toLowerCase().includes('mark')
-    );
+    
+    // Find identifier column (name or idNumber)
+    let identifierColIndex = -1;
+    if (this.importIdentifier === 'idNumber') {
+      identifierColIndex = headers.findIndex((h: any) => 
+        String(h).toLowerCase().includes('id') || 
+        String(h).toLowerCase().includes('رقم') ||
+        String(h).toLowerCase().includes('code') ||
+        String(h).toLowerCase().includes('كود') ||
+        String(h).toLowerCase().includes('رقم التعريف') ||
+        String(h).toLowerCase().includes('رقم الهوية')
+      );
+    } else {
+      identifierColIndex = headers.findIndex((h: any) => 
+        String(h).toLowerCase().includes('name') || 
+        String(h).toLowerCase().includes('اسم')
+      );
+    }
 
-    if (nameColIndex === -1 || scoreColIndex === -1) {
-      alert('لم يتم العثور على أعمدة الاسم أو الدرجة في ملف Excel');
+    if (identifierColIndex === -1) {
+      alert(this.importIdentifier === 'idNumber' 
+        ? 'لم يتم العثور على عمود رقم الهوية/الكود في ملف Excel'
+        : 'لم يتم العثور على عمود الاسم في ملف Excel');
       return;
     }
 
+    // Determine which assessments to import
+    let assessmentsToImport: Assessment[] = [];
+    if (this.importMode === 'multiple') {
+      // استيراد جميع أنواع التقييم: التقييم المستمر، التعبير الشفهي، الفرض، الاختبار
+      const assessmentTypes: AssessmentType[] = ['continuous_assessment', 'oral_expression', 'assignment', 'test'];
+      assessmentsToImport = this.assessments.filter(a => assessmentTypes.includes(a.type));
+    } else {
+      if (!this.selectedAssessment) {
+        alert('يرجى اختيار نوع التقييم أولاً');
+        return;
+      }
+      assessmentsToImport = [this.selectedAssessment];
+    }
+
+    if (assessmentsToImport.length === 0) {
+      alert('لم يتم العثور على أنواع التقييم المطلوبة');
+      return;
+    }
+
+    // Find score columns for each assessment
+    const assessmentColumns: { assessment: Assessment; colIndex: number }[] = [];
+    
+    if (this.importMode === 'multiple') {
+      // البحث عن أعمدة الدرجات لكل نوع تقييم
+      for (const assessment of assessmentsToImport) {
+        const colIndex = headers.findIndex((h: any) => {
+          const headerStr = String(h).toLowerCase().trim();
+          const assessmentNameAr = assessment.nameAr.toLowerCase().trim();
+          
+          // البحث المطابق الدقيق للاسم العربي
+          if (headerStr === assessmentNameAr || 
+              headerStr.includes(assessmentNameAr) || 
+              assessmentNameAr.includes(headerStr)) {
+            return true;
+          }
+          
+          // البحث حسب نوع التقييم - كلمات مفتاحية متعددة
+          switch (assessment.type) {
+            case 'continuous_assessment':
+              return headerStr.includes('continuous') || 
+                     headerStr.includes('مستمر') || 
+                     headerStr.includes('تقييم مستمر') ||
+                     headerStr.includes('évaluation continue') ||
+                     headerStr.includes('تقييم') && headerStr.includes('مستمر');
+            case 'oral_expression':
+              return (headerStr.includes('oral') && headerStr.includes('expression')) ||
+                     (headerStr.includes('شفهي') && headerStr.includes('تعبير')) ||
+                     headerStr.includes('تعبير شفهي') ||
+                     headerStr.includes('expression orale') ||
+                     headerStr.includes('شفهي') ||
+                     headerStr.includes('تعبير') ||
+                     headerStr.includes('oral') ||
+                     headerStr.includes('expression') ||
+                     (headerStr.includes('عمل') && headerStr.includes('عملي'));
+            case 'assignment':
+              return headerStr.includes('assignment') || 
+                     headerStr.includes('فرض') ||
+                     headerStr.includes('معدل الفروض') ||
+                     headerStr.includes('معدل فرض') ||
+                     headerStr.includes('devoir') ||
+                     headerStr === 'فرض' ||
+                     headerStr === 'معدل الفروض';
+            case 'test':
+              return headerStr.includes('test') || 
+                     headerStr.includes('exam') ||
+                     headerStr.includes('اختبار') ||
+                     headerStr.includes('examen') ||
+                     headerStr === 'اختبار';
+            default:
+              return false;
+          }
+        });
+        
+        if (colIndex !== -1) {
+          assessmentColumns.push({ assessment, colIndex });
+        } else {
+          // إذا لم نجد عمود محدد، نضيفه كـ null للتحذير لاحقاً
+          console.warn(`Column not found for assessment: ${assessment.nameAr} (${assessment.type})`);
+        }
+      }
+      
+      // إذا لم نجد أعمدة محددة، نبحث عن أعمدة "درجة" أو "score" عامة
+      // ونحاول مطابقتها مع أنواع التقييم حسب الترتيب
+      if (assessmentColumns.length === 0) {
+        const scoreColumns = headers
+          .map((h: any, index: number) => {
+            const headerStr = String(h).toLowerCase().trim();
+            // تجنب الأعمدة التي هي معرفات (اسم، رقم، إلخ)
+            if ((headerStr.includes('score') || 
+                 headerStr.includes('درجة') ||
+                 headerStr.includes('mark') ||
+                 headerStr.includes('note')) &&
+                !headerStr.includes('name') &&
+                !headerStr.includes('اسم') &&
+                !headerStr.includes('id') &&
+                !headerStr.includes('رقم') &&
+                !headerStr.includes('code') &&
+                !headerStr.includes('كود')) {
+              return index;
+            }
+            return -1;
+          })
+          .filter((idx: number) => idx !== -1);
+        
+        // مطابقة الأعمدة مع أنواع التقييم حسب الترتيب
+        if (scoreColumns.length >= assessmentsToImport.length) {
+          for (let i = 0; i < assessmentsToImport.length; i++) {
+            assessmentColumns.push({ 
+              assessment: assessmentsToImport[i], 
+              colIndex: scoreColumns[i] 
+            });
+          }
+        } else {
+          // إذا كان عدد الأعمدة أقل، نستخدم ما هو متاح
+          for (let i = 0; i < scoreColumns.length; i++) {
+            assessmentColumns.push({ 
+              assessment: assessmentsToImport[i], 
+              colIndex: scoreColumns[i] 
+            });
+          }
+        }
+      }
+      
+      // عرض معلومات عن الأعمدة التي تم العثور عليها
+      if (assessmentColumns.length > 0) {
+        console.log('Found assessment columns:', assessmentColumns.map(ac => ({
+          assessment: ac.assessment.nameAr,
+          column: headers[ac.colIndex]
+        })));
+      }
+    } else {
+      // استيراد نوع واحد - البحث عن عمود الدرجة
+      const scoreColIndex = headers.findIndex((h: any) => 
+        String(h).toLowerCase().includes('score') || 
+        String(h).toLowerCase().includes('درجة') ||
+        String(h).toLowerCase().includes('mark')
+      );
+      if (scoreColIndex === -1) {
+        alert('لم يتم العثور على عمود الدرجة في ملف Excel');
+        return;
+      }
+      assessmentColumns.push({ assessment: this.selectedAssessment!, colIndex: scoreColIndex });
+    }
+
+    if (assessmentColumns.length === 0) {
+      const expectedColumns = this.importMode === 'multiple' 
+        ? assessmentsToImport.map(a => a.nameAr).join('، ')
+        : this.selectedAssessment?.nameAr || 'الدرجة';
+      alert(`لم يتم العثور على أعمدة الدرجات في ملف Excel.\n\nالمتوقع: ${expectedColumns}\n\nتأكد من أن أسماء الأعمدة في ملف Excel تحتوي على:\n${this.importMode === 'multiple' 
+        ? '- التقييم المستمر\n- التعبير الشفهي أو التعبير الشفهي/العمل العملي\n- الفرض أو معدل الفروض\n- الاختبار'
+        : '- الدرجة أو Score'}`);
+      return;
+    }
+    
+    // تحذير إذا لم يتم العثور على جميع الأعمدة في وضع الاستيراد المتعدد
+    if (this.importMode === 'multiple' && assessmentColumns.length < assessmentsToImport.length) {
+      const found = assessmentColumns.map(ac => ac.assessment.nameAr).join('، ');
+      const missing = assessmentsToImport
+        .filter(a => !assessmentColumns.some(ac => ac.assessment.id === a.id))
+        .map(a => a.nameAr)
+        .join('، ');
+      const confirmContinue = confirm(
+        `تم العثور على أعمدة: ${found}\n\nلم يتم العثور على: ${missing}\n\nهل تريد المتابعة باستيراد الأعمدة الموجودة فقط؟`
+      );
+      if (!confirmContinue) {
+        return;
+      }
+    }
+
     // Process rows
-    let imported = 0;
+    let totalImported = 0;
+    let processedCount = 0;
+    let failedCount = 0;
+    const totalRows = data.length - headerRow - 1;
+    const importStats: { [assessmentId: number]: { name: string; count: number } } = {};
+    
+    // تهيئة الإحصائيات
+    assessmentColumns.forEach(({ assessment }) => {
+      importStats[assessment.id] = { name: assessment.nameAr, count: 0 };
+    });
+
     for (let i = headerRow + 1; i < data.length; i++) {
       const row = data[i];
       if (!row || row.length === 0) continue;
 
-      const name = String(row[nameColIndex] || '').trim();
-      const score = parseFloat(row[scoreColIndex] || 0);
+      const identifier = String(row[identifierColIndex] || '').trim();
+      if (!identifier) continue;
 
-      if (!name || isNaN(score)) continue;
+      // Find student by identifier
+      let student: Student | undefined;
+      if (this.importIdentifier === 'idNumber') {
+        // البحث الدقيق أولاً
+        student = this.students.find(s => 
+          s.idNumber && String(s.idNumber).trim() === String(identifier).trim()
+        );
+        // إذا لم نجد، نبحث بدون مسافات
+        if (!student) {
+          student = this.students.find(s => 
+            s.idNumber && String(s.idNumber).replace(/\s/g, '') === String(identifier).replace(/\s/g, '')
+          );
+        }
+      } else {
+        student = this.students.find(s => {
+          const fullName = `${s.firstName} ${s.lastName}`.toLowerCase();
+          const reverseName = `${s.lastName} ${s.firstName}`.toLowerCase();
+          const searchName = identifier.toLowerCase();
+          return fullName === searchName ||
+                 reverseName === searchName ||
+                 fullName.includes(searchName) ||
+                 reverseName.includes(searchName) ||
+                 s.firstName.toLowerCase().includes(searchName) ||
+                 s.lastName.toLowerCase().includes(searchName);
+        });
+      }
 
-      // Find student by name
-      const student = this.students.find(s => 
-        `${s.firstName} ${s.lastName}`.includes(name) ||
-        `${s.lastName} ${s.firstName}`.includes(name) ||
-        s.firstName.includes(name) ||
-        s.lastName.includes(name)
-      );
+      if (!student) {
+        console.warn(`Student not found: ${identifier}`);
+        failedCount++;
+        continue;
+      }
 
-      if (student) {
+      // Import grades for each assessment
+      for (const { assessment, colIndex } of assessmentColumns) {
+        const scoreValue = row[colIndex];
+        if (scoreValue === null || scoreValue === undefined || scoreValue === '') continue;
+        
+        const score = parseFloat(String(scoreValue).replace(',', '.'));
+        if (isNaN(score)) continue;
+
         const gradeData: CreateGradeDto = {
           studentId: student.id,
-          assessmentId: this.selectedAssessment.id,
+          assessmentId: assessment.id,
           classId: this.selectedClass.id,
           term: this.selectedTerm,
           score: score,
-          maxScore: this.selectedAssessment.maxScore,
+          maxScore: assessment.maxScore,
           date: this.formatDateForAPI(this.selectedDate)
         };
 
         this.apiService.post<Grade>('/grades', gradeData).subscribe({
           next: () => {
-            imported++;
-            if (imported === 1) {
+            totalImported++;
+            importStats[assessment.id].count++;
+            processedCount++;
+            if (processedCount === totalRows * assessmentColumns.length || totalImported === 1) {
               this.loadGradesForClass(this.selectedClass!.id);
             }
           },
           error: (error) => {
-            console.error(`Error importing grade for ${name}:`, error);
+            console.error(`Error importing grade for ${identifier} (${assessment.nameAr}):`, error);
+            failedCount++;
+            processedCount++;
           }
         });
       }
     }
 
-    alert(`تم استيراد ${imported} درجة بنجاح`);
-    this.closeImportModal();
+    // Wait a bit before showing the alert to allow requests to complete
+    setTimeout(() => {
+      let message = `تم استيراد ${totalImported} درجة بنجاح`;
+      
+      if (this.importMode === 'multiple' && assessmentColumns.length > 1) {
+        message += '\n\nالتفاصيل:\n';
+        Object.values(importStats).forEach(stat => {
+          if (stat.count > 0) {
+            message += `- ${stat.name}: ${stat.count} درجة\n`;
+          }
+        });
+      }
+      
+      if (failedCount > 0) {
+        message += `\n\nملاحظة: فشل استيراد ${failedCount} صف`;
+      }
+      
+      alert(message);
+      this.closeImportModal();
+    }, 1000);
   }
 
   openImportModal(): void {
-    if (!this.selectedClass || !this.selectedAssessment) {
-      alert('يرجى اختيار القسم ونوع التقييم أولاً');
+    if (!this.selectedClass) {
+      alert('يرجى اختيار القسم أولاً');
       return;
     }
     this.showImportModal = true;
@@ -2274,6 +2540,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     this.processedSheetsData = [];
     this.selectedLevel = 'primary';
     this.selectedLanguage = 'AR';
+    this.autoGenerateObsCons = true;
   }
 
   closeEnhancedImportModal(): void {
@@ -2369,9 +2636,19 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Find column indices
     const findColumnIndex = (keywords: string[]): number => {
       for (let i = 0; i < headers.length; i++) {
-        const headerStr = String(headers[i] || '').toLowerCase();
-        if (keywords.some(keyword => headerStr.includes(keyword))) {
-          return i;
+        const headerStr = String(headers[i] || '').trim();
+        const headerStrLower = headerStr.toLowerCase();
+        // Try exact match first, then partial match
+        for (const keyword of keywords) {
+          const keywordLower = keyword.toLowerCase();
+          // Exact match (case-insensitive)
+          if (headerStrLower === keywordLower) {
+            return i;
+          }
+          // Contains match (case-insensitive)
+          if (headerStrLower.includes(keywordLower) || headerStr.includes(keyword)) {
+            return i;
+          }
         }
       }
       return -1;
@@ -2381,6 +2658,53 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     const lastNameColIndex = findColumnIndex(['lastname', 'اللقب', 'nom', 'last', 'family']);
     const nameColIndex = findColumnIndex(['name', 'اسم', 'nom', 'الاسم الكامل']);
     const idColIndex = findColumnIndex(['id', 'رقم', 'code', 'numéro', 'number']);
+    
+    // Find observation and guidance columns (if they exist in Excel)
+    // نحاول دعم أكثر ما يمكن من الصيغ مثل: الملاحظات (obs)، ملاحظات، obs ...
+    const observationColIndex = findColumnIndex([
+      'obs',
+      'observation',
+      'observations',
+      'obv',
+      'obs.',
+      'ملاحظات',
+      'الملاحظات',
+      'ملاحظة',
+      'الملاحظة',
+      'ملاحظات (obs)',
+      'الملاحظات (obs)',
+      '(obs)',
+      'obs)',
+      'ملاحظات obs',
+      'الملاحظات obs'
+    ]);
+    const guidanceColIndex = findColumnIndex([
+      'cons',
+      'guidance',
+      'conseils',
+      'conseil',
+      'cons.',
+      'إرشادات',
+      'الإرشادات',
+      'إرشاد',
+      'الإرشاد',
+      'إرشادات (cons)',
+      'الإرشادات (cons)',
+      '(cons)',
+      'cons)',
+      'إرشادات cons',
+      'الإرشادات cons'
+    ]);
+    
+    // Debug: Log found column indices and all headers
+    if (!this.autoGenerateObsCons) {
+      console.log('=== Excel Import Debug ===');
+      console.log('Auto-generate Obs/Cons:', this.autoGenerateObsCons);
+      console.log('Observation column index:', observationColIndex, observationColIndex !== -1 ? `(Header: "${headers[observationColIndex]}")` : '(Not found)');
+      console.log('Guidance column index:', guidanceColIndex, guidanceColIndex !== -1 ? `(Header: "${headers[guidanceColIndex]}")` : '(Not found)');
+      console.log('All headers in Excel file:', headers.map((h: any, idx: number) => `${idx}: "${h}"`));
+      console.log('========================');
+    }
 
     // Find all grade columns (exclude name, id, and average columns)
     const gradeColumnIndices: number[] = [];
@@ -2568,9 +2892,58 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
       average = sum / count;
 
-      // Generate observation and guidance
-      const observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
-      const guidance = this.generateGuidance(average, this.selectedLevel, this.selectedLanguage);
+      // Generate or read observation and guidance
+      let observation = '';
+      let guidance = '';
+      
+      if (this.autoGenerateObsCons) {
+        // Generate automatically based on average
+        observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
+        guidance = this.generateGuidance(average, this.selectedLevel, this.selectedLanguage);
+      } else {
+        // Read from Excel file if columns exist
+        if (observationColIndex !== -1) {
+          const obsValue = row[observationColIndex];
+          // Check if value exists and is not empty
+          if (obsValue !== undefined && obsValue !== null) {
+            const obsStr = String(obsValue).trim();
+            if (obsStr !== '' && obsStr !== '-' && obsStr.toLowerCase() !== 'null' && obsStr.toLowerCase() !== 'undefined') {
+              observation = obsStr;
+              // Debug log for first row
+              if (processedData.length === 0) {
+                console.log('✓ Reading observation from Excel:', observation, 'from column index:', observationColIndex, 'Raw value:', obsValue);
+              }
+            } else if (processedData.length === 0) {
+              console.log('✗ Observation column found but value is empty. Column index:', observationColIndex, 'Raw value:', obsValue);
+            }
+          } else if (processedData.length === 0) {
+            console.log('✗ Observation column found but value is null/undefined. Column index:', observationColIndex);
+          }
+        } else if (processedData.length === 0) {
+          console.log('✗ Observation column not found in Excel file');
+        }
+        
+        if (guidanceColIndex !== -1) {
+          const consValue = row[guidanceColIndex];
+          // Check if value exists and is not empty
+          if (consValue !== undefined && consValue !== null) {
+            const consStr = String(consValue).trim();
+            if (consStr !== '' && consStr !== '-' && consStr.toLowerCase() !== 'null' && consStr.toLowerCase() !== 'undefined') {
+              guidance = consStr;
+              // Debug log for first row
+              if (processedData.length === 0) {
+                console.log('✓ Reading guidance from Excel:', guidance, 'from column index:', guidanceColIndex, 'Raw value:', consValue);
+              }
+            } else if (processedData.length === 0) {
+              console.log('✗ Guidance column found but value is empty. Column index:', guidanceColIndex, 'Raw value:', consValue);
+            }
+          } else if (processedData.length === 0) {
+            console.log('✗ Guidance column found but value is null/undefined. Column index:', guidanceColIndex);
+          }
+        } else if (processedData.length === 0) {
+          console.log('✗ Guidance column not found in Excel file');
+        }
+      }
 
       processedData.push({
         id: idColIndex !== -1 ? (row[idColIndex] || processedData.length + 1) : processedData.length + 1,
@@ -2781,8 +3154,33 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         // Build headers array
         const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
         
-        // Add grade column headers
-        const gradeHeaders = Array.from(allColumnHeaders);
+        // Add grade column headers (these are the ONLY columns where we apply coloring)
+        // Map numeric headers to translated names based on selected language
+        const mapHeaderToTranslated = (header: string): string => {
+          const headerStr = String(header).trim();
+          const lang = this.selectedLanguage || 'AR';
+          
+          if (headerStr === '01' || headerStr === '1') {
+            if (lang === 'FR') return 'Évaluation continue';
+            if (lang === 'EN') return 'Continuous Assessment';
+            return 'التقييم المستمر';
+          } else if (headerStr === '02' || headerStr === '2') {
+            if (lang === 'FR') return 'Travaux pratiques ou Expression orale';
+            if (lang === 'EN') return 'Practical Work or Oral Expression';
+            return 'أعمال تطبيقية أو تعبير شفوي';
+          } else if (headerStr === '03' || headerStr === '3') {
+            if (lang === 'FR') return 'Moyenne des devoirs';
+            if (lang === 'EN') return 'Assignment Average';
+            return 'معدل الفروض';
+          } else if (headerStr === '09' || headerStr === '9') {
+            if (lang === 'FR') return 'Examen';
+            if (lang === 'EN') return 'Test';
+            return 'الاختبار';
+          }
+          return headerStr; // Return original if no mapping found
+        };
+        
+        const gradeHeaders = Array.from(allColumnHeaders).map(mapHeaderToTranslated);
         headers.push(...gradeHeaders);
         
         // Add calculated columns
@@ -2804,8 +3202,31 @@ export class GradebookComponent implements OnInit, AfterViewInit {
           ];
 
           // Add grade values in the same order as headers
-          gradeHeaders.forEach(header => {
-            const gradeCol = row.gradeColumns?.find((col: any) => String(col.header) === header);
+          // Need to map back from translated headers to original headers for lookup
+          const mapTranslatedToOriginal = (translatedHeader: string): string => {
+            const lang = this.selectedLanguage || 'AR';
+            // Check all language variations
+            if (translatedHeader === 'التقييم المستمر' || translatedHeader === 'Évaluation continue' || translatedHeader === 'Continuous Assessment') {
+              return '01';
+            }
+            if (translatedHeader === 'أعمال تطبيقية أو تعبير شفوي' || translatedHeader === 'Travaux pratiques ou Expression orale' || translatedHeader === 'Practical Work or Oral Expression') {
+              return '02';
+            }
+            if (translatedHeader === 'معدل الفروض' || translatedHeader === 'Moyenne des devoirs' || translatedHeader === 'Assignment Average') {
+              return '03';
+            }
+            if (translatedHeader === 'الاختبار' || translatedHeader === 'Examen' || translatedHeader === 'Test') {
+              return '09';
+            }
+            return translatedHeader; // Return original if no mapping found
+          };
+          
+          gradeHeaders.forEach(translatedHeader => {
+            const originalHeader = mapTranslatedToOriginal(translatedHeader);
+            const gradeCol = row.gradeColumns?.find((col: any) => {
+              const colHeader = String(col.header).trim();
+              return colHeader === originalHeader || colHeader === translatedHeader;
+            });
             const value = gradeCol?.value;
             if (value !== undefined && value !== null && value !== '') {
               const numValue = parseFloat(String(value));
@@ -2827,6 +3248,60 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
         // Create worksheet
         const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+        // Apply color coding ONLY to grade columns (not name / id / obs / cons)
+        const firstGradeColIndex = 4; // 0:#,1:id,2:firstName,3:lastName,4:first grade column
+        const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
+
+        // Helper to convert column index (0-based) to Excel column letter (A, B, ..., AA, AB, ...)
+        const getColLetter = (colIndex: number): string => {
+          let dividend = colIndex + 1;
+          let colLetter = '';
+          while (dividend > 0) {
+            const modulo = (dividend - 1) % 26;
+            colLetter = String.fromCharCode(65 + modulo) + colLetter;
+            dividend = Math.floor((dividend - modulo) / 26);
+          }
+          return colLetter;
+        };
+
+        // Rows: 0 = header, so start from 1
+        for (let rowIndex = 1; rowIndex < excelData.length; rowIndex++) {
+          for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
+            const cellAddress = `${getColLetter(colIndex)}${rowIndex + 1}`;
+            const cell = ws[cellAddress];
+            if (!cell) continue;
+
+            const rawValue = cell.v;
+            const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
+            const numValue = parseFloat(strValue);
+
+            // Skip empty cells
+            if (strValue === '' || strValue === '-') {
+              continue;
+            }
+
+            // Determine color:
+            // - Green: numeric between 0.25 and 20
+            // - Orange: contains "غ م" OR exactly 0
+            // - Red: everything else
+            let fgColor = 'FFC7CE'; // default red
+
+            if (!isNaN(numValue) && numValue >= 0.25 && numValue <= 20) {
+              fgColor = 'C6EFCE'; // green
+            } else if (strValue.includes('غ م') || (!isNaN(numValue) && numValue === 0)) {
+              fgColor = 'FFEB9C'; // orange
+            }
+
+            cell.s = {
+              ...(cell.s || {}),
+              fill: {
+                ...(cell.s?.fill || {}),
+                fgColor: { rgb: fgColor }
+              }
+            };
+          }
+        }
         
         // Clean sheet name (Excel sheet names have limitations)
         let cleanSheetName = sheetInfo.sheetName || `Sheet${sheetIndex + 1}`;
@@ -2850,7 +3325,33 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       });
 
       const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
-      const gradeHeaders = Array.from(allColumnHeaders);
+      
+      // Map numeric headers to translated names based on selected language
+      const mapHeaderToTranslated = (header: string): string => {
+        const headerStr = String(header).trim();
+        const lang = this.selectedLanguage || 'AR';
+        
+        if (headerStr === '01' || headerStr === '1') {
+          if (lang === 'FR') return 'Évaluation continue';
+          if (lang === 'EN') return 'Continuous Assessment';
+          return 'التقييم المستمر';
+        } else if (headerStr === '02' || headerStr === '2') {
+          if (lang === 'FR') return 'Travaux pratiques ou Expression orale';
+          if (lang === 'EN') return 'Practical Work or Oral Expression';
+          return 'أعمال تطبيقية أو تعبير شفوي';
+        } else if (headerStr === '03' || headerStr === '3') {
+          if (lang === 'FR') return 'Moyenne des devoirs';
+          if (lang === 'EN') return 'Assignment Average';
+          return 'معدل الفروض';
+        } else if (headerStr === '09' || headerStr === '9') {
+          if (lang === 'FR') return 'Examen';
+          if (lang === 'EN') return 'Test';
+          return 'الاختبار';
+        }
+        return headerStr; // Return original if no mapping found
+      };
+      
+      const gradeHeaders = Array.from(allColumnHeaders).map(mapHeaderToTranslated);
       headers.push(...gradeHeaders);
       headers.push(
         this.translate('gradebook.termAverage'),
@@ -2868,8 +3369,30 @@ export class GradebookComponent implements OnInit, AfterViewInit {
           row.lastName || '-'
         ];
 
-        gradeHeaders.forEach(header => {
-          const gradeCol = row.gradeColumns?.find((col: any) => String(col.header) === header);
+        // Need to map back from translated headers to original headers for lookup
+        const mapTranslatedToOriginal = (translatedHeader: string): string => {
+          // Check all language variations
+          if (translatedHeader === 'التقييم المستمر' || translatedHeader === 'Évaluation continue' || translatedHeader === 'Continuous Assessment') {
+            return '01';
+          }
+          if (translatedHeader === 'أعمال تطبيقية أو تعبير شفوي' || translatedHeader === 'Travaux pratiques ou Expression orale' || translatedHeader === 'Practical Work or Oral Expression') {
+            return '02';
+          }
+          if (translatedHeader === 'معدل الفروض' || translatedHeader === 'Moyenne des devoirs' || translatedHeader === 'Assignment Average') {
+            return '03';
+          }
+          if (translatedHeader === 'الاختبار' || translatedHeader === 'Examen' || translatedHeader === 'Test') {
+            return '09';
+          }
+          return translatedHeader; // Return original if no mapping found
+        };
+        
+        gradeHeaders.forEach(translatedHeader => {
+          const originalHeader = mapTranslatedToOriginal(translatedHeader);
+          const gradeCol = row.gradeColumns?.find((col: any) => {
+            const colHeader = String(col.header).trim();
+            return colHeader === originalHeader || colHeader === translatedHeader;
+          });
           const value = gradeCol?.value;
           if (value !== undefined && value !== null && value !== '') {
             const numValue = parseFloat(String(value));
@@ -2889,6 +3412,53 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       });
 
       const ws = XLSX.utils.aoa_to_sheet(excelData);
+
+      // Apply color coding ONLY to grade columns (not name / id / obs / cons)
+      const firstGradeColIndex = 4; // 0:#,1:id,2:firstName,3:lastName,4:first grade column
+      const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
+
+      const getColLetter = (colIndex: number): string => {
+        let dividend = colIndex + 1;
+        let colLetter = '';
+        while (dividend > 0) {
+          const modulo = (dividend - 1) % 26;
+          colLetter = String.fromCharCode(65 + modulo) + colLetter;
+          dividend = Math.floor((dividend - modulo) / 26);
+        }
+        return colLetter;
+      };
+
+      for (let rowIndex = 1; rowIndex < excelData.length; rowIndex++) {
+        for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
+          const cellAddress = `${getColLetter(colIndex)}${rowIndex + 1}`;
+          const cell = ws[cellAddress];
+          if (!cell) continue;
+
+          const rawValue = cell.v;
+          const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
+          const numValue = parseFloat(strValue);
+
+          if (strValue === '' || strValue === '-') {
+            continue;
+          }
+
+          let fgColor = 'FFC7CE'; // red by default
+
+          if (!isNaN(numValue) && numValue >= 0.25 && numValue <= 20) {
+            fgColor = 'C6EFCE'; // green
+          } else if (strValue.includes('غ م') || (!isNaN(numValue) && numValue === 0)) {
+            fgColor = 'FFEB9C'; // orange
+          }
+
+          cell.s = {
+            ...(cell.s || {}),
+            fill: {
+              ...(cell.s?.fill || {}),
+              fgColor: { rgb: fgColor }
+            }
+          };
+        }
+      }
       XLSX.utils.book_append_sheet(wb, ws, 'النتائج المعالجة');
     }
 
@@ -2982,6 +3552,369 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     });
 
     return dist;
+  }
+
+  // Get color class for grade cell based on value
+  getGradeCellColor(value: any): string {
+    if (value === undefined || value === null || value === '') {
+      return '';
+    }
+
+    const valueStr = String(value).trim();
+    
+    // Check if it contains "غ م" (Arabic for "not available")
+    if (valueStr.includes('غ م') || valueStr.toLowerCase().includes('n/a') || valueStr.toLowerCase().includes('na')) {
+      return 'bg-orange-200 text-orange-800';
+    }
+
+    // Try to parse as number
+    const numValue = parseFloat(valueStr);
+    
+    if (isNaN(numValue)) {
+      // Not a number and not "غ م" - red
+      return 'bg-red-200 text-red-800';
+    }
+
+    // Check if value is 0
+    if (numValue === 0) {
+      return 'bg-orange-200 text-orange-800';
+    }
+
+    // Check if value is between 0.25 and 20 - GREEN
+    if (numValue >= 0.25 && numValue <= 20) {
+      return 'bg-green-200 text-green-800';
+    }
+
+    // Otherwise - red
+    return 'bg-red-200 text-red-800';
+  }
+
+  // Get background color style for grade cell
+  getGradeCellBgColor(value: any): string {
+    const colorClass = this.getGradeCellColor(value);
+    if (colorClass.includes('green')) return '#dcfce7'; // green-200
+    if (colorClass.includes('orange')) return '#fed7aa'; // orange-200
+    if (colorClass.includes('red')) return '#fee2e2'; // red-200
+    return '';
+  }
+
+  // Get text color style for grade cell
+  getGradeCellTextColor(value: any): string {
+    const colorClass = this.getGradeCellColor(value);
+    if (colorClass.includes('green')) return '#166534'; // green-800
+    if (colorClass.includes('orange')) return '#9a3412'; // orange-800
+    if (colorClass.includes('red')) return '#991b1b'; // red-800
+    return '';
+  }
+
+  // Get all unique grade column headers from processed data
+  getAllGradeColumnHeaders(): string[] {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) {
+      return [];
+    }
+
+    const headersSet = new Set<string>();
+    
+    this.processedExcelData.forEach((row: any) => {
+      if (row.gradeColumns && Array.isArray(row.gradeColumns)) {
+        row.gradeColumns.forEach((col: any) => {
+          if (col.header) {
+            headersSet.add(String(col.header));
+          }
+        });
+      }
+    });
+
+    // Map numeric headers to translated names for display based on selected language
+    const mapHeaderToTranslated = (header: string): string => {
+      const headerStr = String(header).trim();
+      const lang = this.selectedLanguage || 'AR';
+      
+      if (headerStr === '01' || headerStr === '1') {
+        if (lang === 'FR') return 'Évaluation continue';
+        if (lang === 'EN') return 'Continuous Assessment';
+        return 'التقييم المستمر';
+      } else if (headerStr === '02' || headerStr === '2') {
+        if (lang === 'FR') return 'Travaux pratiques ou Expression orale';
+        if (lang === 'EN') return 'Practical Work or Oral Expression';
+        return 'أعمال تطبيقية أو تعبير شفوي';
+      } else if (headerStr === '03' || headerStr === '3') {
+        if (lang === 'FR') return 'Moyenne des devoirs';
+        if (lang === 'EN') return 'Assignment Average';
+        return 'معدل الفروض';
+      } else if (headerStr === '09' || headerStr === '9') {
+        if (lang === 'FR') return 'Examen';
+        if (lang === 'EN') return 'Test';
+        return 'الاختبار';
+      }
+      return headerStr; // Return original if no mapping found
+    };
+
+    return Array.from(headersSet).map(mapHeaderToTranslated);
+  }
+
+  // Get grade value for a specific column header in a row
+  getGradeValueForColumn(row: any, columnHeader: string): any {
+    if (!row.gradeColumns || !Array.isArray(row.gradeColumns)) {
+      return null;
+    }
+
+    // Map translated header back to original numeric header for lookup
+    const mapTranslatedToOriginal = (translatedHeader: string): string => {
+      // Check all language variations
+      if (translatedHeader === 'التقييم المستمر' || translatedHeader === 'Évaluation continue' || translatedHeader === 'Continuous Assessment') {
+        return '01';
+      }
+      if (translatedHeader === 'أعمال تطبيقية أو تعبير شفوي' || translatedHeader === 'Travaux pratiques ou Expression orale' || translatedHeader === 'Practical Work or Oral Expression') {
+        return '02';
+      }
+      if (translatedHeader === 'معدل الفروض' || translatedHeader === 'Moyenne des devoirs' || translatedHeader === 'Assignment Average') {
+        return '03';
+      }
+      if (translatedHeader === 'الاختبار' || translatedHeader === 'Examen' || translatedHeader === 'Test') {
+        return '09';
+      }
+      return translatedHeader; // Return original if no mapping found
+    };
+
+    const originalHeader = mapTranslatedToOriginal(columnHeader);
+    
+    // Try to find by original header first, then by translated header, and also try numeric variations
+    let gradeCol = row.gradeColumns.find((col: any) => {
+      const colHeader = String(col.header).trim();
+      // Try exact match with original header
+      if (colHeader === originalHeader) return true;
+      // Try exact match with translated header
+      if (colHeader === columnHeader) return true;
+      // Try numeric variations (01, 1, 02, 2, etc.)
+      if ((originalHeader === '01' && (colHeader === '1' || colHeader === '01')) ||
+          (originalHeader === '02' && (colHeader === '2' || colHeader === '02')) ||
+          (originalHeader === '03' && (colHeader === '3' || colHeader === '03')) ||
+          (originalHeader === '09' && (colHeader === '9' || colHeader === '09'))) {
+        return true;
+      }
+      return false;
+    });
+    
+    return gradeCol?.value;
+  }
+
+  // Check if a grade value is valid (between 0 and 20, or "غ م")
+  isValidGrade(value: any): boolean {
+    if (value === undefined || value === null || value === '') {
+      return false; // Empty is considered invalid
+    }
+
+    const valueStr = String(value).trim();
+    
+    // Check if it contains "غ م" (Arabic for "not available") - this is valid
+    if (valueStr.includes('غ م') || valueStr.toLowerCase().includes('n/a') || valueStr.toLowerCase().includes('na')) {
+      return true;
+    }
+
+    // Try to parse as number
+    const numValue = parseFloat(valueStr);
+    
+    if (isNaN(numValue)) {
+      // Not a number and not "غ م" - invalid
+      return false;
+    }
+
+    // Valid if between 0 and 20 (inclusive)
+    return numValue >= 0 && numValue <= 20;
+  }
+
+  // Get error description for invalid grade
+  getGradeError(value: any): string {
+    if (value === undefined || value === null || value === '') {
+      return 'فراغ';
+    }
+
+    const valueStr = String(value).trim();
+    const numValue = parseFloat(valueStr);
+    
+    if (isNaN(numValue)) {
+      return `قيمة غير صحيحة: "${valueStr}"`;
+    }
+
+    if (numValue < 0) {
+      return `قيمة سالبة: ${numValue}`;
+    }
+
+    if (numValue > 20) {
+      return `قيمة أكبر من 20: ${numValue}`;
+    }
+
+    return '';
+  }
+
+  // Get all students with grade errors
+  getStudentsWithGradeErrors(): any[] {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) {
+      return [];
+    }
+
+    const errors: any[] = [];
+    const gradeHeaders = this.getAllGradeColumnHeaders();
+
+    this.processedExcelData.forEach((row: any) => {
+      const studentErrors: any[] = [];
+
+      gradeHeaders.forEach(header => {
+        const value = this.getGradeValueForColumn(row, header);
+        
+        if (!this.isValidGrade(value)) {
+          studentErrors.push({
+            columnHeader: header,
+            value: value,
+            error: this.getGradeError(value)
+          });
+        }
+      });
+
+      if (studentErrors.length > 0) {
+        errors.push({
+          firstName: row.firstName || '-',
+          lastName: row.lastName || '-',
+          sheetName: row.sheetName || '-',
+          errors: studentErrors
+        });
+      }
+    });
+
+    return errors;
+  }
+
+  // Open grade monitoring modal
+  openGradeMonitoringModal(): void {
+    this.showGradeMonitoringModal = true;
+  }
+
+  // Close grade monitoring modal
+  closeGradeMonitoringModal(): void {
+    this.showGradeMonitoringModal = false;
+  }
+
+  // Print grade monitoring report
+  printGradeMonitoringReport(): void {
+    window.print();
+  }
+
+  // Get formatted report date
+  getReportDate(): string {
+    return new Date().toLocaleDateString('ar-EG');
+  }
+
+  // Export grade monitoring report to PDF
+  exportGradeMonitoringPDF(): void {
+    const errors = this.getStudentsWithGradeErrors();
+
+    if (errors.length === 0) {
+      alert('لا توجد أخطاء في النقاط. جميع النقاط صحيحة!');
+      return;
+    }
+
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      let yPosition = margin;
+
+      // Title
+      pdf.setFontSize(18);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text('تقرير مراقبة النقاط', pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
+
+      // Date
+      pdf.setFontSize(10);
+      pdf.setTextColor(100, 100, 100);
+      const date = new Date().toLocaleDateString('ar-EG');
+      pdf.text(`تاريخ التقرير: ${date}`, pageWidth / 2, yPosition, { align: 'center' });
+      yPosition += 10;
+
+      // Summary
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`عدد التلاميذ الذين لديهم أخطاء: ${errors.length}`, margin, yPosition, { align: 'right' });
+      yPosition += 10;
+
+      // Table headers
+      pdf.setFontSize(10);
+      pdf.setFillColor(59, 130, 246); // Blue
+      pdf.rect(margin, yPosition, pageWidth - 2 * margin, 8, 'F');
+      pdf.setTextColor(255, 255, 255);
+      pdf.setFont('helvetica', 'bold');
+      
+      pdf.text('الاسم', margin + pageWidth - 2 * margin - 5, yPosition + 5, { align: 'right' });
+      pdf.text('العمود', margin + pageWidth - 2 * margin - 50, yPosition + 5, { align: 'right' });
+      pdf.text('الخطأ', margin + 5, yPosition + 5, { align: 'right' });
+      
+      yPosition += 8;
+      pdf.setTextColor(0, 0, 0);
+      pdf.setFont('helvetica', 'normal');
+
+      // Table rows
+      errors.forEach((student, studentIndex) => {
+        student.errors.forEach((error: any, errorIndex: number) => {
+          // Check if we need a new page
+          if (yPosition > pageHeight - 20) {
+            pdf.addPage();
+            yPosition = margin;
+            
+            // Repeat headers on new page
+            pdf.setFillColor(59, 130, 246);
+            pdf.rect(margin, yPosition, pageWidth - 2 * margin, 8, 'F');
+            pdf.setTextColor(255, 255, 255);
+            pdf.setFont('helvetica', 'bold');
+            pdf.text('الاسم', margin + pageWidth - 2 * margin - 5, yPosition + 5, { align: 'right' });
+            pdf.text('العمود', margin + pageWidth - 2 * margin - 50, yPosition + 5, { align: 'right' });
+            pdf.text('الخطأ', margin + 5, yPosition + 5, { align: 'right' });
+            yPosition += 8;
+            pdf.setTextColor(0, 0, 0);
+            pdf.setFont('helvetica', 'normal');
+          }
+
+          // Student name (only show once per student)
+          const studentName = errorIndex === 0 
+            ? `${student.firstName} ${student.lastName}`.trim()
+            : '';
+          
+          // Column header
+          const columnHeader = error.columnHeader || '-';
+          
+          // Error description
+          const errorDesc = error.error || '-';
+
+          // Draw row background (alternating colors)
+          if ((studentIndex + errorIndex) % 2 === 0) {
+            pdf.setFillColor(245, 245, 245);
+            pdf.rect(margin, yPosition - 3, pageWidth - 2 * margin, 6, 'F');
+          }
+
+          // Draw text
+          pdf.setFontSize(9);
+          pdf.text(studentName || '', margin + pageWidth - 2 * margin - 5, yPosition, { align: 'right' });
+          pdf.text(columnHeader, margin + pageWidth - 2 * margin - 50, yPosition, { align: 'right' });
+          
+          // Error text (may need to wrap)
+          const errorText = errorDesc.length > 30 ? errorDesc.substring(0, 30) + '...' : errorDesc;
+          pdf.text(errorText, margin + 5, yPosition, { align: 'right', maxWidth: 50 });
+          
+          yPosition += 6;
+        });
+      });
+
+      // Save PDF
+      const fileName = `تقرير_مراقبة_النقاط_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+      
+      alert(`تم تصدير التقرير بنجاح! تم العثور على ${errors.length} تلميذ لديهم أخطاء في النقاط.`);
+    } catch (error) {
+      console.error('Error exporting grade monitoring PDF:', error);
+      alert('حدث خطأ أثناء تصدير التقرير');
+    }
   }
 
   updateExcelAnalysisCharts(): void {

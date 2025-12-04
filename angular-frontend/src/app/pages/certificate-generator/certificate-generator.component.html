@@ -32,13 +32,13 @@
           [class.selected]="template.id === selectedTemplateId"
           class="template-card"
         >
-          <div class="template-icon" [ngSwitch]="template.name">
-            <span *ngSwitchCase="'تقدير تفوق دراسي'">⭐</span>
-            <span *ngSwitchCase="'تقدير حسن سلوك'">🤝</span>
-            <span *ngSwitchCase="'تقدير مشاركة فعالة'">🙌</span>
+          <div class="template-icon" [ngSwitch]="getTemplateKey(template.name)">
+            <span *ngSwitchCase="'certificate.templateAcademicExcellence'">⭐</span>
+            <span *ngSwitchCase="'certificate.templateGoodConduct'">🤝</span>
+            <span *ngSwitchCase="'certificate.templateActiveParticipation'">🙌</span>
             <span *ngSwitchDefault>🏅</span>
           </div>
-          <h3>{{ template.name }}</h3>
+          <h3>{{ getTemplateTranslation(template.name) }}</h3>
           <p>{{ template.description }}</p>
         </div>
       </div>

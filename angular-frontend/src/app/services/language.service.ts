@@ -522,6 +522,15 @@ export class LanguageService {
         'DE': 'Inaktiv',
         'TR': 'Pasif'
       },
+      'common.notSpecified': {
+        'AR': 'غير محدد',
+        'FR': 'Non spécifié',
+        'EN': 'Not specified',
+        'ES': 'No especificado',
+        'IT': 'Non specificato',
+        'DE': 'Nicht angegeben',
+        'TR': 'Belirtilmemiş'
+      },
 
       // Dashboard
       'dashboard.title': {
@@ -757,6 +766,33 @@ export class LanguageService {
         'IT': 'Pulizia del laboratorio',
         'DE': 'Laborsauberkeit',
         'TR': 'Laboratuvar temizliği'
+      },
+      'dashboard.labDevicesWorking': {
+        'AR': 'أجهزة تعمل',
+        'FR': 'Appareils en fonctionnement',
+        'EN': 'Working devices',
+        'ES': 'Dispositivos en funcionamiento',
+        'IT': 'Dispositivi funzionanti',
+        'DE': 'Funktionierende Geräte',
+        'TR': 'Çalışan cihazlar'
+      },
+      'dashboard.loadingProgress': {
+        'AR': 'جاري تحميل بيانات التقدّم...',
+        'FR': 'Chargement des données de progression...',
+        'EN': 'Loading progress data...',
+        'ES': 'Cargando datos de progreso...',
+        'IT': 'Caricamento dati di progresso...',
+        'DE': 'Fortschrittsdaten werden geladen...',
+        'TR': 'İlerleme verileri yükleniyor...'
+      },
+      'dashboard.numberOfStudents': {
+        'AR': 'عدد التلاميذ',
+        'FR': 'Nombre d\'élèves',
+        'EN': 'Number of students',
+        'ES': 'Número de estudiantes',
+        'IT': 'Numero di studenti',
+        'DE': 'Anzahl der Schüler',
+        'TR': 'Öğrenci sayısı'
       },
       'dashboard.programProgress': {
         'AR': 'تقدّم إنجاز البرنامج',
@@ -2856,6 +2892,33 @@ export class LanguageService {
         'IT': 'Apri rapporto visite dell\'ispettore',
         'DE': 'Inspektorenbesuchsbericht öffnen',
         'TR': 'Müfettiş ziyaretleri raporunu aç'
+      },
+      'reports.gradeMonitoring': {
+        'AR': 'تقرير مراقبة النقاط',
+        'FR': 'Rapport de surveillance des notes',
+        'EN': 'Grade monitoring report',
+        'ES': 'Informe de monitoreo de calificaciones',
+        'IT': 'Rapporto monitoraggio voti',
+        'DE': 'Notenüberwachungsbericht',
+        'TR': 'Not izleme raporu'
+      },
+      'reports.gradeMonitoringDesc': {
+        'AR': 'عرض وتصدير تقرير مراقبة النقاط والأخطاء في الدرجات بصيغة PDF.',
+        'FR': 'Afficher et exporter le rapport de surveillance des notes et des erreurs en PDF.',
+        'EN': 'View and export grade monitoring report and errors in PDF format.',
+        'ES': 'Ver y exportar el informe de monitoreo de calificaciones y errores en formato PDF.',
+        'IT': 'Visualizza ed esporta il rapporto di monitoraggio dei voti e degli errori in formato PDF.',
+        'DE': 'Anzeigen und Exportieren des Notenüberwachungsberichts und der Fehler im PDF-Format.',
+        'TR': 'Not izleme raporunu ve hataları PDF formatında görüntüleyin ve dışa aktarın.'
+      },
+      'reports.openGradeMonitoring': {
+        'AR': 'فتح تقرير مراقبة النقاط',
+        'FR': 'Ouvrir le rapport de surveillance des notes',
+        'EN': 'Open grade monitoring report',
+        'ES': 'Abrir informe de monitoreo de calificaciones',
+        'IT': 'Apri rapporto monitoraggio voti',
+        'DE': 'Notenüberwachungsbericht öffnen',
+        'TR': 'Not izleme raporunu aç'
       },
       'reports.dailyNotes': {
         'AR': 'تقرير دفتر الملاحظات اليومية',
@@ -11858,6 +11921,541 @@ export class LanguageService {
         'IT': 'Errore nell\'aggiornamento dei permessi',
         'DE': 'Fehler beim Aktualisieren der Berechtigungen',
         'TR': 'İzinler güncellenirken hata'
+      },
+
+      // Achievements & Penalties
+      'achievementsPenalties.pageTitle': {
+        'AR': 'الإجازات والعقوبات',
+        'FR': 'Distinctions et sanctions',
+        'EN': 'Achievements & Penalties',
+        'ES': 'Logros y sanciones',
+        'IT': 'Risultati e sanzioni',
+        'DE': 'Erfolge & Sanktionen',
+        'TR': 'Başarılar ve Cezalar'
+      },
+      'achievementsPenalties.description': {
+        'AR': 'إدارة شهادات التقدير والعقوبات السلوكية',
+        'FR': 'Gérer les certificats de mérite et les sanctions comportementales',
+        'EN': 'Manage certificates of merit and behavioral penalties',
+        'ES': 'Gestionar certificados de mérito y sanciones de comportamiento',
+        'IT': 'Gestire certificati di merito e sanzioni comportamentali',
+        'DE': 'Verdienstzertifikate und Verhaltenssanktionen verwalten',
+        'TR': 'Başarı sertifikaları ve davranışsal cezaları yönetin'
+      },
+      'achievementsPenalties.tabAchievements': {
+        'AR': 'الإجازات',
+        'FR': 'Distinctions',
+        'EN': 'Achievements',
+        'ES': 'Logros',
+        'IT': 'Risultati',
+        'DE': 'Erfolge',
+        'TR': 'Başarılar'
+      },
+      'achievementsPenalties.tabPenalties': {
+        'AR': 'العقوبات',
+        'FR': 'Sanctions',
+        'EN': 'Penalties',
+        'ES': 'Sanciones',
+        'IT': 'Sanzioni',
+        'DE': 'Sanktionen',
+        'TR': 'Cezalar'
+      },
+      'achievementsPenalties.showPreviousCertificates': {
+        'AR': 'عرض الشهادات السابقة',
+        'FR': 'Afficher les certificats précédents',
+        'EN': 'Show previous certificates',
+        'ES': 'Mostrar certificados anteriores',
+        'IT': 'Mostra certificati precedenti',
+        'DE': 'Vorherige Zertifikate anzeigen',
+        'TR': 'Önceki sertifikaları göster'
+      },
+      'achievementsPenalties.loadingCertificates': {
+        'AR': 'جاري تحميل الشهادات...',
+        'FR': 'Chargement des certificats...',
+        'EN': 'Loading certificates...',
+        'ES': 'Cargando certificados...',
+        'IT': 'Caricamento certificati...',
+        'DE': 'Zertifikate werden geladen...',
+        'TR': 'Sertifikalar yükleniyor...'
+      },
+      'achievementsPenalties.noCertificates': {
+        'AR': 'لا توجد شهادات حالياً',
+        'FR': 'Aucun certificat pour le moment',
+        'EN': 'No certificates currently',
+        'ES': 'No hay certificados actualmente',
+        'IT': 'Nessun certificato al momento',
+        'DE': 'Derzeit keine Zertifikate',
+        'TR': 'Şu anda sertifika yok'
+      },
+      'achievementsPenalties.showPreviousReports': {
+        'AR': 'عرض التقارير السابقة',
+        'FR': 'Afficher les rapports précédents',
+        'EN': 'Show previous reports',
+        'ES': 'Mostrar informes anteriores',
+        'IT': 'Mostra rapporti precedenti',
+        'DE': 'Vorherige Berichte anzeigen',
+        'TR': 'Önceki raporları göster'
+      },
+      'achievementsPenalties.loadingReports': {
+        'AR': 'جاري تحميل التقارير...',
+        'FR': 'Chargement des rapports...',
+        'EN': 'Loading reports...',
+        'ES': 'Cargando informes...',
+        'IT': 'Caricamento rapporti...',
+        'DE': 'Berichte werden geladen...',
+        'TR': 'Raporlar yükleniyor...'
+      },
+      'achievementsPenalties.noReports': {
+        'AR': 'لا توجد تقارير حالياً',
+        'FR': 'Aucun rapport pour le moment',
+        'EN': 'No reports currently',
+        'ES': 'No hay informes actualmente',
+        'IT': 'Nessun rapporto al momento',
+        'DE': 'Derzeit keine Berichte',
+        'TR': 'Şu anda rapor yok'
+      },
+      'achievementsPenalties.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'achievementsPenalties.exporting': {
+        'AR': 'جارٍ التصدير...',
+        'FR': 'Exportation en cours...',
+        'EN': 'Exporting...',
+        'ES': 'Exportando...',
+        'IT': 'Esportazione in corso...',
+        'DE': 'Wird exportiert...',
+        'TR': 'Dışa aktarılıyor...'
+      },
+      'achievementsPenalties.exportPenaltiesToPDF': {
+        'AR': 'تصدير العقوبات إلى PDF',
+        'FR': 'Exporter les sanctions en PDF',
+        'EN': 'Export penalties to PDF',
+        'ES': 'Exportar sanciones a PDF',
+        'IT': 'Esporta sanzioni in PDF',
+        'DE': 'Sanktionen als PDF exportieren',
+        'TR': 'Cezaları PDF olarak dışa aktar'
+      },
+      'achievementsPenalties.errorLoadingBehaviorReports': {
+        'AR': 'تعذر تحميل تقارير السلوك',
+        'FR': 'Erreur lors du chargement des rapports de comportement',
+        'EN': 'Error loading behavior reports',
+        'ES': 'Error al cargar informes de comportamiento',
+        'IT': 'Errore nel caricamento dei rapporti comportamentali',
+        'DE': 'Fehler beim Laden der Verhaltensberichte',
+        'TR': 'Davranış raporları yüklenirken hata'
+      },
+      'achievementsPenalties.errorLoadingCertificates': {
+        'AR': 'تعذر تحميل سجل الشهادات',
+        'FR': 'Erreur lors du chargement de l\'historique des certificats',
+        'EN': 'Error loading certificate history',
+        'ES': 'Error al cargar el historial de certificados',
+        'IT': 'Errore nel caricamento della cronologia dei certificati',
+        'DE': 'Fehler beim Laden des Zertifikatsverlaufs',
+        'TR': 'Sertifika geçmişi yüklenirken hata'
+      },
+      'achievementsPenalties.unknownStudent': {
+        'AR': 'طالب غير معروف',
+        'FR': 'Élève inconnu',
+        'EN': 'Unknown student',
+        'ES': 'Estudiante desconocido',
+        'IT': 'Studente sconosciuto',
+        'DE': 'Unbekannter Schüler',
+        'TR': 'Bilinmeyen öğrenci'
+      },
+      'achievementsPenalties.noAdditionalDetails': {
+        'AR': 'لا يوجد تفاصيل إضافية',
+        'FR': 'Aucun détail supplémentaire',
+        'EN': 'No additional details',
+        'ES': 'Sin detalles adicionales',
+        'IT': 'Nessun dettaglio aggiuntivo',
+        'DE': 'Keine zusätzlichen Details',
+        'TR': 'Ek ayrıntı yok'
+      },
+      'achievementsPenalties.certificate': {
+        'AR': 'شهادة',
+        'FR': 'Certificat',
+        'EN': 'Certificate',
+        'ES': 'Certificado',
+        'IT': 'Certificato',
+        'DE': 'Zertifikat',
+        'TR': 'Sertifika'
+      },
+      'achievementsPenalties.noClassesAvailable': {
+        'AR': 'لا توجد أقسام متاحة',
+        'FR': 'Aucune classe disponible',
+        'EN': 'No classes available',
+        'ES': 'No hay clases disponibles',
+        'IT': 'Nessuna classe disponibile',
+        'DE': 'Keine Klassen verfügbar',
+        'TR': 'Sınıf mevcut değil'
+      },
+      'achievementsPenalties.noReportsToExport': {
+        'AR': 'لا توجد تقارير لتصديرها',
+        'FR': 'Aucun rapport à exporter',
+        'EN': 'No reports to export',
+        'ES': 'No hay informes para exportar',
+        'IT': 'Nessun rapporto da esportare',
+        'DE': 'Keine Berichte zum Exportieren',
+        'TR': 'Dışa aktarılacak rapor yok'
+      },
+      'achievementsPenalties.noCertificatesToExport': {
+        'AR': 'لا توجد شهادات لتصديرها',
+        'FR': 'Aucun certificat à exporter',
+        'EN': 'No certificates to export',
+        'ES': 'No hay certificados para exportar',
+        'IT': 'Nessun certificato da esportare',
+        'DE': 'Keine Zertifikate zum Exportieren',
+        'TR': 'Dışa aktarılacak sertifika yok'
+      },
+      'achievementsPenalties.penaltiesReportTitle': {
+        'AR': 'تقرير العقوبات والتقارير',
+        'FR': 'Rapport des sanctions',
+        'EN': 'Penalties Report',
+        'ES': 'Informe de sanciones',
+        'IT': 'Rapporto sanzioni',
+        'DE': 'Sanktionsbericht',
+        'TR': 'Cezalar Raporu'
+      },
+      'achievementsPenalties.certificatesReportTitle': {
+        'AR': 'تقرير الشهادات',
+        'FR': 'Rapport des certificats',
+        'EN': 'Certificates Report',
+        'ES': 'Informe de certificados',
+        'IT': 'Rapporto certificati',
+        'DE': 'Zertifikatsbericht',
+        'TR': 'Sertifikalar Raporu'
+      },
+      'achievementsPenalties.errorExportingPDF': {
+        'AR': 'حدث خطأ أثناء تصدير PDF',
+        'FR': 'Erreur lors de l\'exportation du PDF',
+        'EN': 'Error exporting PDF',
+        'ES': 'Error al exportar PDF',
+        'IT': 'Errore nell\'esportazione del PDF',
+        'DE': 'Fehler beim Exportieren des PDF',
+        'TR': 'PDF dışa aktarılırken hata'
+      },
+      'achievementsPenalties.studentName': {
+        'AR': 'اسم التلميذ',
+        'FR': 'Nom de l\'élève',
+        'EN': 'Student name',
+        'ES': 'Nombre del estudiante',
+        'IT': 'Nome dello studente',
+        'DE': 'Schülername',
+        'TR': 'Öğrenci adı'
+      },
+      'achievementsPenalties.certificateType': {
+        'AR': 'نوع الشهادة',
+        'FR': 'Type de certificat',
+        'EN': 'Certificate type',
+        'ES': 'Tipo de certificado',
+        'IT': 'Tipo di certificato',
+        'DE': 'Zertifikatstyp',
+        'TR': 'Sertifika türü'
+      },
+      'achievementsPenalties.issueDate': {
+        'AR': 'تاريخ الإصدار',
+        'FR': 'Date d\'émission',
+        'EN': 'Issue date',
+        'ES': 'Fecha de emisión',
+        'IT': 'Data di emissione',
+        'DE': 'Ausstellungsdatum',
+        'TR': 'Düzenleme tarihi'
+      },
+
+      // Certificate Templates
+      'certificate.templateAcademicExcellence': {
+        'AR': 'تقدير تفوق دراسي',
+        'FR': 'Distinction d\'excellence académique',
+        'EN': 'Academic Excellence Award',
+        'ES': 'Distinción de excelencia académica',
+        'IT': 'Distinzione di eccellenza accademica',
+        'DE': 'Auszeichnung für akademische Exzellenz',
+        'TR': 'Akademik Mükemmellik Ödülü'
+      },
+      'certificate.templateGoodConduct': {
+        'AR': 'تقدير حسن سلوك',
+        'FR': 'Distinction de bonne conduite',
+        'EN': 'Good Conduct Award',
+        'ES': 'Distinción de buena conducta',
+        'IT': 'Distinzione di buona condotta',
+        'DE': 'Auszeichnung für gutes Verhalten',
+        'TR': 'İyi Davranış Ödülü'
+      },
+      'certificate.templateActiveParticipation': {
+        'AR': 'تقدير مشاركة فعالة',
+        'FR': 'Distinction de participation active',
+        'EN': 'Active Participation Award',
+        'ES': 'Distinción de participación activa',
+        'IT': 'Distinzione di partecipazione attiva',
+        'DE': 'Auszeichnung für aktive Teilnahme',
+        'TR': 'Aktif Katılım Ödülü'
+      },
+
+      // Default Certificate Texts
+      'certificate.defaultMainTextAcademicExcellence': {
+        'AR': 'بكل فخر، نمنح هذه الشهادة لـ{{student}} اعترافاً بجهوده المتميزة في مادة المعلوماتية.',
+        'FR': 'Avec grande fierté, nous décernons ce certificat à {{student}} en reconnaissance de ses efforts exceptionnels en informatique.',
+        'EN': 'With great pride, we award this certificate to {{student}} in recognition of their outstanding efforts in the subject of Informatics.',
+        'ES': 'Con gran orgullo, otorgamos este certificado a {{student}} en reconocimiento a sus esfuerzos excepcionales en la materia de Informática.',
+        'IT': 'Con grande orgoglio, assegniamo questo certificato a {{student}} in riconoscimento dei suoi sforzi eccezionali nella materia di Informatica.',
+        'DE': 'Mit großem Stolz verleihen wir dieses Zertifikat an {{student}} in Anerkennung ihrer außergewöhnlichen Bemühungen im Fach Informatik.',
+        'TR': 'Büyük bir gururla, {{student}} adlı öğrenciye Bilişim dersindeki olağanüstü çabalarını takdir etmek için bu sertifikayı veriyoruz.'
+      },
+      'certificate.defaultReasonAcademicExcellence': {
+        'AR': 'للإنجاز المتميز في المسارات الرقمية وبرامج التفكير المنطقي.',
+        'FR': 'Pour l\'accomplissement exceptionnel dans les parcours numériques et les programmes de pensée logique.',
+        'EN': 'For outstanding achievement in digital pathways and logical thinking programs.',
+        'ES': 'Por el logro excepcional en las vías digitales y los programas de pensamiento lógico.',
+        'IT': 'Per il conseguimento eccezionale nei percorsi digitali e nei programmi di pensiero logico.',
+        'DE': 'Für herausragende Leistungen in digitalen Wegen und Programmen zum logischen Denken.',
+        'TR': 'Dijital yollar ve mantıksal düşünme programlarındaki olağanüstü başarı için.'
+      },
+      'certificate.defaultMainTextGoodConduct': {
+        'AR': 'نمنح هذه الشهادة لـ{{student}} امتناناً لسلوكه الراقي واحترافيته داخل الفصول.',
+        'FR': 'Nous décernons ce certificat à {{student}} en reconnaissance de son comportement exemplaire et de son professionnalisme en classe.',
+        'EN': 'We award this certificate to {{student}} in recognition of their exemplary behavior and professionalism in the classroom.',
+        'ES': 'Otorgamos este certificado a {{student}} en reconocimiento a su comportamiento ejemplar y profesionalismo en el aula.',
+        'IT': 'Assegniamo questo certificato a {{student}} in riconoscimento del loro comportamento esemplare e professionalità in classe.',
+        'DE': 'Wir verleihen dieses Zertifikat an {{student}} in Anerkennung ihres vorbildlichen Verhaltens und ihrer Professionalität im Klassenzimmer.',
+        'TR': '{{student}} adlı öğrenciye sınıftaki örnek davranışı ve profesyonelliği nedeniyle bu sertifikayı veriyoruz.'
+      },
+      'certificate.defaultReasonGoodConduct': {
+        'AR': 'للمساهمة الملحوظة في تعزيز القيم والاحترام المتبادل.',
+        'FR': 'Pour la contribution remarquable à la promotion des valeurs et du respect mutuel.',
+        'EN': 'For notable contribution to promoting values and mutual respect.',
+        'ES': 'Por la notable contribución a la promoción de valores y respeto mutuo.',
+        'IT': 'Per il notevole contributo alla promozione dei valori e del rispetto reciproco.',
+        'DE': 'Für den bemerkenswerten Beitrag zur Förderung von Werten und gegenseitigem Respekt.',
+        'TR': 'Değerlerin ve karşılıklı saygının teşvik edilmesine dikkate değer katkı için.'
+      },
+      'certificate.defaultMainTextActiveParticipation': {
+        'AR': 'نقر بجهود {{student}} البارزة في النقاشات والمشاريع التطبيقية لهذا الفصل.',
+        'FR': 'Nous reconnaissons les efforts remarquables de {{student}} dans les discussions et les projets pratiques de ce semestre.',
+        'EN': 'We acknowledge {{student}}\'s outstanding efforts in discussions and practical projects this semester.',
+        'ES': 'Reconocemos los esfuerzos destacados de {{student}} en las discusiones y proyectos prácticos de este semestre.',
+        'IT': 'Riconosciamo gli sforzi eccezionali di {{student}} nelle discussioni e nei progetti pratici di questo semestre.',
+        'DE': 'Wir würdigen die herausragenden Bemühungen von {{student}} in Diskussionen und praktischen Projekten dieses Semesters.',
+        'TR': '{{student}} adlı öğrencinin bu dönem tartışmalar ve pratik projelerdeki olağanüstü çabalarını takdir ediyoruz.'
+      },
+      'certificate.defaultReasonActiveParticipation': {
+        'AR': 'للمشاركة البنّاءة والمبادرات الرقمية خلال العام الدراسي.',
+        'FR': 'Pour la participation constructive et les initiatives numériques au cours de l\'année scolaire.',
+        'EN': 'For constructive participation and digital initiatives during the academic year.',
+        'ES': 'Por la participación constructiva y las iniciativas digitales durante el año académico.',
+        'IT': 'Per la partecipazione costruttiva e le iniziative digitali durante l\'anno accademico.',
+        'DE': 'Für konstruktive Teilnahme und digitale Initiativen während des akademischen Jahres.',
+        'TR': 'Akademik yıl boyunca yapıcı katılım ve dijital girişimler için.'
+      },
+
+      // Report Content Templates
+      'report.template.behavioral': {
+        'AR': 'بناءً على متابعتنا المستمرة للتلميذ(ة) {{student}}، تم تسجيل ملاحظة سلوكية تتعلق بـ "{{reason}}". نود إحاطتكم علماً بأن هذا السلوك يؤثر سلباً على السير الحسن للدرس وعلى تركيز التلميذ وزملائه. وعليه، فإننا نؤكد على ضرورة الالتزام بالنظام الداخلي للمؤسسة.',
+        'FR': 'Suite au suivi continu de l\'élève {{student}}, une observation comportementale a été enregistrée concernant "{{reason}}". Nous tenons à vous informer que ce comportement affecte négativement le bon déroulement du cours et la concentration de l\'élève et de ses camarades. Par conséquent, nous soulignons la nécessité de respecter le règlement intérieur de l\'établissement.',
+        'EN': 'Based on our ongoing monitoring of student {{student}}, a behavioral observation has been recorded regarding "{{reason}}". We would like to inform you that this behavior negatively affects the proper conduct of the class and the concentration of the student and their classmates. Therefore, we emphasize the need to comply with the institution\'s internal regulations.',
+        'ES': 'Basado en nuestro seguimiento continuo del estudiante {{student}}, se ha registrado una observación conductual sobre "{{reason}}". Nos gustaría informarle que este comportamiento afecta negativamente la correcta conducta de la clase y la concentración del estudiante y sus compañeros. Por lo tanto, enfatizamos la necesidad de cumplir con las regulaciones internas de la institución.',
+        'IT': 'Sulla base del nostro monitoraggio continuo dello studente {{student}}, è stata registrata un\'osservazione comportamentale riguardo a "{{reason}}". Vorremmo informarvi che questo comportamento influisce negativamente sulla corretta condotta della classe e sulla concentrazione dello studente e dei suoi compagni. Pertanto, sottolineiamo la necessità di rispettare i regolamenti interni dell\'istituto.',
+        'DE': 'Basierend auf unserer kontinuierlichen Überwachung des Schülers {{student}} wurde eine Verhaltensbeobachtung bezüglich "{{reason}}" aufgezeichnet. Wir möchten Sie informieren, dass dieses Verhalten den ordnungsgemäßen Ablauf des Unterrichts und die Konzentration des Schülers und seiner Klassenkameraden negativ beeinflusst. Daher betonen wir die Notwendigkeit, die internen Vorschriften der Einrichtung einzuhalten.',
+        'TR': 'Öğrenci {{student}} için sürekli izlememize dayanarak, "{{reason}}" ile ilgili bir davranışsal gözlem kaydedilmiştir. Bu davranışın sınıfın düzgün yürütülmesini ve öğrencinin ve sınıf arkadaşlarının konsantrasyonunu olumsuz etkilediğini bilginize sunmak isteriz. Bu nedenle, kurumun iç düzenlemelerine uyma gereğini vurguluyoruz.'
+      },
+      'report.template.academic': {
+        'AR': 'من خلال تقييمنا للمسار الدراسي للتلميذ(ة) {{student}}، لاحظنا {{reason}}. هذا الأمر يستدعي تضافر الجهود بين المدرسة والمنزل لتدارك النقائص وتعزيز المكتسبات، لضمان تحقيق نتائج أفضل في المستقبل.',
+        'FR': 'À travers notre évaluation du parcours scolaire de l\'élève {{student}}, nous avons remarqué {{reason}}. Cette situation nécessite un effort conjoint entre l\'école et la maison pour combler les lacunes et renforcer les acquis, afin d\'assurer de meilleurs résultats à l\'avenir.',
+        'EN': 'Through our assessment of student {{student}}\'s academic progress, we have noticed {{reason}}. This situation requires a joint effort between school and home to address the shortcomings and strengthen achievements, to ensure better results in the future.',
+        'ES': 'A través de nuestra evaluación del progreso académico del estudiante {{student}}, hemos notado {{reason}}. Esta situación requiere un esfuerzo conjunto entre la escuela y el hogar para abordar las deficiencias y fortalecer los logros, para asegurar mejores resultados en el futuro.',
+        'IT': 'Attraverso la nostra valutazione del progresso accademico dello studente {{student}}, abbiamo notato {{reason}}. Questa situazione richiede uno sforzo congiunto tra scuola e casa per affrontare le carenze e rafforzare i risultati, per garantire risultati migliori in futuro.',
+        'DE': 'Durch unsere Bewertung des akademischen Fortschritts des Schülers {{student}} haben wir {{reason}} festgestellt. Diese Situation erfordert eine gemeinsame Anstrengung zwischen Schule und Zuhause, um die Mängel zu beheben und die Leistungen zu stärken, um bessere Ergebnisse in der Zukunft zu gewährleisten.',
+        'TR': 'Öğrenci {{student}}\'nin akademik ilerlemesini değerlendirmemiz aracılığıyla {{reason}} fark ettik. Bu durum, eksiklikleri ele almak ve başarıları güçlendirmek, gelecekte daha iyi sonuçlar sağlamak için okul ve ev arasında ortak bir çaba gerektirir.'
+      },
+      'report.template.cheating': {
+        'AR': 'يؤسفنا إبلاغكم بأنه تم ضبط التلميذ(ة) {{student}} في حالة مخالفة لقواعد النزاهة الأكاديمية، والمتمثلة في {{reason}}. يعتبر هذا التصرف مخالفاً للقانون الداخلي ويستوجب إجراءات تأديبية لضمان تكافؤ الفرص بين الجميع.',
+        'FR': 'Nous regrettons de vous informer que l\'élève {{student}} a été pris en flagrant délit de violation des règles d\'intégrité académique, à savoir {{reason}}. Ce comportement est considéré comme contraire au règlement intérieur et nécessite des mesures disciplinaires pour garantir l\'équité des chances pour tous.',
+        'EN': 'We regret to inform you that student {{student}} has been caught violating academic integrity rules, specifically {{reason}}. This behavior is considered contrary to the internal regulations and requires disciplinary measures to ensure equal opportunities for all.',
+        'ES': 'Lamentamos informarle que el estudiante {{student}} ha sido sorprendido violando las reglas de integridad académica, específicamente {{reason}}. Este comportamiento se considera contrario a las regulaciones internas y requiere medidas disciplinarias para garantizar igualdad de oportunidades para todos.',
+        'IT': 'Ci dispiace informarvi che lo studente {{student}} è stato sorpreso a violare le regole di integrità accademica, specificamente {{reason}}. Questo comportamento è considerato contrario ai regolamenti interni e richiede misure disciplinari per garantire pari opportunità per tutti.',
+        'DE': 'Wir bedauern, Sie darüber informieren zu müssen, dass der Schüler {{student}} beim Verstoß gegen die Regeln der akademischen Integrität erwischt wurde, insbesondere {{reason}}. Dieses Verhalten wird als gegen die internen Vorschriften verstoßend angesehen und erfordert disziplinarische Maßnahmen, um Chancengleichheit für alle zu gewährleisten.',
+        'TR': 'Öğrenci {{student}}\'in akademik dürüstlük kurallarını ihlal ettiğini, özellikle {{reason}} konusunda bilgilendirmekten üzüntü duyuyoruz. Bu davranış, iç düzenlemelere aykırı olarak kabul edilir ve herkes için eşit fırsatları sağlamak için disiplin önlemleri gerektirir.'
+      },
+      'report.template.followUp': {
+        'AR': 'في إطار المتابعة التربوية للتلميذ(ة) {{student}}، نلفت انتباهكم إلى {{reason}}. نرجو منكم الحضور أو التواصل مع إدارة المؤسسة في أقرب وقت لمناقشة الوضع واتخاذ التدابير اللازمة.',
+        'FR': 'Dans le cadre du suivi éducatif de l\'élève {{student}}, nous attirons votre attention sur {{reason}}. Nous vous prions de bien vouloir vous présenter ou contacter l\'administration de l\'établissement dans les plus brefs délais pour discuter de la situation et prendre les mesures nécessaires.',
+        'EN': 'As part of the educational follow-up of student {{student}}, we draw your attention to {{reason}}. We kindly ask you to attend or contact the school administration as soon as possible to discuss the situation and take the necessary measures.',
+        'ES': 'Como parte del seguimiento educativo del estudiante {{student}}, llamamos su atención sobre {{reason}}. Le rogamos que asista o se ponga en contacto con la administración de la escuela lo antes posible para discutir la situación y tomar las medidas necesarias.',
+        'IT': 'Nell\'ambito del follow-up educativo dello studente {{student}}, attiriamo la vostra attenzione su {{reason}}. Vi chiediamo gentilmente di presentarvi o contattare l\'amministrazione scolastica il prima possibile per discutere la situazione e prendere le misure necessarie.',
+        'DE': 'Im Rahmen der pädagogischen Nachbetreuung des Schülers {{student}} machen wir Sie auf {{reason}} aufmerksam. Wir bitten Sie höflich, sich so bald wie möglich zu melden oder die Schulverwaltung zu kontaktieren, um die Situation zu besprechen und die notwendigen Maßnahmen zu ergreifen.',
+        'TR': 'Öğrenci {{student}} için eğitim takibi kapsamında, {{reason}} konusuna dikkatinizi çekiyoruz. Durumu görüşmek ve gerekli önlemleri almak için lütfen en kısa sürede okul yönetimiyle iletişime geçmenizi veya katılmanızı rica ederiz.'
+      },
+
+      // Report Reasons - Academic
+      'reportReason.academic.weakConcepts': {
+        'AR': 'ضعف في استيعاب المفاهيم الأساسية',
+        'FR': 'Faiblesse dans la compréhension des concepts fondamentaux',
+        'EN': 'Weakness in understanding fundamental concepts',
+        'ES': 'Debilidad en la comprensión de conceptos fundamentales',
+        'IT': 'Debolezza nella comprensione dei concetti fondamentali',
+        'DE': 'Schwäche im Verständnis grundlegender Konzepte',
+        'TR': 'Temel kavramları anlamada zayıflık'
+      },
+      'reportReason.academic.declineResults': {
+        'AR': 'تراجع ملحوظ في النتائج',
+        'FR': 'Dégradation notable des résultats',
+        'EN': 'Significant decline in results',
+        'ES': 'Deterioro significativo de los resultados',
+        'IT': 'Deterioramento significativo dei risultati',
+        'DE': 'Erheblicher Rückgang der Ergebnisse',
+        'TR': 'Sonuçlarda belirgin düşüş'
+      },
+      'reportReason.academic.neglectedHomework': {
+        'AR': 'إهمال الواجبات المنزلية بصفة متكررة',
+        'FR': 'Négligence fréquente des devoirs à la maison',
+        'EN': 'Frequent neglect of homework',
+        'ES': 'Negligencia frecuente de las tareas',
+        'IT': 'Trascuramento frequente dei compiti a casa',
+        'DE': 'Häufige Vernachlässigung der Hausaufgaben',
+        'TR': 'Ev ödevlerini sık sık ihmal etme'
+      },
+      'reportReason.academic.noParticipation': {
+        'AR': 'عدم المشاركة داخل القسم',
+        'FR': 'Absence de participation en classe',
+        'EN': 'Lack of participation in class',
+        'ES': 'Falta de participación en clase',
+        'IT': 'Mancanza di partecipazione in classe',
+        'DE': 'Mangelnde Teilnahme im Unterricht',
+        'TR': 'Sınıfta katılım eksikliği'
+      },
+      'reportReason.academic.excellence': {
+        'AR': 'تفوق ملحوظ ومشاركة فعالة',
+        'FR': 'Excellence remarquable et participation active',
+        'EN': 'Outstanding excellence and active participation',
+        'ES': 'Excelencia excepcional y participación activa',
+        'IT': 'Eccellenza eccezionale e partecipazione attiva',
+        'DE': 'Außergewöhnliche Exzellenz und aktive Teilnahme',
+        'TR': 'Olağanüstü mükemmellik ve aktif katılım'
+      },
+      // Report Reasons - Behavioral
+      'reportReason.behavioral.discipline': {
+        'AR': 'ملاحظة تدني في الانضباط',
+        'FR': 'Observation d\'une baisse de discipline',
+        'EN': 'Observation of declining discipline',
+        'ES': 'Observación de disminución de la disciplina',
+        'IT': 'Osservazione di un calo della disciplina',
+        'DE': 'Beobachtung abnehmender Disziplin',
+        'TR': 'Disiplinde düşüş gözlemi'
+      },
+      'reportReason.behavioral.disruption': {
+        'AR': 'التشويش المستمر داخل القسم',
+        'FR': 'Perturbation continue en classe',
+        'EN': 'Continuous disruption in class',
+        'ES': 'Perturbación continua en clase',
+        'IT': 'Disturbo continuo in classe',
+        'DE': 'Andauernde Störung im Unterricht',
+        'TR': 'Sınıfta sürekli rahatsızlık'
+      },
+      'reportReason.behavioral.noSupplies': {
+        'AR': 'عدم إحضار اللوازم المدرسية',
+        'FR': 'Absence de matériel scolaire',
+        'EN': 'Failure to bring school supplies',
+        'ES': 'Falta de material escolar',
+        'IT': 'Mancanza di materiale scolastico',
+        'DE': 'Fehlende Schulsachen',
+        'TR': 'Okul malzemelerini getirmeme'
+      },
+      'reportReason.behavioral.phoneUse': {
+        'AR': 'استعمال الهاتف النقال',
+        'FR': 'Utilisation du téléphone portable',
+        'EN': 'Use of mobile phone',
+        'ES': 'Uso del teléfono móvil',
+        'IT': 'Uso del telefono cellulare',
+        'DE': 'Nutzung des Mobiltelefons',
+        'TR': 'Cep telefonu kullanımı'
+      },
+      'reportReason.behavioral.aggressive': {
+        'AR': 'سلوك عدواني مع الزملاء',
+        'FR': 'Comportement agressif envers les camarades',
+        'EN': 'Aggressive behavior towards classmates',
+        'ES': 'Comportamiento agresivo hacia los compañeros',
+        'IT': 'Comportamento aggressivo verso i compagni',
+        'DE': 'Aggressives Verhalten gegenüber Klassenkameraden',
+        'TR': 'Sınıf arkadaşlarına karşı saldırgan davranış'
+      },
+      'reportReason.behavioral.exemplary': {
+        'AR': 'مشاركة إيجابية وسلوك مثالي',
+        'FR': 'Participation positive et comportement exemplaire',
+        'EN': 'Positive participation and exemplary behavior',
+        'ES': 'Participación positiva y comportamiento ejemplar',
+        'IT': 'Partecipazione positiva e comportamento esemplare',
+        'DE': 'Positive Teilnahme und vorbildliches Verhalten',
+        'TR': 'Pozitif katılım ve örnek davranış'
+      },
+      // Report Reasons - Follow-up
+      'reportReason.followup.repeatedAbsence': {
+        'AR': 'غياب متكرر دون مبرر',
+        'FR': 'Absence répétée sans justification',
+        'EN': 'Repeated absence without justification',
+        'ES': 'Ausencia repetida sin justificación',
+        'IT': 'Assenza ripetuta senza giustificazione',
+        'DE': 'Wiederholte Abwesenheit ohne Begründung',
+        'TR': 'Gerekçesiz tekrarlanan devamsızlık'
+      },
+      'reportReason.followup.lateness': {
+        'AR': 'تأخرات صباحية متكررة',
+        'FR': 'Retards matinaux répétés',
+        'EN': 'Repeated morning lateness',
+        'ES': 'Retrasos matutinos repetidos',
+        'IT': 'Ritardi mattutini ripetuti',
+        'DE': 'Wiederholte morgendliche Verspätung',
+        'TR': 'Tekrarlanan sabah gecikmeleri'
+      },
+      'reportReason.followup.summonParent': {
+        'AR': 'استدعاء ولي الأمر للأهمية',
+        'FR': 'Convocation du tuteur pour urgence',
+        'EN': 'Summoning parent/guardian for importance',
+        'ES': 'Convocación del tutor por urgencia',
+        'IT': 'Convocazione del tutore per urgenza',
+        'DE': 'Einberufung des Erziehungsberechtigten wegen Dringlichkeit',
+        'TR': 'Acil durum için veli çağırma'
+      },
+      'reportReason.followup.healthSocial': {
+        'AR': 'متابعة ملف صحي/اجتماعي',
+        'FR': 'Suivi d\'un dossier médical/social',
+        'EN': 'Follow-up of health/social file',
+        'ES': 'Seguimiento de expediente médico/social',
+        'IT': 'Follow-up di un fascicolo sanitario/sociale',
+        'DE': 'Nachbetreuung einer Gesundheits-/Sozialakte',
+        'TR': 'Sağlık/sosyal dosya takibi'
+      },
+      // Report Reasons - Cheating
+      'reportReason.cheating.attempt': {
+        'AR': 'محاولة غش في الفرض المحروس',
+        'FR': 'Tentative de tricherie lors d\'un contrôle surveillé',
+        'EN': 'Cheating attempt during supervised test',
+        'ES': 'Intento de trampa durante examen supervisado',
+        'IT': 'Tentativo di imbroglio durante prova sorvegliata',
+        'DE': 'Betrugsversuch während überwachter Prüfung',
+        'TR': 'Gözetimli sınavda kopya girişimi'
+      },
+      'reportReason.cheating.homeworkCopy': {
+        'AR': 'نقل الواجب المنزلي من الزملاء',
+        'FR': 'Copie des devoirs auprès des camarades',
+        'EN': 'Copying homework from classmates',
+        'ES': 'Copia de tareas de compañeros',
+        'IT': 'Copia dei compiti dai compagni',
+        'DE': 'Abschreiben der Hausaufgaben von Klassenkameraden',
+        'TR': 'Sınıf arkadaşlarından ödev kopyalama'
+      },
+      'reportReason.cheating.examDevice': {
+        'AR': 'ضبط وسيلة غش أثناء الامتحان',
+        'FR': 'Saisie d\'un moyen de tricherie pendant l\'examen',
+        'EN': 'Caught with a cheating device during the exam',
+        'ES': 'Sorprendido con un dispositivo para hacer trampa durante el examen',
+        'IT': 'Preso con un dispositivo per imbrogliare durante l\'esame',
+        'DE': 'Mit Betrugsgerät während der Prüfung erwischt',
+        'TR': 'Sınav sırasında kopya cihazı ile yakalanma'
       }
     };
   }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 import { ApiService } from '../../services/api.service';
@@ -19,7 +19,7 @@ export class ReportsComponent {
 
   constructor(
     private router: Router,
-    public languageService: LanguageService,
+    @Inject('LanguageService') public languageService: LanguageService,
     private apiService: ApiService,
     private certificateService: CertificateService
   ) {}
@@ -65,6 +65,12 @@ export class ReportsComponent {
   navigateToGradebook(autoExport: boolean = false): void {
     this.router.navigate(['/gradebook'], {
       queryParams: { autoExport: autoExport ? '1' : undefined },
+    });
+  }
+
+  navigateToGradeMonitoring(): void {
+    this.router.navigate(['/gradebook'], {
+      queryParams: { openGradeMonitoring: '1' },
     });
   }
 
