@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit, Inject } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
@@ -328,7 +328,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     private apiService: ApiService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    @Inject('LanguageService') public languageService: LanguageService
+    public languageService: LanguageService
   ) {}
 
   translate(key: string): string {

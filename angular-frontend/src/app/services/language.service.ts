@@ -277,6 +277,15 @@ export class LanguageService {
         'DE': 'Berichte',
         'TR': 'Raporlar'
       },
+      'menu.clubs': {
+        'AR': 'النادي والنشاطات الثقافية',
+        'FR': 'Club et activités culturelles',
+        'EN': 'Clubs & Cultural Activities',
+        'ES': 'Clubes y actividades culturales',
+        'IT': 'Club e attività culturali',
+        'DE': 'Vereine & kulturelle Aktivitäten',
+        'TR': 'Kulüpler ve Kültürel Etkinlikler'
+      },
       'menu.settings': {
         'AR': 'الإعدادات',
         'FR': 'Paramètres',
@@ -12555,6 +12564,592 @@ export class LanguageService {
         'IT': 'Preso con un dispositivo per imbrogliare durante l\'esame',
         'DE': 'Mit Betrugsgerät während der Prüfung erwischt',
         'TR': 'Sınav sırasında kopya cihazı ile yakalanma'
+      },
+      // Clubs translations
+      'clubs.title': {
+        'AR': 'النادي والنشاطات الثقافية',
+        'FR': 'Club et activités culturelles',
+        'EN': 'Clubs & Cultural Activities',
+        'ES': 'Clubes y actividades culturales',
+        'IT': 'Club e attività culturali',
+        'DE': 'Vereine & kulturelle Aktivitäten',
+        'TR': 'Kulüpler ve Kültürel Etkinlikler'
+      },
+      'clubs.createClub': {
+        'AR': 'إنشاء نادي',
+        'FR': 'Créer un club',
+        'EN': 'Create Club',
+        'ES': 'Crear club',
+        'IT': 'Crea club',
+        'DE': 'Verein erstellen',
+        'TR': 'Kulüp Oluştur'
+      },
+      'clubs.editClub': {
+        'AR': 'تعديل النادي',
+        'FR': 'Modifier le club',
+        'EN': 'Edit Club',
+        'ES': 'Editar club',
+        'IT': 'Modifica club',
+        'DE': 'Verein bearbeiten',
+        'TR': 'Kulübü Düzenle'
+      },
+      'clubs.myClubs': {
+        'AR': 'أنديتي',
+        'FR': 'Mes clubs',
+        'EN': 'My Clubs',
+        'ES': 'Mis clubes',
+        'IT': 'I miei club',
+        'DE': 'Meine Vereine',
+        'TR': 'Kulüplerim'
+      },
+      'clubs.name': {
+        'AR': 'اسم النادي',
+        'FR': 'Nom du club',
+        'EN': 'Club Name',
+        'ES': 'Nombre del club',
+        'IT': 'Nome del club',
+        'DE': 'Vereinsname',
+        'TR': 'Kulüp Adı'
+      },
+      'clubs.description': {
+        'AR': 'الوصف',
+        'FR': 'Description',
+        'EN': 'Description',
+        'ES': 'Descripción',
+        'IT': 'Descrizione',
+        'DE': 'Beschreibung',
+        'TR': 'Açıklama'
+      },
+      'clubs.members': {
+        'AR': 'الأعضاء',
+        'FR': 'Membres',
+        'EN': 'Members',
+        'ES': 'Miembros',
+        'IT': 'Membri',
+        'DE': 'Mitglieder',
+        'TR': 'Üyeler'
+      },
+      'clubs.membersCount': {
+        'AR': 'عدد الأعضاء',
+        'FR': 'Nombre de membres',
+        'EN': 'Members',
+        'ES': 'Miembros',
+        'IT': 'Membri',
+        'DE': 'Mitglieder',
+        'TR': 'Üyeler'
+      },
+      'clubs.events': {
+        'AR': 'الأحداث',
+        'FR': 'Événements',
+        'EN': 'Events',
+        'ES': 'Eventos',
+        'IT': 'Eventi',
+        'DE': 'Veranstaltungen',
+        'TR': 'Etkinlikler'
+      },
+      'clubs.eventsCount': {
+        'AR': 'عدد الأحداث',
+        'FR': 'Nombre d\'événements',
+        'EN': 'Events',
+        'ES': 'Eventos',
+        'IT': 'Eventi',
+        'DE': 'Veranstaltungen',
+        'TR': 'Etkinlikler'
+      },
+      'clubs.addMember': {
+        'AR': 'إضافة عضو',
+        'FR': 'Ajouter un membre',
+        'EN': 'Add Member',
+        'ES': 'Agregar miembro',
+        'IT': 'Aggiungi membro',
+        'DE': 'Mitglied hinzufügen',
+        'TR': 'Üye Ekle'
+      },
+      'clubs.addEvent': {
+        'AR': 'إضافة حدث',
+        'FR': 'Ajouter un événement',
+        'EN': 'Add Event',
+        'ES': 'Agregar evento',
+        'IT': 'Aggiungi evento',
+        'DE': 'Veranstaltung hinzufügen',
+        'TR': 'Etkinlik Ekle'
+      },
+      'clubs.editEvent': {
+        'AR': 'تعديل الحدث',
+        'FR': 'Modifier l\'événement',
+        'EN': 'Edit Event',
+        'ES': 'Editar evento',
+        'IT': 'Modifica evento',
+        'DE': 'Veranstaltung bearbeiten',
+        'TR': 'Etkinliği Düzenle'
+      },
+      'clubs.sendAnnouncement': {
+        'AR': 'إرسال إعلان',
+        'FR': 'Envoyer une annonce',
+        'EN': 'Send Announcement',
+        'ES': 'Enviar anuncio',
+        'IT': 'Invia annuncio',
+        'DE': 'Ankündigung senden',
+        'TR': 'Duyuru Gönder'
+      },
+      'clubs.eventName': {
+        'AR': 'اسم الحدث',
+        'FR': 'Nom de l\'événement',
+        'EN': 'Event Name',
+        'ES': 'Nombre del evento',
+        'IT': 'Nome evento',
+        'DE': 'Veranstaltungsname',
+        'TR': 'Etkinlik Adı'
+      },
+      'clubs.date': {
+        'AR': 'التاريخ',
+        'FR': 'Date',
+        'EN': 'Date',
+        'ES': 'Fecha',
+        'IT': 'Data',
+        'DE': 'Datum',
+        'TR': 'Tarih'
+      },
+      'clubs.organizer': {
+        'AR': 'الجهة المنظمة',
+        'FR': 'Organisateur',
+        'EN': 'Organizer',
+        'ES': 'Organizador',
+        'IT': 'Organizzatore',
+        'DE': 'Organisator',
+        'TR': 'Organizatör'
+      },
+      'clubs.participationType': {
+        'AR': 'نوع المشاركة',
+        'FR': 'Type de participation',
+        'EN': 'Participation Type',
+        'ES': 'Tipo de participación',
+        'IT': 'Tipo di partecipazione',
+        'DE': 'Teilnahmetyp',
+        'TR': 'Katılım Türü'
+      },
+      'clubs.participationType.presentation': {
+        'AR': 'عرض',
+        'FR': 'Présentation',
+        'EN': 'Presentation',
+        'ES': 'Presentación',
+        'IT': 'Presentazione',
+        'DE': 'Präsentation',
+        'TR': 'Sunum'
+      },
+      'clubs.participationType.competition': {
+        'AR': 'مسابقة',
+        'FR': 'Compétition',
+        'EN': 'Competition',
+        'ES': 'Competición',
+        'IT': 'Competizione',
+        'DE': 'Wettbewerb',
+        'TR': 'Yarışma'
+      },
+      'clubs.participationType.workshop': {
+        'AR': 'ورشة',
+        'FR': 'Atelier',
+        'EN': 'Workshop',
+        'ES': 'Taller',
+        'IT': 'Laboratorio',
+        'DE': 'Workshop',
+        'TR': 'Atölye'
+      },
+      'clubs.results': {
+        'AR': 'النتائج',
+        'FR': 'Résultats',
+        'EN': 'Results',
+        'ES': 'Resultados',
+        'IT': 'Risultati',
+        'DE': 'Ergebnisse',
+        'TR': 'Sonuçlar'
+      },
+      'clubs.report': {
+        'AR': 'التقرير',
+        'FR': 'Rapport',
+        'EN': 'Report',
+        'ES': 'Informe',
+        'IT': 'Rapporto',
+        'DE': 'Bericht',
+        'TR': 'Rapor'
+      },
+      'clubs.photos': {
+        'AR': 'الصور',
+        'FR': 'Photos',
+        'EN': 'Photos',
+        'ES': 'Fotos',
+        'IT': 'Foto',
+        'DE': 'Fotos',
+        'TR': 'Fotoğraflar'
+      },
+      'clubs.videos': {
+        'AR': 'الفيديو',
+        'FR': 'Vidéos',
+        'EN': 'Videos',
+        'ES': 'Videos',
+        'IT': 'Video',
+        'DE': 'Videos',
+        'TR': 'Videolar'
+      },
+      'clubs.subject': {
+        'AR': 'الموضوع',
+        'FR': 'Sujet',
+        'EN': 'Subject',
+        'ES': 'Asunto',
+        'IT': 'Oggetto',
+        'DE': 'Betreff',
+        'TR': 'Konu'
+      },
+      'clubs.message': {
+        'AR': 'الرسالة',
+        'FR': 'Message',
+        'EN': 'Message',
+        'ES': 'Mensaje',
+        'IT': 'Messaggio',
+        'DE': 'Nachricht',
+        'TR': 'Mesaj'
+      },
+      'clubs.sendEmail': {
+        'AR': 'إرسال بريد إلكتروني',
+        'FR': 'Envoyer un e-mail',
+        'EN': 'Send Email',
+        'ES': 'Enviar correo',
+        'IT': 'Invia email',
+        'DE': 'E-Mail senden',
+        'TR': 'E-posta Gönder'
+      },
+      'clubs.eventReport': {
+        'AR': 'تقرير الحدث',
+        'FR': 'Rapport d\'événement',
+        'EN': 'Event Report',
+        'ES': 'Informe del evento',
+        'IT': 'Rapporto evento',
+        'DE': 'Veranstaltungsbericht',
+        'TR': 'Etkinlik Raporu'
+      },
+      'clubs.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF Dışa Aktar'
+      },
+      'clubs.save': {
+        'AR': 'حفظ',
+        'FR': 'Enregistrer',
+        'EN': 'Save',
+        'ES': 'Guardar',
+        'IT': 'Salva',
+        'DE': 'Speichern',
+        'TR': 'Kaydet'
+      },
+      'clubs.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'clubs.close': {
+        'AR': 'إغلاق',
+        'FR': 'Fermer',
+        'EN': 'Close',
+        'ES': 'Cerrar',
+        'IT': 'Chiudi',
+        'DE': 'Schließen',
+        'TR': 'Kapat'
+      },
+      'clubs.send': {
+        'AR': 'إرسال',
+        'FR': 'Envoyer',
+        'EN': 'Send',
+        'ES': 'Enviar',
+        'IT': 'Invia',
+        'DE': 'Senden',
+        'TR': 'Gönder'
+      },
+      'clubs.saving': {
+        'AR': 'جاري الحفظ...',
+        'FR': 'Enregistrement...',
+        'EN': 'Saving...',
+        'ES': 'Guardando...',
+        'IT': 'Salvataggio...',
+        'DE': 'Speichern...',
+        'TR': 'Kaydediliyor...'
+      },
+      'clubs.sending': {
+        'AR': 'جاري الإرسال...',
+        'FR': 'Envoi...',
+        'EN': 'Sending...',
+        'ES': 'Enviando...',
+        'IT': 'Invio...',
+        'DE': 'Senden...',
+        'TR': 'Gönderiliyor...'
+      },
+      'clubs.exporting': {
+        'AR': 'جاري التصدير...',
+        'FR': 'Exportation...',
+        'EN': 'Exporting...',
+        'ES': 'Exportando...',
+        'IT': 'Esportazione...',
+        'DE': 'Exportieren...',
+        'TR': 'Dışa Aktarılıyor...'
+      },
+      'clubs.selectClub': {
+        'AR': 'اختر نادياً لعرض التفاصيل',
+        'FR': 'Sélectionnez un club pour voir les détails',
+        'EN': 'Select a club to view details',
+        'ES': 'Seleccione un club para ver detalles',
+        'IT': 'Seleziona un club per vedere i dettagli',
+        'DE': 'Wählen Sie einen Verein aus, um Details anzuzeigen',
+        'TR': 'Detayları görmek için bir kulüp seçin'
+      },
+      'clubs.noClubs': {
+        'AR': 'لا توجد أندية',
+        'FR': 'Aucun club',
+        'EN': 'No clubs',
+        'ES': 'Sin clubes',
+        'IT': 'Nessun club',
+        'DE': 'Keine Vereine',
+        'TR': 'Kulüp yok'
+      },
+      'clubs.noMembers': {
+        'AR': 'لا يوجد أعضاء',
+        'FR': 'Aucun membre',
+        'EN': 'No members',
+        'ES': 'Sin miembros',
+        'IT': 'Nessun membro',
+        'DE': 'Keine Mitglieder',
+        'TR': 'Üye yok'
+      },
+      'clubs.noEvents': {
+        'AR': 'لا توجد أحداث',
+        'FR': 'Aucun événement',
+        'EN': 'No events',
+        'ES': 'Sin eventos',
+        'IT': 'Nessun evento',
+        'DE': 'Keine Veranstaltungen',
+        'TR': 'Etkinlik yok'
+      },
+      'clubs.searchStudents': {
+        'AR': 'البحث عن التلاميذ...',
+        'FR': 'Rechercher des élèves...',
+        'EN': 'Search students...',
+        'ES': 'Buscar estudiantes...',
+        'IT': 'Cerca studenti...',
+        'DE': 'Schüler suchen...',
+        'TR': 'Öğrenci ara...'
+      },
+      'clubs.noStudentsAvailable': {
+        'AR': 'لا يوجد تلاميذ متاحون',
+        'FR': 'Aucun élève disponible',
+        'EN': 'No students available',
+        'ES': 'Sin estudiantes disponibles',
+        'IT': 'Nessuno studente disponibile',
+        'DE': 'Keine Schüler verfügbar',
+        'TR': 'Müsait öğrenci yok'
+      },
+      'clubs.allTypes': {
+        'AR': 'جميع الأنواع',
+        'FR': 'Tous les types',
+        'EN': 'All Types',
+        'ES': 'Todos los tipos',
+        'IT': 'Tutti i tipi',
+        'DE': 'Alle Typen',
+        'TR': 'Tüm Türler'
+      },
+      'clubs.selectType': {
+        'AR': 'اختر النوع',
+        'FR': 'Sélectionner le type',
+        'EN': 'Select Type',
+        'ES': 'Seleccionar tipo',
+        'IT': 'Seleziona tipo',
+        'DE': 'Typ auswählen',
+        'TR': 'Tür Seç'
+      },
+      'clubs.viewReport': {
+        'AR': 'عرض التقرير',
+        'FR': 'Voir le rapport',
+        'EN': 'View Report',
+        'ES': 'Ver informe',
+        'IT': 'Visualizza rapporto',
+        'DE': 'Bericht anzeigen',
+        'TR': 'Raporu Görüntüle'
+      },
+      'clubs.nameRequired': {
+        'AR': 'اسم النادي مطلوب',
+        'FR': 'Le nom du club est requis',
+        'EN': 'Club name is required',
+        'ES': 'El nombre del club es requerido',
+        'IT': 'Il nome del club è richiesto',
+        'DE': 'Vereinsname ist erforderlich',
+        'TR': 'Kulüp adı gerekli'
+      },
+      'clubs.eventRequiredFields': {
+        'AR': 'اسم الحدث والتاريخ مطلوبان',
+        'FR': 'Le nom et la date de l\'événement sont requis',
+        'EN': 'Event name and date are required',
+        'ES': 'El nombre y la fecha del evento son requeridos',
+        'IT': 'Nome e data dell\'evento sono richiesti',
+        'DE': 'Veranstaltungsname und Datum sind erforderlich',
+        'TR': 'Etkinlik adı ve tarihi gerekli'
+      },
+      'clubs.announcementRequiredFields': {
+        'AR': 'الموضوع والرسالة مطلوبان',
+        'FR': 'Le sujet et le message sont requis',
+        'EN': 'Subject and message are required',
+        'ES': 'El asunto y el mensaje son requeridos',
+        'IT': 'Oggetto e messaggio sono richiesti',
+        'DE': 'Betreff und Nachricht sind erforderlich',
+        'TR': 'Konu ve mesaj gerekli'
+      },
+      'clubs.confirmDelete': {
+        'AR': 'هل أنت متأكد من حذف هذا النادي؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer ce club?',
+        'EN': 'Are you sure you want to delete this club?',
+        'ES': '¿Está seguro de que desea eliminar este club?',
+        'IT': 'Sei sicuro di voler eliminare questo club?',
+        'DE': 'Sind Sie sicher, dass Sie diesen Verein löschen möchten?',
+        'TR': 'Bu kulübü silmek istediğinizden emin misiniz?'
+      },
+      'clubs.confirmRemoveMember': {
+        'AR': 'هل أنت متأكد من إزالة هذا العضو؟',
+        'FR': 'Êtes-vous sûr de vouloir retirer ce membre?',
+        'EN': 'Are you sure you want to remove this member?',
+        'ES': '¿Está seguro de que desea eliminar este miembro?',
+        'IT': 'Sei sicuro di voler rimuovere questo membro?',
+        'DE': 'Sind Sie sicher, dass Sie dieses Mitglied entfernen möchten?',
+        'TR': 'Bu üyeyi kaldırmak istediğinizden emin misiniz?'
+      },
+      'clubs.confirmDeleteEvent': {
+        'AR': 'هل أنت متأكد من حذف هذا الحدث؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer cet événement?',
+        'EN': 'Are you sure you want to delete this event?',
+        'ES': '¿Está seguro de que desea eliminar este evento?',
+        'IT': 'Sei sicuro di voler eliminare questo evento?',
+        'DE': 'Sind Sie sicher, dass Sie diese Veranstaltung löschen möchten?',
+        'TR': 'Bu etkinliği silmek istediğinizden emin misiniz?'
+      },
+      'clubs.saveError': {
+        'AR': 'حدث خطأ أثناء حفظ النادي',
+        'FR': 'Erreur lors de l\'enregistrement du club',
+        'EN': 'Error saving club',
+        'ES': 'Error al guardar el club',
+        'IT': 'Errore nel salvataggio del club',
+        'DE': 'Fehler beim Speichern des Vereins',
+        'TR': 'Kulüp kaydedilirken hata oluştu'
+      },
+      'clubs.deleteError': {
+        'AR': 'حدث خطأ أثناء حذف النادي',
+        'FR': 'Erreur lors de la suppression du club',
+        'EN': 'Error deleting club',
+        'ES': 'Error al eliminar el club',
+        'IT': 'Errore nell\'eliminazione del club',
+        'DE': 'Fehler beim Löschen des Vereins',
+        'TR': 'Kulüp silinirken hata oluştu'
+      },
+      'clubs.addMemberError': {
+        'AR': 'حدث خطأ أثناء إضافة العضو',
+        'FR': 'Erreur lors de l\'ajout du membre',
+        'EN': 'Error adding member',
+        'ES': 'Error al agregar miembro',
+        'IT': 'Errore nell\'aggiunta del membro',
+        'DE': 'Fehler beim Hinzufügen des Mitglieds',
+        'TR': 'Üye eklenirken hata oluştu'
+      },
+      'clubs.removeMemberError': {
+        'AR': 'حدث خطأ أثناء إزالة العضو',
+        'FR': 'Erreur lors de la suppression du membre',
+        'EN': 'Error removing member',
+        'ES': 'Error al eliminar miembro',
+        'IT': 'Errore nella rimozione del membro',
+        'DE': 'Fehler beim Entfernen des Mitglieds',
+        'TR': 'Üye kaldırılırken hata oluştu'
+      },
+      'clubs.saveEventError': {
+        'AR': 'حدث خطأ أثناء حفظ الحدث',
+        'FR': 'Erreur lors de l\'enregistrement de l\'événement',
+        'EN': 'Error saving event',
+        'ES': 'Error al guardar el evento',
+        'IT': 'Errore nel salvataggio dell\'evento',
+        'DE': 'Fehler beim Speichern der Veranstaltung',
+        'TR': 'Etkinlik kaydedilirken hata oluştu'
+      },
+      'clubs.deleteEventError': {
+        'AR': 'حدث خطأ أثناء حذف الحدث',
+        'FR': 'Erreur lors de la suppression de l\'événement',
+        'EN': 'Error deleting event',
+        'ES': 'Error al eliminar el evento',
+        'IT': 'Errore nell\'eliminazione dell\'evento',
+        'DE': 'Fehler beim Löschen der Veranstaltung',
+        'TR': 'Etkinlik silinirken hata oluştu'
+      },
+      'clubs.announcementSent': {
+        'AR': 'تم إرسال الإعلان: {{sent}} نجح، {{failed}} فشل',
+        'FR': 'Annonce envoyée: {{sent}} réussis, {{failed}} échoués',
+        'EN': 'Announcement sent: {{sent}} succeeded, {{failed}} failed',
+        'ES': 'Anuncio enviado: {{sent}} exitosos, {{failed}} fallidos',
+        'IT': 'Annuncio inviato: {{sent}} riusciti, {{failed}} falliti',
+        'DE': 'Ankündigung gesendet: {{sent}} erfolgreich, {{failed}} fehlgeschlagen',
+        'TR': 'Duyuru gönderildi: {{sent}} başarılı, {{failed}} başarısız'
+      },
+      'clubs.announcementError': {
+        'AR': 'حدث خطأ أثناء إرسال الإعلان',
+        'FR': 'Erreur lors de l\'envoi de l\'annonce',
+        'EN': 'Error sending announcement',
+        'ES': 'Error al enviar anuncio',
+        'IT': 'Errore nell\'invio dell\'annuncio',
+        'DE': 'Fehler beim Senden der Ankündigung',
+        'TR': 'Duyuru gönderilirken hata oluştu'
+      },
+      'clubs.exportFullReport': {
+        'AR': 'تصدير تقرير النادي الكامل',
+        'FR': 'Exporter le rapport complet du club',
+        'EN': 'Export Full Club Report',
+        'ES': 'Exportar informe completo del club',
+        'IT': 'Esporta rapporto completo del club',
+        'DE': 'Vollständigen Vereinsbericht exportieren',
+        'TR': 'Tam Kulüp Raporunu Dışa Aktar'
+      },
+      'clubs.fullReport': {
+        'AR': 'تقرير النادي الكامل',
+        'FR': 'Rapport complet du club',
+        'EN': 'Full Club Report',
+        'ES': 'Informe completo del club',
+        'IT': 'Rapporto completo del club',
+        'DE': 'Vollständiger Vereinsbericht',
+        'TR': 'Tam Kulüp Raporu'
+      },
+      'clubs.generatedOn': {
+        'AR': 'تم الإنشاء في',
+        'FR': 'Généré le',
+        'EN': 'Generated on',
+        'ES': 'Generado el',
+        'IT': 'Generato il',
+        'DE': 'Erstellt am',
+        'TR': 'Oluşturulma tarihi'
+      },
+      'clubs.reportGenerated': {
+        'AR': 'تم إنشاء التقرير',
+        'FR': 'Rapport généré',
+        'EN': 'Report generated',
+        'ES': 'Informe generado',
+        'IT': 'Rapporto generato',
+        'DE': 'Bericht erstellt',
+        'TR': 'Rapor oluşturuldu'
+      },
+      'clubs.exportError': {
+        'AR': 'حدث خطأ أثناء تصدير التقرير',
+        'FR': 'Erreur lors de l\'exportation du rapport',
+        'EN': 'Error exporting report',
+        'ES': 'Error al exportar el informe',
+        'IT': 'Errore nell\'esportazione del rapporto',
+        'DE': 'Fehler beim Exportieren des Berichts',
+        'TR': 'Rapor dışa aktarılırken hata oluştu'
       }
     };
   }

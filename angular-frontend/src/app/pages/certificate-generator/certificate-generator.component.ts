@@ -5,7 +5,6 @@ import {
   OnDestroy,
   OnInit,
   ViewChild,
-  Inject,
 } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { CertificateService, CertificateTemplate } from '../../services/certificate.service';
@@ -62,7 +61,7 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
     private certificateService: CertificateService,
     private apiService: ApiService,
     private authService: AuthService,
-    @Inject('LanguageService') public languageService: LanguageService,
+    public languageService: LanguageService,
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {

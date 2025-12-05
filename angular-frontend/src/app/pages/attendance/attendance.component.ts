@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
@@ -118,7 +118,7 @@ export class AttendanceComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
-    @Inject('LanguageService') public languageService: LanguageService
+    public languageService: LanguageService
   ) {
     this.updateWeekDays();
   }

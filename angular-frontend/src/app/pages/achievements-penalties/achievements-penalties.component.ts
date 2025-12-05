@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CertificateService } from '../../services/certificate.service';
@@ -75,7 +75,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
     private apiService: ApiService,
     private certificateService: CertificateService,
     private route: ActivatedRoute,
-    @Inject('LanguageService') public languageService: LanguageService
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {

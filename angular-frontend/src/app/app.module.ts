@@ -39,6 +39,7 @@ import { SubscriptionManagementComponent } from './pages/admin/subscription-mana
 import { SubscriptionStatusComponent } from './pages/subscription-status/subscription-status.component';
 import { SubscriptionPaymentComponent } from './pages/subscription-payment/subscription-payment.component';
 import { ReportGeneratorComponent } from './pages/report-generator/report-generator.component';
+import { ClubsComponent } from './pages/clubs/clubs.component';
 
 @NgModule({
   declarations: [
@@ -75,6 +76,7 @@ import { ReportGeneratorComponent } from './pages/report-generator/report-genera
     SubscriptionStatusComponent,
     SubscriptionPaymentComponent,
     ReportGeneratorComponent,
+    ClubsComponent,
   ],
   imports: [
     BrowserModule,
@@ -84,12 +86,7 @@ import { ReportGeneratorComponent } from './pages/report-generator/report-genera
     AppRoutingModule,
     NgChartsModule
   ],
-  providers: [
-    {
-      provide: 'LanguageService',
-      useExisting: LanguageService
-    }
-  ],
+  providers: [LanguageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

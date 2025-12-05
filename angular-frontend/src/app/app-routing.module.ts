@@ -23,6 +23,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { AdminComponent } from './pages/admin/admin.component';
 import { SubscriptionStatusComponent } from './pages/subscription-status/subscription-status.component';
 import { SubscriptionPaymentComponent } from './pages/subscription-payment/subscription-payment.component';
+import { ClubsComponent } from './pages/clubs/clubs.component';
 import { AuthGuard } from './guards/auth.guard';
 import { AdminGuard } from './guards/admin.guard';
 
@@ -51,6 +52,7 @@ const routes: Routes = [
   { path: 'training-inspection', component: TrainingInspectionComponent, canActivate: [AuthGuard] },
   { path: 'subscription-status', component: SubscriptionStatusComponent, canActivate: [AuthGuard] },
   { path: 'subscription-payment', component: SubscriptionPaymentComponent, canActivate: [AuthGuard] },
+  { path: 'clubs', component: ClubsComponent, canActivate: [AuthGuard] },
   { path: 'settings', redirectTo: '/admin', pathMatch: 'full' } // Redirect to admin panel for admins
 ];
 

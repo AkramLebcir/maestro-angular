@@ -1,0 +1,572 @@
+<div class="flex-1 p-6">
+  <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('clubs.title') }}</h1>
+      <button 
+        (click)="openAddClubModal()"
+        class="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+        <span>{{ translate('clubs.createClub') }}</span>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Clubs List -->
+      <div class="lg:col-span-1">
+        <h2 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-4">{{ translate('clubs.myClubs') }}</h2>
+        <div class="space-y-2 max-h-[600px] overflow-y-auto">
+          <div 
+            *ngFor="let club of clubs"
+            (click)="selectClub(club)"
+            [class]="'p-4 rounded-lg cursor-pointer transition ' + (selectedClub?.id === club.id ? 'bg-blue-100 dark:bg-blue-900 border-2 border-blue-500' : 'bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600')">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h3 class="font-semibold text-gray-800 dark:text-gray-200">{{ club.name }}</h3>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mt-1" *ngIf="club.description">{{ club.description }}</p>
+                <div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                  <span>{{ translate('clubs.membersCount') }}: {{ club.members?.length || 0 }}</span>
+                  <span class="mx-2">|</span>
+                  <span>{{ translate('clubs.eventsCount') }}: {{ club.events?.length || 0 }}</span>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <button 
+                  (click)="openEditClubModal(club); $event.stopPropagation()"
+                  class="text-blue-600 hover:text-blue-800">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button 
+                  (click)="deleteClub(club); $event.stopPropagation()"
+                  class="text-red-600 hover:text-red-800">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div *ngIf="clubs.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8">
+            {{ translate('clubs.noClubs') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Club Details -->
+      <div class="lg:col-span-2" *ngIf="selectedClub">
+        <div class="mb-6">
+          <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ selectedClub.name }}</h2>
+          <p class="text-gray-600 dark:text-gray-400 mb-4" *ngIf="selectedClub.description">{{ selectedClub.description }}</p>
+          
+          <div class="flex gap-3 mb-4 flex-wrap">
+            <button 
+              (click)="openAddMemberModal()"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>{{ translate('clubs.addMember') }}</span>
+            </button>
+            <button 
+              (click)="openAddEventModal()"
+              class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <span>{{ translate('clubs.addEvent') }}</span>
+            </button>
+            <button 
+              (click)="openAnnouncementModal()"
+              class="bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-700 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+              </svg>
+              <span>{{ translate('clubs.sendAnnouncement') }}</span>
+            </button>
+            <button 
+              (click)="exportClubFullReportToPDF()"
+              [disabled]="isExportingPDF"
+              class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition disabled:opacity-50">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>{{ isExportingPDF ? translate('clubs.exporting') : translate('clubs.exportFullReport') }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Members Section -->
+        <div class="mb-6">
+          <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300 mb-4">{{ translate('clubs.members') }} ({{ selectedClub.members?.length || 0 }})</h3>
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+            <div *ngIf="selectedClub.members && selectedClub.members.length > 0" class="space-y-2">
+              <div 
+                *ngFor="let member of selectedClub.members"
+                class="flex justify-between items-center p-3 bg-white dark:bg-gray-800 rounded-lg">
+                <div>
+                  <span class="font-medium text-gray-800 dark:text-gray-200">
+                    {{ member.student?.firstName }} {{ member.student?.lastName }}
+                  </span>
+                  <span class="text-sm text-gray-500 dark:text-gray-400 ml-2" *ngIf="member.student?.email">
+                    ({{ member.student?.email }})
+                  </span>
+                </div>
+                <button 
+                  (click)="removeMember(member.id)"
+                  class="text-red-600 hover:text-red-800">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div *ngIf="!selectedClub.members || selectedClub.members.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
+              {{ translate('clubs.noMembers') }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Section -->
+        <div>
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-300">{{ translate('clubs.events') }} ({{ getFilteredEvents().length }})</h3>
+            <select 
+              [(ngModel)]="selectedEventType"
+              class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <option value="">{{ translate('clubs.allTypes') }}</option>
+              <option value="presentation">{{ translate('clubs.participationType.presentation') }}</option>
+              <option value="competition">{{ translate('clubs.participationType.competition') }}</option>
+              <option value="workshop">{{ translate('clubs.participationType.workshop') }}</option>
+            </select>
+          </div>
+          <div class="space-y-4">
+            <div 
+              *ngFor="let event of getFilteredEvents()"
+              class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4">
+              <div class="flex justify-between items-start mb-3">
+                <div class="flex-1">
+                  <h4 class="font-semibold text-lg text-gray-800 dark:text-gray-200">{{ event.name }}</h4>
+                  <div class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    <span>{{ translate('clubs.date') }}: {{ event.date | date:'short' }}</span>
+                    <span class="mx-2" *ngIf="event.organizer">|</span>
+                    <span *ngIf="event.organizer">{{ translate('clubs.organizer') }}: {{ event.organizer }}</span>
+                    <span class="mx-2" *ngIf="event.participationType">|</span>
+                    <span *ngIf="event.participationType">{{ getParticipationTypeLabel(event.participationType) }}</span>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button 
+                    (click)="openEventReportModal(event)"
+                    class="text-blue-600 hover:text-blue-800" [title]="translate('clubs.viewReport')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </button>
+                  <button 
+                    (click)="openEditEventModal(event)"
+                    class="text-green-600 hover:text-green-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  </button>
+                  <button 
+                    (click)="deleteEvent(event)"
+                    class="text-red-600 hover:text-red-800">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="text-sm text-gray-700 dark:text-gray-300" *ngIf="event.results">
+                <strong>{{ translate('clubs.results') }}:</strong> {{ event.results }}
+              </div>
+              <div class="mt-3" *ngIf="event.photos && event.photos.length > 0">
+                <div class="grid grid-cols-3 gap-2">
+                  <img 
+                    *ngFor="let photo of event.photos"
+                    [src]="photo"
+                    class="w-full h-24 object-cover rounded-lg cursor-pointer"
+                    (click)="openPhoto(photo)">
+                </div>
+              </div>
+            </div>
+            <div *ngIf="getFilteredEvents().length === 0" class="text-center text-gray-500 dark:text-gray-400 py-8">
+              {{ translate('clubs.noEvents') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2" *ngIf="!selectedClub">
+        <div class="text-center text-gray-500 dark:text-gray-400 py-16">
+          <svg class="w-24 h-24 mx-auto mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <p class="text-xl">{{ translate('clubs.selectClub') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Club Modal -->
+<div *ngIf="showClubModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+      {{ editingClub ? translate('clubs.editClub') : translate('clubs.createClub') }}
+    </h2>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.name') }} *</label>
+        <input 
+          type="text"
+          [(ngModel)]="clubForm.name"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.description') }}</label>
+        <textarea 
+          [(ngModel)]="clubForm.description"
+          rows="4"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button 
+          (click)="showClubModal = false"
+          class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400">
+          {{ translate('clubs.cancel') }}
+        </button>
+        <button 
+          (click)="saveClub()"
+          [disabled]="isSaving"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+          {{ isSaving ? translate('clubs.saving') : translate('clubs.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member Modal -->
+<div *ngIf="showMemberModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('clubs.addMember') }}</h2>
+    <div class="mb-4">
+      <input 
+        type="text"
+        [(ngModel)]="searchTerm"
+        (input)="filterStudents()"
+        [placeholder]="translate('clubs.searchStudents')"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+    </div>
+    <div class="space-y-2 max-h-96 overflow-y-auto">
+      <div 
+        *ngFor="let student of filteredStudents"
+        (click)="addMember(student.id)"
+        class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600">
+        <div class="font-medium text-gray-800 dark:text-gray-200">
+          {{ student.firstName }} {{ student.lastName }}
+        </div>
+        <div class="text-sm text-gray-500 dark:text-gray-400" *ngIf="student.email">{{ student.email }}</div>
+      </div>
+      <div *ngIf="filteredStudents.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-4">
+        {{ translate('clubs.noStudentsAvailable') }}
+      </div>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button 
+        (click)="showMemberModal = false"
+        class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400">
+        {{ translate('clubs.close') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Event Modal -->
+<div *ngIf="showEventModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-3xl my-8">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">
+      {{ editingEvent ? translate('clubs.editEvent') : translate('clubs.addEvent') }}
+    </h2>
+    <div class="space-y-4">
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.eventName') }} *</label>
+          <input 
+            type="text"
+            [(ngModel)]="eventForm.name"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.date') }} *</label>
+          <input 
+            type="date"
+            [(ngModel)]="eventForm.date"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.organizer') }}</label>
+          <input 
+            type="text"
+            [(ngModel)]="eventForm.organizer"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.participationType') }}</label>
+          <select 
+            [(ngModel)]="eventForm.participationType"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="">{{ translate('clubs.selectType') }}</option>
+            <option value="presentation">{{ translate('clubs.participationType.presentation') }}</option>
+            <option value="competition">{{ translate('clubs.participationType.competition') }}</option>
+            <option value="workshop">{{ translate('clubs.participationType.workshop') }}</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.results') }}</label>
+        <textarea 
+          [(ngModel)]="eventForm.results"
+          rows="3"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.report') }}</label>
+        <textarea 
+          [(ngModel)]="eventForm.report"
+          rows="5"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.photos') }}</label>
+          <input 
+            type="file"
+            accept="image/*"
+            multiple
+            (change)="onPhotoSelected($event)"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+          <div class="grid grid-cols-3 gap-2 mt-2" *ngIf="photoPreviews.length > 0">
+            <div *ngFor="let preview of photoPreviews; let i = index" class="relative">
+              <img [src]="preview" class="w-full h-24 object-cover rounded-lg">
+              <button 
+                (click)="removePhoto(i)"
+                class="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center">
+                ×
+              </button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.videos') }}</label>
+          <input 
+            type="file"
+            accept="video/*"
+            multiple
+            (change)="onVideoSelected($event)"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+          <div class="mt-2 space-y-1" *ngIf="videoPreviews.length > 0">
+            <div *ngFor="let preview of videoPreviews; let i = index" class="flex justify-between items-center p-2 bg-gray-50 dark:bg-gray-700 rounded">
+              <span class="text-sm">{{ preview }}</span>
+              <button 
+                (click)="removeVideo(i)"
+                class="text-red-600">×</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button 
+          (click)="showEventModal = false"
+          class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400">
+          {{ translate('clubs.cancel') }}
+        </button>
+        <button 
+          (click)="saveEvent()"
+          [disabled]="isSaving"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+          {{ isSaving ? translate('clubs.saving') : translate('clubs.save') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Announcement Modal -->
+<div *ngIf="showAnnouncementModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('clubs.sendAnnouncement') }}</h2>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.subject') }} *</label>
+        <input 
+          type="text"
+          [(ngModel)]="announcementForm.subject"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('clubs.message') }} *</label>
+        <textarea 
+          [(ngModel)]="announcementForm.message"
+          rows="5"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+      </div>
+      <div>
+        <label class="flex items-center">
+          <input 
+            type="checkbox"
+            [(ngModel)]="announcementForm.sendEmail"
+            class="mr-2">
+          <span class="text-sm text-gray-700 dark:text-gray-300">{{ translate('clubs.sendEmail') }}</span>
+        </label>
+      </div>
+      <div class="flex gap-3 justify-end">
+        <button 
+          (click)="showAnnouncementModal = false"
+          class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400">
+          {{ translate('clubs.cancel') }}
+        </button>
+        <button 
+          (click)="sendAnnouncement()"
+          [disabled]="isSaving"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+          {{ isSaving ? translate('clubs.sending') : translate('clubs.send') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Event Report Modal -->
+<div *ngIf="showEventReportModal && selectedEventForReport" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+  <div class="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl my-8">
+    <div class="flex justify-between items-center mb-4">
+      <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ translate('clubs.eventReport') }}</h2>
+      <button 
+        (click)="exportEventToPDF()"
+        [disabled]="isExportingPDF"
+        class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 disabled:opacity-50">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <span>{{ isExportingPDF ? translate('clubs.exporting') : translate('clubs.exportPDF') }}</span>
+      </button>
+    </div>
+    <div #reportContent class="bg-white p-6">
+      <h1 class="text-3xl font-bold mb-4">{{ selectedEventForReport.name }}</h1>
+      <div class="mb-4 text-gray-600">
+        <p><strong>{{ translate('clubs.date') }}:</strong> {{ selectedEventForReport.date | date:'fullDate' }}</p>
+        <p *ngIf="selectedEventForReport.organizer"><strong>{{ translate('clubs.organizer') }}:</strong> {{ selectedEventForReport.organizer }}</p>
+        <p *ngIf="selectedEventForReport.participationType"><strong>{{ translate('clubs.participationType') }}:</strong> {{ getParticipationTypeLabel(selectedEventForReport.participationType) }}</p>
+      </div>
+      <div class="mb-4" *ngIf="selectedEventForReport.results">
+        <h3 class="text-xl font-bold mb-2">{{ translate('clubs.results') }}</h3>
+        <p>{{ selectedEventForReport.results }}</p>
+      </div>
+      <div class="mb-4" *ngIf="selectedEventForReport.report">
+        <h3 class="text-xl font-bold mb-2">{{ translate('clubs.report') }}</h3>
+        <p class="whitespace-pre-wrap">{{ selectedEventForReport.report }}</p>
+      </div>
+      <div class="mb-4" *ngIf="selectedEventForReport.photos && selectedEventForReport.photos.length > 0">
+        <h3 class="text-xl font-bold mb-2">{{ translate('clubs.photos') }}</h3>
+        <div class="grid grid-cols-3 gap-4">
+          <img *ngFor="let photo of selectedEventForReport.photos" [src]="photo" class="w-full rounded-lg">
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 flex justify-end">
+      <button 
+        (click)="showEventReportModal = false"
+        class="px-4 py-2 bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-400">
+        {{ translate('clubs.close') }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden Club Full Report for PDF Export -->
+<div #clubReportContent class="club-report-pdf" style="position: absolute; left: -9999px; width: 210mm; background: white; padding: 20mm; font-family: Arial, sans-serif; direction: rtl;" *ngIf="selectedClub">
+  <!-- Club Header -->
+  <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 20px;">
+    <h1 style="font-size: 32px; color: #1e40af; margin-bottom: 10px;">{{ selectedClub.name }}</h1>
+    <p style="font-size: 14px; color: #666;">{{ translate('clubs.fullReport') }} - {{ translate('clubs.generatedOn') }}: {{ new Date() | date:'fullDate' }}</p>
+  </div>
+
+  <!-- Club Description -->
+  <div style="margin-bottom: 30px;" *ngIf="selectedClub.description">
+    <h2 style="font-size: 20px; color: #333; margin-bottom: 10px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">{{ translate('clubs.description') }}</h2>
+    <p style="font-size: 14px; line-height: 1.6; color: #555;">{{ selectedClub.description }}</p>
+  </div>
+
+  <!-- Members Section -->
+  <div style="margin-bottom: 30px;" *ngIf="selectedClub.members && selectedClub.members.length > 0">
+    <h2 style="font-size: 20px; color: #333; margin-bottom: 15px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">
+      {{ translate('clubs.members') }} ({{ selectedClub.members.length }})
+    </h2>
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+      <div *ngFor="let member of selectedClub.members" style="padding: 10px; background: #f5f5f5; border-radius: 5px;">
+        <p style="font-size: 14px; font-weight: bold; margin: 0; color: #333;">
+          {{ member.student?.firstName }} {{ member.student?.lastName }}
+        </p>
+        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;" *ngIf="member.student?.email">{{ member.student.email }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Section -->
+  <div style="margin-bottom: 30px;" *ngIf="selectedClub.events && selectedClub.events.length > 0">
+    <h2 style="font-size: 20px; color: #333; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 5px;">
+      {{ translate('clubs.events') }} ({{ selectedClub.events.length }})
+    </h2>
+    
+    <div *ngFor="let event of selectedClub.events; let i = index" style="margin-bottom: 40px; page-break-inside: avoid;">
+      <!-- Event Header -->
+      <div style="background: #f0f0f0; padding: 15px; border-radius: 5px; margin-bottom: 15px;">
+        <h3 style="font-size: 18px; color: #1e40af; margin: 0 0 10px 0;">{{ event.name }}</h3>
+        <div style="font-size: 13px; color: #666;">
+          <p style="margin: 5px 0;"><strong>{{ translate('clubs.date') }}:</strong> {{ event.date | date:'fullDate' }}</p>
+          <p style="margin: 5px 0;" *ngIf="event.organizer"><strong>{{ translate('clubs.organizer') }}:</strong> {{ event.organizer }}</p>
+          <p style="margin: 5px 0;" *ngIf="event.participationType">
+            <strong>{{ translate('clubs.participationType') }}:</strong> {{ getParticipationTypeLabel(event.participationType) }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Event Results -->
+      <div style="margin-bottom: 15px;" *ngIf="event.results">
+        <h4 style="font-size: 16px; color: #333; margin-bottom: 8px;">{{ translate('clubs.results') }}</h4>
+        <p style="font-size: 14px; line-height: 1.6; color: #555;">{{ event.results }}</p>
+      </div>
+
+      <!-- Event Report -->
+      <div style="margin-bottom: 15px;" *ngIf="event.report">
+        <h4 style="font-size: 16px; color: #333; margin-bottom: 8px;">{{ translate('clubs.report') }}</h4>
+        <p style="font-size: 14px; line-height: 1.6; color: #555; white-space: pre-wrap;">{{ event.report }}</p>
+      </div>
+
+      <!-- Event Photos -->
+      <div style="margin-bottom: 15px;" *ngIf="event.photos && event.photos.length > 0">
+        <h4 style="font-size: 16px; color: #333; margin-bottom: 10px;">{{ translate('clubs.photos') }} ({{ event.photos.length }})</h4>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;">
+          <img 
+            *ngFor="let photo of event.photos" 
+            [src]="photo" 
+            style="width: 100%; height: auto; max-height: 200px; object-fit: cover; border-radius: 5px; border: 1px solid #ddd;"
+            onerror="this.style.display='none'">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; font-size: 12px; color: #666;">
+    <p>{{ translate('clubs.reportGenerated') }} - {{ new Date() | date:'full' }}</p>
+  </div>
+</div>

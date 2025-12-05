@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild, Inject } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
@@ -103,7 +103,7 @@ export class ReportGeneratorComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private authService: AuthService,
-    @Inject('LanguageService') public languageService: LanguageService
+    public languageService: LanguageService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {

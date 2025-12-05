@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../../services/api.service';
 import { LanguageService } from '../../../services/language.service';
 
@@ -143,7 +143,7 @@ export class SubscriptionManagementComponent implements OnInit {
 
   constructor(
     private api: ApiService,
-    @Inject('LanguageService') public languageService: LanguageService
+    public languageService: LanguageService
   ) {}
 
   ngOnInit(): void {
