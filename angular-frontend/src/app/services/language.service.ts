@@ -2234,6 +2234,24 @@ export class LanguageService {
         'DE': 'Notizen (obs)',
         'TR': 'Notlar (obs)'
       },
+      'gradebook.ratings': {
+        'AR': 'التقديرات',
+        'FR': 'Appréciations',
+        'EN': 'Ratings',
+        'ES': 'Calificaciones',
+        'IT': 'Valutazioni',
+        'DE': 'Bewertungen',
+        'TR': 'Değerlendirmeler'
+      },
+      'gradebook.guidance': {
+        'AR': 'الإرشادات',
+        'FR': 'Conseils',
+        'EN': 'Guidance',
+        'ES': 'Orientación',
+        'IT': 'Consigli',
+        'DE': 'Beratung',
+        'TR': 'Rehberlik'
+      },
       'gradebook.guidanceCons': {
         'AR': 'الإرشادات (cons)',
         'FR': 'Conseils (cons)',

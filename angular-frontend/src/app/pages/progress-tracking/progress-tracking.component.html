@@ -19,10 +19,10 @@
   <div #reportContainer>
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold text-gray-800">
+        <h1 class="text-xl font-bold text-gray-800 dark:text-white">
           {{ translate('progressTracking.title') }}
         </h1>
-        <p class="text-sm text-gray-500 mt-1" *ngIf="overview">
+        <p class="text-sm text-gray-500 dark:text-gray-300 mt-1" *ngIf="overview">
           {{ translate('progressTracking.untilDate') }}
           <span class="font-semibold">{{ overview.currentDate }}</span>
           ({{ translate('progressTracking.weekNumber') }} {{ overview.currentWeek }}
@@ -45,13 +45,13 @@
       <table class="min-w-full border border-gray-200 dark:border-gray-700 text-sm">
         <thead class="bg-gray-50 dark:bg-gray-900">
           <tr>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.teacher') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.levelAndTrack') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.class') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.lastLesson') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.progressPercentage') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.delayWeeks') }}</th>
-            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center">{{ translate('progressTracking.notes') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.teacher') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.levelAndTrack') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.class') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.lastLesson') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.progressPercentage') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.delayWeeks') }}</th>
+            <th class="border border-gray-200 dark:border-gray-700 px-2 py-2 text-center text-gray-800 dark:text-white">{{ translate('progressTracking.notes') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -59,7 +59,7 @@
             <!-- الأستاذ (rowspan) -->
             <td
               *ngIf="row.rowSpanTeacher > 0"
-              class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center align-middle"
+              class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center align-middle text-gray-800 dark:text-white"
               [attr.rowspan]="row.rowSpanTeacher"
             >
               {{ teacherFullName || '-' }}
@@ -68,34 +68,34 @@
             <!-- المستوى والشعبة (rowspan) -->
             <td
               *ngIf="row.rowSpanLevel > 0"
-              class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center align-middle"
+              class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center align-middle text-gray-800 dark:text-white"
               [attr.rowspan]="row.rowSpanLevel"
             >
               {{ row.level }}
             </td>
 
             <!-- القسم -->
-            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center">
+            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center text-gray-800 dark:text-white">
               {{ row.className }}
             </td>
 
             <!-- آخر درس -->
-            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center">
+            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center text-gray-800 dark:text-white">
               {{ row.data.lastLessonReached }}
             </td>
 
             <!-- نسبة التقدم -->
-            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center">
+            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center text-gray-800 dark:text-white">
               {{ row.data.lessonProgressPercentage | number: '1.0-1' }}%
             </td>
 
             <!-- عدد أسابيع التأخر/التقدم -->
-            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center">
+            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center text-gray-800 dark:text-white">
               {{ row.data.delayOrAdvanceUnits }}
             </td>
 
             <!-- الملاحظات -->
-            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center">
+            <td class="border border-gray-200 dark:border-gray-700 px-2 py-1 text-center text-gray-800 dark:text-white">
               {{ formatStatus(row.data) }}
             </td>
           </tr>
@@ -110,7 +110,7 @@
         <h2 class="text-sm font-semibold text-red-600 mb-2">
           {{ translate('progressTracking.delayedClassesTitle') }}
         </h2>
-        <div *ngIf="overview.delayed.length === 0" class="text-xs text-gray-500">
+        <div *ngIf="overview.delayed.length === 0" class="text-xs text-gray-500 dark:text-gray-300">
           {{ translate('progressTracking.noDelayedClasses') }}
         </div>
         <ul *ngIf="overview.delayed.length > 0" class="space-y-1 text-xs">
@@ -118,7 +118,7 @@
             *ngFor="let item of overview.delayed"
             class="flex justify-between border-b border-dashed border-gray-200 dark:border-gray-700 pb-1"
           >
-            <span>
+            <span class="text-gray-800 dark:text-white">
               {{ item.className }} ({{ toArabicLevel(item.level) }})
             </span>
             <span class="text-red-600">
@@ -134,7 +134,7 @@
         <h2 class="text-sm font-semibold text-green-600 mb-2">
           {{ translate('progressTracking.advancedClassesTitle') }}
         </h2>
-        <div *ngIf="overview.advanced.length === 0" class="text-xs text-gray-500">
+        <div *ngIf="overview.advanced.length === 0" class="text-xs text-gray-500 dark:text-gray-300">
           {{ translate('progressTracking.noAdvancedClasses') }}
         </div>
         <ul *ngIf="overview.advanced.length > 0" class="space-y-1 text-xs">
@@ -142,7 +142,7 @@
             *ngFor="let item of overview.advanced"
             class="flex justify-between border-b border-dashed border-gray-200 dark:border-gray-700 pb-1"
           >
-            <span>
+            <span class="text-gray-800 dark:text-white">
               {{ item.className }} ({{ toArabicLevel(item.level) }})
             </span>
             <span class="text-green-600">

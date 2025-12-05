@@ -1,13 +1,13 @@
 .status-advance {
-  @apply text-green-600;
+  @apply text-green-600 dark:text-green-400;
 }
 
 .status-delay {
-  @apply text-red-600;
+  @apply text-red-600 dark:text-red-400;
 }
 
 .status-ontrack {
-  @apply text-gray-700;
+  @apply text-gray-700 dark:text-gray-300;
 }
 
 

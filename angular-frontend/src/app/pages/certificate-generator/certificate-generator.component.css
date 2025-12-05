@@ -20,10 +20,6 @@
   padding: 1rem;
 }
 
-.dark .certificate-page.embed-mode .card {
-  background: #1f2937;
-}
-
 .certificate-page.embed-mode .certificate-builder {
   grid-template-columns: 350px 1fr; /* Maintain ratio in embed mode */
 }
