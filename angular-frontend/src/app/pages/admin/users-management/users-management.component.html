@@ -1,7 +1,7 @@
 <div>
   <!-- Header with Create Button -->
   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">{{ translate('usersManagement.title') }}</h2>
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ translate('usersManagement.title') }}</h2>
     <button
       (click)="openCreateForm()"
       class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -11,24 +11,24 @@
   </div>
 
   <!-- Messages -->
-  <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+  <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg text-red-700 dark:text-red-400 text-sm">
     {{ errorMessage }}
   </div>
-  <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
+  <div *ngIf="successMessage" class="mb-4 p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg text-green-700 dark:text-green-400 text-sm">
     {{ successMessage }}
   </div>
 
   <!-- Users Table -->
   <div *ngIf="!isLoading && users.length > 0" class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
+      <thead class="bg-gray-50 dark:bg-gray-900">
         <tr>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.name') }}</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.email') }}</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.role') }}</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.status') }}</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.lastLogin') }}</th>
-          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">{{ translate('usersManagement.actions') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.name') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.email') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.role') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.status') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.lastLogin') }}</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">{{ translate('usersManagement.actions') }}</th>
         </tr>
       </thead>
       <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200">
@@ -37,7 +37,7 @@
             <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
               {{ (user.firstName || '') + ' ' + (user.lastName || '') || translate('usersManagement.noName') }}
             </div>
-            <div *ngIf="user.username" class="text-sm text-gray-500">{{ user.username }}</div>
+            <div *ngIf="user.username" class="text-sm text-gray-500 dark:text-gray-400">{{ user.username }}</div>
           </td>
           <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">{{ user.email }}</td>
           <td class="px-6 py-4 whitespace-nowrap">
@@ -50,7 +50,7 @@
               {{ user.isActive ? translate('usersManagement.statusActive') : translate('usersManagement.statusInactive') }}
             </span>
           </td>
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ formatDate(user.lastLoginAt) }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ formatDate(user.lastLoginAt) }}</td>
           <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2 space-x-reverse">
             <button
               (click)="openEditForm(user)"
@@ -90,7 +90,7 @@
   <!-- User Form Modal -->
   <div *ngIf="showUserForm" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 p-4" (click)="closeForm()">
     <div class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 max-w-md w-full p-6" (click)="$event.stopPropagation()">
-      <h3 class="text-xl font-bold text-gray-800 mb-4">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">
         {{ editingUser ? translate('usersManagement.editUser') : translate('usersManagement.addNewUser') }}
       </h3>
 

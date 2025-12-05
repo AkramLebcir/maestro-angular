@@ -7,22 +7,24 @@
   </header>
 
   <section class="certificate-builder">
-    <div class="card form-card">
+    <div class="card form-card bg-white dark:bg-gray-800">
       <div class="form-group">
-        <label>{{ translate('certificate.class') }}</label>
-        <select [(ngModel)]="selectedClassId" (ngModelChange)="updateStudents()">
-          <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+        <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.class') }}</label>
+        <select [(ngModel)]="selectedClassId" (ngModelChange)="updateStudents()"
+          class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+          <option *ngFor="let cls of classes" [value]="cls.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ cls.name }}</option>
         </select>
       </div>
 
       <div class="form-group">
-        <label>{{ translate('certificate.student') }}</label>
-        <select [(ngModel)]="selectedStudentId">
-          <option *ngFor="let student of students" [value]="student.id">
+        <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.student') }}</label>
+        <select [(ngModel)]="selectedStudentId"
+          class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+          <option *ngFor="let student of students" [value]="student.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
             {{ student.firstName }} {{ student.lastName ?? '' }}
           </option>
         </select>
-        <small *ngIf="isLoadingStudents">{{ translate('certificate.loading') }}</small>
+        <small *ngIf="isLoadingStudents" class="text-gray-500 dark:text-gray-400">{{ translate('certificate.loading') }}</small>
       </div>
 
       <div class="templates-section">
@@ -38,42 +40,47 @@
             <span *ngSwitchCase="'certificate.templateActiveParticipation'">🙌</span>
             <span *ngSwitchDefault>🏅</span>
           </div>
-          <h3>{{ getTemplateTranslation(template.name) }}</h3>
-          <p>{{ template.description }}</p>
+          <h3 class="text-gray-800 dark:text-gray-200">{{ getTemplateTranslation(template.name) }}</h3>
+          <p class="text-gray-600 dark:text-gray-400">{{ template.description }}</p>
         </div>
       </div>
 
       <div class="form-group">
-        <label>{{ translate('certificate.mainText') }}</label>
-        <textarea [(ngModel)]="mainText" rows="3"></textarea>
+        <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.mainText') }}</label>
+        <textarea [(ngModel)]="mainText" rows="3"
+          class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"></textarea>
       </div>
 
       <div class="form-group">
-        <label>{{ translate('certificate.reason') }}</label>
-        <textarea [(ngModel)]="reason" rows="2"></textarea>
+        <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.reason') }}</label>
+        <textarea [(ngModel)]="reason" rows="2"
+          class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"></textarea>
       </div>
 
       <div class="form-row">
         <div class="form-group">
-          <label>{{ translate('certificate.issueDate') }}</label>
-          <input type="date" [(ngModel)]="issueDate" />
+          <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.issueDate') }}</label>
+          <input type="date" [(ngModel)]="issueDate"
+            class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
         </div>
         <div class="form-group">
-          <label>{{ translate('certificate.academicYear') }}</label>
-          <input type="text" [(ngModel)]="academicYear" />
+          <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.academicYear') }}</label>
+          <input type="text" [(ngModel)]="academicYear"
+            class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
         </div>
       </div>
 
       <div class="form-group">
-        <label>{{ translate('certificate.signature') }}</label>
-        <input type="text" [(ngModel)]="signatureName" />
+        <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.signature') }}</label>
+        <input type="text" [(ngModel)]="signatureName"
+          class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400" />
       </div>
 
       <div class="actions">
-        <button (click)="issueCertificate()" [disabled]="isSubmitting">
+        <button (click)="issueCertificate()" [disabled]="isSubmitting" class="bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white">
           {{ isSubmitting ? translate('certificate.issuing') : translate('certificate.issue') }}
         </button>
-        <button class="secondary btn-export-pdf" (click)="downloadPdf()" [disabled]="isExporting">
+        <button class="secondary btn-export-pdf dark:bg-red-600 dark:hover:bg-red-700 dark:text-white" (click)="downloadPdf()" [disabled]="isExporting">
           {{ isExporting ? translate('certificate.exporting') : translate('certificate.export') }}
         </button>
       </div>
@@ -84,8 +91,8 @@
       </div>
     </div>
 
-    <div class="card preview-card">
-      <div class="preview-label">{{ translate('certificate.preview') }}</div>
+    <div class="card preview-card bg-white dark:bg-gray-800">
+      <div class="preview-label text-gray-800 dark:text-gray-200">{{ translate('certificate.preview') }}</div>
       <div class="certificate-preview" #certificatePreview>
         <div class="certificate-border" [ngClass]="getSelectedTheme()">
           <div class="certificate-inner-border">

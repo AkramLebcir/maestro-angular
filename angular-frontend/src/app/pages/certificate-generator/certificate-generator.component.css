@@ -3,6 +3,11 @@
   max-width: 100%;
   margin: 0 auto;
 }
+
+.dark .certificate-page {
+  background: transparent;
+}
+
 .certificate-page.embed-mode {
   padding: 0;
   box-shadow: none;
@@ -13,6 +18,10 @@
   box-shadow: none;
   border-radius: 0.75rem;
   padding: 1rem;
+}
+
+.dark .certificate-page.embed-mode .card {
+  background: #1f2937;
 }
 
 .certificate-page.embed-mode .certificate-builder {
@@ -27,6 +36,18 @@
 .certificate-header p {
   margin: 0.25rem 0 0;
   color: #4b5563;
+}
+
+.dark .certificate-header p {
+  color: #9ca3af;
+}
+
+.certificate-header h1 {
+  color: #1f2937;
+}
+
+.dark .certificate-header h1 {
+  color: #f3f4f6;
 }
 
 .certificate-builder {
@@ -44,6 +65,11 @@
   padding: 1.5rem;
 }
 
+.dark .card {
+  background: #1f2937;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+}
+
 .form-group {
   display: flex;
   flex-direction: column;
@@ -53,6 +79,11 @@
 .form-group label {
   font-weight: 600;
   margin-bottom: 0.25rem;
+  color: #374151;
+}
+
+.dark .form-group label {
+  color: #e5e7eb;
 }
 
 .form-group select,
@@ -62,6 +93,16 @@
   border-radius: 0.75rem;
   padding: 0.65rem;
   font-size: 1rem;
+  background: #fff;
+  color: #1f2937;
+}
+
+.dark .form-group select,
+.dark .form-group input,
+.dark .form-group textarea {
+  border-color: #4b5563;
+  background: #374151;
+  color: #f3f4f6;
 }
 
 .templates-section {
@@ -81,6 +122,14 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  background: #fff;
+  color: #1f2937;
+}
+
+.dark .template-card {
+  border-color: #4b5563;
+  background: #374151;
+  color: #e5e7eb;
 }
 
 .template-card:hover {
@@ -88,9 +137,18 @@
   box-shadow: 0 4px 6px rgba(0,0,0,0.05);
 }
 
+.dark .template-card:hover {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
 .template-card.selected {
   border-color: #0ea5e9;
   background: #e0f2fe;
+}
+
+.dark .template-card.selected {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: #0ea5e9;
 }
 
 .template-icon {
@@ -131,13 +189,30 @@
   background: #0ea5e9;
   color: white;
   cursor: pointer;
-  transition: opacity 0.2s ease;
+  transition: all 0.2s ease;
   flex: 1; /* Make buttons stretch */
 }
 
+.actions button:hover:not(:disabled) {
+  background: #0284c7;
+}
+
+.dark .actions button:hover:not(:disabled) {
+  background: #0369a1;
+}
+
 .actions button.secondary {
-  background: #f3f4f6;
-  color: #0f172a;
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.dark .actions button.secondary {
+  background: #dc2626;
+  color: #ffffff;
+}
+
+.dark .actions button.secondary:hover:not(:disabled) {
+  background: #b91c1c;
 }
 
 .actions button:disabled {
@@ -153,8 +228,16 @@
   color: #0f9d58;
 }
 
+.dark .feedback .success {
+  color: #34d399;
+}
+
 .feedback .error {
   color: #b91c1c;
+}
+
+.dark .feedback .error {
+  color: #fca5a5;
 }
 
 .preview-card .preview-label {
@@ -170,6 +253,10 @@
   color: #1e293b;
   position: relative;
   overflow: hidden;
+}
+
+.dark .certificate-preview {
+  background-color: #374151;
 }
 
 /* Sticky positioning for the preview card */

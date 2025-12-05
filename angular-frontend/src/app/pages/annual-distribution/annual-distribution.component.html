@@ -1,13 +1,13 @@
 <div class="p-6 space-y-6">
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div class="flex items-center gap-4">
-      <h1 class="text-2xl font-bold text-gray-800">{{ translate('annualDistribution.title') }}</h1>
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200">{{ translate('annualDistribution.title') }}</h1>
       <div class="flex flex-col">
-        <span class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.schoolYear') }}</span>
+        <span class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.schoolYear') }}</span>
         <select
           [(ngModel)]="selectedYear"
           (change)="onYearChange()"
-          class="border rounded px-2 py-1 text-sm"
+          class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
         >
           <option *ngFor="let y of years" [ngValue]="y">
             {{ y }}
@@ -17,11 +17,11 @@
     </div>
     <div class="flex flex-wrap gap-3 text-sm">
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.level') }}</label>
+        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.level') }}</label>
         <select
           [(ngModel)]="selectedLevel"
           (change)="loadDistributions(true)"
-          class="border rounded px-2 py-1"
+          class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
         >
           <option *ngFor="let lvl of levels" [ngValue]="lvl">
             {{ lvl }}
@@ -29,11 +29,11 @@
         </select>
       </div>
       <div class="flex flex-col">
-        <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.track') }}</label>
+        <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.track') }}</label>
         <select
           [(ngModel)]="selectedTrack"
           (change)="loadDistributions(true)"
-          class="border rounded px-2 py-1"
+          class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
         >
           <option *ngFor="let trk of tracks" [ngValue]="trk">
             {{ trk }}
@@ -43,13 +43,13 @@
     </div>
   </div>
 
-  <div class="border-b border-gray-200">
+  <div class="border-b border-gray-200 dark:border-gray-700">
     <nav class="-mb-px flex space-x-4 rtl:space-x-reverse">
       <button
         (click)="setTab('holidays')"
         [class.border-indigo-500]="activeTab === 'holidays'"
         [class.text-indigo-600]="activeTab === 'holidays'"
-        class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium"
+        class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400"
       >
         {{ translate('annualDistribution.tabHolidays') }}
       </button>
@@ -57,18 +57,18 @@
         (click)="setTab('distribution')"
         [class.border-indigo-500]="activeTab === 'distribution'"
         [class.text-indigo-600]="activeTab === 'distribution'"
-        class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium"
+        class="whitespace-nowrap border-b-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400"
       >
         {{ translate('annualDistribution.tabDistribution') }}
       </button>
     </nav>
   </div>
 
-  <div *ngIf="errorMessage" class="bg-red-100 text-red-700 px-3 py-2 rounded text-sm">
+  <div *ngIf="errorMessage" class="bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 px-3 py-2 rounded text-sm border border-red-200 dark:border-red-800">
     {{ errorMessage }}
   </div>
 
-  <div *ngIf="loading" class="text-sm text-gray-500">{{ translate('annualDistribution.loading') }}</div>
+  <div *ngIf="loading" class="text-sm text-gray-500 dark:text-gray-400">{{ translate('annualDistribution.loading') }}</div>
 
   <!-- Holidays Tab -->
   <section *ngIf="activeTab === 'holidays'" class="space-y-4">
@@ -76,19 +76,19 @@
       <h2 class="font-semibold text-gray-700 dark:text-gray-300 text-lg">{{ translate('annualDistribution.addHolidayTitle') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-5 gap-3 text-sm">
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.holidayName') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.holidayName') }}</label>
           <input
             type="text"
             [(ngModel)]="newHoliday.name"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             [placeholder]="translate('annualDistribution.holidayNamePlaceholder')"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.holidayType') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.holidayType') }}</label>
           <select
             [(ngModel)]="newHoliday.type"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           >
             <option value="HOLIDAY">{{ translate('annualDistribution.typeHoliday') }}</option>
             <option value="EXAM">{{ translate('annualDistribution.typeExam') }}</option>
@@ -97,27 +97,27 @@
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.startDate') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.startDate') }}</label>
           <input
             type="date"
             [(ngModel)]="newHoliday.startDate"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.endDate') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.endDate') }}</label>
           <input
             type="date"
             [(ngModel)]="newHoliday.endDate"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.notes') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.notes') }}</label>
           <input
             type="text"
             [(ngModel)]="newHoliday.notes"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             [placeholder]="translate('annualDistribution.notesPlaceholder')"
           />
         </div>
@@ -138,17 +138,17 @@
         <table class="min-w-full text-sm text-right">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th class="px-3 py-2">{{ translate('annualDistribution.name') }}</th>
-              <th class="px-3 py-2">{{ translate('annualDistribution.type') }}</th>
-              <th class="px-3 py-2">{{ translate('annualDistribution.start') }}</th>
-              <th class="px-3 py-2">{{ translate('annualDistribution.end') }}</th>
-              <th class="px-3 py-2">{{ translate('annualDistribution.notes') }}</th>
-              <th class="px-3 py-2">{{ translate('annualDistribution.actions') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.name') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.type') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.start') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.end') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.notes') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.actions') }}</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let h of holidays" class="border-b last:border-0">
-              <td class="px-3 py-2">{{ h.name }}</td>
+          <tbody class="bg-white dark:bg-gray-800">
+            <tr *ngFor="let h of holidays" class="border-b border-gray-200 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">{{ h.name }}</td>
               <td class="px-3 py-2">
                 <span class="px-2 py-0.5 rounded-full text-xs"
                   [ngClass]="{
@@ -161,20 +161,20 @@
                   {{ h.type }}
                 </span>
               </td>
-              <td class="px-3 py-2">{{ h.startDate }}</td>
-              <td class="px-3 py-2">{{ h.endDate }}</td>
-              <td class="px-3 py-2">{{ h.notes }}</td>
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">{{ h.startDate }}</td>
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">{{ h.endDate }}</td>
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">{{ h.notes }}</td>
               <td class="px-3 py-2">
                 <button
                   (click)="deleteHoliday(h)"
-                  class="text-xs text-red-600 hover:text-red-800"
+                  class="text-xs text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300"
                 >
                   {{ translate('annualDistribution.delete') }}
                 </button>
               </td>
             </tr>
             <tr *ngIf="holidays.length === 0">
-              <td colspan="6" class="px-3 py-4 text-center text-gray-400">
+              <td colspan="6" class="px-3 py-4 text-center text-gray-400 dark:text-gray-500">
                 {{ translate('annualDistribution.noPeriodsForYear') }}
               </td>
             </tr>
@@ -190,40 +190,40 @@
       <h2 class="font-semibold text-gray-700 dark:text-gray-300 text-lg">{{ translate('annualDistribution.addRow') }}</h2>
       <div class="grid grid-cols-1 md:grid-cols-6 gap-3 text-sm">
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.term') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.term') }}</label>
           <input
             type="number"
             [(ngModel)]="newDistribution.term"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             min="1"
             max="3"
             [placeholder]="translate('annualDistribution.termPlaceholder')"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.weekNumber') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.weekNumber') }}</label>
           <input
             type="number"
             [(ngModel)]="newDistribution.weekNumber"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             min="1"
             [placeholder]="translate('annualDistribution.weekNumberPlaceholder')"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.yearStartDate') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.yearStartDate') }}</label>
           <input
             type="date"
             [(ngModel)]="newDistribution.yearStartDate"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           />
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.topicTitle') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.topicTitle') }}</label>
           <select
             [(ngModel)]="selectedTopicId"
             (ngModelChange)="onTopicTitleChange()"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           >
             <option [ngValue]="null">{{ translate('annualDistribution.selectTopicTitle') }}</option>
             <option *ngFor="let t of topics" [ngValue]="t.id">
@@ -232,11 +232,11 @@
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.subtitle') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.subtitle') }}</label>
           <select
             [(ngModel)]="selectedSubtitle"
             (ngModelChange)="onSubtitleChange()"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
           >
             <option [ngValue]="''">{{ translate('annualDistribution.selectSubtitle') }}</option>
             <option *ngFor="let sub of topicSubtitles" [ngValue]="sub">
@@ -245,11 +245,11 @@
           </select>
         </div>
         <div class="flex flex-col">
-          <label class="text-xs text-gray-500 mb-1">{{ translate('annualDistribution.notes') }}</label>
+          <label class="text-xs text-gray-500 dark:text-gray-400 mb-1">{{ translate('annualDistribution.notes') }}</label>
           <input
             type="text"
             [(ngModel)]="newDistribution.notes"
-            class="border rounded px-2 py-1"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             [placeholder]="translate('annualDistribution.notesPlaceholder')"
           />
         </div>
@@ -285,18 +285,18 @@
         <table class="min-w-full text-sm text-right">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th class="px-3 py-2">النوع</th>
-              <th class="px-3 py-2">الفصل</th>
-              <th class="px-3 py-2">الأسبوع</th>
-              <th class="px-3 py-2">الوحدة / النشاط</th>
-              <th class="px-3 py-2">المجال / اسم العطلة</th>
-              <th class="px-3 py-2">تاريخ البداية</th>
-              <th class="px-3 py-2">تاريخ النهاية</th>
-              <th class="px-3 py-2">ملاحظات</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">النوع</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الفصل</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الأسبوع</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الوحدة / النشاط</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">المجال / اسم العطلة</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">تاريخ البداية</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">تاريخ النهاية</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">ملاحظات</th>
             </tr>
           </thead>
-          <tbody>
-            <tr *ngFor="let row of timelineRows" class="border-b last:border-0">
+          <tbody class="bg-white dark:bg-gray-800">
+            <tr *ngFor="let row of timelineRows" class="border-b border-gray-200 dark:border-gray-700 last:border-0 hover:bg-gray-50 dark:hover:bg-gray-700">
               <!-- نوع السطر -->
               <td class="px-3 py-2">
                 <span
@@ -313,7 +313,7 @@
               </td>
 
               <!-- الفصل -->
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else dash">
                   {{ row.distribution?.term }}
                 </ng-container>
@@ -321,7 +321,7 @@
               </td>
 
               <!-- الأسبوع -->
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else dash2">
                   {{ row.distribution?.weekNumber }}
                 </ng-container>
@@ -329,7 +329,7 @@
               </td>
 
               <!-- الوحدة / النشاط -->
-              <td class="px-3 py-2 whitespace-pre-line">
+              <td class="px-3 py-2 whitespace-pre-line text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else holidayUnit">
                   {{ row.distribution?.unitTitle }}
                 </ng-container>
@@ -339,7 +339,7 @@
               </td>
 
               <!-- المجال أو اسم العطلة -->
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else holidayName">
                   {{ row.distribution?.domain }}
                 </ng-container>
@@ -349,7 +349,7 @@
               </td>
 
               <!-- تواريخ البداية والنهاية -->
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else holidayStart">
                   {{ row.distribution?.computedStartDate || '-' }}
                 </ng-container>
@@ -357,7 +357,7 @@
                   {{ row.holiday?.startDate }}
                 </ng-template>
               </td>
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else holidayEnd">
                   {{ row.distribution?.computedEndDate || '-' }}
                 </ng-container>
@@ -367,7 +367,7 @@
               </td>
 
               <!-- ملاحظات -->
-              <td class="px-3 py-2">
+              <td class="px-3 py-2 text-gray-800 dark:text-gray-200">
                 <ng-container *ngIf="row.kind === 'distribution'; else holidayNotes">
                   {{ row.distribution?.notes }}
                 </ng-container>
@@ -378,7 +378,7 @@
             </tr>
 
             <tr *ngIf="timelineRows.length === 0">
-              <td colspan="8" class="px-3 py-4 text-center text-gray-400">
+              <td colspan="8" class="px-3 py-4 text-center text-gray-400 dark:text-gray-500">
                 لم تتم إضافة أي توزيع أو عطلة بعد لهذه السنة والمستوى.
               </td>
             </tr>

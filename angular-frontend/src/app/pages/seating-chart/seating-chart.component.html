@@ -10,20 +10,10 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ translate('seatingChart.numberOfRows') }}</label>
         <div class="flex gap-3">
-          <button 
-            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
-            [class.border-blue-500]="roomRows === 3"
-            [class.bg-blue-50 dark:bg-blue-900/20]="roomRows === 3"
-            [class.border-gray-200 dark:border-gray-700]="roomRows !== 3"
-            (click)="roomRows = 3">
+          <button class="flex-1 px-4 py-3 rounded-xl border-2 transition" [ngClass]="roomRows === 3 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'" (click)="roomRows = 3">
             {{ translate('seatingChart.threeRows') }}
           </button>
-          <button 
-            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
-            [class.border-blue-500]="roomRows === 4"
-            [class.bg-blue-50 dark:bg-blue-900/20]="roomRows === 4"
-            [class.border-gray-200 dark:border-gray-700]="roomRows !== 4"
-            (click)="roomRows = 4">
+          <button class="flex-1 px-4 py-3 rounded-xl border-2 transition" [ngClass]="roomRows === 4 ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'" (click)="roomRows = 4">
             {{ translate('seatingChart.fourRows') }}
           </button>
         </div>
@@ -32,23 +22,13 @@
       <div>
         <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ translate('seatingChart.tableType') }}</label>
         <div class="flex gap-3">
-          <button 
-            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
-            [class.border-blue-500]="tableType === 'single'"
-            [class.bg-blue-50 dark:bg-blue-900/20]="tableType === 'single'"
-            [class.border-gray-200 dark:border-gray-700]="tableType !== 'single'"
-            (click)="tableType = 'single'">
+          <button class="flex-1 px-4 py-3 rounded-xl border-2 transition" [ngClass]="tableType === 'single' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'" (click)="tableType = 'single'">
             <div class="text-center">
               <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.singleTable') }}</div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.oneStudent') }}</div>
             </div>
           </button>
-          <button 
-            class="flex-1 px-4 py-3 rounded-xl border-2 transition"
-            [class.border-blue-500]="tableType === 'double'"
-            [class.bg-blue-50 dark:bg-blue-900/20]="tableType === 'double'"
-            [class.border-gray-200 dark:border-gray-700]="tableType !== 'double'"
-            (click)="tableType = 'double'">
+          <button class="flex-1 px-4 py-3 rounded-xl border-2 transition" [ngClass]="tableType === 'double' ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-gray-200 dark:border-gray-700'" (click)="tableType = 'double'">
             <div class="text-center">
               <div class="text-lg font-semibold mb-1">{{ translate('seatingChart.doubleTable') }}</div>
               <div class="text-xs text-gray-500 dark:text-gray-400">{{ translate('seatingChart.twoStudents') }}</div>

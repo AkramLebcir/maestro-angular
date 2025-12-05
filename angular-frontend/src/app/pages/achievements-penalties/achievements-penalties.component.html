@@ -1,8 +1,8 @@
-<div class="page">
+<div class="page bg-gray-50 dark:bg-gray-900 min-h-screen">
   <header class="page-header">
     <div>
-      <h1>{{ translate('achievementsPenalties.pageTitle') }}</h1>
-      <p class="description">
+      <h1 class="text-gray-800 dark:text-gray-200">{{ translate('achievementsPenalties.pageTitle') }}</h1>
+      <p class="description text-gray-600 dark:text-gray-400">
         {{ translate('achievementsPenalties.description') }}
       </p>
     </div>
@@ -11,6 +11,10 @@
         type="button"
         [class.active]="activeTab === 'achievements'"
         (click)="onTabChange('achievements')"
+        class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-full font-semibold transition-all"
+        [class.bg-blue-500]="activeTab === 'achievements'"
+        [class.text-white]="activeTab === 'achievements'"
+        [class.border-blue-500]="activeTab === 'achievements'"
       >
         {{ translate('achievementsPenalties.tabAchievements') }}
       </button>
@@ -18,65 +22,71 @@
         type="button"
         [class.active]="activeTab === 'penalties'"
         (click)="onTabChange('penalties')"
+        class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-2 rounded-full font-semibold transition-all"
+        [class.bg-blue-500]="activeTab === 'penalties'"
+        [class.text-white]="activeTab === 'penalties'"
+        [class.border-blue-500]="activeTab === 'penalties'"
       >
         {{ translate('achievementsPenalties.tabPenalties') }}
       </button>
     </div>
   </header>
 
-  <section *ngIf="activeTab === 'achievements'">
-    <div class="certificate-region">
-      <h3>{{ translate('certificate.title') }}</h3>
-      <p>{{ translate('certificate.description') }}</p>
+  <section *ngIf="activeTab === 'achievements'" class="text-gray-800 dark:text-gray-200">
+    <div class="certificate-region bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 p-6 mt-8">
+      <h3 class="text-gray-800 dark:text-gray-200 text-xl font-bold mb-2">{{ translate('certificate.title') }}</h3>
+      <p class="text-gray-600 dark:text-gray-400 mb-4">{{ translate('certificate.description') }}</p>
       <app-certificate-generator [embedMode]="true"></app-certificate-generator>
     </div>
 
-    <div class="divider"></div>
+    <div class="divider border-t border-gray-200 dark:border-gray-700 my-8"></div>
 
-    <div class="controls">
-      <label for="classPickerCert">
+    <div class="controls flex gap-4 items-center mb-4">
+      <label for="classPickerCert" class="font-semibold text-gray-700 dark:text-gray-300">
         {{ translate('achievementsPenalties.showPreviousCertificates') }}
       </label>
-      <select id="classPickerCert" (change)="onClassChange($event)" [value]="selectedClassId">
-        <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+      <select id="classPickerCert" (change)="onClassChange($event)" [value]="selectedClassId"
+        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+        <option *ngFor="let cls of classes" [value]="cls.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ cls.name }}</option>
       </select>
     </div>
 
-    <div *ngIf="isLoadingCertificates" class="status">
+    <div *ngIf="isLoadingCertificates" class="status bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg mb-4">
       {{ translate('achievementsPenalties.loadingCertificates') }}
     </div>
-    <div *ngIf="!isLoadingCertificates && certificateHistory.length === 0" class="status">
+    <div *ngIf="!isLoadingCertificates && certificateHistory.length === 0" class="status bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg mb-4">
       {{ translate('achievementsPenalties.noCertificates') }}
     </div>
 
-    <ul class="reports-list" *ngIf="certificateHistory.length">
-      <li *ngFor="let cert of certificateHistory">
-        <div class="report-header">
+    <ul class="reports-list flex flex-col gap-3" *ngIf="certificateHistory.length">
+      <li *ngFor="let cert of certificateHistory" class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div class="report-header flex justify-between items-center mb-2">
           <div>
-            <p class="student">{{ cert.studentName }}</p>
-            <small class="class">{{ cert.templateName }}</small>
+            <p class="student font-semibold text-gray-800 dark:text-gray-200">{{ cert.studentName }}</p>
+            <small class="class text-gray-600 dark:text-gray-400 text-sm">{{ cert.templateName }}</small>
           </div>
-          <span class="date">{{ cert.issueDate }}</span>
+          <span class="date text-blue-600 dark:text-blue-400 font-semibold">{{ cert.issueDate }}</span>
         </div>
       </li>
     </ul>
   </section>
 
-  <section *ngIf="activeTab === 'penalties'">
+  <section *ngIf="activeTab === 'penalties'" class="text-gray-800 dark:text-gray-200">
     <app-report-generator [embedMode]="true"></app-report-generator>
 
-    <div class="divider"></div>
+    <div class="divider border-t border-gray-200 dark:border-gray-700 my-8"></div>
 
-    <div class="controls">
-      <label for="classPicker">
+    <div class="controls flex gap-4 items-center mb-4">
+      <label for="classPicker" class="font-semibold text-gray-700 dark:text-gray-300">
         {{ translate('achievementsPenalties.showPreviousReports') }}
       </label>
-      <select id="classPicker" (change)="onClassChange($event)" [value]="selectedClassId">
-        <option *ngFor="let cls of classes" [value]="cls.id">{{ cls.name }}</option>
+      <select id="classPicker" (change)="onClassChange($event)" [value]="selectedClassId"
+        class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+        <option *ngFor="let cls of classes" [value]="cls.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ cls.name }}</option>
       </select>
       <button 
         type="button" 
-        class="btn-export-pdf"
+        class="btn-export-pdf px-4 py-2 rounded-lg font-semibold"
         (click)="exportPenaltiesToPDF()"
         [disabled]="isExportingPdf || behaviorReports.length === 0"
         [title]="translate('achievementsPenalties.exportPenaltiesToPDF')"
@@ -85,24 +95,24 @@
       </button>
     </div>
 
-    <div *ngIf="isLoadingReports" class="status">
+    <div *ngIf="isLoadingReports" class="status bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg mb-4">
       {{ translate('achievementsPenalties.loadingReports') }}
     </div>
-    <div *ngIf="errorMessage" class="status error">{{ errorMessage }}</div>
-    <div *ngIf="!isLoadingReports && !errorMessage && behaviorReports.length === 0" class="status">
+    <div *ngIf="errorMessage" class="status error bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800 px-4 py-3 rounded-lg mb-4">{{ errorMessage }}</div>
+    <div *ngIf="!isLoadingReports && !errorMessage && behaviorReports.length === 0" class="status bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg mb-4">
       {{ translate('achievementsPenalties.noReports') }}
     </div>
 
-    <ul class="reports-list" #penaltiesList *ngIf="behaviorReports.length">
-      <li *ngFor="let report of behaviorReports">
-        <div class="report-header">
+    <ul class="reports-list flex flex-col gap-3" #penaltiesList *ngIf="behaviorReports.length">
+      <li *ngFor="let report of behaviorReports" class="bg-white dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
+        <div class="report-header flex justify-between items-center mb-2">
           <div>
-            <p class="student">{{ report.studentName }}</p>
-            <small class="class">{{ report.className || translate('common.notSpecified') }}</small>
+            <p class="student font-semibold text-gray-800 dark:text-gray-200">{{ report.studentName }}</p>
+            <small class="class text-gray-600 dark:text-gray-400 text-sm">{{ report.className || translate('common.notSpecified') }}</small>
           </div>
-          <span class="date">{{ report.date }}</span>
+          <span class="date text-blue-600 dark:text-blue-400 font-semibold">{{ report.date }}</span>
         </div>
-        <p class="description">{{ report.description }}</p>
+        <p class="description text-gray-700 dark:text-gray-300 mt-2">{{ report.description }}</p>
       </li>
     </ul>
   </section>

@@ -96,10 +96,10 @@
               {{ timeSlotLabels[i] }}
             </td>
             <td *ngFor="let day of workingDays" 
-                class="border border-gray-300 dark:border-gray-600 p-1 min-w-[150px] h-16 align-top"
-                [class.bg-green-50 dark:bg-green-900/20]="dragOverDay === day.value && dragOverTime === timeSlot"
-                (dragover)="onDragOver(day.value, timeSlot, $event)"
-                (dragleave)="onDragLeave()"
+                class="border border-gray-300 dark:border-gray-600 p-1 min-w-[150px] h-16 align-top" 
+                [ngClass]="(dragOverDay === day.value && dragOverTime === timeSlot) ? 'bg-green-50 dark:bg-green-900/20' : ''" 
+                (dragover)="onDragOver(day.value, timeSlot, $event)" 
+                (dragleave)="onDragLeave()" 
                 (drop)="onDrop(day.value, timeSlot, $event)">
               <ng-container *ngFor="let entry of getEntriesForDay(day.value)">
                 <div *ngIf="shouldDisplayEntryInSlot(entry, timeSlot)"

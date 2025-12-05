@@ -42,11 +42,7 @@
             class="w-20 h-20 rounded-full mx-auto object-cover border-2 border-gray-200 dark:border-gray-700">
           
           <!-- Default Icon (if no photo) -->
-          <div 
-            *ngIf="!hasPhoto(student)"
-            class="w-20 h-20 rounded-full mx-auto border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-4xl bg-gray-100 dark:bg-gray-800"
-            [class.bg-green-50 dark:bg-green-900/20]="student.gender === 'male'"
-            [class.bg-pink-50]="student.gender === 'female'">
+          <div *ngIf="!hasPhoto(student)" class="w-20 h-20 rounded-full mx-auto border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-4xl bg-gray-100 dark:bg-gray-800" [class.bg-green-50]="student.gender === 'male'" [class.bg-pink-50]="student.gender === 'female'">
             {{ getDefaultIcon(student) }}
           </div>
           
@@ -349,10 +345,9 @@
           </tr>
         </thead>
         <tbody>
-          <tr 
-            *ngFor="let report of getClassReportData()" 
-            class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
-            [class.bg-red-50 dark:bg-red-900/20]="report.negativeCount >= warningThreshold">
+          <tr *ngFor="let report of getClassReportData()" 
+              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900" 
+              [ngClass]="report.negativeCount >= warningThreshold ? 'bg-red-50 dark:bg-red-900/20' : ''">
             <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ report.studentName }}</td>
             <td class="py-3 px-4 text-green-600 font-semibold">{{ report.positiveCount }}</td>
             <td class="py-3 px-4 text-red-600 font-semibold">{{ report.negativeCount }}</td>

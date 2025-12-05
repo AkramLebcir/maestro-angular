@@ -2,6 +2,12 @@
   padding: 2rem;
   max-width: 1600px; /* Significantly increased to use full screen width */
   margin: 0 auto;
+  background-color: transparent;
+}
+
+/* Dark mode support - override with Tailwind if needed */
+.dark .page {
+  background-color: transparent;
 }
 
 .page-header {
@@ -17,11 +23,20 @@
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 0.25rem;
+  color: #1f2937;
+}
+
+.dark .page-header h1 {
+  color: #f3f4f6;
 }
 
 .page-header .description {
   color: #6b7280;
   margin: 0;
+}
+
+.dark .page-header .description {
+  color: #9ca3af;
 }
 
 .tabs {
@@ -37,6 +52,13 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  color: #374151;
+}
+
+.dark .tabs button {
+  border-color: #4b5563;
+  background: #374151;
+  color: #e5e7eb;
 }
 
 .tabs button.active {
@@ -54,20 +76,35 @@
 
 .certificate-region {
   margin-top: 2rem;
-  background: #fff;
+  background: #000;
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
 }
 
+/* Dark mode is now handled by Tailwind classes in HTML */
+.dark .certificate-region {
+  background: #1f2937;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
 .certificate-region h3 {
   margin: 0 0 0.35rem;
   font-size: 1.35rem;
+  color: #1f2937;
+}
+
+.dark .certificate-region h3 {
+  color: #f3f4f6;
 }
 
 .certificate-region p {
   margin: 0 0 1rem;
   color: #475569;
+}
+
+.dark .certificate-region p {
+  color: #9ca3af;
 }
 
 .achievement-card {
@@ -80,6 +117,11 @@
   align-items: flex-start;
 }
 
+.dark .achievement-card {
+  background: #1f2937;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
 .achievement-card .badge {
   font-size: 1.8rem;
 }
@@ -88,6 +130,11 @@
   margin: 0;
   font-size: 1.25rem;
   font-weight: 700;
+  color: #1f2937;
+}
+
+.dark .achievement-card h2 {
+  color: #f3f4f6;
 }
 
 .achievement-card .category {
@@ -99,6 +146,10 @@
 .achievement-card .description {
   margin: 0;
   color: #4b5563;
+}
+
+.dark .achievement-card .description {
+  color: #9ca3af;
 }
 
 .achievement-card .date {
@@ -115,6 +166,21 @@
 
 .controls label {
   font-weight: 600;
+  color: #374151;
+}
+
+.dark .controls label {
+  color: #e5e7eb;
+}
+
+.divider {
+  height: 1px;
+  background-color: #e5e7eb;
+  margin: 2rem 0;
+}
+
+.dark .divider {
+  background-color: #374151;
 }
 
 .controls select {
@@ -122,6 +188,26 @@
   border-radius: 0.5rem;
   border: 1px solid #d1d5db;
   background: white;
+  color: #1f2937;
+}
+
+.dark .controls select {
+  border-color: #4b5563;
+  background: #374151;
+  color: #f3f4f6;
+}
+
+.dark .controls select option {
+  background-color: #374151;
+  color: #f3f4f6;
+}
+
+section {
+  color: #1f2937;
+}
+
+.dark section {
+  color: #e5e7eb;
 }
 
 .controls .btn-export-pdf {
@@ -147,9 +233,19 @@
   margin-bottom: 1rem;
 }
 
+.dark .status {
+  background: #374151;
+  color: #e5e7eb;
+}
+
 .status.error {
   background: #fee2e2;
   color: #991b1b;
+}
+
+.dark .status.error {
+  background: rgba(185, 28, 28, 0.2);
+  color: #fca5a5;
 }
 
 .reports-list {
@@ -168,6 +264,11 @@
   border: 1px solid #e5e7eb;
 }
 
+.dark .reports-list li {
+  background: #1f2937;
+  border-color: #374151;
+}
+
 .report-header {
   display: flex;
   justify-content: space-between;
@@ -178,11 +279,20 @@
 .report-header .student {
   margin: 0;
   font-weight: 600;
+  color: #1f2937;
+}
+
+.dark .report-header .student {
+  color: #f3f4f6;
 }
 
 .report-header .class {
   color: #6b7280;
   font-size: 0.9rem;
+}
+
+.dark .report-header .class {
+  color: #9ca3af;
 }
 
 .report-header .date {
@@ -193,4 +303,8 @@
 .reports-list .description {
   margin: 0;
   color: #334155;
+}
+
+.dark .reports-list .description {
+  color: #d1d5db;
 }

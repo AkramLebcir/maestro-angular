@@ -145,10 +145,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              *ngFor="let student of students; let i = index" 
-              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
-              [class.bg-red-50 dark:bg-red-900/20]="(student.averages?.termAverage || 0) < 10">
+            <tr *ngFor="let student of students; let i = index" 
+                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900" 
+                [ngClass]="(student.averages?.termAverage || 0) < 10 ? 'bg-red-50 dark:bg-red-900/20' : ''">
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">{{ i + 1 }}</td>
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ student.idNumber || '-' }}
@@ -169,7 +168,7 @@
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('notebook_correction'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('notebook_correction'))"
-                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   min="0"
                   max="5"
                   step="0.5"
@@ -182,22 +181,22 @@
                   [value]="getGradeForStudent(student.id, getAssessmentIdByType('duty'))?.score || ''"
                   (blur)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
                   (keyup.enter)="onGradeInputBlur($event, student.id, getAssessmentIdByType('duty'))"
-                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                   min="0"
                   max="5"
                   step="0.5"
                   placeholder="0">
               </td>
               <!-- الحضور (تلقائي من إدارة الحضور) -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
                 {{ (student.calculatedGrades?.attendance || 0).toFixed(2) }}
               </td>
               <!-- السلوك (تلقائي من إدارة السلوك) -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
                 {{ (student.calculatedGrades?.behavior || 0).toFixed(2) }}
               </td>
               <!-- التقييم المستمر (محسوب تلقائياً) -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold text-gray-800 dark:text-gray-200">
                 {{ (student.calculatedGrades?.continuousAssessment || 0).toFixed(2) }}
               </td>
                <!-- التعبير الشفهي/العمل العملي (عمود واحد) -->
@@ -247,7 +246,7 @@
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
               <!-- التقديرات -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold text-gray-800 dark:text-gray-200">
                 {{ getGradeRating(student) }}
               </td>
               <!-- الإرشادات -->
@@ -255,7 +254,7 @@
                 {{ getGuidance(student) }}
               </td>
               <!-- الترتيب -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.ranking || '-' }}
               </td>
             </tr>
@@ -353,10 +352,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr 
-              *ngFor="let student of students; let i = index" 
-              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
-              [class.bg-red-50 dark:bg-red-900/20]="(student.averages?.termAverage || 0) < 10">
+            <tr *ngFor="let student of students; let i = index" 
+                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900" 
+                [ngClass]="(student.averages?.termAverage || 0) < 10 ? 'bg-red-50 dark:bg-red-900/20' : ''">
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">{{ i + 1 }}</td>
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ student.idNumber || '-' }}
@@ -370,28 +368,28 @@
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-center">
                 {{ formatDateOfBirth(student.dateOfBirth) }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.notebookCorrection?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.duty?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.attendance?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.behavior?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.continuousAssessment?.toFixed(2) || '-' }}
               </td>
-                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                  {{ student.calculatedGrades?.oralExpression?.toFixed(2) || '-' }}
                </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.assignment?.toFixed(2) || '-' }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.test?.toFixed(2) || '-' }}
               </td>
               <!-- معدل الفصل المحدد -->
@@ -401,14 +399,14 @@
                 {{ (student.averages?.termAverage || 0).toFixed(2) }}
               </td>
               <!-- التقديرات -->
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold text-gray-800 dark:text-gray-200">
                 {{ getGradeRating(student) }}
               </td>
               <!-- الإرشادات -->
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-gray-800 dark:text-gray-200 text-right" style="min-width: 200px;">
                 {{ getGuidance(student) }}
               </td>
-              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+              <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.ranking || '-' }}
               </td>
             </tr>

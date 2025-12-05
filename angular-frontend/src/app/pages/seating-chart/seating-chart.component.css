@@ -15,11 +15,11 @@
 }
 
 .select-input {
-  @apply border border-gray-200 rounded-xl px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400;
+  @apply border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400;
 }
 
 .group-switch {
-  @apply px-4 py-2 rounded-xl border border-gray-200 text-gray-600 transition;
+  @apply px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 transition;
 }
 
 .group-switch.active {
@@ -27,11 +27,11 @@
 }
 
 .search-input {
-  @apply w-full border border-gray-200 rounded-xl px-4 py-2 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-400;
+  @apply w-full border border-gray-200 dark:border-gray-600 rounded-xl px-4 py-2 bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-400;
 }
 
 .ghost-btn {
-  @apply px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition;
+  @apply px-4 py-2 rounded-xl border border-gray-200 dark:border-gray-600 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition;
 }
 
 .primary-outline {
@@ -43,15 +43,15 @@
 }
 
 .alert {
-  @apply bg-red-50 text-red-600 px-4 py-3 rounded-xl;
+  @apply bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl border border-red-200 dark:border-red-800;
 }
 
 .section-title {
-  @apply text-lg font-semibold text-gray-800;
+  @apply text-lg font-semibold text-gray-800 dark:text-gray-200;
 }
 
 .seating-stage-wrapper {
-  @apply flex-1 border border-dashed border-gray-200 rounded-3xl bg-gradient-to-b from-slate-50 via-white to-slate-100;
+  @apply flex-1 border border-dashed border-gray-200 dark:border-gray-700 rounded-3xl bg-gradient-to-b from-slate-50 via-white to-slate-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -94,6 +94,11 @@
   transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.dark .workstation-card {
+  background: #1f2937;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+}
+
 .workstation-card[data-capacity="2"] {
   width: 240px;
 }
@@ -126,10 +131,19 @@
   gap: 16px;
 }
 
+.dark .card-drop {
+  border-color: #4b5563;
+  background-color: #374151;
+}
+
 .seat-occupant {
-  @apply flex gap-2 items-start bg-white rounded-2xl border border-gray-100 p-2 cursor-grab;
+  @apply flex gap-2 items-start bg-white dark:bg-gray-700 rounded-2xl border border-gray-100 dark:border-gray-600 p-2 cursor-grab;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
   width: 100%;
+}
+
+.dark .seat-occupant {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
 .seat-occupant.double-seat-left {
@@ -172,15 +186,15 @@
 }
 
 .selectors-inline label {
-  @apply flex items-center gap-1 text-[10px] text-gray-500;
+  @apply flex items-center gap-1 text-[10px] text-gray-500 dark:text-gray-400;
 }
 
 .selectors-inline select {
-  @apply border border-gray-200 rounded-lg px-1 py-0.5 text-[10px] bg-white;
+  @apply border border-gray-200 dark:border-gray-600 rounded-lg px-1 py-0.5 text-[10px] bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200;
 }
 
 .selectors-inline .name {
-  @apply text-xs font-semibold text-gray-700 whitespace-nowrap;
+  @apply text-xs font-semibold text-gray-700 dark:text-gray-300 whitespace-nowrap;
 }
 
 textarea {
