@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 import { ApiService } from '../../services/api.service';
@@ -20,7 +20,7 @@ export class ReportsComponent {
 
   constructor(
     private router: Router,
-    public languageService: LanguageService,
+    @Inject(LanguageService) public languageService: LanguageService,
     private apiService: ApiService,
     private certificateService: CertificateService,
     private authService: AuthService

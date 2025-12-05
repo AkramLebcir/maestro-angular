@@ -79,6 +79,12 @@
         class="px-4 py-2 font-semibold">
         {{ translate('gradebook.excelAnalysis') }}
       </button>
+      <button 
+        (click)="viewMode = 'settings'"
+        [class]="viewMode === 'settings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+        class="px-4 py-2 font-semibold">
+        {{ translate('gradebook.settings') }}
+      </button>
     </div>
 
     <!-- Grade Entry View -->
@@ -126,8 +132,13 @@
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.homework') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.attendance5') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.behavior5') }}</th>
+              <!-- Custom Assessment Columns Headers -->
+              <th *ngFor="let column of getCustomColumns()" 
+                  class="border border-blue-700 p-2 text-right font-semibold">
+                {{ column.name }}
+              </th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.continuousAssessment') }}</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
+              <th *ngIf="shouldShowOralExpressionColumn()" class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.assignment') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.test') }}</th>
               <th 
@@ -195,12 +206,27 @@
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-200">
                 {{ (student.calculatedGrades?.behavior || 0).toFixed(2) }}
               </td>
+              <!-- Custom Assessment Columns Input Fields -->
+              <td *ngFor="let column of getCustomColumns()" 
+                  class="border border-gray-300 dark:border-gray-600 p-2">
+                <input 
+                  type="number"
+                  [value]="getCustomColumnGrade(student.id, column.id) || ''"
+                  (blur)="onCustomColumnGradeBlur($event, student.id, column)"
+                  (keyup.enter)="onCustomColumnGradeBlur($event, student.id, column)"
+                  class="w-16 px-1 py-1 border border-gray-300 dark:border-gray-600 rounded text-center text-sm bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                  [min]="0"
+                  [max]="column.maxScore"
+                  step="0.1"
+                  [placeholder]="'0'"
+                  [title]="column.name">
+              </td>
               <!-- التقييم المستمر (محسوب تلقائياً) -->
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center font-semibold text-gray-800 dark:text-gray-200">
                 {{ (student.calculatedGrades?.continuousAssessment || 0).toFixed(2) }}
               </td>
                <!-- التعبير الشفهي/العمل العملي (عمود واحد) -->
-               <td class="border border-gray-300 dark:border-gray-600 p-2">
+               <td *ngIf="shouldShowOralExpressionColumn()" class="border border-gray-300 dark:border-gray-600 p-2">
                  <input 
                    type="number"
                    [value]="getGradeForStudent(student.id, getAssessmentIdByType('oral_expression'))?.score || ''"
@@ -259,7 +285,7 @@
               </td>
             </tr>
             <tr *ngIf="students.length === 0">
-              <td colspan="19" class="border border-gray-300 dark:border-gray-600 p-8 text-center text-gray-500 dark:text-gray-400">
+              <td [attr.colspan]="getTotalColumnsCount()" class="border border-gray-300 dark:border-gray-600 p-8 text-center text-gray-500 dark:text-gray-400">
                 {{ translate('gradebook.noStudents') }}
               </td>
             </tr>
@@ -333,8 +359,13 @@
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.homework') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.attendance5') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.behavior5') }}</th>
+              <!-- Custom Assessment Columns Headers in Grades View -->
+              <th *ngFor="let column of getCustomColumns()" 
+                  class="border border-blue-700 p-2 text-right font-semibold">
+                {{ column.name }}
+              </th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.continuousAssessment') }}</th>
-              <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
+              <th *ngIf="shouldShowOralExpressionColumn()" class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.oralExpression') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.assignment') }}</th>
               <th class="border border-blue-700 p-2 text-right font-semibold">{{ translate('gradebook.test') }}</th>
               <th 
@@ -380,10 +411,15 @@
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.behavior?.toFixed(2) || '-' }}
               </td>
+              <!-- Custom Assessment Columns Display -->
+              <td *ngFor="let column of getCustomColumns()" 
+                  class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
+                {{ getCustomColumnGrade(student.id, column.id)?.toFixed(2) || '-' }}
+              </td>
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                 {{ student.calculatedGrades?.continuousAssessment?.toFixed(2) || '-' }}
               </td>
-                <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
+                <td *ngIf="shouldShowOralExpressionColumn()" class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
                  {{ student.calculatedGrades?.oralExpression?.toFixed(2) || '-' }}
                </td>
               <td class="border border-gray-300 dark:border-gray-600 p-2 text-center text-gray-800 dark:text-gray-200">
@@ -710,7 +746,263 @@
       </div>
     </div>
 
-    <div *ngIf="!selectedClass" class="text-center text-gray-500 dark:text-gray-400 py-12">
+    <!-- Settings View -->
+    <div *ngIf="viewMode === 'settings'">
+      <div class="mb-6">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.settings') }}</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6">{{ translate('gradebook.settingsDescription') }}</p>
+      </div>
+
+      <!-- Section Selection -->
+      <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50 mb-6">
+        <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.selectSection') }}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.class') }}</label>
+            <select 
+              [(ngModel)]="settingsSelectedClass"
+              (change)="onSettingsClassChange()"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <option [ngValue]="null">{{ translate('gradebook.selectClass') }}</option>
+              <option *ngFor="let classItem of classes" [ngValue]="classItem">{{ classItem.name }}</option>
+            </select>
+          </div>
+          <div *ngIf="settingsSelectedClass">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.applyToMultipleSections') }}</label>
+            <select 
+              [(ngModel)]="selectedClassesForBulk"
+              multiple
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 min-h-[100px]">
+              <option *ngFor="let classItem of classes" [ngValue]="classItem.id">{{ classItem.name }}</option>
+            </select>
+            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ translate('gradebook.selectMultipleClassesHint') }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Form -->
+      <div *ngIf="settingsSelectedClass" class="space-y-6">
+        <!-- Custom Assessment Columns -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">{{ translate('gradebook.customAssessmentColumns') }}</h3>
+            <button 
+              (click)="addCustomColumn()"
+              class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+              <span>{{ translate('gradebook.addColumn') }}</span>
+            </button>
+          </div>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">{{ translate('gradebook.customColumnsDescription') }}</p>
+          
+          <div *ngFor="let column of gradingSettings.customAssessmentColumns || []; let i = index" 
+               class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.columnName') }}</label>
+              <input 
+                type="text"
+                [(ngModel)]="column.name"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
+                [placeholder]="translate('gradebook.columnNamePlaceholder')">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.maxScore') }}</label>
+              <input 
+                type="number"
+                [(ngModel)]="column.maxScore"
+                (blur)="validateTotalMaxScore()"
+                step="0.1"
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
+                [placeholder]="translate('gradebook.maxScore')">
+            </div>
+            <div class="flex items-end">
+              <button 
+                (click)="removeCustomColumn(i)"
+                class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition w-full">
+                {{ translate('gradebook.remove') }}
+              </button>
+            </div>
+          </div>
+          <div *ngIf="!gradingSettings.customAssessmentColumns || gradingSettings.customAssessmentColumns.length === 0" 
+               class="text-center text-gray-500 dark:text-gray-400 py-4">
+            {{ translate('gradebook.noCustomColumns') }}
+          </div>
+        </div>
+
+        <!-- Oral Expression/Practical Work -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.oralExpressionPracticalWork') }}</h3>
+          <div class="flex items-center gap-2">
+            <input 
+              type="checkbox"
+              id="includeOralExpression"
+              [(ngModel)]="gradingSettings.includeOralExpression"
+              class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 rounded focus:ring-blue-500">
+            <label for="includeOralExpression" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+              {{ translate('gradebook.includeOralExpression') }}
+            </label>
+          </div>
+          <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+            {{ translate('gradebook.oralExpressionNote') }}
+          </p>
+        </div>
+
+        <!-- Attendance and Behavior Settings -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.attendanceBehavior') }}</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Attendance -->
+            <div>
+              <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.attendance') }}</h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.maxScore') }}</label>
+                  <input 
+                    type="number"
+                    [(ngModel)]="gradingSettings.attendanceMaxScore"
+                    (blur)="validateTotalMaxScore()"
+                    step="0.1"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="radio"
+                    id="attendanceAuto"
+                    name="attendanceMode"
+                    [value]="true"
+                    [(ngModel)]="gradingSettings.attendanceAutoApply"
+                    class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                  <label for="attendanceAuto" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    {{ translate('gradebook.automatic') }}
+                  </label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="radio"
+                    id="attendanceManual"
+                    name="attendanceMode"
+                    [value]="false"
+                    [(ngModel)]="gradingSettings.attendanceAutoApply"
+                    class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                  <label for="attendanceManual" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    {{ translate('gradebook.manual') }}
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Behavior -->
+            <div>
+              <h4 class="text-md font-semibold text-gray-800 dark:text-gray-200 mb-3">{{ translate('gradebook.behavior') }}</h4>
+              <div class="space-y-3">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.maxScore') }}</label>
+                  <input 
+                    type="number"
+                    [(ngModel)]="gradingSettings.behaviorMaxScore"
+                    (blur)="validateTotalMaxScore()"
+                    step="0.1"
+                    min="0"
+                    class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="radio"
+                    id="behaviorAuto"
+                    name="behaviorMode"
+                    [value]="true"
+                    [(ngModel)]="gradingSettings.behaviorAutoApply"
+                    class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                  <label for="behaviorAuto" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    {{ translate('gradebook.automatic') }}
+                  </label>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input 
+                    type="radio"
+                    id="behaviorManual"
+                    name="behaviorMode"
+                    [value]="false"
+                    [(ngModel)]="gradingSettings.behaviorAutoApply"
+                    class="h-4 w-4 text-blue-600 border-gray-300 dark:border-gray-600 focus:ring-blue-500">
+                  <label for="behaviorManual" class="text-sm text-gray-700 dark:text-gray-300 cursor-pointer">
+                    {{ translate('gradebook.manual') }}
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notebook Correction and Homework -->
+        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+          <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('gradebook.notebookHomework') }}</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.notebookCorrectionMaxScore') }}</label>
+              <input 
+                type="number"
+                [(ngModel)]="gradingSettings.notebookCorrectionMaxScore"
+                (blur)="validateTotalMaxScore()"
+                step="0.1"
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('gradebook.homeworkMaxScore') }}</label>
+              <input 
+                type="number"
+                [(ngModel)]="gradingSettings.dutyMaxScore"
+                (blur)="validateTotalMaxScore()"
+                step="0.1"
+                min="0"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+            </div>
+          </div>
+        </div>
+
+        <!-- Total Max Score Validation -->
+        <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 mb-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <p class="text-sm font-medium text-gray-800 dark:text-gray-200">{{ translate('gradebook.totalMaxScore') }}</p>
+              <p class="text-xs text-gray-600 dark:text-gray-400">{{ translate('gradebook.totalMaxScoreHint') }}</p>
+            </div>
+            <div class="text-2xl font-bold"
+                 [class.text-red-600]="calculateTotalMaxScore() > 20"
+                 [class.text-green-600]="calculateTotalMaxScore() <= 20">
+              {{ calculateTotalMaxScore().toFixed(1) }} / 20
+            </div>
+          </div>
+        </div>
+
+        <!-- Save Buttons -->
+        <div class="flex gap-4">
+          <button 
+            (click)="saveGradingSettings()"
+            [disabled]="calculateTotalMaxScore() > 20"
+            class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+            {{ translate('gradebook.saveSettings') }}
+          </button>
+          <button 
+            *ngIf="selectedClassesForBulk && selectedClassesForBulk.length > 0"
+            (click)="bulkApplySettings()"
+            [disabled]="calculateTotalMaxScore() > 20"
+            class="bg-purple-600 text-white px-6 py-3 rounded-lg hover:bg-purple-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed">
+            {{ translate('gradebook.applyToSelectedClasses') }}
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!settingsSelectedClass" class="text-center text-gray-500 dark:text-gray-400 py-12">
+        {{ translate('gradebook.selectClassFirst') }}
+      </div>
+    </div>
+
+    <div *ngIf="!selectedClass && viewMode !== 'settings'" class="text-center text-gray-500 dark:text-gray-400 py-12">
         {{ translate('gradebook.selectClassFirst') }}
     </div>
   </div>

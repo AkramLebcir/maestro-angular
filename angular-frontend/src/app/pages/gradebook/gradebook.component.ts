@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewI
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
+import { GradingSettingsService, GradingSettings, CustomAssessmentColumn } from '../../services/grading-settings.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -204,7 +205,25 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   ];
 
   // View mode
-  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' = 'entry';
+  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'settings' = 'entry';
+  
+  // Settings variables
+  settingsSelectedClass: Class | null = null;
+  selectedClassesForBulk: number[] = [];
+  gradingSettings: GradingSettings = {
+    classId: 0,
+    notebookCorrectionMaxScore: 5,
+    dutyMaxScore: 5,
+    attendanceMaxScore: 5,
+    attendanceAutoApply: true,
+    behaviorMaxScore: 5,
+    behaviorAutoApply: true,
+    customAssessmentColumns: [],
+    includeOralExpression: true,
+  };
+  
+  // Current class grading settings (loaded when class is selected)
+  currentClassGradingSettings: GradingSettings | null = null;
 
   // Chart configurations
   public chartOptions: ChartConfiguration['options'] = {
@@ -326,6 +345,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
   constructor(
     private apiService: ApiService,
+    private gradingSettingsService: GradingSettingsService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
     public languageService: LanguageService
@@ -476,10 +496,54 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   onClassChange(): void {
     if (this.selectedClass) {
       this.loadStudentsForClass(this.selectedClass.id);
+      this.loadCurrentClassGradingSettings();
     } else {
       this.students = [];
       this.grades = [];
+      this.currentClassGradingSettings = null;
     }
+  }
+  
+  loadCurrentClassGradingSettings(): void {
+    if (!this.selectedClass) return;
+    
+    this.gradingSettingsService.getByClassId(this.selectedClass.id).subscribe({
+      next: (settings) => {
+        if (settings) {
+          this.currentClassGradingSettings = settings;
+        } else {
+          // Use defaults if no settings exist
+          this.currentClassGradingSettings = {
+            classId: this.selectedClass!.id,
+            notebookCorrectionMaxScore: 5,
+            dutyMaxScore: 5,
+            attendanceMaxScore: 5,
+            attendanceAutoApply: true,
+            behaviorMaxScore: 5,
+            behaviorAutoApply: true,
+            customAssessmentColumns: [],
+            includeOralExpression: true,
+          };
+        }
+        // Recalculate grades with new settings
+        this.calculateAllGrades();
+      },
+      error: (error) => {
+        console.error('Error loading grading settings:', error);
+        // Use defaults on error
+        this.currentClassGradingSettings = {
+          classId: this.selectedClass!.id,
+          notebookCorrectionMaxScore: 5,
+          dutyMaxScore: 5,
+          attendanceMaxScore: 5,
+          attendanceAutoApply: true,
+          behaviorMaxScore: 5,
+          behaviorAutoApply: true,
+          customAssessmentColumns: [],
+          includeOralExpression: true,
+        };
+      }
+    });
   }
 
   onTermChange(): void {
@@ -1015,11 +1079,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // الفصل الأول: سبتمبر إلى ديسمبر
     // الفصل الثاني: جانفي إلى مارس
     // الفصل الثالث: أفريل إلى جوان
-    // نبدأ من 3 نقاط
+    const maxScore = this.getAttendanceMaxFromSettings();
+    const startScore = this.isAttendanceAutoApplyEnabled() ? maxScore / 2 : 0;
     // كل حضور أو معذور: +0.5
     // كل غياب أو مغادرة مبكرة: -0.5
     // كل متأخر: -0.25
-    if (!this.selectedClass) return 3; // Default starting value
+    if (!this.selectedClass) return startScore;
     
     const termFilter = term || this.selectedTerm;
     // تصفية سجلات الحضور للتلميذ والقسم المحدد
@@ -1031,10 +1096,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       return this.isDateInTerm(r.date, termFilter);
     });
     
-    if (studentRecords.length === 0) return 3; // Default starting value
+    if (studentRecords.length === 0) return startScore;
     
-    // نبدأ من 3 نقاط
-    let score = 3;
+    let score = startScore;
     
     // كل حضور: +0.5
     const presentDays = studentRecords.filter(r => r.status === 'present').length;
@@ -1056,8 +1120,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     const lateDays = studentRecords.filter(r => r.status === 'late').length;
     score -= lateDays * 0.25;
     
-    // التأكد من أن النتيجة بين 0 و 5
-    return Math.max(0, Math.min(5, score));
+    return Math.max(0, Math.min(maxScore, score));
   }
 
   calculateBehaviorGrade(student: Student, term?: number): number {
@@ -1066,8 +1129,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // الفصل الأول: سبتمبر إلى ديسمبر
     // الفصل الثاني: جانفي إلى مارس
     // الفصل الثالث: أفريل إلى جوان
-    // نبدأ من 3 نقاط، كل سلوك إيجابي +0.5، كل سلوك سلبي -0.5
-    if (!this.selectedClass) return 3; // Default starting value
+    const maxScore = this.getBehaviorMaxFromSettings();
+    const startScore = this.isBehaviorAutoApplyEnabled() ? maxScore / 2 : 0;
+    if (!this.selectedClass) return startScore;
     
     const termFilter = term || this.selectedTerm;
     // تصفية أحداث السلوك للتلميذ والقسم المحدد
@@ -1079,10 +1143,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       return this.isDateInTerm(e.date, termFilter);
     });
     
-    if (studentEvents.length === 0) return 3; // Default starting value
+    if (studentEvents.length === 0) return startScore;
     
-    // نبدأ من 3 نقاط
-    let score = 3;
+    let score = startScore;
     
     // حساب النقاط بناءً على نوع السلوك
     studentEvents.forEach(event => {
@@ -1095,8 +1158,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       }
     });
     
-    // التأكد من أن النتيجة بين 0 و 5
-    return Math.max(0, Math.min(5, score));
+    return Math.max(0, Math.min(maxScore, score));
   }
 
   calculateContinuousAssessment(student: Student, term?: number): number {
@@ -1128,7 +1190,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // الحضور: 5 نقاط (تلقائي)
     // السلوك: 5 نقاط (تلقائي)
     // المجموع الكلي = 5 + 5 + 5 + 5 = 20 نقطة (الحد الأقصى)
-    const total = (notebook || 0) + (duty || 0) + (attendance || 0) + (behavior || 0);
+    const customColumnsScore = this.getCustomColumns().reduce((sum, column) => {
+      const columnScore = this.getCustomColumnGrade(student.id, column.id);
+      return sum + (columnScore || 0);
+    }, 0);
+    const total = (notebook || 0) + (duty || 0) + (attendance || 0) + (behavior || 0) + customColumnsScore;
     
     // التأكد من أن النتيجة لا تتعدى 20 نقطة
     return Math.min(Math.max(total, 0), 20);
@@ -1188,12 +1254,16 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     const continuous = (notebook || 0) + (duty || 0) + (attendance || 0) + (behavior || 0);
     const continuousAssessment = Math.min(Math.max(continuous, 0), 20);
     
-    const oralExpressionGrade = this.grades.find(g => 
+    // Check if oral expression column is included based on grading settings
+    const includeOralExpression = this.currentClassGradingSettings?.includeOralExpression !== false;
+    
+    const oralExpressionGrade = includeOralExpression ? this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'oral_expression')?.id &&
       g.classId === this.selectedClass?.id &&
       g.term === termFilter
-    );
+    ) : null;
+    
     const assignmentGrade = this.grades.find(g => 
       g.studentId === student.id && 
       g.assessmentId === this.assessments.find(a => a.type === 'assignment')?.id &&
@@ -1211,12 +1281,20 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     const assignment = assignmentGrade?.score || 0;
     const test = testGrade?.score || 0;
     
-    // معدل الفصل = ((التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) + (الاختبار × 2)) ÷ 5
-    const part1 = continuousAssessment + oralExpression + assignment;
-    const part2 = test * 2;
-    const average = (part1 + part2) / 5;
-    
-    return average;
+    // حساب المعدل حسب إعدادات التقييم
+    if (includeOralExpression) {
+      // المعدل العادي: ((التقييم المستمر + التعبير الشفهي/العمل العملي + الفرض) + (الاختبار × 2)) ÷ 5
+      const part1 = continuousAssessment + oralExpression + assignment;
+      const part2 = test * 2;
+      const average = (part1 + part2) / 5;
+      return average;
+    } else {
+      // المعدل عند إزالة عمود التعبير الشفهي: ((التقييم المستمر) + (الفرض) + (الاختبار × 2)) ÷ 4
+      const part1 = continuousAssessment + assignment;
+      const part2 = test * 2;
+      const average = (part1 + part2) / 4;
+      return average;
+    }
   }
 
   calculateAnnualAverage(student: Student): number {
@@ -4216,6 +4294,320 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       console.error('Error exporting to PDF:', error);
       alert('حدث خطأ أثناء تصدير PDF');
     }
+  }
+
+  // Grading Settings Methods
+  onSettingsClassChange(): void {
+    if (this.settingsSelectedClass) {
+      this.loadGradingSettings(this.settingsSelectedClass.id);
+    }
+  }
+
+  loadGradingSettings(classId: number): void {
+    this.gradingSettingsService.getByClassId(classId).subscribe({
+      next: (settings) => {
+        if (settings) {
+          this.gradingSettings = settings;
+        } else {
+          // Initialize with defaults
+          this.gradingSettings = {
+            classId: classId,
+            notebookCorrectionMaxScore: 5,
+            dutyMaxScore: 5,
+            attendanceMaxScore: 5,
+            attendanceAutoApply: true,
+            behaviorMaxScore: 5,
+            behaviorAutoApply: true,
+            customAssessmentColumns: [],
+            includeOralExpression: true,
+          };
+        }
+      },
+      error: (error) => {
+        console.error('Error loading grading settings:', error);
+      }
+    });
+  }
+
+  addCustomColumn(): void {
+    if (!this.gradingSettings.customAssessmentColumns) {
+      this.gradingSettings.customAssessmentColumns = [];
+    }
+    const newColumn: CustomAssessmentColumn = {
+      id: `custom_${Date.now()}`,
+      name: '',
+      maxScore: 0,
+    };
+    this.gradingSettings.customAssessmentColumns.push(newColumn);
+    this.validateTotalMaxScore();
+  }
+
+  removeCustomColumn(index: number): void {
+    if (this.gradingSettings.customAssessmentColumns) {
+      this.gradingSettings.customAssessmentColumns.splice(index, 1);
+      this.validateTotalMaxScore();
+    }
+  }
+
+  calculateTotalMaxScore(): number {
+    const notebookMax = Number(this.gradingSettings.notebookCorrectionMaxScore || 5);
+    const dutyMax = Number(this.gradingSettings.dutyMaxScore || 5);
+    const attendanceMax = Number(this.gradingSettings.attendanceMaxScore || 5);
+    const behaviorMax = Number(this.gradingSettings.behaviorMaxScore || 5);
+    const customColumnsTotal = (this.gradingSettings.customAssessmentColumns || []).reduce((sum, col) => {
+      return sum + Number(col.maxScore || 0);
+    }, 0);
+
+    return notebookMax + dutyMax + attendanceMax + behaviorMax + customColumnsTotal;
+  }
+
+  validateTotalMaxScore(): void {
+    const total = this.calculateTotalMaxScore();
+    if (total > 20) {
+      // Show warning but don't block
+      console.warn(`Total max score (${total}) exceeds 20`);
+    }
+  }
+
+  saveGradingSettings(): void {
+    if (!this.settingsSelectedClass) return;
+
+    const total = this.calculateTotalMaxScore();
+    if (total > 20) {
+      alert('مجموع النقاط القصوى يجب ألا يتجاوز 20. الرجاء تعديل القيم.');
+      return;
+    }
+
+    // Helper function to safely convert to number
+    const toNumber = (value: any): number => {
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    };
+
+    // Ensure all numeric values are properly converted to numbers
+    const customColumns = (this.gradingSettings.customAssessmentColumns || []).map(col => ({
+      ...col,
+      maxScore: toNumber(col.maxScore)
+    }));
+
+    const settingsToSave: Partial<GradingSettings> = {
+      notebookCorrectionMaxScore: toNumber(this.gradingSettings.notebookCorrectionMaxScore),
+      dutyMaxScore: toNumber(this.gradingSettings.dutyMaxScore),
+      attendanceMaxScore: toNumber(this.gradingSettings.attendanceMaxScore),
+      attendanceAutoApply: this.gradingSettings.attendanceAutoApply,
+      behaviorMaxScore: toNumber(this.gradingSettings.behaviorMaxScore),
+      behaviorAutoApply: this.gradingSettings.behaviorAutoApply,
+      customAssessmentColumns: customColumns,
+      includeOralExpression: this.gradingSettings.includeOralExpression,
+    };
+
+    this.gradingSettingsService.update(this.settingsSelectedClass.id, settingsToSave).subscribe({
+      next: (savedSettings) => {
+        this.gradingSettings = savedSettings;
+        
+        // If this is the current selected class, reload its settings and recalculate grades
+        if (this.selectedClass && this.settingsSelectedClass && this.selectedClass.id === this.settingsSelectedClass.id) {
+          this.loadCurrentClassGradingSettings();
+        }
+        
+        alert('تم حفظ الإعدادات بنجاح');
+      },
+      error: (error) => {
+        console.error('Error saving grading settings:', error);
+        const errorMessage = error?.error?.message || 
+                            (error?.error?.error && Array.isArray(error.error.error) 
+                              ? error.error.error.join(', ') 
+                              : error.error?.error) ||
+                            error?.message || 
+                            'حدث خطأ أثناء حفظ الإعدادات';
+        alert(errorMessage);
+      }
+    });
+  }
+
+  shouldShowOralExpressionColumn(): boolean {
+    // Show column if settings exist and includeOralExpression is true, or if no settings exist (default behavior)
+    if (this.currentClassGradingSettings) {
+      return this.currentClassGradingSettings.includeOralExpression !== false;
+    }
+    // Default behavior: show the column
+    return true;
+  }
+
+  private getAttendanceMaxFromSettings(): number {
+    return this.currentClassGradingSettings?.attendanceMaxScore ?? 5;
+  }
+
+  private getBehaviorMaxFromSettings(): number {
+    return this.currentClassGradingSettings?.behaviorMaxScore ?? 5;
+  }
+
+  private isAttendanceAutoApplyEnabled(): boolean {
+    return this.currentClassGradingSettings?.attendanceAutoApply ?? true;
+  }
+
+  private isBehaviorAutoApplyEnabled(): boolean {
+    return this.currentClassGradingSettings?.behaviorAutoApply ?? true;
+  }
+
+  getCustomColumns(): CustomAssessmentColumn[] {
+    if (this.currentClassGradingSettings && this.currentClassGradingSettings.customAssessmentColumns) {
+      return this.currentClassGradingSettings.customAssessmentColumns;
+    }
+    return [];
+  }
+
+  getTotalColumnsCount(): number {
+    // Base columns: #, idNumber, firstName, lastName, birthDate, notebook, homework, attendance, behavior, 
+    // continuousAssessment, oralExpression (conditional), assignment, test, termAverage, ratings, guidance, ranking
+    let count = 17; // Base columns
+    if (this.shouldShowOralExpressionColumn()) {
+      count += 1;
+    }
+    count += this.getCustomColumns().length; // Add custom columns
+    return count;
+  }
+
+  getCustomColumnGrade(studentId: number, columnId: string | undefined): number | null {
+    if (!this.selectedClass || !columnId) return null;
+    
+    // Find grade for this custom column by checking notes field
+    const grade = this.grades.find(g => 
+      g.studentId === studentId &&
+      g.classId === this.selectedClass!.id &&
+      g.term === this.selectedTerm &&
+      g.notes === `custom_column_${columnId}`
+    );
+    
+    return grade ? grade.score : null;
+  }
+
+  onCustomColumnGradeBlur(event: Event, studentId: number, column: CustomAssessmentColumn): void {
+    const input = event.target as HTMLInputElement;
+    if (input && input.value !== null && input.value !== undefined && input.value !== '') {
+      const score = parseFloat(input.value);
+      if (!isNaN(score) && score >= 0 && score <= column.maxScore) {
+        this.saveCustomColumnGrade(studentId, column, score);
+      } else if (score > column.maxScore) {
+        alert(`الدرجة القصوى المسموحة هي ${column.maxScore} نقاط`);
+        input.value = '';
+      }
+    } else if (input && input.value === '') {
+      // Delete the grade if input is cleared
+      this.deleteCustomColumnGrade(studentId, column.id);
+    }
+  }
+
+  saveCustomColumnGrade(studentId: number, column: CustomAssessmentColumn, score: number): void {
+    if (!this.selectedClass || !column.id) return;
+
+    // Find existing grade
+    let existingGrade = this.grades.find(g => 
+      g.studentId === studentId &&
+      g.classId === this.selectedClass!.id &&
+      g.term === this.selectedTerm &&
+      g.notes === `custom_column_${column.id}`
+    );
+
+    const gradeData: CreateGradeDto = {
+      studentId: studentId,
+      assessmentId: 0, // We'll use 0 as a placeholder for custom columns
+      classId: this.selectedClass.id,
+      term: this.selectedTerm,
+      score: score,
+      maxScore: column.maxScore,
+      date: new Date().toISOString().split('T')[0],
+      notes: `custom_column_${column.id}`,
+      mark: ''
+    };
+
+    if (existingGrade) {
+      // Update existing grade
+      this.apiService.patch<Grade>(`/grades/${existingGrade.id}`, {
+        score: score,
+        maxScore: column.maxScore
+      }).subscribe({
+        next: (updatedGrade) => {
+          const index = this.grades.findIndex(g => g.id === existingGrade!.id);
+          if (index !== -1) {
+            this.grades[index] = updatedGrade;
+          }
+          this.calculateAllGrades();
+        },
+        error: (error) => {
+          console.error('Error updating custom column grade:', error);
+        }
+      });
+    } else {
+      // Create new grade
+      this.apiService.post<Grade>('/grades', gradeData).subscribe({
+        next: (newGrade) => {
+          this.grades.push(newGrade);
+          this.calculateAllGrades();
+        },
+        error: (error) => {
+          console.error('Error creating custom column grade:', error);
+        }
+      });
+    }
+  }
+
+  deleteCustomColumnGrade(studentId: number, columnId: string | undefined): void {
+    if (!this.selectedClass || !columnId) return;
+
+    const grade = this.grades.find(g => 
+      g.studentId === studentId &&
+      g.classId === this.selectedClass!.id &&
+      g.term === this.selectedTerm &&
+      g.notes === `custom_column_${columnId}`
+    );
+
+    if (grade) {
+      this.apiService.delete(`/grades/${grade.id}`).subscribe({
+        next: () => {
+          this.grades = this.grades.filter(g => g.id !== grade.id);
+          this.calculateAllGrades();
+        },
+        error: (error) => {
+          console.error('Error deleting custom column grade:', error);
+        }
+      });
+    }
+  }
+
+  bulkApplySettings(): void {
+    if (!this.selectedClassesForBulk || this.selectedClassesForBulk.length === 0) {
+      alert('يرجى اختيار قسم واحد على الأقل');
+      return;
+    }
+
+    const total = this.calculateTotalMaxScore();
+    if (total > 20) {
+      alert('مجموع النقاط القصوى يجب ألا يتجاوز 20. الرجاء تعديل القيم.');
+      return;
+    }
+
+    const bulkDto = {
+      classIds: this.selectedClassesForBulk,
+      notebookCorrectionMaxScore: this.gradingSettings.notebookCorrectionMaxScore,
+      dutyMaxScore: this.gradingSettings.dutyMaxScore,
+      attendanceMaxScore: this.gradingSettings.attendanceMaxScore,
+      attendanceAutoApply: this.gradingSettings.attendanceAutoApply,
+      behaviorMaxScore: this.gradingSettings.behaviorMaxScore,
+      behaviorAutoApply: this.gradingSettings.behaviorAutoApply,
+      customAssessmentColumns: this.gradingSettings.customAssessmentColumns,
+      includeOralExpression: this.gradingSettings.includeOralExpression,
+    };
+
+    this.gradingSettingsService.bulkApply(bulkDto).subscribe({
+      next: (results) => {
+        alert(`تم تطبيق الإعدادات على ${results.length} قسم بنجاح`);
+      },
+      error: (error) => {
+        console.error('Error bulk applying settings:', error);
+        alert('حدث خطأ أثناء تطبيق الإعدادات');
+      }
+    });
   }
 }
 

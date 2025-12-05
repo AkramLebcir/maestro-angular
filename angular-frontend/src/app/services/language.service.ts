@@ -1811,15 +1811,6 @@ export class LanguageService {
         'DE': 'Anwesenheit (5)',
         'TR': 'Yoklama (5)'
       },
-      'gradebook.behavior': {
-        'AR': 'السلوك (5)',
-        'FR': 'Comportement (5)',
-        'EN': 'Behavior (5)',
-        'ES': 'Comportamiento (5)',
-        'IT': 'Comportamento (5)',
-        'DE': 'Verhalten (5)',
-        'TR': 'Davranış (5)'
-      },
       'gradebook.average': {
         'AR': 'المعدل',
         'FR': 'Moyenne',
@@ -2323,6 +2314,249 @@ export class LanguageService {
         'IT': 'Importa prima il file Excel',
         'DE': 'Zuerst Excel-Datei importieren',
         'TR': 'Önce Excel dosyasını içe aktar'
+      },
+      'gradebook.settings': {
+        'AR': 'إعدادات التنقيط',
+        'FR': 'Paramètres de notation',
+        'EN': 'Grading Settings',
+        'ES': 'Configuración de calificaciones',
+        'IT': 'Impostazioni di valutazione',
+        'DE': 'Bewertungseinstellungen',
+        'TR': 'Notlama ayarları'
+      },
+      'gradebook.settingsDescription': {
+        'AR': 'تخصيص إعدادات التقييم والتنقيط للقسم',
+        'FR': 'Personnaliser les paramètres d\'évaluation et de notation pour la classe',
+        'EN': 'Customize assessment and grading settings for the class',
+        'ES': 'Personalizar la configuración de evaluación y calificación para la clase',
+        'IT': 'Personalizza le impostazioni di valutazione e di votazione per la classe',
+        'DE': 'Anpassen der Bewertungs- und Benotungseinstellungen für die Klasse',
+        'TR': 'Sınıf için değerlendirme ve notlama ayarlarını özelleştirin'
+      },
+      'gradebook.selectSection': {
+        'AR': 'اختيار القسم',
+        'FR': 'Sélectionner la classe',
+        'EN': 'Select Section',
+        'ES': 'Seleccionar sección',
+        'IT': 'Seleziona sezione',
+        'DE': 'Abschnitt auswählen',
+        'TR': 'Bölüm seç'
+      },
+      'gradebook.applyToMultipleSections': {
+        'AR': 'تطبيق على عدة أقسام',
+        'FR': 'Appliquer à plusieurs classes',
+        'EN': 'Apply to Multiple Sections',
+        'ES': 'Aplicar a múltiples secciones',
+        'IT': 'Applica a più sezioni',
+        'DE': 'Auf mehrere Abschnitte anwenden',
+        'TR': 'Birden fazla bölüme uygula'
+      },
+      'gradebook.selectMultipleClassesHint': {
+        'AR': 'اضغط Ctrl (أو Cmd على Mac) لاختيار عدة أقسام',
+        'FR': 'Appuyez sur Ctrl (ou Cmd sur Mac) pour sélectionner plusieurs classes',
+        'EN': 'Hold Ctrl (or Cmd on Mac) to select multiple classes',
+        'ES': 'Mantenga presionado Ctrl (o Cmd en Mac) para seleccionar múltiples clases',
+        'IT': 'Tieni premuto Ctrl (o Cmd su Mac) per selezionare più classi',
+        'DE': 'Halten Sie Strg (oder Cmd auf Mac) gedrückt, um mehrere Klassen auszuwählen',
+        'TR': 'Birden fazla sınıf seçmek için Ctrl (veya Mac\'te Cmd) tuşunu basılı tutun'
+      },
+      'gradebook.customAssessmentColumns': {
+        'AR': 'أعمدة التقييم المخصصة',
+        'FR': 'Colonnes d\'évaluation personnalisées',
+        'EN': 'Custom Assessment Columns',
+        'ES': 'Columnas de evaluación personalizadas',
+        'IT': 'Colonne di valutazione personalizzate',
+        'DE': 'Benutzerdefinierte Bewertungsspalten',
+        'TR': 'Özel değerlendirme sütunları'
+      },
+      'gradebook.customColumnsDescription': {
+        'AR': 'إضافة أعمدة مخصصة قبل عمود التقييم المستمر النهائي',
+        'FR': 'Ajouter des colonnes personnalisées avant la colonne d\'évaluation continue finale',
+        'EN': 'Add custom columns before the final continuous assessment column',
+        'ES': 'Agregar columnas personalizadas antes de la columna de evaluación continua final',
+        'IT': 'Aggiungi colonne personalizzate prima della colonna di valutazione continua finale',
+        'DE': 'Benutzerdefinierte Spalten vor der finalen fortlaufenden Bewertungsspalte hinzufügen',
+        'TR': 'Son sürekli değerlendirme sütunundan önce özel sütunlar ekle'
+      },
+      'gradebook.addColumn': {
+        'AR': 'إضافة عمود',
+        'FR': 'Ajouter une colonne',
+        'EN': 'Add Column',
+        'ES': 'Agregar columna',
+        'IT': 'Aggiungi colonna',
+        'DE': 'Spalte hinzufügen',
+        'TR': 'Sütun ekle'
+      },
+      'gradebook.columnName': {
+        'AR': 'اسم العمود',
+        'FR': 'Nom de la colonne',
+        'EN': 'Column Name',
+        'ES': 'Nombre de columna',
+        'IT': 'Nome colonna',
+        'DE': 'Spaltenname',
+        'TR': 'Sütun adı'
+      },
+      'gradebook.columnNamePlaceholder': {
+        'AR': 'مثال: مشاركة صفية',
+        'FR': 'Ex: Participation en classe',
+        'EN': 'Example: Class Participation',
+        'ES': 'Ejemplo: Participación en clase',
+        'IT': 'Esempio: Partecipazione in classe',
+        'DE': 'Beispiel: Klassenbeteiligung',
+        'TR': 'Örnek: Sınıf katılımı'
+      },
+      'gradebook.maxScore': {
+        'AR': 'النقطة القصوى',
+        'FR': 'Score maximum',
+        'EN': 'Max Score',
+        'ES': 'Puntuación máxima',
+        'IT': 'Punteggio massimo',
+        'DE': 'Maximale Punktzahl',
+        'TR': 'Maksimum puan'
+      },
+      'gradebook.remove': {
+        'AR': 'إزالة',
+        'FR': 'Supprimer',
+        'EN': 'Remove',
+        'ES': 'Eliminar',
+        'IT': 'Rimuovi',
+        'DE': 'Entfernen',
+        'TR': 'Kaldır'
+      },
+      'gradebook.noCustomColumns': {
+        'AR': 'لا توجد أعمدة مخصصة',
+        'FR': 'Aucune colonne personnalisée',
+        'EN': 'No custom columns',
+        'ES': 'Sin columnas personalizadas',
+        'IT': 'Nessuna colonna personalizzata',
+        'DE': 'Keine benutzerdefinierten Spalten',
+        'TR': 'Özel sütun yok'
+      },
+      'gradebook.oralExpressionPracticalWork': {
+        'AR': 'التعبير الشفهي/العمل العملي',
+        'FR': 'Expression orale / Travail pratique',
+        'EN': 'Oral Expression / Practical Work',
+        'ES': 'Expresión oral / Trabajo práctico',
+        'IT': 'Espressione orale / Lavoro pratico',
+        'DE': 'Mündlicher Ausdruck / Praktische Arbeit',
+        'TR': 'Sözlü ifade / Pratik çalışma'
+      },
+      'gradebook.includeOralExpression': {
+        'AR': 'تضمين عمود التعبير الشفهي/العمل العملي',
+        'FR': 'Inclure la colonne Expression orale / Travail pratique',
+        'EN': 'Include Oral Expression / Practical Work column',
+        'ES': 'Incluir columna de Expresión oral / Trabajo práctico',
+        'IT': 'Includi colonna Espressione orale / Lavoro pratico',
+        'DE': 'Spalte Mündlicher Ausdruck / Praktische Arbeit einbeziehen',
+        'TR': 'Sözlü ifade / Pratik çalışma sütununu dahil et'
+      },
+      'gradebook.oralExpressionNote': {
+        'AR': 'عند إزالة هذا العمود، سيتم تغيير طريقة حساب المعدل',
+        'FR': 'Lors de la suppression de cette colonne, la méthode de calcul de la moyenne sera modifiée',
+        'EN': 'When removing this column, the average calculation method will be changed',
+        'ES': 'Al eliminar esta columna, se cambiará el método de cálculo del promedio',
+        'IT': 'Quando si rimuove questa colonna, il metodo di calcolo della media verrà modificato',
+        'DE': 'Beim Entfernen dieser Spalte wird die Berechnungsmethode des Durchschnitts geändert',
+        'TR': 'Bu sütun kaldırıldığında, ortalama hesaplama yöntemi değiştirilecek'
+      },
+      'gradebook.attendanceBehavior': {
+        'AR': 'الحضور والسلوك',
+        'FR': 'Présence et comportement',
+        'EN': 'Attendance and Behavior',
+        'ES': 'Asistencia y comportamiento',
+        'IT': 'Presenza e comportamento',
+        'DE': 'Anwesenheit und Verhalten',
+        'TR': 'Katılım ve davranış'
+      },
+      'gradebook.behavior': {
+        'AR': 'السلوك',
+        'FR': 'Comportement',
+        'EN': 'Behavior',
+        'ES': 'Comportamiento',
+        'IT': 'Comportamento',
+        'DE': 'Verhalten',
+        'TR': 'Davranış'
+      },
+      'gradebook.automatic': {
+        'AR': 'تلقائي',
+        'FR': 'Automatique',
+        'EN': 'Automatic',
+        'ES': 'Automático',
+        'IT': 'Automatico',
+        'DE': 'Automatisch',
+        'TR': 'Otomatik'
+      },
+      'gradebook.manual': {
+        'AR': 'يدوي',
+        'FR': 'Manuel',
+        'EN': 'Manual',
+        'ES': 'Manual',
+        'IT': 'Manuale',
+        'DE': 'Manuell',
+        'TR': 'Manuel'
+      },
+      'gradebook.notebookHomework': {
+        'AR': 'تصحيح الدفتر والواجب',
+        'FR': 'Correction du cahier et des devoirs',
+        'EN': 'Notebook Correction and Homework',
+        'ES': 'Corrección de cuaderno y tarea',
+        'IT': 'Correzione del quaderno e compiti',
+        'DE': 'Heftkorrektur und Hausaufgaben',
+        'TR': 'Defter düzeltme ve ödev'
+      },
+      'gradebook.notebookCorrectionMaxScore': {
+        'AR': 'النقطة القصوى لتصحيح الدفتر',
+        'FR': 'Score maximum pour la correction du cahier',
+        'EN': 'Notebook Correction Max Score',
+        'ES': 'Puntuación máxima de corrección de cuaderno',
+        'IT': 'Punteggio massimo correzione quaderno',
+        'DE': 'Maximale Punktzahl für Heftkorrektur',
+        'TR': 'Defter düzeltme maksimum puanı'
+      },
+      'gradebook.homeworkMaxScore': {
+        'AR': 'النقطة القصوى للواجب',
+        'FR': 'Score maximum pour les devoirs',
+        'EN': 'Homework Max Score',
+        'ES': 'Puntuación máxima de tarea',
+        'IT': 'Punteggio massimo compiti',
+        'DE': 'Maximale Punktzahl für Hausaufgaben',
+        'TR': 'Ödev maksimum puanı'
+      },
+      'gradebook.totalMaxScore': {
+        'AR': 'المجموع الكلي',
+        'FR': 'Total maximum',
+        'EN': 'Total Max Score',
+        'ES': 'Puntuación máxima total',
+        'IT': 'Punteggio massimo totale',
+        'DE': 'Gesamte maximale Punktzahl',
+        'TR': 'Toplam maksimum puan'
+      },
+      'gradebook.totalMaxScoreHint': {
+        'AR': 'يجب ألا يتجاوز مجموع النقاط القصوى 20',
+        'FR': 'La somme des scores maximums ne doit pas dépasser 20',
+        'EN': 'The sum of maximum scores must not exceed 20',
+        'ES': 'La suma de las puntuaciones máximas no debe exceder 20',
+        'IT': 'La somma dei punteggi massimi non deve superare 20',
+        'DE': 'Die Summe der maximalen Punktzahlen darf 20 nicht überschreiten',
+        'TR': 'Maksimum puanların toplamı 20\'yi geçmemelidir'
+      },
+      'gradebook.saveSettings': {
+        'AR': 'حفظ الإعدادات',
+        'FR': 'Enregistrer les paramètres',
+        'EN': 'Save Settings',
+        'ES': 'Guardar configuración',
+        'IT': 'Salva impostazioni',
+        'DE': 'Einstellungen speichern',
+        'TR': 'Ayarları kaydet'
+      },
+      'gradebook.applyToSelectedClasses': {
+        'AR': 'تطبيق على الأقسام المحددة',
+        'FR': 'Appliquer aux classes sélectionnées',
+        'EN': 'Apply to Selected Classes',
+        'ES': 'Aplicar a las clases seleccionadas',
+        'IT': 'Applica alle classi selezionate',
+        'DE': 'Auf ausgewählte Klassen anwenden',
+        'TR': 'Seçili sınıflara uygula'
       },
 
       // Reports

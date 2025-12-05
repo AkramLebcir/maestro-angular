@@ -10,6 +10,10 @@ export class CreateGradeDto {
   @IsInt()
   assessmentId: number;
 
+  @IsOptional()
+  @IsString()
+  customAssessmentId?: string;
+
   @Type(() => Number)
   @IsInt()
   classId: number;

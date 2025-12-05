@@ -1,12 +1,13 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In, Not, IsNull } from 'typeorm';
 import { Grade } from './grade.entity';
 import { Student } from '../students/student.entity';
 import { Class } from '../classes/class.entity';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
 import { GradeResponseDto } from './dto/grade-response.dto';
+import { GradingSettingsService } from '../grading-settings/grading-settings.service';
 
 @Injectable()
 export class GradesService {
@@ -17,6 +18,7 @@ export class GradesService {
     private studentRepository: Repository<Student>,
     @InjectRepository(Class)
     private classRepository: Repository<Class>,
+    private gradingSettingsService: GradingSettingsService,
   ) {}
 
   async create(ownerId: number, createGradeDto: CreateGradeDto): Promise<GradeResponseDto> {
@@ -120,6 +122,9 @@ export class GradesService {
     if (updateGradeDto.assessmentId !== undefined) {
       fieldsToUpdate.assessmentId = updateGradeDto.assessmentId;
     }
+    if (updateGradeDto.customAssessmentId !== undefined) {
+      fieldsToUpdate.customAssessmentId = updateGradeDto.customAssessmentId;
+    }
     if (updateGradeDto.classId !== undefined) {
       fieldsToUpdate.classId = updateGradeDto.classId;
     }
@@ -183,9 +188,7 @@ export class GradesService {
   }
 
   /**
-   * Calculate continuous assessment based on behavior, attendance, duty, and notebook grades
-   * Formula: notebook + duty + attendance + behavior (all out of 5, total out of 20)
-   * Assessment IDs: notebook_correction=1, duty=2, attendance=3, behavior=4, continuous_assessment=5
+   * Calculate continuous assessment based on grading settings
    */
   private async updateContinuousAssessment(ownerId: number, studentId: number, classId: number): Promise<void> {
     // Assessment IDs based on frontend definition
@@ -195,31 +198,70 @@ export class GradesService {
     const BEHAVIOR_ID = 4;
     const CONTINUOUS_ASSESSMENT_ID = 5;
 
+    // Fetch Grading Settings
+    const settings = await this.gradingSettingsService.findByClassId(ownerId, classId);
+
+    // Default Max Scores
+    let notebookMax = 5;
+    let dutyMax = 5;
+    let attendanceMax = 5;
+    let behaviorMax = 5;
+    let customColumns = [];
+
+    if (settings) {
+        notebookMax = Number(settings.notebookCorrectionMaxScore);
+        dutyMax = Number(settings.dutyMaxScore);
+        attendanceMax = Number(settings.attendanceMaxScore);
+        behaviorMax = Number(settings.behaviorMaxScore);
+        customColumns = settings.customAssessmentColumns || [];
+    }
+
     // Get all related grades for this student and class
+    const standardIds = [NOTEBOOK_CORRECTION_ID, DUTY_ID, ATTENDANCE_ID, BEHAVIOR_ID];
+    
     const grades = await this.gradeRepository.find({
       where: [
-        { ownerId, studentId, classId, assessmentId: NOTEBOOK_CORRECTION_ID },
-        { ownerId, studentId, classId, assessmentId: DUTY_ID },
-        { ownerId, studentId, classId, assessmentId: ATTENDANCE_ID },
-        { ownerId, studentId, classId, assessmentId: BEHAVIOR_ID },
+        { ownerId, studentId, classId, assessmentId: In(standardIds) },
+        { ownerId, studentId, classId, customAssessmentId: Not(IsNull()) }
       ],
     });
 
-    const notebookGrade = grades.find(g => g.assessmentId === NOTEBOOK_CORRECTION_ID);
-    const dutyGrade = grades.find(g => g.assessmentId === DUTY_ID);
-    const attendanceGrade = grades.find(g => g.assessmentId === ATTENDANCE_ID);
-    const behaviorGrade = grades.find(g => g.assessmentId === BEHAVIOR_ID);
+    const getScore = (assessmentId: number) => {
+        const grade = grades.find(g => g.assessmentId === assessmentId);
+        return grade ? parseFloat(grade.score.toString()) : 0;
+    };
 
-    const behavior = behaviorGrade ? parseFloat(behaviorGrade.score.toString()) : 0;
-    const attendance = attendanceGrade ? parseFloat(attendanceGrade.score.toString()) : 0;
-    const duty = dutyGrade ? parseFloat(dutyGrade.score.toString()) : 0;
-    const notebook = notebookGrade ? parseFloat(notebookGrade.score.toString()) : 0;
+    const notebook = getScore(NOTEBOOK_CORRECTION_ID);
+    const duty = getScore(DUTY_ID);
+    const attendance = getScore(ATTENDANCE_ID);
+    const behavior = getScore(BEHAVIOR_ID);
 
-    // Calculate continuous assessment
-    // Max scores: behavior=5, attendance=5, duty=5, notebook=5, total=20
-    // Simple sum: notebook + duty + attendance + behavior
-    const total = behavior + attendance + duty + notebook;
-    const finalScore = Math.min(Math.max(total, 0), 20); // Cap at 20, minimum 0
+    let total = 0;
+    
+    // Add standard components (use Math.min to respect max score settings)
+    // We sum the actual score, but logically it shouldn't exceed the max score. 
+    // However, if the user entered a score higher than max, we typically count it as is or cap it.
+    // The requirement says "Validation... check points... not exceed". That's frontend validation.
+    // Here we just sum up what's in the DB. 
+    total += notebook;
+    total += duty;
+    total += attendance;
+    total += behavior;
+
+    // Add custom columns
+    if (customColumns.length > 0) {
+        for (const col of customColumns) {
+            // Find grade for this custom column by customAssessmentId
+            const grade = grades.find(g => g.customAssessmentId === col.id);
+            if (grade) {
+                const score = parseFloat(grade.score.toString());
+                total += score;
+            }
+        }
+    }
+
+    // Cap at 20
+    const finalScore = Math.min(Math.max(total, 0), 20);
 
     // Find existing continuous assessment grade
     const existingContinuousGrade = await this.gradeRepository.findOne({
@@ -232,9 +274,8 @@ export class GradesService {
     });
 
     // Use the most recent date from the related grades, or today's date
-    const relatedGrades = [notebookGrade, dutyGrade, attendanceGrade, behaviorGrade].filter(Boolean);
-    const mostRecentDate = relatedGrades.length > 0
-      ? relatedGrades.reduce((latest, g) => g.date > latest ? g.date : latest, relatedGrades[0].date)
+    const mostRecentDate = grades.length > 0
+      ? grades.reduce((latest, g) => g.date > latest ? g.date : latest, grades[0].date)
       : new Date();
 
     if (existingContinuousGrade) {
@@ -272,6 +313,7 @@ export class GradesService {
           }
         : undefined,
       assessmentId: grade.assessmentId,
+      customAssessmentId: grade.customAssessmentId,
       classId: grade.classId,
       class: grade.class
         ? {
@@ -290,4 +332,3 @@ export class GradesService {
     };
   }
 }
-

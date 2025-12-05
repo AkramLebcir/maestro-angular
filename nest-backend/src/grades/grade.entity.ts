@@ -18,6 +18,9 @@ export class Grade extends TenantOwnedEntity {
   @Column()
   assessmentId: number;
 
+  @Column({ type: 'varchar', nullable: true })
+  customAssessmentId: string;
+
   @ManyToOne(() => Class, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'classId' })
   class: Class;

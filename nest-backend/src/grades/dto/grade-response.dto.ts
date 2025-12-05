@@ -8,6 +8,7 @@ export class GradeResponseDto {
     gender?: 'male' | 'female';
   };
   assessmentId: number;
+  customAssessmentId?: string;
   classId: number;
   class?: {
     id: number;
