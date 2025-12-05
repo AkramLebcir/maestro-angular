@@ -13,8 +13,10 @@ import { TimetableModule } from './timetable/timetable.module';
 import { NotebooksModule } from './notebooks/notebooks.module';
 import { TopicsModule } from './topics/topics.module';
 import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
+import { BehaviorsModule } from './behaviors/behaviors.module';
 import { AttendanceModule } from './attendance/attendance.module';
 import { GradesModule } from './grades/grades.module';
+import { AssessmentsModule } from './assessments/assessments.module';
 import { WorkstationsModule } from './workstations/workstations.module';
 import { LabManagementModule } from './lab-management/lab-management.module';
 import { AnnualPlanningModule } from './annual-planning/annual-planning.module';
@@ -46,8 +48,10 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     NotebooksModule,
     TopicsModule,
     BehaviorEventsModule,
+    BehaviorsModule,
     AttendanceModule,
     GradesModule,
+    AssessmentsModule,
     WorkstationsModule,
     LabManagementModule,
     AnnualPlanningModule,

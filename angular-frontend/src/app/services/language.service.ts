@@ -2902,6 +2902,33 @@ export class LanguageService {
         'DE': 'Fortschrittsbericht öffnen',
         'TR': 'İlerleme raporunu aç'
       },
+      'reports.clubReport': {
+        'AR': 'تقرير النادي',
+        'FR': 'Rapport du club',
+        'EN': 'Club report',
+        'ES': 'Informe del club',
+        'IT': 'Rapporto del club',
+        'DE': 'Club-Bericht',
+        'TR': 'Kulüp raporu'
+      },
+      'reports.clubReportDesc': {
+        'AR': 'تقرير شامل عن أنشطة النادي والأعضاء والأحداث.',
+        'FR': 'Rapport complet sur les activités du club, les membres et les événements.',
+        'EN': 'Comprehensive report on club activities, members, and events.',
+        'ES': 'Informe completo sobre las actividades del club, miembros y eventos.',
+        'IT': 'Rapporto completo su attività del club, membri ed eventi.',
+        'DE': 'Umfassender Bericht über Club-Aktivitäten, Mitglieder und Veranstaltungen.',
+        'TR': 'Kulüp faaliyetleri, üyeler ve etkinlikler hakkında kapsamlı rapor.'
+      },
+      'reports.openClubReport': {
+        'AR': 'فتح تقرير النادي',
+        'FR': 'Ouvrir le rapport du club',
+        'EN': 'Open club report',
+        'ES': 'Abrir informe del club',
+        'IT': 'Apri rapporto del club',
+        'DE': 'Club-Bericht öffnen',
+        'TR': 'Kulüp raporunu aç'
+      },
       'reports.teacherCard': {
         'AR': 'بطاقة معلومات الأستاذ',
         'FR': 'Carte d\'information du professeur',

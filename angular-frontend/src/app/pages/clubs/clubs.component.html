@@ -496,7 +496,7 @@
   <!-- Club Header -->
   <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #333; padding-bottom: 20px;">
     <h1 style="font-size: 32px; color: #1e40af; margin-bottom: 10px;">{{ selectedClub.name }}</h1>
-    <p style="font-size: 14px; color: #666;">{{ translate('clubs.fullReport') }} - {{ translate('clubs.generatedOn') }}: {{ new Date() | date:'fullDate' }}</p>
+    <p style="font-size: 14px; color: #666;">{{ translate('clubs.fullReport') }} - {{ translate('clubs.generatedOn') }}: {{ currentDate | date:'fullDate' }}</p>
   </div>
 
   <!-- Club Description -->
@@ -515,7 +515,7 @@
         <p style="font-size: 14px; font-weight: bold; margin: 0; color: #333;">
           {{ member.student?.firstName }} {{ member.student?.lastName }}
         </p>
-        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;" *ngIf="member.student?.email">{{ member.student.email }}</p>
+        <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;" *ngIf="member.student?.email">{{ member.student?.email }}</p>
       </div>
     </div>
   </div>
@@ -567,6 +567,6 @@
 
   <!-- Footer -->
   <div style="margin-top: 40px; padding-top: 20px; border-top: 2px solid #ddd; text-align: center; font-size: 12px; color: #666;">
-    <p>{{ translate('clubs.reportGenerated') }} - {{ new Date() | date:'full' }}</p>
+    <p>{{ translate('clubs.reportGenerated') }} - {{ currentDate | date:'full' }}</p>
   </div>
 </div>

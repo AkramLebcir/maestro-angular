@@ -120,6 +120,9 @@ export class ClubsComponent implements OnInit {
   
   // Selected event for report
   selectedEventForReport: ClubEvent | null = null;
+  
+  // Current date for templates
+  currentDate = new Date();
 
   constructor(
     private apiService: ApiService,

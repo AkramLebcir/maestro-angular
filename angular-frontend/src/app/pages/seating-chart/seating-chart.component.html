@@ -74,7 +74,7 @@
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'workstations' && stats">
       <div class="stat-pill">
         <p class="label">{{ translate('seatingChart.averageAttendance') }}</p>
-        <p class="value">{{ stats.averageAttendance ?? 0 }}%</p>
+        <p class="value">{{ stats.averageAttendance }}%</p>
       </div>
       <div class="stat-pill">
         <p class="label">{{ translate('seatingChart.averageGrade') }}</p>
@@ -82,7 +82,7 @@
       </div>
       <div class="stat-pill">
         <p class="label text-green-100">{{ translate('seatingChart.positiveBehavior') }}</p>
-        <p class="value text-green-300">{{ stats.positiveBehaviorRate ?? 0 }}%</p>
+        <p class="value text-green-300">{{ stats.positiveBehaviorRate }}%</p>
       </div>
     </div>
     <div class="flex gap-6 flex-wrap" *ngIf="layoutMode === 'classroom' && classroomLayout">

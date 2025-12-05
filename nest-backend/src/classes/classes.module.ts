@@ -8,9 +8,13 @@ import { Student } from '../students/student.entity';
 import { Grade } from '../grades/grade.entity';
 import { Attendance } from '../attendance/attendance.entity';
 import { BehaviorEvent } from '../behavior-events/behavior-event.entity';
+import { StudentsModule } from '../students/students.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Class, Lab, Student, Grade, Attendance, BehaviorEvent])],
+  imports: [
+    TypeOrmModule.forFeature([Class, Lab, Student, Grade, Attendance, BehaviorEvent]),
+    StudentsModule,
+  ],
   controllers: [ClassesController],
   providers: [ClassesService],
   exports: [ClassesService],

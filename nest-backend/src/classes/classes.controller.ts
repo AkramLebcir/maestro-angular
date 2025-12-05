@@ -11,9 +11,11 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { ClassesService } from './classes.service';
+import { StudentsService } from '../students/students.service';
 import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassResponseDto } from './dto/class-response.dto';
+import { StudentResponseDto } from '../students/dto/student-response.dto';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUser } from '../auth/interfaces/auth-user.interface';
 import { ModuleAccess } from '../auth/decorators/module-access.decorator';
@@ -21,7 +23,10 @@ import { ModuleAccess } from '../auth/decorators/module-access.decorator';
 @Controller('classes')
 @ModuleAccess('classes')
 export class ClassesController {
-  constructor(private readonly classesService: ClassesService) {}
+  constructor(
+    private readonly classesService: ClassesService,
+    private readonly studentsService: StudentsService,
+  ) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -52,6 +57,17 @@ export class ClassesController {
   ): Promise<{ studentCount: number }> {
     const count = await this.classesService.getStudentCount(user.id, id);
     return { studentCount: count };
+  }
+
+  @Get(':id/students')
+  async getStudents(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<StudentResponseDto[]> {
+    // Verify class exists and belongs to user
+    await this.classesService.findOne(user.id, id);
+    // Get students for this class
+    return this.studentsService.findAll(user.id, { classId: id });
   }
 
   @Patch(':id')

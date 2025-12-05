@@ -318,6 +318,10 @@ export class ReportsComponent {
     this.router.navigate(['/progress-tracking']);
   }
 
+  navigateToClubs(): void {
+    this.router.navigate(['/clubs']);
+  }
+
   navigateToTeacherCard(): void {
     this.router.navigate(['/teacher-card']);
   }

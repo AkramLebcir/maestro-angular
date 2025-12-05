@@ -38,12 +38,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
-      labelKey: 'menu.seatingChart',
-      route: '/seating-chart', 
-      icon: 'M4 6h16M4 10h16M4 14h16M4 18h16',
-      active: false
-    },
-    { 
       labelKey: 'menu.students',
       route: '/students', 
       icon: 'M12 14l9-5-9-5-9 5 9 5z M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z',
@@ -56,9 +50,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
-      labelKey: 'menu.timetable',
-      route: '/timetable', 
-      icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+      labelKey: 'menu.seatingChart',
+      route: '/seating-chart', 
+      icon: 'M4 6h16M4 10h16M4 14h16M4 18h16',
       active: false
     },
     { 
@@ -86,15 +80,15 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
-      labelKey: 'menu.achievementsPenalties',
-      route: '/achievements-penalties', 
-      icon: 'M5 3h14a2 2 0 012 2v4a5 5 0 01-5 5h-1v3h2a1 1 0 011 1v3H5v-3a1 1 0 011-1h2v-3h-1a5 5 0 01-5-5V5a2 2 0 012-2z',
-      active: false
-    },
-    { 
       labelKey: 'menu.gradebook',
       route: '/gradebook', 
       icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+      active: false
+    },
+    { 
+      labelKey: 'menu.achievementsPenalties',
+      route: '/achievements-penalties', 
+      icon: 'M5 3h14a2 2 0 012 2v4a5 5 0 01-5 5h-1v3h2a1 1 0 011 1v3H5v-3a1 1 0 011-1h2v-3h-1a5 5 0 01-5-5V5a2 2 0 012-2z',
       active: false
     },
     { 
@@ -116,21 +110,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
-      labelKey: 'menu.teacherNotebook',
-      route: '/teacher-notebook', 
-      icon: 'M4 5h16a1 1 0 011 1v11a2 2 0 01-2 2H5a2 2 0 01-2-2V6a1 1 0 011-1zm3 3h8m-8 4h5', 
-      active: false
-    },
-    { 
       labelKey: 'menu.pedagogicalDocs',
       route: '/pedagogical-docs', 
       icon: 'M4 6h16M4 10h16M4 14h10M4 18h6', 
-      active: false
-    },
-    { 
-      labelKey: 'menu.reports',
-      route: '/reports', 
-      icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
       active: false
     },
     { 
@@ -140,8 +122,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
+      labelKey: 'menu.teacherNotebook',
+      route: '/teacher-notebook', 
+      icon: 'M4 5h16a1 1 0 011 1v11a2 2 0 01-2 2H5a2 2 0 01-2-2V6a1 1 0 011-1zm3 3h8m-8 4h5', 
+      active: false
+    },
+    { 
+      labelKey: 'menu.reports',
+      route: '/reports', 
+      icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z',
+      active: false
+    },
+    { 
       labelKey: 'menu.settings',
-      route: '/settings', 
+      route: '/admin', 
       icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z',
       active: false,
       adminOnly: true
@@ -160,21 +154,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Check if user is admin
     this.isAdmin = this.authService.isAdmin();
-    
-    // Update settings route for admin
-    const settingsItem = this.menuItems.find(item => item.route === '/settings');
-    if (settingsItem && this.isAdmin) {
-      settingsItem.route = '/admin';
-    }
-
-    // Subscribe to user changes
-    this.userSubscription = this.authService.currentUser$.subscribe(user => {
-      this.isAdmin = this.authService.isAdmin();
-      const settingsItem = this.menuItems.find(item => item.labelKey === 'menu.settings');
-      if (settingsItem) {
-        settingsItem.route = this.isAdmin ? '/admin' : '/settings';
-      }
-    });
 
     // الاشتراك في تغييرات اللغة
     this.languageSubscription = this.languageService.currentLanguage$.subscribe(() => {
