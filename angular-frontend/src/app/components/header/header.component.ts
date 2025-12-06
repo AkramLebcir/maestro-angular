@@ -78,6 +78,16 @@ export class HeaderComponent implements OnInit, OnDestroy {
       if (user) {
         const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim();
         this.teacherName = fullName || user.email || 'المستخدم';
+        // تحميل الإشعارات فقط إذا كان المستخدم مسجلاً دخوله
+        if (user) {
+          this.loadNotifications();
+        }
+      } else {
+        // إعادة تعيين الإشعارات إذا لم يكن هناك مستخدم
+        this.notifications = [];
+        this.notificationStats = null;
+        this.notificationCount = 0;
+        this.notificationsLoaded = true;
       }
     });
 
@@ -94,8 +104,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
       }
     }
 
-    // تحميل الإشعارات
-    this.loadNotifications();
+    // تحميل الإشعارات فقط إذا كان هناك مستخدم مسجل دخوله
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.loadNotifications();
+    }
   }
 
   ngOnDestroy(): void {
@@ -141,6 +154,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
    * تحميل الإشعارات
    */
   private loadNotifications(): void {
+    // التحقق من وجود مستخدم مسجل دخوله قبل تحميل الإشعارات
+    if (!this.currentUser) {
+      this.notifications = [];
+      this.notificationStats = null;
+      this.notificationCount = 0;
+      this.notificationsLoaded = true;
+      return;
+    }
+
     this.notificationsLoaded = false;
 
     // تحميل الإشعارات
@@ -150,7 +172,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.notificationsLoaded = true;
       },
       error: err => {
-        console.error('Error loading notifications:', err);
+        // تجاهل أخطاء 401 (Unauthorized) بصمت - طبيعية إذا لم يكن المستخدم مسجلاً دخوله
+        if (err.status !== 401) {
+          console.error('Error loading notifications:', err);
+        }
         this.notifications = [];
         this.notificationsLoaded = true;
       }
@@ -163,7 +188,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.notificationCount = stats?.unread || 0;
       },
       error: err => {
-        console.error('Error loading notification stats:', err);
+        // تجاهل أخطاء 401 (Unauthorized) بصمت - طبيعية إذا لم يكن المستخدم مسجلاً دخوله
+        if (err.status !== 401) {
+          console.error('Error loading notification stats:', err);
+        }
         this.notificationStats = null;
         this.notificationCount = 0;
       }

@@ -63,6 +63,7 @@ interface TeacherCardForm {
   address: string;
   wilaya: string;
   phoneNumber: string;
+  email: string;
 
   // صورة الأستاذ (data URL)
   photoDataUrl: string | null;
@@ -132,6 +133,7 @@ export class TeacherCardComponent implements OnInit {
     address: '',
     wilaya: '',
     phoneNumber: '',
+    email: '',
 
     photoDataUrl: null
   };

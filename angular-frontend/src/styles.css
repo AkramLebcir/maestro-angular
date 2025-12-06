@@ -112,3 +112,23 @@ button.btn-export-excel:hover {
   background-color: rgba(0, 0, 0, 0.75);
 }
 
+/* Prevent horizontal scroll globally */
+html, body {
+  overflow-x: hidden !important;
+  max-width: 100vw !important;
+  width: 100% !important;
+}
+
+/* Fix main container to prevent horizontal scroll */
+main {
+  overflow-x: hidden !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Ensure router-outlet doesn't cause overflow */
+router-outlet + * {
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+}
+
