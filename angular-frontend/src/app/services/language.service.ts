@@ -2585,6 +2585,114 @@ export class LanguageService {
         'DE': 'Auf ausgewählte Klassen anwenden',
         'TR': 'Seçili sınıflara uygula'
       },
+      'gradebook.customRatingsAndGuidance': {
+        'AR': 'التقديرات والإرشادات المخصصة',
+        'FR': 'Appréciations et conseils personnalisés',
+        'EN': 'Custom Ratings and Guidance',
+        'ES': 'Calificaciones y orientación personalizadas',
+        'IT': 'Valutazioni e consigli personalizzati',
+        'DE': 'Benutzerdefinierte Bewertungen und Beratung',
+        'TR': 'Özel değerlendirmeler ve rehberlik'
+      },
+      'gradebook.addRange': {
+        'AR': 'إضافة نطاق',
+        'FR': 'Ajouter une plage',
+        'EN': 'Add Range',
+        'ES': 'Agregar rango',
+        'IT': 'Aggiungi intervallo',
+        'DE': 'Bereich hinzufügen',
+        'TR': 'Aralık ekle'
+      },
+      'gradebook.minimum': {
+        'AR': 'الحد الأدنى',
+        'FR': 'Minimum',
+        'EN': 'Minimum',
+        'ES': 'Mínimo',
+        'IT': 'Minimo',
+        'DE': 'Minimum',
+        'TR': 'Minimum'
+      },
+      'gradebook.maximumOptional': {
+        'AR': 'الحد الأقصى (اختياري)',
+        'FR': 'Maximum (optionnel)',
+        'EN': 'Maximum (optional)',
+        'ES': 'Máximo (opcional)',
+        'IT': 'Massimo (opzionale)',
+        'DE': 'Maximum (optional)',
+        'TR': 'Maksimum (isteğe bağlı)'
+      },
+      'gradebook.text': {
+        'AR': 'النص',
+        'FR': 'Texte',
+        'EN': 'Text',
+        'ES': 'Texto',
+        'IT': 'Testo',
+        'DE': 'Text',
+        'TR': 'Metin'
+      },
+      'gradebook.selectLanguage': {
+        'AR': 'اختر اللغة',
+        'FR': 'Sélectionner la langue',
+        'EN': 'Select Language',
+        'ES': 'Seleccionar idioma',
+        'IT': 'Seleziona lingua',
+        'DE': 'Sprache auswählen',
+        'TR': 'Dil seç'
+      },
+      'gradebook.selectLanguageForRatings': {
+        'AR': 'اختر اللغة للتقديرات',
+        'FR': 'Sélectionner la langue pour les appréciations',
+        'EN': 'Select Language for Ratings',
+        'ES': 'Seleccionar idioma para calificaciones',
+        'IT': 'Seleziona lingua per le valutazioni',
+        'DE': 'Sprache für Bewertungen auswählen',
+        'TR': 'Değerlendirmeler için dil seç'
+      },
+      'gradebook.selectLanguageForGuidance': {
+        'AR': 'اختر اللغة للإرشادات',
+        'FR': 'Sélectionner la langue pour les conseils',
+        'EN': 'Select Language for Guidance',
+        'ES': 'Seleccionar idioma para orientación',
+        'IT': 'Seleziona lingua per i consigli',
+        'DE': 'Sprache für Beratung auswählen',
+        'TR': 'Rehberlik için dil seç'
+      },
+      'gradebook.selectLanguageFirst': {
+        'AR': 'اختر اللغة أولاً',
+        'FR': 'Sélectionnez d\'abord la langue',
+        'EN': 'Select language first',
+        'ES': 'Seleccione el idioma primero',
+        'IT': 'Seleziona prima la lingua',
+        'DE': 'Wählen Sie zuerst die Sprache',
+        'TR': 'Önce dili seçin'
+      },
+      'gradebook.enterRating': {
+        'AR': 'أدخل التقدير',
+        'FR': 'Entrez l\'appréciation',
+        'EN': 'Enter rating',
+        'ES': 'Ingrese calificación',
+        'IT': 'Inserisci valutazione',
+        'DE': 'Bewertung eingeben',
+        'TR': 'Değerlendirme girin'
+      },
+      'gradebook.enterGuidance': {
+        'AR': 'أدخل الإرشاد',
+        'FR': 'Entrez le conseil',
+        'EN': 'Enter guidance',
+        'ES': 'Ingrese orientación',
+        'IT': 'Inserisci consiglio',
+        'DE': 'Beratung eingeben',
+        'TR': 'Rehberlik girin'
+      },
+      'gradebook.applyToAllClasses': {
+        'AR': 'تطبيق على جميع الأقسام',
+        'FR': 'Appliquer à toutes les classes',
+        'EN': 'Apply to All Classes',
+        'ES': 'Aplicar a todas las clases',
+        'IT': 'Applica a tutte le classi',
+        'DE': 'Auf alle Klassen anwenden',
+        'TR': 'Tüm sınıflara uygula'
+      },
 
       // Reports
       'reports.title': {

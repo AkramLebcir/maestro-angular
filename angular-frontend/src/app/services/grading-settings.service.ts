@@ -23,6 +23,36 @@ export interface CustomAssessmentColumn {
   maxScore: number;
 }
 
+export type LanguageCode = 'AR' | 'FR' | 'EN' | 'ES' | 'IT' | 'DE' | 'TR';
+
+export interface RatingRangeConfig {
+  min: number;
+  max?: number; // undefined means infinity
+  ratings: {
+    AR?: string;
+    FR?: string;
+    EN?: string;
+    ES?: string;
+    IT?: string;
+    DE?: string;
+    TR?: string;
+  };
+}
+
+export interface GuidanceRangeConfig {
+  min: number;
+  max?: number; // undefined means infinity
+  guidance: {
+    AR?: string;
+    FR?: string;
+    EN?: string;
+    ES?: string;
+    IT?: string;
+    DE?: string;
+    TR?: string;
+  };
+}
+
 export interface GradingSettings {
   id?: number;
   classId: number;
@@ -35,10 +65,13 @@ export interface GradingSettings {
   customAssessmentColumns?: CustomAssessmentColumn[];
   baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression: boolean;
+  customRatings?: RatingRangeConfig[];
+  customGuidance?: GuidanceRangeConfig[];
 }
 
 export interface BulkApplySettingsDto {
-  classIds: number[];
+  classIds?: number[];
+  applyToAllClasses?: boolean;
   notebookCorrectionMaxScore?: number;
   dutyMaxScore?: number;
   attendanceMaxScore?: number;
@@ -48,6 +81,10 @@ export interface BulkApplySettingsDto {
   customAssessmentColumns?: CustomAssessmentColumn[];
   baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression?: boolean;
+  customRatings?: RatingRangeConfig[];
+  ratingsLanguage?: LanguageCode;
+  customGuidance?: GuidanceRangeConfig[];
+  guidanceLanguage?: LanguageCode;
 }
 
 @Injectable({

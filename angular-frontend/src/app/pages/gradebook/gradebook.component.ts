@@ -9,6 +9,8 @@ import {
   BaseColumnConfig,
   BaseColumnKey,
   DEFAULT_BASE_COLUMN_SETTINGS,
+  RatingRangeConfig,
+  GuidanceRangeConfig,
 } from '../../services/grading-settings.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
@@ -224,6 +226,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   // Settings variables
   settingsSelectedClass: Class | null = null;
   selectedClassesForBulk: number[] = [];
+  applyToAllClasses: boolean = false;
+  selectedRatingsLanguage: string = '';
+  selectedGuidanceLanguage: string = '';
   gradingSettings: GradingSettings = {
     classId: 0,
     notebookCorrectionMaxScore: 5,
@@ -2577,44 +2582,86 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   // Calculate grade rating based on term average
   getGradeRating(student: Student): string {
     const average = student.averages?.termAverage || 0;
+    const language = this.languageService.getCurrentLanguage() as 'AR' | 'FR' | 'EN';
+    
+    // استخدام القيم المخصصة إذا كانت موجودة
+    if (this.currentClassGradingSettings?.customRatings && this.currentClassGradingSettings.customRatings.length > 0) {
+      // البحث عن النطاق المناسب
+      for (const range of this.currentClassGradingSettings.customRatings) {
+        if (average >= range.min && (range.max === undefined || average < range.max)) {
+          return range.ratings[language] || range.ratings.AR || range.ratings.FR || range.ratings.EN || '';
+        }
+      }
+    }
+    
+    // استخدام القيم الافتراضية
     if (average >= 18) {
-      return 'ممتاز';
+      return language === 'AR' ? 'ممتاز' : language === 'FR' ? 'Excellent' : 'Excellent';
     } else if (average >= 16) {
-      return 'عمل جيد جدا';
+      return language === 'AR' ? 'عمل جيد جدا' : language === 'FR' ? 'Très bon travail' : 'Very good work';
     } else if (average >= 14) {
-      return 'عمل جيد';
+      return language === 'AR' ? 'عمل جيد' : language === 'FR' ? 'Bon travail' : 'Good work';
     } else if (average >= 12) {
-      return 'عمل حسن';
+      return language === 'AR' ? 'عمل حسن' : language === 'FR' ? 'Travail correct' : 'Fair work';
     } else if (average >= 10) {
-      return 'عمل متوسط';
+      return language === 'AR' ? 'عمل متوسط' : language === 'FR' ? 'Travail moyen' : 'Average work';
     } else if (average >= 8) {
-      return 'دون الوسط';
+      return language === 'AR' ? 'دون الوسط' : language === 'FR' ? 'En dessous de la moyenne' : 'Below average';
     } else if (average >= 4) {
-      return 'عمل ناقص';
+      return language === 'AR' ? 'عمل ناقص' : language === 'FR' ? 'Travail insuffisant' : 'Insufficient work';
     } else {
-      return 'عمل ناقص جدا';
+      return language === 'AR' ? 'عمل ناقص جدا' : language === 'FR' ? 'Travail très insuffisant' : 'Very insufficient work';
     }
   }
 
   // Calculate guidance based on term average
   getGuidance(student: Student): string {
     const average = student.averages?.termAverage || 0;
+    const language = this.languageService.getCurrentLanguage() as 'AR' | 'FR' | 'EN';
+    
+    // استخدام القيم المخصصة إذا كانت موجودة
+    if (this.currentClassGradingSettings?.customGuidance && this.currentClassGradingSettings.customGuidance.length > 0) {
+      // البحث عن النطاق المناسب
+      for (const range of this.currentClassGradingSettings.customGuidance) {
+        if (average >= range.min && (range.max === undefined || average < range.max)) {
+          return range.guidance[language] || range.guidance.AR || range.guidance.FR || range.guidance.EN || '';
+        }
+      }
+    }
+    
+    // استخدام القيم الافتراضية
     if (average >= 18) {
-      return 'تلميذ نجيب يتمتع بقدرات عالية وجدية متميزة، أتمنى لك التوفيق';
+      return language === 'AR' ? 'تلميذ نجيب يتمتع بقدرات عالية وجدية متميزة، أتمنى لك التوفيق' :
+             language === 'FR' ? 'Élève assidu avec des capacités élevées et un sérieux remarquable, je vous souhaite succès' :
+             'Diligent student with high abilities and remarkable seriousness, I wish you success';
     } else if (average >= 16) {
-      return 'عمل يستحق الشكر والتشجيع، واصل';
+      return language === 'AR' ? 'عمل يستحق الشكر والتشجيع، واصل' :
+             language === 'FR' ? 'Travail méritant des félicitations et des encouragements, continuez' :
+             'Work deserving of congratulations and encouragement, continue';
     } else if (average >= 14) {
-      return 'نتائج مرضية وفي تحسن مستمر، لديك إمكانيات لمواصلة ذلك';
+      return language === 'AR' ? 'نتائج مرضية وفي تحسن مستمر، لديك إمكانيات لمواصلة ذلك' :
+             language === 'FR' ? 'Résultats satisfaisants et en amélioration continue, vous avez le potentiel de continuer' :
+             'Satisfactory results and continuous improvement, you have the potential to continue';
     } else if (average >= 12) {
-      return 'نتائج حسنة، لديك امكانيات لمواصلة ذلك';
+      return language === 'AR' ? 'نتائج حسنة، لديك امكانيات لمواصلة ذلك' :
+             language === 'FR' ? 'Résultats corrects, vous avez le potentiel de continuer à vous améliorer' :
+             'Good results, you have the potential to continue improving';
     } else if (average >= 10) {
-      return 'كان بالإمكان أن تكون النتائج أفضل';
+      return language === 'AR' ? 'كان بالإمكان أن تكون النتائج أفضل' :
+             language === 'FR' ? 'Les résultats auraient pu être meilleurs' :
+             'Results could have been better';
     } else if (average >= 8) {
-      return 'عليك بمضاعفة مجهوداتك';
+      return language === 'AR' ? 'عليك بمضاعفة مجهوداتك' :
+             language === 'FR' ? 'Vous devez multiplier vos efforts' :
+             'You need to multiply your efforts';
     } else if (average >= 6) {
-      return 'عليك ببذل المزيد من الجهد لتحسين نتائجك';
+      return language === 'AR' ? 'عليك ببذل المزيد من الجهد لتحسين نتائجك' :
+             language === 'FR' ? 'Vous devez faire plus d\'efforts pour améliorer vos résultats' :
+             'You need to make more effort to improve your results';
     } else {
-      return 'عمل ناقص عليك بمضاعفة مجهودك';
+      return language === 'AR' ? 'عمل ناقص عليك بمضاعفة مجهودك' :
+             language === 'FR' ? 'Travail insuffisant, vous devez multiplier vos efforts' :
+             'Insufficient work, you need to multiply your efforts';
     }
   }
 
@@ -4345,6 +4392,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
           };
         }
         this.gradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings);
+        // Initialize default ratings and guidance if not present
+        this.initializeDefaultRatingsAndGuidance();
       },
       error: (error) => {
         console.error('Error loading grading settings:', error);
@@ -4431,6 +4480,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       customAssessmentColumns: customColumns,
       baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
+      customRatings: this.gradingSettings.customRatings || [],
+      customGuidance: this.gradingSettings.customGuidance || [],
     };
 
     this.gradingSettingsService.update(this.settingsSelectedClass.id, settingsToSave).subscribe({
@@ -4641,6 +4692,495 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     return !this.gradingSettings.behaviorAutoApply;
   }
 
+  getDefaultRatings(): RatingRangeConfig[] {
+    return [
+      { 
+        min: 18, 
+        ratings: { 
+          AR: 'ممتاز', 
+          FR: 'Excellent', 
+          EN: 'Excellent',
+          ES: 'Excelente',
+          IT: 'Eccellente',
+          DE: 'Ausgezeichnet',
+          TR: 'Mükemmel'
+        } 
+      },
+      { 
+        min: 16, 
+        max: 18, 
+        ratings: { 
+          AR: 'عمل جيد جدا', 
+          FR: 'Très bon travail', 
+          EN: 'Very good work',
+          ES: 'Muy buen trabajo',
+          IT: 'Ottimo lavoro',
+          DE: 'Sehr gute Arbeit',
+          TR: 'Çok iyi iş'
+        } 
+      },
+      { 
+        min: 14, 
+        max: 16, 
+        ratings: { 
+          AR: 'عمل جيد', 
+          FR: 'Bon travail', 
+          EN: 'Good work',
+          ES: 'Buen trabajo',
+          IT: 'Buon lavoro',
+          DE: 'Gute Arbeit',
+          TR: 'İyi iş'
+        } 
+      },
+      { 
+        min: 12, 
+        max: 14, 
+        ratings: { 
+          AR: 'عمل حسن', 
+          FR: 'Travail correct', 
+          EN: 'Fair work',
+          ES: 'Trabajo aceptable',
+          IT: 'Lavoro discreto',
+          DE: 'Angemessene Arbeit',
+          TR: 'Kabul edilebilir iş'
+        } 
+      },
+      { 
+        min: 10, 
+        max: 12, 
+        ratings: { 
+          AR: 'عمل متوسط', 
+          FR: 'Travail moyen', 
+          EN: 'Average work',
+          ES: 'Trabajo promedio',
+          IT: 'Lavoro medio',
+          DE: 'Durchschnittliche Arbeit',
+          TR: 'Orta iş'
+        } 
+      },
+      { 
+        min: 8, 
+        max: 10, 
+        ratings: { 
+          AR: 'دون الوسط', 
+          FR: 'En dessous de la moyenne', 
+          EN: 'Below average',
+          ES: 'Por debajo del promedio',
+          IT: 'Sotto la media',
+          DE: 'Unter dem Durchschnitt',
+          TR: 'Ortalamanın altında'
+        } 
+      },
+      { 
+        min: 4, 
+        max: 8, 
+        ratings: { 
+          AR: 'عمل ناقص', 
+          FR: 'Travail insuffisant', 
+          EN: 'Insufficient work',
+          ES: 'Trabajo insuficiente',
+          IT: 'Lavoro insufficiente',
+          DE: 'Unzureichende Arbeit',
+          TR: 'Yetersiz iş'
+        } 
+      },
+      { 
+        min: 0, 
+        max: 4, 
+        ratings: { 
+          AR: 'عمل ناقص جدا', 
+          FR: 'Travail très insuffisant', 
+          EN: 'Very insufficient work',
+          ES: 'Trabajo muy insuficiente',
+          IT: 'Lavoro molto insufficiente',
+          DE: 'Sehr unzureichende Arbeit',
+          TR: 'Çok yetersiz iş'
+        } 
+      },
+    ];
+  }
+
+  getDefaultGuidance(): GuidanceRangeConfig[] {
+    return [
+      { 
+        min: 18, 
+        guidance: { 
+          AR: 'تلميذ نجيب يتمتع بقدرات عالية وجدية متميزة، أتمنى لك التوفيق', 
+          FR: 'Élève assidu avec des capacités élevées et un sérieux remarquable, je vous souhaite succès',
+          EN: 'Diligent student with high abilities and remarkable seriousness, I wish you success',
+          ES: 'Estudiante diligente con altas capacidades y seriedad notable, te deseo éxito',
+          IT: 'Studente diligente con elevate capacità e serietà notevole, ti auguro successo',
+          DE: 'Fleißiger Schüler mit hohen Fähigkeiten und bemerkenswerter Ernsthaftigkeit, ich wünsche dir Erfolg',
+          TR: 'Yüksek yeteneklere ve dikkat çekici ciddiyete sahip çalışkan öğrenci, sana başarılar dilerim'
+        } 
+      },
+      { 
+        min: 16, 
+        max: 18, 
+        guidance: { 
+          AR: 'عمل يستحق الشكر والتشجيع، واصل', 
+          FR: 'Travail méritant des félicitations et des encouragements, continuez',
+          EN: 'Work deserving of congratulations and encouragement, continue',
+          ES: 'Trabajo que merece felicitaciones y aliento, continúa',
+          IT: 'Lavoro che merita congratulazioni e incoraggiamento, continua',
+          DE: 'Arbeit, die Glückwünsche und Ermutigung verdient, weiter so',
+          TR: 'Tebrikleri ve teşviki hak eden iş, devam et'
+        } 
+      },
+      { 
+        min: 14, 
+        max: 16, 
+        guidance: { 
+          AR: 'نتائج مرضية وفي تحسن مستمر، لديك إمكانيات لمواصلة ذلك', 
+          FR: 'Résultats satisfaisants et en amélioration continue, vous avez le potentiel de continuer',
+          EN: 'Satisfactory results and continuous improvement, you have the potential to continue',
+          ES: 'Resultados satisfactorios y mejora continua, tienes el potencial para continuar',
+          IT: 'Risultati soddisfacenti e miglioramento continuo, hai il potenziale per continuare',
+          DE: 'Zufriedenstellende Ergebnisse und kontinuierliche Verbesserung, du hast das Potenzial weiterzumachen',
+          TR: 'Tatmin edici sonuçlar ve sürekli iyileşme, devam etme potansiyelin var'
+        } 
+      },
+      { 
+        min: 12, 
+        max: 14, 
+        guidance: { 
+          AR: 'نتائج حسنة، لديك امكانيات لمواصلة ذلك', 
+          FR: 'Résultats corrects, vous avez le potentiel de continuer à vous améliorer',
+          EN: 'Good results, you have the potential to continue improving',
+          ES: 'Buenos resultados, tienes el potencial para seguir mejorando',
+          IT: 'Buoni risultati, hai il potenziale per continuare a migliorare',
+          DE: 'Gute Ergebnisse, du hast das Potenzial, dich weiter zu verbessern',
+          TR: 'İyi sonuçlar, gelişmeye devam etme potansiyelin var'
+        } 
+      },
+      { 
+        min: 10, 
+        max: 12, 
+        guidance: { 
+          AR: 'كان بالإمكان أن تكون النتائج أفضل', 
+          FR: 'Les résultats auraient pu être meilleurs',
+          EN: 'Results could have been better',
+          ES: 'Los resultados podrían haber sido mejores',
+          IT: 'I risultati avrebbero potuto essere migliori',
+          DE: 'Die Ergebnisse hätten besser sein können',
+          TR: 'Sonuçlar daha iyi olabilirdi'
+        } 
+      },
+      { 
+        min: 8, 
+        max: 10, 
+        guidance: { 
+          AR: 'عليك بمضاعفة مجهوداتك', 
+          FR: 'Vous devez multiplier vos efforts',
+          EN: 'You need to multiply your efforts',
+          ES: 'Necesitas multiplicar tus esfuerzos',
+          IT: 'Devi moltiplicare i tuoi sforzi',
+          DE: 'Du musst deine Anstrengungen vervielfachen',
+          TR: 'Çabalarını çoğaltmalısın'
+        } 
+      },
+      { 
+        min: 6, 
+        max: 8, 
+        guidance: { 
+          AR: 'عليك ببذل المزيد من الجهد لتحسين نتائجك', 
+          FR: 'Vous devez faire plus d\'efforts pour améliorer vos résultats',
+          EN: 'You need to make more effort to improve your results',
+          ES: 'Necesitas hacer más esfuerzo para mejorar tus resultados',
+          IT: 'Devi fare più sforzo per migliorare i tuoi risultati',
+          DE: 'Du musst mehr Anstrengung unternehmen, um deine Ergebnisse zu verbessern',
+          TR: 'Sonuçlarını iyileştirmek için daha fazla çaba göstermelisin'
+        } 
+      },
+      { 
+        min: 0, 
+        max: 6, 
+        guidance: { 
+          AR: 'عمل ناقص عليك بمضاعفة مجهودك', 
+          FR: 'Travail insuffisant, vous devez multiplier vos efforts',
+          EN: 'Insufficient work, you need to multiply your efforts',
+          ES: 'Trabajo insuficiente, necesitas multiplicar tus esfuerzos',
+          IT: 'Lavoro insufficiente, devi moltiplicare i tuoi sforzi',
+          DE: 'Unzureichende Arbeit, du musst deine Anstrengungen vervielfachen',
+          TR: 'Yetersiz iş, çabalarını çoğaltmalısın'
+        } 
+      },
+    ];
+  }
+
+  initializeDefaultRatingsAndGuidance(): void {
+    if (!this.gradingSettings.customRatings || this.gradingSettings.customRatings.length === 0) {
+      this.gradingSettings.customRatings = this.getDefaultRatings();
+    }
+    if (!this.gradingSettings.customGuidance || this.gradingSettings.customGuidance.length === 0) {
+      this.gradingSettings.customGuidance = this.getDefaultGuidance();
+    }
+  }
+
+  addRatingRange(): void {
+    if (!this.gradingSettings.customRatings) {
+      this.gradingSettings.customRatings = [];
+    }
+    this.gradingSettings.customRatings.push({
+      min: 0,
+      max: undefined,
+      ratings: {}
+    });
+  }
+
+  removeRatingRange(index: number): void {
+    if (this.gradingSettings.customRatings) {
+      this.gradingSettings.customRatings.splice(index, 1);
+    }
+  }
+
+  addGuidanceRange(): void {
+    if (!this.gradingSettings.customGuidance) {
+      this.gradingSettings.customGuidance = [];
+    }
+    this.gradingSettings.customGuidance.push({
+      min: 0,
+      max: undefined,
+      guidance: {}
+    });
+  }
+
+  removeGuidanceRange(index: number): void {
+    if (this.gradingSettings.customGuidance) {
+      this.gradingSettings.customGuidance.splice(index, 1);
+    }
+  }
+
+  // Helper functions for managing rating languages
+  getRatingLanguageCodes(range: any): string[] {
+    if (!range.ratings) {
+      range.ratings = {};
+      return [''];
+    }
+    const codes: string[] = [];
+    const allCodes = ['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'];
+    allCodes.forEach(code => {
+      if (range.ratings[code] !== undefined && range.ratings[code] !== '') {
+        codes.push(code);
+      }
+    });
+    // Always add one empty entry for adding new language
+    codes.push('');
+    return codes;
+  }
+
+  addRatingLanguage(range: any): void {
+    if (!range.ratings) {
+      range.ratings = {};
+    }
+    // Add empty entry - already handled by getRatingLanguageCodes
+  }
+
+  updateRatingLanguageCode(range: any, index: number, newCode: string): void {
+    if (!range.ratings) {
+      range.ratings = {};
+    }
+    const codes = this.getRatingLanguageCodes(range);
+    const oldCode = codes[index];
+    const value = oldCode ? range.ratings[oldCode] : '';
+    
+    if (oldCode && oldCode !== newCode) {
+      delete range.ratings[oldCode];
+    }
+    if (newCode) {
+      range.ratings[newCode] = value || '';
+    }
+  }
+
+  getRatingValue(range: any, code: string): string {
+    if (!range.ratings || !code) {
+      return '';
+    }
+    return range.ratings[code] || '';
+  }
+
+  setRatingValue(range: any, code: string, value: string): void {
+    if (!range.ratings) {
+      range.ratings = {};
+    }
+    if (code) {
+      range.ratings[code] = value;
+    }
+  }
+
+  removeRatingLanguage(range: any, code: string): void {
+    if (range.ratings && code) {
+      delete range.ratings[code];
+    }
+  }
+
+  // Helper functions for managing guidance languages
+  getGuidanceLanguageCodes(range: any): string[] {
+    if (!range.guidance) {
+      range.guidance = {};
+      return [''];
+    }
+    const codes: string[] = [];
+    const allCodes = ['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'];
+    allCodes.forEach(code => {
+      if (range.guidance[code] !== undefined && range.guidance[code] !== '') {
+        codes.push(code);
+      }
+    });
+    // Always add one empty entry for adding new language
+    codes.push('');
+    return codes;
+  }
+
+  addGuidanceLanguage(range: any): void {
+    if (!range.guidance) {
+      range.guidance = {};
+    }
+    // Add empty entry - already handled by getGuidanceLanguageCodes
+  }
+
+  updateGuidanceLanguageCode(range: any, index: number, newCode: string): void {
+    if (!range.guidance) {
+      range.guidance = {};
+    }
+    const codes = this.getGuidanceLanguageCodes(range);
+    const oldCode = codes[index];
+    const value = oldCode ? range.guidance[oldCode] : '';
+    
+    if (oldCode && oldCode !== newCode) {
+      delete range.guidance[oldCode];
+    }
+    if (newCode) {
+      range.guidance[newCode] = value || '';
+    }
+  }
+
+  getGuidanceValue(range: any, code: string): string {
+    if (!range.guidance || !code) {
+      return '';
+    }
+    return range.guidance[code] || '';
+  }
+
+  setGuidanceValue(range: any, code: string, value: string): void {
+    if (!range.guidance) {
+      range.guidance = {};
+    }
+    if (code) {
+      range.guidance[code] = value;
+    }
+  }
+
+  removeGuidanceLanguage(range: any, code: string): void {
+    if (range.guidance && code) {
+      delete range.guidance[code];
+    }
+  }
+
+  // Apply default ratings for selected language
+  applyDefaultRatingsForLanguage(language: string): void {
+    if (!language) {
+      return;
+    }
+
+    const defaultRatings = this.getDefaultRatings();
+    
+    // Initialize customRatings if empty
+    if (!this.gradingSettings.customRatings || this.gradingSettings.customRatings.length === 0) {
+      this.gradingSettings.customRatings = defaultRatings.map(r => ({
+        min: r.min,
+        max: r.max,
+        ratings: {}
+      }));
+    }
+
+    // Apply default values for selected language to all ranges
+    this.gradingSettings.customRatings.forEach((range, index) => {
+      const defaultRange = defaultRatings.find(dr => 
+        dr.min === range.min && 
+        (dr.max === range.max || (dr.max === undefined && range.max === undefined))
+      );
+      
+      if (defaultRange && defaultRange.ratings[language as keyof typeof defaultRange.ratings]) {
+        if (!range.ratings) {
+          range.ratings = {};
+        }
+        range.ratings[language as keyof typeof range.ratings] = defaultRange.ratings[language as keyof typeof defaultRange.ratings] as string;
+      }
+    });
+  }
+
+  // Get rating value for selected language
+  getRatingValueForSelectedLanguage(range: any): string {
+    if (!this.selectedRatingsLanguage || !range.ratings) {
+      return '';
+    }
+    return range.ratings[this.selectedRatingsLanguage] || '';
+  }
+
+  // Set rating value for selected language
+  setRatingValueForSelectedLanguage(range: any, value: string): void {
+    if (!this.selectedRatingsLanguage) {
+      return;
+    }
+    if (!range.ratings) {
+      range.ratings = {};
+    }
+    range.ratings[this.selectedRatingsLanguage] = value;
+  }
+
+  // Apply default guidance for selected language
+  applyDefaultGuidanceForLanguage(language: string): void {
+    if (!language) {
+      return;
+    }
+
+    const defaultGuidance = this.getDefaultGuidance();
+    
+    // Initialize customGuidance if empty
+    if (!this.gradingSettings.customGuidance || this.gradingSettings.customGuidance.length === 0) {
+      this.gradingSettings.customGuidance = defaultGuidance.map(g => ({
+        min: g.min,
+        max: g.max,
+        guidance: {}
+      }));
+    }
+
+    // Apply default values for selected language to all ranges
+    this.gradingSettings.customGuidance.forEach((range, index) => {
+      const defaultRange = defaultGuidance.find(dg => 
+        dg.min === range.min && 
+        (dg.max === range.max || (dg.max === undefined && range.max === undefined))
+      );
+      
+      if (defaultRange && defaultRange.guidance[language as keyof typeof defaultRange.guidance]) {
+        if (!range.guidance) {
+          range.guidance = {};
+        }
+        range.guidance[language as keyof typeof range.guidance] = defaultRange.guidance[language as keyof typeof defaultRange.guidance] as string;
+      }
+    });
+  }
+
+  // Get guidance value for selected language
+  getGuidanceValueForSelectedLanguage(range: any): string {
+    if (!this.selectedGuidanceLanguage || !range.guidance) {
+      return '';
+    }
+    return range.guidance[this.selectedGuidanceLanguage] || '';
+  }
+
+  // Set guidance value for selected language
+  setGuidanceValueForSelectedLanguage(range: any, value: string): void {
+    if (!this.selectedGuidanceLanguage) {
+      return;
+    }
+    if (!range.guidance) {
+      range.guidance = {};
+    }
+    range.guidance[this.selectedGuidanceLanguage] = value;
+  }
+
   getTotalColumnsCount(): number {
     const fixedColumns = 5; // #, idNumber, firstName, lastName, birthDate
     const visibleBaseColumns = this.getBaseColumnsForCurrentView().filter(column => column.visible).length;
@@ -4769,19 +5309,13 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   bulkApplySettings(): void {
-    if (!this.selectedClassesForBulk || this.selectedClassesForBulk.length === 0) {
-      alert('يرجى اختيار قسم واحد على الأقل');
-      return;
-    }
-
     const total = this.calculateTotalMaxScore();
     if (total > 20) {
       alert('مجموع النقاط القصوى يجب ألا يتجاوز 20. الرجاء تعديل القيم.');
       return;
     }
 
-    const bulkDto = {
-      classIds: this.selectedClassesForBulk,
+    const bulkDto: any = {
       notebookCorrectionMaxScore: this.gradingSettings.notebookCorrectionMaxScore,
       dutyMaxScore: this.gradingSettings.dutyMaxScore,
       attendanceMaxScore: this.gradingSettings.attendanceMaxScore,
@@ -4791,7 +5325,28 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       customAssessmentColumns: this.gradingSettings.customAssessmentColumns,
       baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
+      customRatings: this.gradingSettings.customRatings,
+      customGuidance: this.gradingSettings.customGuidance,
     };
+
+    // Check if applying to all classes or specific classes
+    if (this.applyToAllClasses) {
+      bulkDto.applyToAllClasses = true;
+    } else {
+      if (!this.selectedClassesForBulk || this.selectedClassesForBulk.length === 0) {
+        alert('يرجى اختيار قسم واحد على الأقل أو تفعيل "تطبيق على جميع الأقسام"');
+        return;
+      }
+      bulkDto.classIds = this.selectedClassesForBulk;
+    }
+
+    // Add language selection if specified
+    if (this.selectedRatingsLanguage) {
+      bulkDto.ratingsLanguage = this.selectedRatingsLanguage;
+    }
+    if (this.selectedGuidanceLanguage) {
+      bulkDto.guidanceLanguage = this.selectedGuidanceLanguage;
+    }
 
     this.gradingSettingsService.bulkApply(bulkDto).subscribe({
       next: (results) => {

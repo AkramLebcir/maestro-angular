@@ -16,6 +16,36 @@ export interface BaseColumnConfig {
   visible?: boolean;
 }
 
+export type LanguageCode = 'AR' | 'FR' | 'EN' | 'ES' | 'IT' | 'DE' | 'TR';
+
+export interface RatingRangeConfig {
+  min: number;
+  max?: number; // undefined means infinity
+  ratings: {
+    AR?: string;
+    FR?: string;
+    EN?: string;
+    ES?: string;
+    IT?: string;
+    DE?: string;
+    TR?: string;
+  };
+}
+
+export interface GuidanceRangeConfig {
+  min: number;
+  max?: number; // undefined means infinity
+  guidance: {
+    AR?: string;
+    FR?: string;
+    EN?: string;
+    ES?: string;
+    IT?: string;
+    DE?: string;
+    TR?: string;
+  };
+}
+
 @Entity('grading_settings')
 export class GradingSettings extends TenantOwnedEntity {
   @PrimaryGeneratedColumn()
@@ -59,6 +89,14 @@ export class GradingSettings extends TenantOwnedEntity {
   // Oral Expression/Practical Work
   @Column({ type: 'boolean', default: true })
   includeOralExpression: boolean;
+
+  // Custom Ratings Configuration
+  @Column({ type: 'json', nullable: true })
+  customRatings: RatingRangeConfig[];
+
+  // Custom Guidance Configuration
+  @Column({ type: 'json', nullable: true })
+  customGuidance: GuidanceRangeConfig[];
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

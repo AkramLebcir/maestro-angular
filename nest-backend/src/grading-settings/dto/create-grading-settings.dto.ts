@@ -1,6 +1,6 @@
-import { IsNumber, IsBoolean, IsOptional, IsArray, ValidateNested, Min, IsString, IsIn } from 'class-validator';
+import { IsNumber, IsBoolean, IsOptional, IsArray, ValidateNested, Min, IsString, IsIn, ValidateIf } from 'class-validator';
 import { Type } from 'class-transformer';
-import { BaseColumnKey } from '../grading-settings.entity';
+import { BaseColumnKey, LanguageCode } from '../grading-settings.entity';
 
 export class CustomAssessmentColumnDto {
   @IsOptional()
@@ -29,6 +29,96 @@ export class BaseColumnConfigDto {
   @IsOptional()
   @IsBoolean()
   visible?: boolean;
+}
+
+export class RatingsDto {
+  @IsOptional()
+  @IsString()
+  AR?: string;
+
+  @IsOptional()
+  @IsString()
+  FR?: string;
+
+  @IsOptional()
+  @IsString()
+  EN?: string;
+
+  @IsOptional()
+  @IsString()
+  ES?: string;
+
+  @IsOptional()
+  @IsString()
+  IT?: string;
+
+  @IsOptional()
+  @IsString()
+  DE?: string;
+
+  @IsOptional()
+  @IsString()
+  TR?: string;
+}
+
+export class RatingRangeConfigDto {
+  @IsNumber()
+  @Min(0)
+  min: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  max?: number;
+
+  @ValidateNested()
+  @Type(() => RatingsDto)
+  ratings: RatingsDto;
+}
+
+export class GuidanceDto {
+  @IsOptional()
+  @IsString()
+  AR?: string;
+
+  @IsOptional()
+  @IsString()
+  FR?: string;
+
+  @IsOptional()
+  @IsString()
+  EN?: string;
+
+  @IsOptional()
+  @IsString()
+  ES?: string;
+
+  @IsOptional()
+  @IsString()
+  IT?: string;
+
+  @IsOptional()
+  @IsString()
+  DE?: string;
+
+  @IsOptional()
+  @IsString()
+  TR?: string;
+}
+
+export class GuidanceRangeConfigDto {
+  @IsNumber()
+  @Min(0)
+  min: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  max?: number;
+
+  @ValidateNested()
+  @Type(() => GuidanceDto)
+  guidance: GuidanceDto;
 }
 
 export class CreateGradingSettingsDto {
@@ -78,6 +168,18 @@ export class CreateGradingSettingsDto {
   @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RatingRangeConfigDto)
+  customRatings?: RatingRangeConfigDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GuidanceRangeConfigDto)
+  customGuidance?: GuidanceRangeConfigDto[];
 }
 
 export class UpdateGradingSettingsDto {
@@ -124,13 +226,31 @@ export class UpdateGradingSettingsDto {
   @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RatingRangeConfigDto)
+  customRatings?: RatingRangeConfigDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GuidanceRangeConfigDto)
+  customGuidance?: GuidanceRangeConfigDto[];
 }
 
 export class BulkApplySettingsDto {
-  @IsArray()
+  @ValidateIf((o) => !o.applyToAllClasses)
+  @IsArray({ message: 'classIds is required when applyToAllClasses is false' })
   @IsNumber({}, { each: true })
-  classIds: number[];
+  classIds?: number[];
 
+  @IsOptional()
+  @IsBoolean()
+  applyToAllClasses?: boolean;
+
+  @IsOptional()
   @IsNumber()
   @Min(0)
   notebookCorrectionMaxScore?: number;
@@ -173,5 +293,27 @@ export class BulkApplySettingsDto {
   @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RatingRangeConfigDto)
+  customRatings?: RatingRangeConfigDto[];
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'])
+  ratingsLanguage?: LanguageCode;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => GuidanceRangeConfigDto)
+  customGuidance?: GuidanceRangeConfigDto[];
+
+  @IsOptional()
+  @IsString()
+  @IsIn(['AR', 'FR', 'EN', 'ES', 'IT', 'DE', 'TR'])
+  guidanceLanguage?: LanguageCode;
 }
 

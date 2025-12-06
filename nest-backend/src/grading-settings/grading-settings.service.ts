@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { GradingSettings, BaseColumnConfig, BaseColumnKey } from './grading-settings.entity';
+import { GradingSettings, BaseColumnConfig, BaseColumnKey, LanguageCode } from './grading-settings.entity';
 import { Class } from '../classes/class.entity';
 import { CreateGradingSettingsDto, UpdateGradingSettingsDto, BulkApplySettingsDto } from './dto/create-grading-settings.dto';
 
@@ -82,6 +82,8 @@ export class GradingSettingsService {
       customAssessmentColumns: createDto.customAssessmentColumns ?? [],
       baseColumnSettings: normalizeBaseColumnSettings(createDto.baseColumnSettings),
       includeOralExpression: createDto.includeOralExpression ?? true,
+      customRatings: createDto.customRatings ?? null,
+      customGuidance: createDto.customGuidance ?? null,
     });
 
     return this.gradingSettingsRepository.save(settings);
@@ -135,17 +137,40 @@ export class GradingSettingsService {
     if (updateDto.includeOralExpression !== undefined) {
       settings.includeOralExpression = updateDto.includeOralExpression;
     }
+    if (updateDto.customRatings !== undefined) {
+      settings.customRatings = updateDto.customRatings;
+    }
+    if (updateDto.customGuidance !== undefined) {
+      settings.customGuidance = updateDto.customGuidance;
+    }
 
     return this.gradingSettingsRepository.save(settings);
   }
 
   async bulkApply(ownerId: number, bulkDto: BulkApplySettingsDto): Promise<GradingSettings[]> {
+    // Determine which classes to apply to
+    let classIds: number[];
+
+    if (bulkDto.applyToAllClasses) {
+      // Get all classes for the owner
+      const allClasses = await this.classRepository.find({
+        where: { ownerId },
+        select: ['id'],
+      });
+      classIds = allClasses.map((cls) => cls.id);
+    } else {
+      if (!bulkDto.classIds || bulkDto.classIds.length === 0) {
+        throw new BadRequestException('classIds is required unless applyToAllClasses is true');
+      }
+      classIds = bulkDto.classIds;
+    }
+
     // Verify all classes exist and belong to owner
     const classes = await this.classRepository.find({
-      where: { id: In(bulkDto.classIds), ownerId },
+      where: { id: In(classIds), ownerId },
     });
 
-    if (classes.length !== bulkDto.classIds.length) {
+    if (classes.length !== classIds.length) {
       throw new NotFoundException('One or more classes not found');
     }
 
@@ -154,7 +179,38 @@ export class GradingSettingsService {
 
     const results: GradingSettings[] = [];
 
-    for (const classId of bulkDto.classIds) {
+    for (const classId of classIds) {
+      // Get existing settings to merge ratings/guidance with language selection
+      const existingSettings = await this.findByClassId(ownerId, classId);
+
+      // Prepare ratings with language selection
+      let customRatings = bulkDto.customRatings;
+      if (bulkDto.customRatings !== undefined) {
+        if (bulkDto.ratingsLanguage && existingSettings?.customRatings) {
+          // Merge: update only the selected language in existing ratings
+          customRatings = this.mergeRatingsWithLanguage(
+            existingSettings.customRatings,
+            bulkDto.customRatings,
+            bulkDto.ratingsLanguage,
+          );
+        }
+        // If ratingsLanguage is not specified, customRatings will replace entirely (already set above)
+      }
+
+      // Prepare guidance with language selection
+      let customGuidance = bulkDto.customGuidance;
+      if (bulkDto.customGuidance !== undefined) {
+        if (bulkDto.guidanceLanguage && existingSettings?.customGuidance) {
+          // Merge: update only the selected language in existing guidance
+          customGuidance = this.mergeGuidanceWithLanguage(
+            existingSettings.customGuidance,
+            bulkDto.customGuidance,
+            bulkDto.guidanceLanguage,
+          );
+        }
+        // If guidanceLanguage is not specified, customGuidance will replace entirely (already set above)
+      }
+
       const updateDto: UpdateGradingSettingsDto = {
         notebookCorrectionMaxScore: bulkDto.notebookCorrectionMaxScore,
         dutyMaxScore: bulkDto.dutyMaxScore,
@@ -165,6 +221,8 @@ export class GradingSettingsService {
         customAssessmentColumns: bulkDto.customAssessmentColumns,
         baseColumnSettings: bulkDto.baseColumnSettings,
         includeOralExpression: bulkDto.includeOralExpression,
+        customRatings,
+        customGuidance,
       };
 
       const updated = await this.update(ownerId, classId, updateDto);
@@ -172,6 +230,74 @@ export class GradingSettingsService {
     }
 
     return results;
+  }
+
+  private mergeRatingsWithLanguage(
+    existing: any[],
+    newRatings: any[],
+    language: LanguageCode,
+  ): any[] {
+    // If no existing ratings, return new ones
+    if (!existing || existing.length === 0) {
+      return newRatings;
+    }
+
+    // Create a map of existing ratings by min/max for quick lookup
+    const existingMap = new Map<string, any>();
+    existing.forEach((rating) => {
+      const key = `${rating.min}-${rating.max ?? 'inf'}`;
+      existingMap.set(key, { ...rating });
+    });
+
+    // Update existing ratings with new language values
+    newRatings.forEach((newRating) => {
+      const key = `${newRating.min}-${newRating.max ?? 'inf'}`;
+      const existingRating = existingMap.get(key);
+
+      if (existingRating) {
+        // Update only the selected language
+        existingRating.ratings[language] = newRating.ratings[language];
+      } else {
+        // Add new rating if it doesn't exist
+        existingMap.set(key, { ...newRating });
+      }
+    });
+
+    return Array.from(existingMap.values());
+  }
+
+  private mergeGuidanceWithLanguage(
+    existing: any[],
+    newGuidance: any[],
+    language: LanguageCode,
+  ): any[] {
+    // If no existing guidance, return new ones
+    if (!existing || existing.length === 0) {
+      return newGuidance;
+    }
+
+    // Create a map of existing guidance by min/max for quick lookup
+    const existingMap = new Map<string, any>();
+    existing.forEach((guidance) => {
+      const key = `${guidance.min}-${guidance.max ?? 'inf'}`;
+      existingMap.set(key, { ...guidance });
+    });
+
+    // Update existing guidance with new language values
+    newGuidance.forEach((newGuidanceItem) => {
+      const key = `${newGuidanceItem.min}-${newGuidanceItem.max ?? 'inf'}`;
+      const existingGuidance = existingMap.get(key);
+
+      if (existingGuidance) {
+        // Update only the selected language
+        existingGuidance.guidance[language] = newGuidanceItem.guidance[language];
+      } else {
+        // Add new guidance if it doesn't exist
+        existingMap.set(key, { ...newGuidanceItem });
+      }
+    });
+
+    return Array.from(existingMap.values());
   }
 
   async delete(ownerId: number, classId: number): Promise<void> {
