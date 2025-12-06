@@ -1,5 +1,6 @@
-import { IsNumber, IsBoolean, IsOptional, IsArray, ValidateNested, Min, Max, IsString, IsObject } from 'class-validator';
+import { IsNumber, IsBoolean, IsOptional, IsArray, ValidateNested, Min, IsString, IsIn } from 'class-validator';
 import { Type } from 'class-transformer';
+import { BaseColumnKey } from '../grading-settings.entity';
 
 export class CustomAssessmentColumnDto {
   @IsOptional()
@@ -12,6 +13,22 @@ export class CustomAssessmentColumnDto {
   @IsNumber()
   @Min(0)
   maxScore: number;
+}
+
+const BASE_COLUMN_KEYS: BaseColumnKey[] = ['notebook_correction', 'duty', 'attendance', 'behavior'];
+
+export class BaseColumnConfigDto {
+  @IsString()
+  @IsIn(BASE_COLUMN_KEYS)
+  key: BaseColumnKey;
+
+  @IsOptional()
+  @IsString()
+  label?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  visible?: boolean;
 }
 
 export class CreateGradingSettingsDto {
@@ -53,6 +70,12 @@ export class CreateGradingSettingsDto {
   customAssessmentColumns?: CustomAssessmentColumnDto[];
 
   @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BaseColumnConfigDto)
+  baseColumnSettings?: BaseColumnConfigDto[];
+
+  @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
 }
@@ -91,6 +114,12 @@ export class UpdateGradingSettingsDto {
   @ValidateNested({ each: true })
   @Type(() => CustomAssessmentColumnDto)
   customAssessmentColumns?: CustomAssessmentColumnDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BaseColumnConfigDto)
+  baseColumnSettings?: BaseColumnConfigDto[];
 
   @IsOptional()
   @IsBoolean()
@@ -134,6 +163,12 @@ export class BulkApplySettingsDto {
   @ValidateNested({ each: true })
   @Type(() => CustomAssessmentColumnDto)
   customAssessmentColumns?: CustomAssessmentColumnDto[];
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => BaseColumnConfigDto)
+  baseColumnSettings?: BaseColumnConfigDto[];
 
   @IsOptional()
   @IsBoolean()

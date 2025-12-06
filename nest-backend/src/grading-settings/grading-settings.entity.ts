@@ -2,10 +2,18 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 't
 import { Class } from '../classes/class.entity';
 import { TenantOwnedEntity } from '../common/entities/tenant-owned.entity';
 
+export type BaseColumnKey = 'notebook_correction' | 'duty' | 'attendance' | 'behavior';
+
 export interface CustomAssessmentColumn {
   id?: string;
   name: string;
   maxScore: number;
+}
+
+export interface BaseColumnConfig {
+  key: BaseColumnKey;
+  label?: string;
+  visible?: boolean;
 }
 
 @Entity('grading_settings')
@@ -43,6 +51,10 @@ export class GradingSettings extends TenantOwnedEntity {
   // Custom Assessment Columns
   @Column({ type: 'json', nullable: true })
   customAssessmentColumns: CustomAssessmentColumn[];
+
+  // Base Column Configuration (labels + visibility overrides)
+  @Column({ type: 'json', nullable: true })
+  baseColumnSettings: BaseColumnConfig[];
 
   // Oral Expression/Practical Work
   @Column({ type: 'boolean', default: true })

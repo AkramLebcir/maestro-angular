@@ -2,6 +2,21 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiService } from './api.service';
 
+export type BaseColumnKey = 'notebook_correction' | 'duty' | 'attendance' | 'behavior';
+
+export interface BaseColumnConfig {
+  key: BaseColumnKey;
+  label?: string;
+  visible?: boolean;
+}
+
+export const DEFAULT_BASE_COLUMN_SETTINGS: BaseColumnConfig[] = [
+  { key: 'notebook_correction', visible: true },
+  { key: 'duty', visible: true },
+  { key: 'attendance', visible: true },
+  { key: 'behavior', visible: true },
+];
+
 export interface CustomAssessmentColumn {
   id?: string;
   name: string;
@@ -18,6 +33,7 @@ export interface GradingSettings {
   behaviorMaxScore: number;
   behaviorAutoApply: boolean;
   customAssessmentColumns?: CustomAssessmentColumn[];
+  baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression: boolean;
 }
 
@@ -30,6 +46,7 @@ export interface BulkApplySettingsDto {
   behaviorMaxScore?: number;
   behaviorAutoApply?: boolean;
   customAssessmentColumns?: CustomAssessmentColumn[];
+  baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression?: boolean;
 }
 

@@ -2405,6 +2405,33 @@ export class LanguageService {
         'DE': 'Beispiel: Klassenbeteiligung',
         'TR': 'Örnek: Sınıf katılımı'
       },
+      'gradebook.baseColumnSettings': {
+        'AR': 'إعدادات الأعمدة الأساسية',
+        'FR': 'Paramètres des colonnes de base',
+        'EN': 'Base column settings',
+        'ES': 'Configuración de columnas básicas',
+        'IT': 'Impostazioni colonne base',
+        'DE': 'Einstellungen der Basis-Spalten',
+        'TR': 'Temel sütun ayarları'
+      },
+      'gradebook.baseColumnSettingsDescription': {
+        'AR': 'قم بتغيير الاسم أو إخفاء الأعمدة الافتراضية: تصحيح الدفتر، الواجب، الحضور، والسلوك.',
+        'FR': 'Renommez ou masquez les colonnes par défaut : correction du cahier, devoir, présence et comportement.',
+        'EN': 'Rename or hide the default columns: notebook correction, homework, attendance, and behavior.',
+        'ES': 'Cambie el nombre o oculte las columnas predeterminadas: corrección del cuaderno, deber, asistencia y comportamiento.',
+        'IT': 'Rinomina o nascondi le colonne predefinite: correzione quaderno, compiti, presenza e comportamento.',
+        'DE': 'Benennen Sie die Standardspalten um oder blenden Sie sie aus: Heftekorrektur, Hausaufgaben, Anwesenheit und Verhalten.',
+        'TR': 'Varsayılan sütunları yeniden adlandırın veya gizleyin: defter düzeltme, ödev, yoklama ve davranış.'
+      },
+      'gradebook.showColumn': {
+        'AR': 'عرض العمود',
+        'FR': 'Afficher la colonne',
+        'EN': 'Show column',
+        'ES': 'Mostrar columna',
+        'IT': 'Mostra colonna',
+        'DE': 'Spalte anzeigen',
+        'TR': 'Sütunu göster'
+      },
       'gradebook.maxScore': {
         'AR': 'النقطة القصوى',
         'FR': 'Score maximum',

@@ -2,7 +2,14 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewI
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
-import { GradingSettingsService, GradingSettings, CustomAssessmentColumn } from '../../services/grading-settings.service';
+import {
+  GradingSettingsService,
+  GradingSettings,
+  CustomAssessmentColumn,
+  BaseColumnConfig,
+  BaseColumnKey,
+  DEFAULT_BASE_COLUMN_SETTINGS,
+} from '../../services/grading-settings.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -204,6 +211,13 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     { id: 9, type: 'test', name: 'Test', nameAr: 'الاختبار', weight: 3, maxScore: 20, isAutomatic: false }
   ];
 
+  readonly baseColumnDefinitions: { key: BaseColumnKey; translationKey: string }[] = [
+    { key: 'notebook_correction', translationKey: 'gradebook.notebookCorrection' },
+    { key: 'duty', translationKey: 'gradebook.homework' },
+    { key: 'attendance', translationKey: 'gradebook.attendance5' },
+    { key: 'behavior', translationKey: 'gradebook.behavior5' },
+  ];
+
   // View mode
   viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'settings' = 'entry';
   
@@ -219,6 +233,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     behaviorMaxScore: 5,
     behaviorAutoApply: true,
     customAssessmentColumns: [],
+    baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
     includeOralExpression: true,
   };
   
@@ -522,8 +537,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
             behaviorMaxScore: 5,
             behaviorAutoApply: true,
             customAssessmentColumns: [],
+            baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
             includeOralExpression: true,
           };
+        }
+        if (this.currentClassGradingSettings) {
+          this.currentClassGradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.currentClassGradingSettings.baseColumnSettings);
         }
         // Recalculate grades with new settings
         this.calculateAllGrades();
@@ -540,8 +559,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
           behaviorMaxScore: 5,
           behaviorAutoApply: true,
           customAssessmentColumns: [],
+          baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
           includeOralExpression: true,
         };
+        this.currentClassGradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.currentClassGradingSettings.baseColumnSettings);
       }
     });
   }
@@ -4319,9 +4340,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
             behaviorMaxScore: 5,
             behaviorAutoApply: true,
             customAssessmentColumns: [],
+            baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
             includeOralExpression: true,
           };
         }
+        this.gradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings);
       },
       error: (error) => {
         console.error('Error loading grading settings:', error);
@@ -4350,15 +4373,23 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   calculateTotalMaxScore(): number {
-    const notebookMax = Number(this.gradingSettings.notebookCorrectionMaxScore || 5);
-    const dutyMax = Number(this.gradingSettings.dutyMaxScore || 5);
-    const attendanceMax = Number(this.gradingSettings.attendanceMaxScore || 5);
-    const behaviorMax = Number(this.gradingSettings.behaviorMaxScore || 5);
+    const safeNumber = (value: any): number => {
+      const num = Number(value);
+      return isNaN(num) ? 0 : num;
+    };
+
+    const baseColumnsTotal = this.baseColumnDefinitions.reduce((sum, def) => {
+      if (!this.isBaseColumnVisibleInSettings(def.key)) {
+        return sum;
+      }
+      return sum + safeNumber(this.getMaxForBaseColumn(def.key));
+    }, 0);
+
     const customColumnsTotal = (this.gradingSettings.customAssessmentColumns || []).reduce((sum, col) => {
       return sum + Number(col.maxScore || 0);
     }, 0);
 
-    return notebookMax + dutyMax + attendanceMax + behaviorMax + customColumnsTotal;
+    return baseColumnsTotal + customColumnsTotal;
   }
 
   validateTotalMaxScore(): void {
@@ -4398,6 +4429,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       behaviorMaxScore: toNumber(this.gradingSettings.behaviorMaxScore),
       behaviorAutoApply: this.gradingSettings.behaviorAutoApply,
       customAssessmentColumns: customColumns,
+      baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
     };
 
@@ -4434,6 +4466,14 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     return true;
   }
 
+  getNotebookCorrectionMaxFromSettings(): number {
+    return this.currentClassGradingSettings?.notebookCorrectionMaxScore ?? 5;
+  }
+
+  getDutyMaxFromSettings(): number {
+    return this.currentClassGradingSettings?.dutyMaxScore ?? 5;
+  }
+
   private getAttendanceMaxFromSettings(): number {
     return this.currentClassGradingSettings?.attendanceMaxScore ?? 5;
   }
@@ -4457,15 +4497,168 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     return [];
   }
 
-  getTotalColumnsCount(): number {
-    // Base columns: #, idNumber, firstName, lastName, birthDate, notebook, homework, attendance, behavior, 
-    // continuousAssessment, oralExpression (conditional), assignment, test, termAverage, ratings, guidance, ranking
-    let count = 17; // Base columns
-    if (this.shouldShowOralExpressionColumn()) {
-      count += 1;
+  private normalizeBaseColumnSettings(settings?: BaseColumnConfig[]): BaseColumnConfig[] {
+    const normalizedMap = new Map<BaseColumnKey, BaseColumnConfig>();
+    (settings || []).forEach(column => {
+      normalizedMap.set(column.key, {
+        key: column.key,
+        label: column.label,
+        visible: column.visible ?? true,
+      });
+    });
+
+    return this.baseColumnDefinitions.map(def => {
+      const existing = normalizedMap.get(def.key);
+      if (existing) {
+        return existing;
+      }
+      const fallback = DEFAULT_BASE_COLUMN_SETTINGS.find(entry => entry.key === def.key);
+      return {
+        key: def.key,
+        label: fallback?.label,
+        visible: fallback?.visible ?? true,
+      };
+    });
+  }
+
+  private getBaseColumnsForCurrentView(): BaseColumnConfig[] {
+    return this.normalizeBaseColumnSettings(this.currentClassGradingSettings?.baseColumnSettings);
+  }
+
+  private getCurrentBaseColumnConfig(key: BaseColumnKey): BaseColumnConfig {
+    return this.getBaseColumnsForCurrentView().find(column => column.key === key) ?? { key, visible: true };
+  }
+
+  getSettingsBaseColumn(key: BaseColumnKey): BaseColumnConfig {
+    if (!this.gradingSettings.baseColumnSettings) {
+      this.gradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings([]);
     }
-    count += this.getCustomColumns().length; // Add custom columns
-    return count;
+    this.gradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings);
+    let column = this.gradingSettings.baseColumnSettings.find(item => item.key === key);
+    if (!column) {
+      column = { key, visible: true };
+      this.gradingSettings.baseColumnSettings.push(column);
+    }
+    return column;
+  }
+
+  shouldShowBaseColumn(key: BaseColumnKey): boolean {
+    return this.getCurrentBaseColumnConfig(key).visible ?? true;
+  }
+
+  getBaseColumnLabel(key: BaseColumnKey, translationKey: string): string {
+    const config = this.getCurrentBaseColumnConfig(key);
+    return config.label?.trim() ? config.label : this.translate(translationKey);
+  }
+
+  private isBaseColumnVisibleInSettings(key: BaseColumnKey): boolean {
+    const column = this.getSettingsBaseColumn(key);
+    return column.visible ?? true;
+  }
+
+  getMaxForBaseColumn(key: BaseColumnKey): number {
+    switch (key) {
+      case 'notebook_correction':
+        return this.gradingSettings.notebookCorrectionMaxScore ?? 5;
+      case 'duty':
+        return this.gradingSettings.dutyMaxScore ?? 5;
+      case 'attendance':
+        return this.gradingSettings.attendanceMaxScore ?? 5;
+      case 'behavior':
+        return this.gradingSettings.behaviorMaxScore ?? 5;
+      default:
+        return 0;
+    }
+  }
+
+  onBaseColumnMaxChange(key: BaseColumnKey, value: string | number): void {
+    const numericValue = Number(value);
+    const safeValue = isNaN(numericValue) ? 0 : numericValue;
+    switch (key) {
+      case 'notebook_correction':
+        this.gradingSettings.notebookCorrectionMaxScore = safeValue;
+        break;
+      case 'duty':
+        this.gradingSettings.dutyMaxScore = safeValue;
+        break;
+      case 'attendance':
+        this.gradingSettings.attendanceMaxScore = safeValue;
+        break;
+      case 'behavior':
+        this.gradingSettings.behaviorMaxScore = safeValue;
+        break;
+    }
+    this.validateTotalMaxScore();
+  }
+
+  onBaseColumnVisibilityChange(key: BaseColumnKey, visible: boolean): void {
+    const column = this.getSettingsBaseColumn(key);
+    column.visible = visible;
+    
+    // عند إخفاء العمود، تعيين النقطة القصوى إلى 0
+    if (!visible) {
+      switch (key) {
+        case 'notebook_correction':
+          this.gradingSettings.notebookCorrectionMaxScore = 0;
+          break;
+        case 'duty':
+          this.gradingSettings.dutyMaxScore = 0;
+          break;
+        case 'attendance':
+          this.gradingSettings.attendanceMaxScore = 0;
+          break;
+        case 'behavior':
+          this.gradingSettings.behaviorMaxScore = 0;
+          break;
+      }
+      this.validateTotalMaxScore();
+      this.cdr.detectChanges();
+    }
+  }
+
+  getAutoApplyValue(key: BaseColumnKey): boolean {
+    if (key === 'attendance') {
+      return this.gradingSettings.attendanceAutoApply;
+    } else if (key === 'behavior') {
+      return this.gradingSettings.behaviorAutoApply;
+    }
+    return false;
+  }
+
+  setAutoApplyValue(key: BaseColumnKey, value: boolean): void {
+    if (key === 'attendance') {
+      this.gradingSettings.attendanceAutoApply = value;
+    } else if (key === 'behavior') {
+      this.gradingSettings.behaviorAutoApply = value;
+    }
+  }
+
+  isAttendanceManual(): boolean {
+    return !this.gradingSettings.attendanceAutoApply;
+  }
+
+  isBehaviorManual(): boolean {
+    return !this.gradingSettings.behaviorAutoApply;
+  }
+
+  getTotalColumnsCount(): number {
+    const fixedColumns = 5; // #, idNumber, firstName, lastName, birthDate
+    const visibleBaseColumns = this.getBaseColumnsForCurrentView().filter(column => column.visible).length;
+    const continuousAssessment = 1;
+    const oralExpression = this.shouldShowOralExpressionColumn() ? 1 : 0;
+    const assignment = 1;
+    const test = 1;
+    const extraColumns = 4; // termAverage, ratings, guidance, ranking
+    return (
+      fixedColumns +
+      visibleBaseColumns +
+      continuousAssessment +
+      oralExpression +
+      assignment +
+      test +
+      extraColumns +
+      this.getCustomColumns().length
+    );
   }
 
   getCustomColumnGrade(studentId: number, columnId: string | undefined): number | null {
@@ -4596,6 +4789,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       behaviorMaxScore: this.gradingSettings.behaviorMaxScore,
       behaviorAutoApply: this.gradingSettings.behaviorAutoApply,
       customAssessmentColumns: this.gradingSettings.customAssessmentColumns,
+      baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
     };
 

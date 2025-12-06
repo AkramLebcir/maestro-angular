@@ -1,9 +1,25 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
-import { GradingSettings } from './grading-settings.entity';
+import { GradingSettings, BaseColumnConfig, BaseColumnKey } from './grading-settings.entity';
 import { Class } from '../classes/class.entity';
 import { CreateGradingSettingsDto, UpdateGradingSettingsDto, BulkApplySettingsDto } from './dto/create-grading-settings.dto';
+
+const DEFAULT_BASE_COLUMN_SETTINGS: BaseColumnConfig[] = [
+  { key: 'notebook_correction', visible: true },
+  { key: 'duty', visible: true },
+  { key: 'attendance', visible: true },
+  { key: 'behavior', visible: true },
+];
+
+const normalizeBaseColumnSettings = (settings?: BaseColumnConfig[]): BaseColumnConfig[] => {
+  const source = settings && settings.length > 0 ? settings : DEFAULT_BASE_COLUMN_SETTINGS;
+  return source.map(config => ({
+    key: config.key,
+    label: config.label,
+    visible: config.visible ?? true,
+  }));
+};
 
 @Injectable()
 export class GradingSettingsService {
@@ -15,17 +31,24 @@ export class GradingSettingsService {
   ) {}
 
   async findByClassId(ownerId: number, classId: number): Promise<GradingSettings | null> {
-    return this.gradingSettingsRepository.findOne({
+    const settings = await this.gradingSettingsRepository.findOne({
       where: { ownerId, classId },
       relations: ['class'],
     });
+    if (!settings) return null;
+    settings.baseColumnSettings = normalizeBaseColumnSettings(settings.baseColumnSettings);
+    return settings;
   }
 
   async findAll(ownerId: number): Promise<GradingSettings[]> {
-    return this.gradingSettingsRepository.find({
+    const settings = await this.gradingSettingsRepository.find({
       where: { ownerId },
       relations: ['class'],
     });
+    settings.forEach(setting => {
+      setting.baseColumnSettings = normalizeBaseColumnSettings(setting.baseColumnSettings);
+    });
+    return settings;
   }
 
   async create(ownerId: number, createDto: CreateGradingSettingsDto): Promise<GradingSettings> {
@@ -57,6 +80,7 @@ export class GradingSettingsService {
       behaviorMaxScore: createDto.behaviorMaxScore ?? 5,
       behaviorAutoApply: createDto.behaviorAutoApply ?? true,
       customAssessmentColumns: createDto.customAssessmentColumns ?? [],
+      baseColumnSettings: normalizeBaseColumnSettings(createDto.baseColumnSettings),
       includeOralExpression: createDto.includeOralExpression ?? true,
     });
 
@@ -103,6 +127,11 @@ export class GradingSettingsService {
     if (updateDto.customAssessmentColumns !== undefined) {
       settings.customAssessmentColumns = updateDto.customAssessmentColumns;
     }
+    if (updateDto.baseColumnSettings !== undefined) {
+      settings.baseColumnSettings = normalizeBaseColumnSettings(updateDto.baseColumnSettings);
+    } else {
+      settings.baseColumnSettings = normalizeBaseColumnSettings(settings.baseColumnSettings);
+    }
     if (updateDto.includeOralExpression !== undefined) {
       settings.includeOralExpression = updateDto.includeOralExpression;
     }
@@ -134,6 +163,7 @@ export class GradingSettingsService {
         behaviorMaxScore: bulkDto.behaviorMaxScore,
         behaviorAutoApply: bulkDto.behaviorAutoApply,
         customAssessmentColumns: bulkDto.customAssessmentColumns,
+        baseColumnSettings: bulkDto.baseColumnSettings,
         includeOralExpression: bulkDto.includeOralExpression,
       };
 
