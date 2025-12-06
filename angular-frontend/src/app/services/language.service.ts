@@ -10794,13 +10794,13 @@ export class LanguageService {
 
       // Login
       'login.title': {
-        'AR': 'نظام إدارة التدريس',
-        'FR': 'Système de gestion pédagogique',
-        'EN': 'Teaching Management System',
-        'ES': 'Sistema de gestión de enseñanza',
-        'IT': 'Sistema di gestione didattica',
-        'DE': 'Lehrverwaltungssystem',
-        'TR': 'Öğretim Yönetim Sistemi'
+        'AR': 'المايسترو',
+        'FR': 'Maestro',
+        'EN': 'Maestro',
+        'ES': 'Maestro',
+        'IT': 'Maestro',
+        'DE': 'Maestro',
+        'TR': 'Maestro'
       },
       'login.subtitle': {
         'AR': 'تسجيل الدخول إلى حسابك',
@@ -10866,13 +10866,13 @@ export class LanguageService {
         'TR': 'Giriş yapılıyor...'
       },
       'login.footer': {
-        'AR': '© 2024 نظام إدارة التدريس. جميع الحقوق محفوظة.',
-        'FR': '© 2024 Système de gestion pédagogique. Tous droits réservés.',
-        'EN': '© 2024 Teaching Management System. All rights reserved.',
-        'ES': '© 2024 Sistema de gestión de enseñanza. Todos los derechos reservados.',
-        'IT': '© 2024 Sistema di gestione didattica. Tutti i diritti riservati.',
-        'DE': '© 2024 Lehrverwaltungssystem. Alle Rechte vorbehalten.',
-        'TR': '© 2024 Öğretim Yönetim Sistemi. Tüm hakları saklıdır.'
+        'AR': '© 2024 المايسترو. جميع الحقوق محفوظة.',
+        'FR': '© 2024 Maestro. Tous droits réservés.',
+        'EN': '© 2024 Maestro. All rights reserved.',
+        'ES': '© 2024 Maestro. Todos los derechos reservados.',
+        'IT': '© 2024 Maestro. Tutti i diritti riservati.',
+        'DE': '© 2024 Maestro. Alle Rechte vorbehalten.',
+        'TR': '© 2024 Maestro. Tüm hakları saklıdır.'
       },
       'login.error': {
         'AR': 'خطأ في تسجيل الدخول. الرجاء التحقق من البيانات المدخلة.',
