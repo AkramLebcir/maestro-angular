@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
@@ -202,7 +202,7 @@ export class ClassesComponent implements OnInit {
 
   constructor(
     private apiService: ApiService,
-    public languageService: LanguageService
+    @Inject(LanguageService) public languageService: LanguageService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {

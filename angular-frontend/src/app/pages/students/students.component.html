@@ -490,7 +490,7 @@
     class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-4xl my-8"
     (click)="$event.stopPropagation()">
     <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">تحديد صف رؤوس الأعمدة</h3>
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ translate('students.headerRowSelection') }}</h3>
       <button 
         (click)="closeHeaderRowModal()"
         class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
@@ -503,23 +503,23 @@
     <div class="space-y-6">
       <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4 mb-4">
         <p class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-2">
-          📋 تعليمات:
+          📋 {{ translate('students.headerRowInstructions') }}
         </p>
         <ul class="text-sm text-gray-600 dark:text-gray-400 space-y-1 list-disc list-inside">
-          <li>راجع معاينة الصفوف لكل ورقة عمل أدناه</li>
-          <li>أدخل رقم الصف الذي يحتوي على رؤوس الأعمدة (مثل: 8 أو 9)</li>
-          <li>سيتم تجاهل الصفوف من 1 إلى (رقم الصف المحدد - 1) تلقائياً</li>
-          <li>الصف المحدد سيظهر بخلفية صفراء</li>
+          <li>{{ translate('students.reviewPreview') }}</li>
+          <li>{{ translate('students.enterHeaderRowNumber') }}</li>
+          <li>{{ translate('students.rowsWillBeIgnored') }}</li>
+          <li>{{ translate('students.selectedRowHighlighted') }}</li>
         </ul>
       </div>
 
       <div *ngFor="let sheetData of pendingExcelData" class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-        <h4 class="font-semibold text-gray-800 dark:text-gray-200">ورقة العمل: {{ sheetData.className }}</h4>
+        <h4 class="font-semibold text-gray-800 dark:text-gray-200">{{ translate('students.worksheet') }} {{ sheetData.className }}</h4>
         
         <!-- Preview of first rows -->
         <div class="overflow-x-auto max-h-96 overflow-y-auto">
           <p class="text-xs text-gray-500 dark:text-gray-400 mb-2">
-            💡 الصف المحدد سيظهر بخلفية صفراء. الصف المكتشف تلقائياً بخلفية زرقاء.
+            💡 {{ translate('students.selectedRowInfo') }}
           </p>
           <table class="w-full text-sm border-collapse border border-gray-300 dark:border-gray-600">
             <thead class="sticky top-0 bg-gray-100 dark:bg-gray-800 z-10">
@@ -527,7 +527,7 @@
                 <th class="border border-gray-300 dark:border-gray-600 px-2 py-1 text-right font-semibold bg-gray-200">#</th>
                 <th *ngFor="let cell of getPreviewRows(sheetData.className, 1)[0]?.slice(0, 8) || []; let i = index" 
                     class="border border-gray-300 dark:border-gray-600 px-2 py-1 text-right text-xs font-semibold bg-gray-200">
-                  {{ cell || ('عمود ' + (i + 1)) }}
+                  {{ cell || (translate('students.column') + ' ' + (i + 1)) }}
                 </th>
               </tr>
             </thead>
@@ -551,7 +551,7 @@
         <!-- Header row input -->
         <div class="flex flex-wrap items-center gap-3">
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
-            الصف الذي يحتوي على رؤوس الأعمدة هو:
+            {{ translate('students.headerRowLabel') }}
           </label>
           <input 
             type="number"
@@ -561,16 +561,16 @@
             min="1"
             [max]="sheetData.rawData.length || 100"
             class="w-20 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            placeholder="رقم الصف"
+            [placeholder]="translate('students.rowNumber')"
             required>
           <span class="text-sm text-gray-600 dark:text-gray-400">
-            <span class="font-medium">سيتم تجاهل الصفوف من 1 إلى</span> 
+            <span class="font-medium">{{ translate('students.rowsWillBeIgnoredFrom') }}</span> 
             <span class="font-bold text-blue-600">{{ (selectedHeaderRow[sheetData.className] || (detectedHeaderRow[sheetData.className] !== -1 ? detectedHeaderRow[sheetData.className] + 1 : 1)) - 1 }}</span>
-            <span class="font-medium">تلقائياً</span>
+            <span class="font-medium">{{ translate('students.automatically') }}</span>
           </span>
           <span *ngIf="detectedHeaderRow[sheetData.className] !== -1 && !selectedHeaderRow[sheetData.className]" 
                 class="text-xs text-blue-600 bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded">
-            تم اكتشاف تلقائياً: {{ detectedHeaderRow[sheetData.className] + 1 }}
+            {{ translate('students.autoDetected') }} {{ detectedHeaderRow[sheetData.className] + 1 }}
           </span>
         </div>
       </div>
@@ -580,12 +580,12 @@
         <button 
           (click)="closeHeaderRowModal()"
           class="px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition">
-          إلغاء
+          {{ translate('students.cancel') }}
         </button>
         <button 
           (click)="confirmHeaderRows()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-          تأكيد والاستيراد
+          {{ translate('students.confirmAndImport') }}
         </button>
       </div>
     </div>
@@ -603,15 +603,15 @@
     <!-- Header -->
     <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start z-10">
       <div class="flex-1">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">تقرير ملخص الطالب</h2>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ translate('students.studentReportTitle') }}</h2>
         <div class="flex items-center gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">القسم</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('students.class') }}</label>
             <select 
               [(ngModel)]="reportSelectedClass"
               (change)="onReportClassChange()"
               class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
-              <option [ngValue]="null">اختر القسم</option>
+              <option [ngValue]="null">{{ translate('students.selectClassForReport') }}</option>
               <option *ngFor="let classItem of reportStudentClasses" [ngValue]="classItem">{{ classItem.name }}</option>
             </select>
           </div>
@@ -631,7 +631,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>{{ isExportingPDF ? 'جاري التصدير...' : 'تصدير PDF' }}</span>
+          <span>{{ isExportingPDF ? translate('classes.exportingPDF') : translate('classes.exportPDF') }}</span>
         </button>
         <button 
           (click)="closeReportModal()"
@@ -661,10 +661,10 @@
         </div>
         <div class="flex-1">
           <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ reportStudent.firstName }} {{ reportStudent.lastName }}</h3>
-          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>القسم:</strong> {{ reportSubject }}</p>
-          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>البريد الإلكتروني:</strong> {{ reportStudent.email || '-' }}</p>
-          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>بريد ولي الأمر:</strong> {{ reportStudent.email || '-' }}</p>
-          <p class="text-gray-600 dark:text-gray-400"><strong>هاتف ولي الأمر:</strong> -</p>
+          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>{{ translate('classes.reportClassLabel') }}</strong> {{ reportSubject }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>{{ translate('students.emailLabel') }}</strong> {{ reportStudent.email || '-' }}</p>
+          <p class="text-gray-600 dark:text-gray-400 mb-1"><strong>{{ translate('students.parentEmailLabel') }}</strong> {{ reportStudent.email || '-' }}</p>
+          <p class="text-gray-600 dark:text-gray-400"><strong>{{ translate('students.parentPhoneLabel') }}</strong> -</p>
         </div>
         <div class="text-right">
           <div class="text-4xl font-bold text-blue-600 mb-1">{{ getGradeLetter(reportOverallGrade) }}</div>
@@ -674,12 +674,12 @@
 
       <!-- Attendance Section -->
       <div class="mb-6">
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">الحضور</h3>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('attendance.title') }}</h3>
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
           <!-- Overall Attendance Donut Chart -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">الحضور الإجمالي</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('students.totalAttendance') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'doughnut'"
@@ -691,7 +691,7 @@
           
           <!-- Bi-Weekly Distribution -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع ثنائي الأسبوع (آخر 16 أسبوع)</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('students.biWeeklyDistribution') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'bar'"
@@ -705,12 +705,12 @@
 
       <!-- Behavior Section -->
       <div class="mb-6">
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">السلوك</h3>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('students.behavior') }}</h3>
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-4">
           <!-- Bi-Weekly Behavior Line Chart -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع ثنائي الأسبوع (آخر 16 أسبوع)</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('students.biWeeklyDistribution') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'line'"
@@ -722,26 +722,26 @@
           
           <!-- Behavior Details Table -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">تفاصيل السلوك (أحدث الحوادث)</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('students.behaviorDetails') }}</h4>
             <div class="space-y-4">
               <div>
-                <p class="text-sm font-semibold text-green-600 mb-2">إيجابي ({{ getBehaviorDetails().positive.length }})</p>
+                <p class="text-sm font-semibold text-green-600 mb-2">{{ translate('classes.positive') }} ({{ getBehaviorDetails().positive.length }})</p>
                 <div class="space-y-1">
                   <div *ngFor="let event of getBehaviorDetails().positive" class="text-sm text-gray-700 dark:text-gray-300 flex justify-between">
-                    <span>{{ event.behaviorName || 'سلوك إيجابي' }}</span>
+                    <span>{{ event.behaviorName || translate('students.positiveBehavior') }}</span>
                     <span class="text-gray-500 dark:text-gray-400">{{ formatDate(event.date) }}</span>
                   </div>
-                  <div *ngIf="getBehaviorDetails().positive.length === 0" class="text-sm text-gray-500 dark:text-gray-400">لا توجد حوادث إيجابية</div>
+                  <div *ngIf="getBehaviorDetails().positive.length === 0" class="text-sm text-gray-500 dark:text-gray-400">{{ translate('students.noPositiveIncidents') }}</div>
                 </div>
               </div>
               <div>
-                <p class="text-sm font-semibold text-red-600 mb-2">سلبي ({{ getBehaviorDetails().negative.length }})</p>
+                <p class="text-sm font-semibold text-red-600 mb-2">{{ translate('classes.negative') }} ({{ getBehaviorDetails().negative.length }})</p>
                 <div class="space-y-1">
                   <div *ngFor="let event of getBehaviorDetails().negative" class="text-sm text-gray-700 dark:text-gray-300 flex justify-between">
-                    <span>{{ event.behaviorName || 'سلوك سلبي' }}</span>
+                    <span>{{ event.behaviorName || translate('students.negativeBehavior') }}</span>
                     <span class="text-gray-500 dark:text-gray-400">{{ formatDate(event.date) }}</span>
                   </div>
-                  <div *ngIf="getBehaviorDetails().negative.length === 0" class="text-sm text-gray-500 dark:text-gray-400">لا توجد حوادث سلبية</div>
+                  <div *ngIf="getBehaviorDetails().negative.length === 0" class="text-sm text-gray-500 dark:text-gray-400">{{ translate('students.noNegativeIncidents') }}</div>
                 </div>
               </div>
             </div>
@@ -751,12 +751,12 @@
 
       <!-- Grades Section -->
       <div class="mb-6">
-        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">الدرجات</h3>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('classes.grades') }}</h3>
         
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <!-- Grades Bar Chart -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">الدرجات</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('classes.grades') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'bar'"
@@ -768,7 +768,7 @@
           
           <!-- Weighted Gradable Items Pie Chart -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">الأوزان المرجحة للعناصر القابلة للتقييم</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('students.weightedGradableItems') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'pie'"
@@ -783,7 +783,7 @@
 
     <!-- No Class Selected Message -->
     <div class="p-6 text-center text-gray-500 dark:text-gray-400" *ngIf="!reportSelectedClass">
-      <p>يرجى اختيار مادة لعرض التقرير</p>
+      <p>{{ translate('students.selectSubjectForReport') }}</p>
     </div>
   </div>
 </div>

@@ -264,19 +264,19 @@
 
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
       <div class="flex items-center justify-between mb-3 gap-2">
-        <h2 class="font-semibold text-gray-700 dark:text-gray-300">التوزيع السنوي (مع الإزاحة حسب العطل)</h2>
+        <h2 class="font-semibold text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.withHolidays') }}</h2>
         <div class="flex items-center gap-2">
           <button
             (click)="loadDistributions(true)"
             class="text-xs px-3 py-1 rounded border border-indigo-500 text-indigo-600 hover:bg-indigo-50 dark:bg-indigo-900/20"
           >
-            إعادة احتساب التواريخ
+            {{ translate('annualDistribution.recalculateDates') }}
           </button>
         <button
           (click)="exportDistributionToPdf()"
           class="btn-export-pdf text-xs px-3 py-1 rounded bg-red-600 text-white hover:bg-red-700"
         >
-            تصدير PDF
+            {{ translate('annualDistribution.exportPdf') }}
           </button>
         </div>
       </div>
@@ -285,14 +285,14 @@
         <table class="min-w-full text-sm text-right">
           <thead class="bg-gray-50 dark:bg-gray-900">
             <tr>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">النوع</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الفصل</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الأسبوع</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">الوحدة / النشاط</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">المجال / اسم العطلة</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">تاريخ البداية</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">تاريخ النهاية</th>
-              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">ملاحظات</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderType') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderTerm') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderWeek') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderUnit') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderDomain') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderStartDate') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderEndDate') }}</th>
+              <th class="px-3 py-2 text-gray-700 dark:text-gray-300">{{ translate('annualDistribution.tableHeaderNotes') }}</th>
             </tr>
           </thead>
           <tbody class="bg-white dark:bg-gray-800">
@@ -303,11 +303,11 @@
                   *ngIf="row.kind === 'distribution'; else holidayType"
                   class="px-2 py-0.5 rounded-full text-xs bg-indigo-100 text-indigo-700"
                 >
-                  حصة
+                  {{ translate('annualDistribution.lesson') }}
                 </span>
                 <ng-template #holidayType>
                   <span class="px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-700">
-                    {{ row.holiday?.type === 'EXAM' ? 'امتحان' : 'عطلة' }}
+                    {{ row.holiday?.type === 'EXAM' ? translate('annualDistribution.typeExam') : translate('annualDistribution.typeHoliday') }}
                   </span>
                 </ng-template>
               </td>
@@ -379,7 +379,7 @@
 
             <tr *ngIf="timelineRows.length === 0">
               <td colspan="8" class="px-3 py-4 text-center text-gray-400 dark:text-gray-500">
-                لم تتم إضافة أي توزيع أو عطلة بعد لهذه السنة والمستوى.
+                {{ translate('annualDistribution.noDistribution') }}
               </td>
             </tr>
           </tbody>

@@ -396,6 +396,15 @@ export class LanguageService {
         'DE': 'Exportieren',
         'TR': 'Dışa aktar'
       },
+      'common.exportPdf': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter en PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'Als PDF exportieren',
+        'TR': 'PDF olarak dışa aktar'
+      },
       'common.search': {
         'AR': 'بحث',
         'FR': 'Rechercher',
@@ -1635,6 +1644,60 @@ export class LanguageService {
         'IT': 'Non specificato',
         'DE': 'Nicht angegeben',
         'TR': 'Belirtilmemiş'
+      },
+      'trainingInspection.visitTypeConfirmation': {
+        'AR': 'ترسيم',
+        'FR': 'Inauguration',
+        'EN': 'Inauguration',
+        'ES': 'Inauguración',
+        'IT': 'Inaugurazione',
+        'DE': 'Einweihung',
+        'TR': 'Açılış'
+      },
+      'trainingInspection.visitTypeExchange': {
+        'AR': 'تبادل خبرات',
+        'FR': 'Échange d\'expériences',
+        'EN': 'Experience exchange',
+        'ES': 'Intercambio de experiencias',
+        'IT': 'Scambio di esperienze',
+        'DE': 'Erfahrungsaustausch',
+        'TR': 'Deneyim paylaşımı'
+      },
+      'trainingInspection.visitTypeAdministrative': {
+        'AR': 'إدارية',
+        'FR': 'Administrative',
+        'EN': 'Administrative',
+        'ES': 'Administrativa',
+        'IT': 'Amministrativa',
+        'DE': 'Verwaltungsbezogen',
+        'TR': 'İdari'
+      },
+      'trainingInspection.visitTypeFollowUp': {
+        'AR': 'متابعة بيداغوجية',
+        'FR': 'Suivi pédagogique',
+        'EN': 'Pedagogical follow-up',
+        'ES': 'Seguimiento pedagógico',
+        'IT': 'Follow-up pedagogico',
+        'DE': 'Pädagogische Nachbetreuung',
+        'TR': 'Pedagojik takip'
+      },
+      'trainingInspection.visitorName': {
+        'AR': 'اسم الزائر',
+        'FR': 'Nom du visiteur',
+        'EN': 'Visitor name',
+        'ES': 'Nombre del visitante',
+        'IT': 'Nome del visitatore',
+        'DE': 'Name des Besuchers',
+        'TR': 'Ziyaretçi adı'
+      },
+      'trainingInspection.noPedagogicalVisits': {
+        'AR': 'لا توجد زيارات تربوية مسجلة بعد.',
+        'FR': 'Aucune visite pédagogique enregistrée pour le moment.',
+        'EN': 'No pedagogical visits recorded yet.',
+        'ES': 'No hay visitas pedagógicas registradas todavía.',
+        'IT': 'Nessuna visita pedagogica registrata finora.',
+        'DE': 'Noch keine pädagogischen Besuche aufgezeichnet.',
+        'TR': 'Henüz pedagojik ziyaret kaydı yok.'
       },
 
       // Header
@@ -4069,6 +4132,15 @@ export class LanguageService {
         'DE': 'Gruppe 2',
         'TR': '2. grup'
       },
+      'classes.group': {
+        'AR': 'المجموعة',
+        'FR': 'Groupe',
+        'EN': 'Group',
+        'ES': 'Grupo',
+        'IT': 'Gruppo',
+        'DE': 'Gruppe',
+        'TR': 'Grup'
+      },
       'classes.remove': {
         'AR': 'إزالة',
         'FR': 'Retirer',
@@ -4131,6 +4203,312 @@ export class LanguageService {
         'IT': 'Elimina',
         'DE': 'Löschen',
         'TR': 'Sil'
+      },
+      'classes.reportTitle': {
+        'AR': 'تقرير ملخص القسم',
+        'FR': 'Rapport récapitulatif de la classe',
+        'EN': 'Class Summary Report',
+        'ES': 'Informe resumido de la clase',
+        'IT': 'Rapporto riepilogativo della classe',
+        'DE': 'Klassenübersichtsbericht',
+        'TR': 'Sınıf özet raporu'
+      },
+      'classes.reportClassLabel': {
+        'AR': 'القسم:',
+        'FR': 'Classe :',
+        'EN': 'Class:',
+        'ES': 'Clase:',
+        'IT': 'Classe:',
+        'DE': 'Klasse:',
+        'TR': 'Sınıf:'
+      },
+      'classes.exportingPDF': {
+        'AR': 'جاري التصدير...',
+        'FR': 'Exportation en cours...',
+        'EN': 'Exporting...',
+        'ES': 'Exportando...',
+        'IT': 'Esportazione in corso...',
+        'DE': 'Exportieren...',
+        'TR': 'Dışa aktarılıyor...'
+      },
+      'classes.exportPDF': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'classes.loadingReport': {
+        'AR': 'جاري تحميل بيانات التقرير...',
+        'FR': 'Chargement des données du rapport...',
+        'EN': 'Loading report data...',
+        'ES': 'Cargando datos del informe...',
+        'IT': 'Caricamento dati del rapporto...',
+        'DE': 'Berichtsdaten werden geladen...',
+        'TR': 'Rapor verileri yükleniyor...'
+      },
+      'classes.studentsSortedByGrades': {
+        'AR': 'جميع الطلاب مرتبين حسب درجاتهم تنازلياً',
+        'FR': 'Tous les étudiants triés par notes décroissantes',
+        'EN': 'All students sorted by grades in descending order',
+        'ES': 'Todos los estudiantes ordenados por calificaciones en orden descendente',
+        'IT': 'Tutti gli studenti ordinati per voti in ordine decrescente',
+        'DE': 'Alle Schüler nach Noten in absteigender Reihenfolge sortiert',
+        'TR': 'Tüm öğrenciler notlarına göre azalan sırada sıralanmış'
+      },
+      'classes.firstName': {
+        'AR': 'الاسم',
+        'FR': 'Prénom',
+        'EN': 'First name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Vorname',
+        'TR': 'Ad'
+      },
+      'classes.lastName': {
+        'AR': 'اللقب',
+        'FR': 'Nom',
+        'EN': 'Last name',
+        'ES': 'Apellido',
+        'IT': 'Cognome',
+        'DE': 'Nachname',
+        'TR': 'Soyad'
+      },
+      'classes.average': {
+        'AR': 'المتوسط',
+        'FR': 'Moyenne',
+        'EN': 'Average',
+        'ES': 'Promedio',
+        'IT': 'Media',
+        'DE': 'Durchschnitt',
+        'TR': 'Ortalama'
+      },
+      'classes.attendanceDistribution': {
+        'AR': 'التوزيع العام للحضور',
+        'FR': 'Distribution générale de la présence',
+        'EN': 'Overall Attendance Distribution',
+        'ES': 'Distribución general de asistencia',
+        'IT': 'Distribuzione generale della presenza',
+        'DE': 'Gesamtverteilung der Anwesenheit',
+        'TR': 'Genel devam dağılımı'
+      },
+      'classes.generalDistribution': {
+        'AR': 'التوزيع العام',
+        'FR': 'Distribution générale',
+        'EN': 'General Distribution',
+        'ES': 'Distribución general',
+        'IT': 'Distribuzione generale',
+        'DE': 'Allgemeine Verteilung',
+        'TR': 'Genel dağılım'
+      },
+      'classes.weeklyDistribution': {
+        'AR': 'التوزيع الأسبوعي (آخر 16 أسبوع)',
+        'FR': 'Distribution hebdomadaire (16 dernières semaines)',
+        'EN': 'Weekly Distribution (Last 16 weeks)',
+        'ES': 'Distribución semanal (últimas 16 semanas)',
+        'IT': 'Distribuzione settimanale (ultime 16 settimane)',
+        'DE': 'Wöchentliche Verteilung (letzte 16 Wochen)',
+        'TR': 'Haftalık dağılım (son 16 hafta)'
+      },
+      'classes.top5Present': {
+        'AR': 'أفضل 5 - حاضر',
+        'FR': 'Top 5 - Présent',
+        'EN': 'Top 5 - Present',
+        'ES': 'Top 5 - Presente',
+        'IT': 'Top 5 - Presente',
+        'DE': 'Top 5 - Anwesend',
+        'TR': 'İlk 5 - Mevcut'
+      },
+      'classes.top5Absent': {
+        'AR': 'أفضل 5 - غائب',
+        'FR': 'Top 5 - Absent',
+        'EN': 'Top 5 - Absent',
+        'ES': 'Top 5 - Ausente',
+        'IT': 'Top 5 - Assente',
+        'DE': 'Top 5 - Abwesend',
+        'TR': 'İlk 5 - Yok'
+      },
+      'classes.top5Late': {
+        'AR': 'أفضل 5 - متأخر',
+        'FR': 'Top 5 - En retard',
+        'EN': 'Top 5 - Late',
+        'ES': 'Top 5 - Tarde',
+        'IT': 'Top 5 - In ritardo',
+        'DE': 'Top 5 - Verspätet',
+        'TR': 'İlk 5 - Geç'
+      },
+      'classes.top5Excused': {
+        'AR': 'أفضل 5 - معذور',
+        'FR': 'Top 5 - Excusé',
+        'EN': 'Top 5 - Excused',
+        'ES': 'Top 5 - Justificado',
+        'IT': 'Top 5 - Giustificato',
+        'DE': 'Top 5 - Entschuldigt',
+        'TR': 'İlk 5 - Mazeretli'
+      },
+      'classes.top5LeftEarly': {
+        'AR': 'أفضل 5 - مغادر مبكراً',
+        'FR': 'Top 5 - Parti tôt',
+        'EN': 'Top 5 - Left Early',
+        'ES': 'Top 5 - Salió temprano',
+        'IT': 'Top 5 - Partito presto',
+        'DE': 'Top 5 - Früher gegangen',
+        'TR': 'İlk 5 - Erken ayrıldı'
+      },
+      'classes.noDataAvailable': {
+        'AR': 'لا توجد بيانات',
+        'FR': 'Aucune donnée disponible',
+        'EN': 'No data available',
+        'ES': 'No hay datos disponibles',
+        'IT': 'Nessun dato disponibile',
+        'DE': 'Keine Daten verfügbar',
+        'TR': 'Veri yok'
+      },
+      'classes.generalBehavior': {
+        'AR': 'السلوك العام',
+        'FR': 'Comportement général',
+        'EN': 'General Behavior',
+        'ES': 'Comportamiento general',
+        'IT': 'Comportamento generale',
+        'DE': 'Allgemeines Verhalten',
+        'TR': 'Genel davranış'
+      },
+      'classes.positive': {
+        'AR': 'إيجابي',
+        'FR': 'Positif',
+        'EN': 'Positive',
+        'ES': 'Positivo',
+        'IT': 'Positivo',
+        'DE': 'Positiv',
+        'TR': 'Pozitif'
+      },
+      'classes.negative': {
+        'AR': 'سلبي',
+        'FR': 'Négatif',
+        'EN': 'Negative',
+        'ES': 'Negativo',
+        'IT': 'Negativo',
+        'DE': 'Negativ',
+        'TR': 'Negatif'
+      },
+      'classes.top5Positive': {
+        'AR': 'أفضل 5 - إيجابي',
+        'FR': 'Top 5 - Positif',
+        'EN': 'Top 5 - Positive',
+        'ES': 'Top 5 - Positivo',
+        'IT': 'Top 5 - Positivo',
+        'DE': 'Top 5 - Positiv',
+        'TR': 'İlk 5 - Pozitif'
+      },
+      'classes.top5Negative': {
+        'AR': 'أفضل 5 - سلبي',
+        'FR': 'Top 5 - Négatif',
+        'EN': 'Top 5 - Negative',
+        'ES': 'Top 5 - Negativo',
+        'IT': 'Top 5 - Negativo',
+        'DE': 'Top 5 - Negativ',
+        'TR': 'İlk 5 - Negatif'
+      },
+      'classes.grades': {
+        'AR': 'الدرجات',
+        'FR': 'Notes',
+        'EN': 'Grades',
+        'ES': 'Calificaciones',
+        'IT': 'Voti',
+        'DE': 'Noten',
+        'TR': 'Notlar'
+      },
+      'classes.quickOverview': {
+        'AR': 'نظرة سريعة لكل بند قابل للتقييم',
+        'FR': 'Aperçu rapide de chaque élément évaluable',
+        'EN': 'Quick Overview of Each Gradable Item',
+        'ES': 'Vista rápida de cada elemento calificable',
+        'IT': 'Panoramica rapida di ogni elemento valutabile',
+        'DE': 'Schnellübersicht für jeden bewertbaren Punkt',
+        'TR': 'Her değerlendirilebilir öğe için hızlı genel bakış'
+      },
+      'classes.item': {
+        'AR': 'البند',
+        'FR': 'Élément',
+        'EN': 'Item',
+        'ES': 'Elemento',
+        'IT': 'Elemento',
+        'DE': 'Element',
+        'TR': 'Öğe'
+      },
+      'classes.maximum': {
+        'AR': 'الحد الأقصى',
+        'FR': 'Maximum',
+        'EN': 'Maximum',
+        'ES': 'Máximo',
+        'IT': 'Massimo',
+        'DE': 'Maximum',
+        'TR': 'Maksimum'
+      },
+      'classes.minimum': {
+        'AR': 'الحد الأدنى',
+        'FR': 'Minimum',
+        'EN': 'Minimum',
+        'ES': 'Mínimo',
+        'IT': 'Minimo',
+        'DE': 'Minimum',
+        'TR': 'Minimum'
+      },
+      'classes.median': {
+        'AR': 'الوسيط',
+        'FR': 'Médiane',
+        'EN': 'Median',
+        'ES': 'Mediana',
+        'IT': 'Mediana',
+        'DE': 'Median',
+        'TR': 'Medyan'
+      },
+      'classes.importance': {
+        'AR': 'الأهمية (%)',
+        'FR': 'Importance (%)',
+        'EN': 'Importance (%)',
+        'ES': 'Importancia (%)',
+        'IT': 'Importanza (%)',
+        'DE': 'Bedeutung (%)',
+        'TR': 'Önem (%)'
+      },
+      'classes.studentsAtRisk': {
+        'AR': 'الطلاب المعرضون للخطر (متوسط أقل من 5)',
+        'FR': 'Étudiants à risque (moyenne inférieure à 5)',
+        'EN': 'Students at Risk (average below 5)',
+        'ES': 'Estudiantes en riesgo (promedio inferior a 5)',
+        'IT': 'Studenti a rischio (media inferiore a 5)',
+        'DE': 'Schüler mit Risiko (Durchschnitt unter 5)',
+        'TR': 'Risk altındaki öğrenciler (ortalama 5\'in altında)'
+      },
+      'classes.noStudentsAtRisk': {
+        'AR': 'لا يوجد طلاب معرضون للخطر',
+        'FR': 'Aucun étudiant à risque',
+        'EN': 'No students at risk',
+        'ES': 'No hay estudiantes en riesgo',
+        'IT': 'Nessuno studente a rischio',
+        'DE': 'Keine Schüler mit Risiko',
+        'TR': 'Risk altında öğrenci yok'
+      },
+      'classes.topPerformingStudents': {
+        'AR': 'الطلاب المتفوقون (متوسط 8 أو أكثر)',
+        'FR': 'Étudiants performants (moyenne de 8 ou plus)',
+        'EN': 'Top Performing Students (average 8 or more)',
+        'ES': 'Estudiantes destacados (promedio 8 o más)',
+        'IT': 'Studenti migliori (media 8 o superiore)',
+        'DE': 'Leistungsstarke Schüler (Durchschnitt 8 oder mehr)',
+        'TR': 'En başarılı öğrenciler (ortalama 8 veya daha fazla)'
+      },
+      'classes.noTopPerformingStudents': {
+        'AR': 'لا يوجد طلاب متفوقون',
+        'FR': 'Aucun étudiant performant',
+        'EN': 'No top performing students',
+        'ES': 'No hay estudiantes destacados',
+        'IT': 'Nessuno studente migliore',
+        'DE': 'Keine leistungsstarken Schüler',
+        'TR': 'En başarılı öğrenci yok'
       },
 
       // Students
@@ -4345,10 +4723,10 @@ export class LanguageService {
         'AR': 'معيد',
         'FR': 'Redoublant',
         'EN': 'Repeater',
-        'ES': 'Repe',
+        'ES': 'Repetidor',
         'IT': 'Ripetente',
         'DE': 'Wiederholer',
-        'TR': 'Tekrar'
+        'TR': 'Tekrar eden'
       },
       'students.nonRepeaterOnly': {
         'AR': 'غير معيد',
@@ -4628,6 +5006,294 @@ export class LanguageService {
         'IT': 'Dettagli errori:',
         'DE': 'Fehlerdetails:',
         'TR': 'Hata detayları:'
+      },
+      'students.viewReport': {
+        'AR': 'عرض التقرير',
+        'FR': 'Voir le rapport',
+        'EN': 'View report',
+        'ES': 'Ver informe',
+        'IT': 'Vedi rapporto',
+        'DE': 'Bericht anzeigen',
+        'TR': 'Raporu görüntüle'
+      },
+      'students.headerRowSelection': {
+        'AR': 'تحديد صف رؤوس الأعمدة',
+        'FR': 'Sélection de la ligne d\'en-tête',
+        'EN': 'Header Row Selection',
+        'ES': 'Selección de fila de encabezado',
+        'IT': 'Selezione riga di intestazione',
+        'DE': 'Kopfzeilenauswahl',
+        'TR': 'Başlık satırı seçimi'
+      },
+      'students.headerRowInstructions': {
+        'AR': 'تعليمات:',
+        'FR': 'Instructions :',
+        'EN': 'Instructions:',
+        'ES': 'Instrucciones:',
+        'IT': 'Istruzioni:',
+        'DE': 'Anweisungen:',
+        'TR': 'Talimatlar:'
+      },
+      'students.reviewPreview': {
+        'AR': 'راجع معاينة الصفوف لكل ورقة عمل أدناه',
+        'FR': 'Examinez l\'aperçu des lignes pour chaque feuille de calcul ci-dessous',
+        'EN': 'Review the row preview for each worksheet below',
+        'ES': 'Revise la vista previa de filas para cada hoja de cálculo a continuación',
+        'IT': 'Rivedi l\'anteprima delle righe per ogni foglio di lavoro qui sotto',
+        'DE': 'Überprüfen Sie die Zeilenvorschau für jedes Arbeitsblatt unten',
+        'TR': 'Aşağıdaki her çalışma sayfası için satır önizlemesini inceleyin'
+      },
+      'students.enterHeaderRowNumber': {
+        'AR': 'أدخل رقم الصف الذي يحتوي على رؤوس الأعمدة (مثل: 8 أو 9)',
+        'FR': 'Entrez le numéro de la ligne contenant les en-têtes (par exemple : 8 ou 9)',
+        'EN': 'Enter the row number containing headers (e.g.: 8 or 9)',
+        'ES': 'Ingrese el número de fila que contiene los encabezados (ej.: 8 o 9)',
+        'IT': 'Inserisci il numero della riga contenente le intestazioni (es.: 8 o 9)',
+        'DE': 'Geben Sie die Zeilennummer mit den Überschriften ein (z.B.: 8 oder 9)',
+        'TR': 'Başlıkları içeren satır numarasını girin (örn.: 8 veya 9)'
+      },
+      'students.rowsWillBeIgnored': {
+        'AR': 'سيتم تجاهل الصفوف من 1 إلى (رقم الصف المحدد - 1) تلقائياً',
+        'FR': 'Les lignes de 1 à (numéro de ligne sélectionné - 1) seront ignorées automatiquement',
+        'EN': 'Rows from 1 to (selected row number - 1) will be automatically ignored',
+        'ES': 'Las filas del 1 al (número de fila seleccionado - 1) se ignorarán automáticamente',
+        'IT': 'Le righe da 1 a (numero riga selezionato - 1) verranno ignorate automaticamente',
+        'DE': 'Zeilen von 1 bis (ausgewählte Zeilennummer - 1) werden automatisch ignoriert',
+        'TR': '1\'den (seçilen satır numarası - 1)\'e kadar olan satırlar otomatik olarak yok sayılacak'
+      },
+      'students.selectedRowHighlighted': {
+        'AR': 'الصف المحدد سيظهر بخلفية صفراء',
+        'FR': 'La ligne sélectionnée apparaîtra avec un fond jaune',
+        'EN': 'The selected row will appear with a yellow background',
+        'ES': 'La fila seleccionada aparecerá con un fondo amarillo',
+        'IT': 'La riga selezionata apparirà con uno sfondo giallo',
+        'DE': 'Die ausgewählte Zeile wird mit gelbem Hintergrund angezeigt',
+        'TR': 'Seçilen satır sarı arka planla görünecek'
+      },
+      'students.worksheet': {
+        'AR': 'ورقة العمل:',
+        'FR': 'Feuille de calcul :',
+        'EN': 'Worksheet:',
+        'ES': 'Hoja de cálculo:',
+        'IT': 'Foglio di lavoro:',
+        'DE': 'Arbeitsblatt:',
+        'TR': 'Çalışma sayfası:'
+      },
+      'students.selectedRowInfo': {
+        'AR': 'الصف المحدد سيظهر بخلفية صفراء. الصف المكتشف تلقائياً بخلفية زرقاء.',
+        'FR': 'La ligne sélectionnée apparaîtra avec un fond jaune. La ligne détectée automatiquement avec un fond bleu.',
+        'EN': 'The selected row will appear with a yellow background. The automatically detected row with a blue background.',
+        'ES': 'La fila seleccionada aparecerá con un fondo amarillo. La fila detectada automáticamente con un fondo azul.',
+        'IT': 'La riga selezionata apparirà con uno sfondo giallo. La riga rilevata automaticamente con uno sfondo blu.',
+        'DE': 'Die ausgewählte Zeile wird mit gelbem Hintergrund angezeigt. Die automatisch erkannte Zeile mit blauem Hintergrund.',
+        'TR': 'Seçilen satır sarı arka planla görünecek. Otomatik olarak algılanan satır mavi arka planla görünecek.'
+      },
+      'students.column': {
+        'AR': 'عمود',
+        'FR': 'Colonne',
+        'EN': 'Column',
+        'ES': 'Columna',
+        'IT': 'Colonna',
+        'DE': 'Spalte',
+        'TR': 'Sütun'
+      },
+      'students.headerRowLabel': {
+        'AR': 'الصف الذي يحتوي على رؤوس الأعمدة هو:',
+        'FR': 'La ligne contenant les en-têtes est :',
+        'EN': 'The row containing headers is:',
+        'ES': 'La fila que contiene los encabezados es:',
+        'IT': 'La riga contenente le intestazioni è:',
+        'DE': 'Die Zeile mit den Überschriften ist:',
+        'TR': 'Başlıkları içeren satır:'
+      },
+      'students.rowNumber': {
+        'AR': 'رقم الصف',
+        'FR': 'Numéro de ligne',
+        'EN': 'Row number',
+        'ES': 'Número de fila',
+        'IT': 'Numero di riga',
+        'DE': 'Zeilennummer',
+        'TR': 'Satır numarası'
+      },
+      'students.rowsWillBeIgnoredFrom': {
+        'AR': 'سيتم تجاهل الصفوف من 1 إلى',
+        'FR': 'Les lignes de 1 à',
+        'EN': 'Rows from 1 to',
+        'ES': 'Las filas del 1 al',
+        'IT': 'Le righe da 1 a',
+        'DE': 'Zeilen von 1 bis',
+        'TR': '1\'den'
+      },
+      'students.automatically': {
+        'AR': 'تلقائياً',
+        'FR': 'automatiquement',
+        'EN': 'automatically',
+        'ES': 'automáticamente',
+        'IT': 'automaticamente',
+        'DE': 'automatisch',
+        'TR': 'otomatik olarak'
+      },
+      'students.autoDetected': {
+        'AR': 'تم اكتشاف تلقائياً:',
+        'FR': 'Détecté automatiquement :',
+        'EN': 'Auto-detected:',
+        'ES': 'Detectado automáticamente:',
+        'IT': 'Rilevato automaticamente:',
+        'DE': 'Automatisch erkannt:',
+        'TR': 'Otomatik algılandı:'
+      },
+      'students.cancel': {
+        'AR': 'إلغاء',
+        'FR': 'Annuler',
+        'EN': 'Cancel',
+        'ES': 'Cancelar',
+        'IT': 'Annulla',
+        'DE': 'Abbrechen',
+        'TR': 'İptal'
+      },
+      'students.confirmAndImport': {
+        'AR': 'تأكيد والاستيراد',
+        'FR': 'Confirmer et importer',
+        'EN': 'Confirm and Import',
+        'ES': 'Confirmar e importar',
+        'IT': 'Conferma e importa',
+        'DE': 'Bestätigen und importieren',
+        'TR': 'Onayla ve içe aktar'
+      },
+      'students.studentReportTitle': {
+        'AR': 'تقرير ملخص الطالب',
+        'FR': 'Rapport récapitulatif de l\'étudiant',
+        'EN': 'Student Summary Report',
+        'ES': 'Informe resumido del estudiante',
+        'IT': 'Rapporto riepilogativo dello studente',
+        'DE': 'Schülerübersichtsbericht',
+        'TR': 'Öğrenci özet raporu'
+      },
+      'students.selectClassForReport': {
+        'AR': 'اختر القسم',
+        'FR': 'Sélectionner la classe',
+        'EN': 'Select class',
+        'ES': 'Seleccionar clase',
+        'IT': 'Selezione classe',
+        'DE': 'Klasse auswählen',
+        'TR': 'Sınıf seç'
+      },
+      'students.emailLabel': {
+        'AR': 'البريد الإلكتروني:',
+        'FR': 'E-mail :',
+        'EN': 'Email:',
+        'ES': 'Correo electrónico:',
+        'IT': 'Email:',
+        'DE': 'E-Mail:',
+        'TR': 'E-posta:'
+      },
+      'students.parentEmailLabel': {
+        'AR': 'بريد ولي الأمر:',
+        'FR': 'E-mail du parent :',
+        'EN': 'Parent email:',
+        'ES': 'Correo del padre:',
+        'IT': 'Email del genitore:',
+        'DE': 'E-Mail der Eltern:',
+        'TR': 'Veli e-postası:'
+      },
+      'students.parentPhoneLabel': {
+        'AR': 'هاتف ولي الأمر:',
+        'FR': 'Téléphone du parent :',
+        'EN': 'Parent phone:',
+        'ES': 'Teléfono del padre:',
+        'IT': 'Telefono del genitore:',
+        'DE': 'Telefon der Eltern:',
+        'TR': 'Veli telefonu:'
+      },
+      'students.totalAttendance': {
+        'AR': 'الحضور الإجمالي',
+        'FR': 'Présence totale',
+        'EN': 'Total Attendance',
+        'ES': 'Asistencia total',
+        'IT': 'Presenza totale',
+        'DE': 'Gesamtanwesenheit',
+        'TR': 'Toplam devam'
+      },
+      'students.biWeeklyDistribution': {
+        'AR': 'التوزيع ثنائي الأسبوع (آخر 16 أسبوع)',
+        'FR': 'Distribution bihebdomadaire (16 dernières semaines)',
+        'EN': 'Bi-Weekly Distribution (Last 16 weeks)',
+        'ES': 'Distribución quincenal (últimas 16 semanas)',
+        'IT': 'Distribuzione bisettimanale (ultime 16 settimane)',
+        'DE': 'Zweiwöchentliche Verteilung (letzte 16 Wochen)',
+        'TR': 'İki haftalık dağılım (son 16 hafta)'
+      },
+      'students.behavior': {
+        'AR': 'السلوك',
+        'FR': 'Comportement',
+        'EN': 'Behavior',
+        'ES': 'Comportamiento',
+        'IT': 'Comportamento',
+        'DE': 'Verhalten',
+        'TR': 'Davranış'
+      },
+      'students.behaviorDetails': {
+        'AR': 'تفاصيل السلوك (أحدث الحوادث)',
+        'FR': 'Détails du comportement (derniers incidents)',
+        'EN': 'Behavior Details (Latest Incidents)',
+        'ES': 'Detalles del comportamiento (últimos incidentes)',
+        'IT': 'Dettagli comportamento (ultimi incidenti)',
+        'DE': 'Verhaltensdetails (neueste Vorfälle)',
+        'TR': 'Davranış detayları (son olaylar)'
+      },
+      'students.positiveBehavior': {
+        'AR': 'سلوك إيجابي',
+        'FR': 'Comportement positif',
+        'EN': 'Positive behavior',
+        'ES': 'Comportamiento positivo',
+        'IT': 'Comportamento positivo',
+        'DE': 'Positives Verhalten',
+        'TR': 'Pozitif davranış'
+      },
+      'students.negativeBehavior': {
+        'AR': 'سلوك سلبي',
+        'FR': 'Comportement négatif',
+        'EN': 'Negative behavior',
+        'ES': 'Comportamiento negativo',
+        'IT': 'Comportamento negativo',
+        'DE': 'Negatives Verhalten',
+        'TR': 'Negatif davranış'
+      },
+      'students.noPositiveIncidents': {
+        'AR': 'لا توجد حوادث إيجابية',
+        'FR': 'Aucun incident positif',
+        'EN': 'No positive incidents',
+        'ES': 'No hay incidentes positivos',
+        'IT': 'Nessun incidente positivo',
+        'DE': 'Keine positiven Vorfälle',
+        'TR': 'Pozitif olay yok'
+      },
+      'students.noNegativeIncidents': {
+        'AR': 'لا توجد حوادث سلبية',
+        'FR': 'Aucun incident négatif',
+        'EN': 'No negative incidents',
+        'ES': 'No hay incidentes negativos',
+        'IT': 'Nessun incidente negativo',
+        'DE': 'Keine negativen Vorfälle',
+        'TR': 'Negatif olay yok'
+      },
+      'students.weightedGradableItems': {
+        'AR': 'الأوزان المرجحة للعناصر القابلة للتقييم',
+        'FR': 'Poids pondérés des éléments évaluables',
+        'EN': 'Weighted Gradable Items',
+        'ES': 'Elementos calificables ponderados',
+        'IT': 'Elementi valutabili ponderati',
+        'DE': 'Gewichtete bewertbare Elemente',
+        'TR': 'Ağırlıklı değerlendirilebilir öğeler'
+      },
+      'students.selectSubjectForReport': {
+        'AR': 'يرجى اختيار مادة لعرض التقرير',
+        'FR': 'Veuillez sélectionner une matière pour afficher le rapport',
+        'EN': 'Please select a subject to view the report',
+        'ES': 'Por favor seleccione una materia para ver el informe',
+        'IT': 'Seleziona una materia per visualizzare il rapporto',
+        'DE': 'Bitte wählen Sie ein Fach aus, um den Bericht anzuzeigen',
+        'TR': 'Lütfen raporu görüntülemek için bir ders seçin'
       },
 
       // Attendance
@@ -9514,6 +10180,105 @@ export class LanguageService {
         'DE': 'Für dieses Jahr und Niveau wurde noch keine Verteilung oder Feiertag hinzugefügt.',
         'TR': 'Bu yıl ve seviye için henüz dağıtım veya tatil eklenmedi.'
       },
+      'annualDistribution.recalculateDates': {
+        'AR': 'إعادة احتساب التواريخ',
+        'FR': 'Recalculer les dates',
+        'EN': 'Recalculate dates',
+        'ES': 'Recalcular fechas',
+        'IT': 'Ricalcola date',
+        'DE': 'Termine neu berechnen',
+        'TR': 'Tarihleri yeniden hesapla'
+      },
+      'annualDistribution.exportPdf': {
+        'AR': 'تصدير PDF',
+        'FR': 'Exporter PDF',
+        'EN': 'Export PDF',
+        'ES': 'Exportar PDF',
+        'IT': 'Esporta PDF',
+        'DE': 'PDF exportieren',
+        'TR': 'PDF dışa aktar'
+      },
+      'annualDistribution.tableHeaderType': {
+        'AR': 'النوع',
+        'FR': 'Type',
+        'EN': 'Type',
+        'ES': 'Tipo',
+        'IT': 'Tipo',
+        'DE': 'Typ',
+        'TR': 'Tür'
+      },
+      'annualDistribution.tableHeaderTerm': {
+        'AR': 'الفصل',
+        'FR': 'Trimestre',
+        'EN': 'Term',
+        'ES': 'Trimestre',
+        'IT': 'Trimestre',
+        'DE': 'Trimester',
+        'TR': 'Dönem'
+      },
+      'annualDistribution.tableHeaderWeek': {
+        'AR': 'الأسبوع',
+        'FR': 'Semaine',
+        'EN': 'Week',
+        'ES': 'Semana',
+        'IT': 'Settimana',
+        'DE': 'Woche',
+        'TR': 'Hafta'
+      },
+      'annualDistribution.tableHeaderUnit': {
+        'AR': 'الوحدة / النشاط',
+        'FR': 'Unité / Activité',
+        'EN': 'Unit / Activity',
+        'ES': 'Unidad / Actividad',
+        'IT': 'Unità / Attività',
+        'DE': 'Einheit / Aktivität',
+        'TR': 'Ünite / Etkinlik'
+      },
+      'annualDistribution.tableHeaderDomain': {
+        'AR': 'المجال / اسم العطلة',
+        'FR': 'Domaine / Nom de la vacance',
+        'EN': 'Domain / Holiday name',
+        'ES': 'Dominio / Nombre de la vacación',
+        'IT': 'Dominio / Nome della vacanza',
+        'DE': 'Bereich / Feiertagsname',
+        'TR': 'Alan / Tatil adı'
+      },
+      'annualDistribution.tableHeaderStartDate': {
+        'AR': 'تاريخ البداية',
+        'FR': 'Date de début',
+        'EN': 'Start date',
+        'ES': 'Fecha de inicio',
+        'IT': 'Data di inizio',
+        'DE': 'Startdatum',
+        'TR': 'Başlangıç tarihi'
+      },
+      'annualDistribution.tableHeaderEndDate': {
+        'AR': 'تاريخ النهاية',
+        'FR': 'Date de fin',
+        'EN': 'End date',
+        'ES': 'Fecha de fin',
+        'IT': 'Data di fine',
+        'DE': 'Enddatum',
+        'TR': 'Bitiş tarihi'
+      },
+      'annualDistribution.tableHeaderNotes': {
+        'AR': 'ملاحظات',
+        'FR': 'Remarques',
+        'EN': 'Notes',
+        'ES': 'Notas',
+        'IT': 'Note',
+        'DE': 'Bemerkungen',
+        'TR': 'Notlar'
+      },
+      'annualDistribution.lesson': {
+        'AR': 'حصة',
+        'FR': 'Leçon',
+        'EN': 'Lesson',
+        'ES': 'Lección',
+        'IT': 'Lezione',
+        'DE': 'Lektion',
+        'TR': 'Ders'
+      },
 
       // Progress Tracking
       'progressTracking.title': {
@@ -9677,6 +10442,15 @@ export class LanguageService {
         'IT': 'Nessuna classe in anticipo.',
         'DE': 'Keine fortgeschrittenen Klassen.',
         'TR': 'İleride olan sınıf yok.'
+      },
+      'progressTracking.lesson': {
+        'AR': 'درس',
+        'FR': 'leçon',
+        'EN': 'lesson',
+        'ES': 'lección',
+        'IT': 'lezione',
+        'DE': 'Lektion',
+        'TR': 'ders'
       },
 
       // Teacher Card

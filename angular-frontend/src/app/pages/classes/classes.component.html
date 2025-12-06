@@ -434,9 +434,9 @@
     <!-- Header -->
     <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start z-10">
       <div class="flex-1">
-        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">تقرير ملخص القسم</h2>
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">{{ translate('classes.reportTitle') }}</h2>
         <p class="text-gray-600 dark:text-gray-400" *ngIf="currentClassForReport">
-          <strong>القسم:</strong> {{ currentClassForReport.name }} - {{ currentClassForReport.subject }}
+          <strong>{{ translate('classes.reportClassLabel') }}</strong> {{ currentClassForReport.name }} - {{ currentClassForReport.subject }}
         </p>
       </div>
       <div class="flex items-center gap-3">
@@ -453,7 +453,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          <span>{{ isExportingPDF ? 'جاري التصدير...' : 'تصدير PDF' }}</span>
+          <span>{{ isExportingPDF ? translate('classes.exportingPDF') : translate('classes.exportPDF') }}</span>
         </button>
         <button 
           (click)="closeClassReportModal()"
@@ -469,26 +469,26 @@
     <div #classReportContent class="p-6" *ngIf="classReportData">
       <!-- Loading State -->
       <div *ngIf="!classReportData" class="text-center py-8">
-        <p class="text-gray-500 dark:text-gray-400">جاري تحميل بيانات التقرير...</p>
+        <p class="text-gray-500 dark:text-gray-400">{{ translate('classes.loadingReport') }}</p>
       </div>
 
       <!-- Report Preview -->
       <div class="space-y-6" *ngIf="classReportStudents.length > 0">
         <!-- Students List Sorted by Grades -->
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
-          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">جميع الطلاب مرتبين حسب درجاتهم تنازلياً</h3>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('classes.studentsSortedByGrades') }}</h3>
           <div class="bg-green-600 text-white p-2 mb-4 rounded">
-            <span class="font-semibold">عدد الطلاب: {{ classReportStudents.length }}</span>
+            <span class="font-semibold">{{ translate('classes.studentCount') }} {{ classReportStudents.length }}</span>
           </div>
           <div class="overflow-x-auto">
             <table class="w-full border-collapse text-sm">
               <thead>
                 <tr class="bg-gray-100 dark:bg-gray-800">
                   <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">#</th>
-                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الاسم</th>
-                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">اللقب</th>
-                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المتوسط</th>
-                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المجموعة</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.firstName') }}</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.lastName') }}</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.average') }}</th>
+                  <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.group') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -504,8 +504,8 @@
                     </span>
                   </td>
                   <td class="border border-gray-300 dark:border-gray-600 px-3 py-2">
-                    <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">المجموعة 1</span>
-                    <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">المجموعة 2</span>
+                    <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-xs">{{ translate('classes.group1') }}</span>
+                    <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs">{{ translate('classes.group2') }}</span>
                     <span *ngIf="!student.group" class="text-gray-400">-</span>
                   </td>
                 </tr>
@@ -516,12 +516,12 @@
 
         <!-- Attendance Section -->
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportAttendance.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">التوزيع العام للحضور</h3>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('classes.attendanceDistribution') }}</h3>
           
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <!-- Donut Chart -->
             <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع العام</h4>
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('classes.generalDistribution') }}</h4>
               <div class="h-64">
                 <canvas baseChart
                   [type]="'doughnut'"
@@ -533,7 +533,7 @@
             
             <!-- Weekly Distribution -->
             <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
+              <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('classes.weeklyDistribution') }}</h4>
               <div class="h-64">
                 <canvas baseChart
                   [type]="'bar'"
@@ -547,52 +547,52 @@
           <!-- Top 5 Students by Attendance Type -->
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
             <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-green-700 mb-2">أفضل 5 - حاضر</h4>
+              <h4 class="text-sm font-semibold text-green-700 mb-2">{{ translate('classes.top5Present') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.present; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.present }})
                 </div>
-                <div *ngIf="topAttendanceStudents.present.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topAttendanceStudents.present.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
             
             <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-red-700 mb-2">أفضل 5 - غائب</h4>
+              <h4 class="text-sm font-semibold text-red-700 mb-2">{{ translate('classes.top5Absent') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.absent; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.absent }})
                 </div>
-                <div *ngIf="topAttendanceStudents.absent.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topAttendanceStudents.absent.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
             
             <div class="bg-orange-50 dark:bg-orange-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-orange-700 mb-2">أفضل 5 - متأخر</h4>
+              <h4 class="text-sm font-semibold text-orange-700 mb-2">{{ translate('classes.top5Late') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.late; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.late }})
                 </div>
-                <div *ngIf="topAttendanceStudents.late.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topAttendanceStudents.late.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
             
             <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-blue-700 mb-2">أفضل 5 - معذور</h4>
+              <h4 class="text-sm font-semibold text-blue-700 mb-2">{{ translate('classes.top5Excused') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.excused; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.excused }})
                 </div>
-                <div *ngIf="topAttendanceStudents.excused.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topAttendanceStudents.excused.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
             
             <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-yellow-700 mb-2">أفضل 5 - مغادر مبكراً</h4>
+              <h4 class="text-sm font-semibold text-yellow-700 mb-2">{{ translate('classes.top5LeftEarly') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topAttendanceStudents.leftEarly; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.leftEarly }})
                 </div>
-                <div *ngIf="topAttendanceStudents.leftEarly.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topAttendanceStudents.leftEarly.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
           </div>
@@ -600,23 +600,23 @@
 
         <!-- Behavior Section -->
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportBehaviorEvents.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">السلوك العام</h3>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('classes.generalBehavior') }}</h3>
           
           <!-- Overall Counts -->
           <div class="grid grid-cols-2 gap-4 mb-6">
             <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg text-center">
               <div class="text-2xl font-bold text-green-600">{{ getTotalPositiveBehavior() }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">إيجابي</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ translate('classes.positive') }}</div>
             </div>
             <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg text-center">
               <div class="text-2xl font-bold text-red-600">{{ getTotalNegativeBehavior() }}</div>
-              <div class="text-sm text-gray-600 dark:text-gray-400">سلبي</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ translate('classes.negative') }}</div>
             </div>
           </div>
           
           <!-- Weekly Distribution -->
           <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg mb-6">
-            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">التوزيع الأسبوعي (آخر 16 أسبوع)</h4>
+            <h4 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">{{ translate('classes.weeklyDistribution') }}</h4>
             <div class="h-64">
               <canvas baseChart
                 [type]="'line'"
@@ -629,22 +629,22 @@
           <!-- Top 5 Students -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-green-700 mb-2">أفضل 5 - إيجابي</h4>
+              <h4 class="text-sm font-semibold text-green-700 mb-2">{{ translate('classes.top5Positive') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topBehaviorStudents.positive; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.positive }})
                 </div>
-                <div *ngIf="topBehaviorStudents.positive.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topBehaviorStudents.positive.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
             
             <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-              <h4 class="text-sm font-semibold text-red-700 mb-2">أفضل 5 - سلبي</h4>
+              <h4 class="text-sm font-semibold text-red-700 mb-2">{{ translate('classes.top5Negative') }}</h4>
               <div class="space-y-1">
                 <div *ngFor="let item of topBehaviorStudents.negative; let i = index" class="text-xs">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ item.name }} ({{ item.negative }})
                 </div>
-                <div *ngIf="topBehaviorStudents.negative.length === 0" class="text-xs text-gray-400">لا توجد بيانات</div>
+                <div *ngIf="topBehaviorStudents.negative.length === 0" class="text-xs text-gray-400">{{ translate('classes.noDataAvailable') }}</div>
               </div>
             </div>
           </div>
@@ -652,21 +652,21 @@
 
         <!-- Grades Section -->
         <div class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-6" *ngIf="classReportGrades.length > 0">
-          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">الدرجات</h3>
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('classes.grades') }}</h3>
           
           <!-- Assessment Statistics -->
           <div class="mb-6">
-            <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">نظرة سريعة لكل بند قابل للتقييم</h4>
+            <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-300 mb-4">{{ translate('classes.quickOverview') }}</h4>
             <div class="overflow-x-auto">
               <table class="w-full border-collapse text-sm">
                 <thead>
                   <tr class="bg-gray-100 dark:bg-gray-800">
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">البند</th>
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الحد الأقصى</th>
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الحد الأدنى</th>
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">المتوسط</th>
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الوسيط</th>
-                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">الأهمية (%)</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.item') }}</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.maximum') }}</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.minimum') }}</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.average') }}</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.median') }}</th>
+                    <th class="border border-gray-300 dark:border-gray-600 px-3 py-2 text-right">{{ translate('classes.importance') }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -686,24 +686,24 @@
           <!-- Students at Risk and Top Performers -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
-              <h4 class="text-lg font-semibold text-red-700 mb-3">الطلاب المعرضون للخطر (متوسط أقل من 5)</h4>
+              <h4 class="text-lg font-semibold text-red-700 mb-3">{{ translate('classes.studentsAtRisk') }}</h4>
               <div class="space-y-2">
                 <div *ngFor="let student of studentsAtRisk; let i = index" class="text-sm">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ student.firstName }} {{ student.lastName }} 
                   <span class="text-red-600 font-semibold">({{ (student.average || 0).toFixed(2) }})</span>
                 </div>
-                <div *ngIf="studentsAtRisk.length === 0" class="text-sm text-gray-400">لا يوجد طلاب معرضون للخطر</div>
+                <div *ngIf="studentsAtRisk.length === 0" class="text-sm text-gray-400">{{ translate('classes.noStudentsAtRisk') }}</div>
               </div>
             </div>
             
             <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
-              <h4 class="text-lg font-semibold text-green-700 mb-3">الطلاب المتفوقون (متوسط 8 أو أكثر)</h4>
+              <h4 class="text-lg font-semibold text-green-700 mb-3">{{ translate('classes.topPerformingStudents') }}</h4>
               <div class="space-y-2">
                 <div *ngFor="let student of topPerformingStudents; let i = index" class="text-sm">
                   <span class="font-semibold">{{ i + 1 }}.</span> {{ student.firstName }} {{ student.lastName }} 
                   <span class="text-green-600 font-semibold">({{ (student.average || 0).toFixed(2) }})</span>
                 </div>
-                <div *ngIf="topPerformingStudents.length === 0" class="text-sm text-gray-400">لا يوجد طلاب متفوقون</div>
+                <div *ngIf="topPerformingStudents.length === 0" class="text-sm text-gray-400">{{ translate('classes.noTopPerformingStudents') }}</div>
               </div>
             </div>
           </div>
@@ -713,7 +713,7 @@
 
     <!-- Loading Message -->
     <div class="p-6 text-center text-gray-500 dark:text-gray-400" *ngIf="!classReportData">
-      <p>جاري تحميل بيانات التقرير...</p>
+      <p>{{ translate('classes.loadingReport') }}</p>
     </div>
   </div>
 </div>

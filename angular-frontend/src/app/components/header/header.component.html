@@ -319,7 +319,7 @@
           <div *ngFor="let notification of notifications"
                [ngClass]="notification.isRead ? 'bg-gray-50 dark:bg-gray-700/50' : 'bg-blue-50 dark:bg-blue-900/30'"
                class="p-4 border-b border-gray-100 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer"
-               (click)="markNotificationAsRead(notification)">
+               (click)="handleNotificationClick(notification)">
             <div class="flex items-start gap-3">
               <div class="text-2xl">{{ notificationService.getNotificationIcon(notification.type) }}</div>
               <div class="flex-1 min-w-0">

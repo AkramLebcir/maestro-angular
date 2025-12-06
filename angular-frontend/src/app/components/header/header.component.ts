@@ -207,6 +207,50 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * تحديد المسار بناءً على نوع الإشعار
+   */
+  getNotificationRoute(notification: Notification): string {
+    switch (notification.type) {
+      case 'upcoming_assessment':
+        // التنقل إلى صفحة سجل الدرجات للإشعارات المتعلقة بالاختبارات
+        return '/gradebook';
+      case 'upcoming_holiday':
+      case 'upcoming_seminar':
+      case 'upcoming_visit':
+        // التنقل إلى صفحة الجدول الزمني للإشعارات المتعلقة بالعطلات والندوات والزيارات
+        return '/timetable';
+      case 'incomplete_task':
+        // التنقل إلى صفحة الدفاتر للمهام غير المكتملة
+        return '/notebooks';
+      case 'subscription_expiring':
+        // التنقل إلى صفحة حالة الاشتراك
+        return '/subscription-status';
+      default:
+        // الافتراضي: التنقل إلى لوحة التحكم
+        return '/dashboard';
+    }
+  }
+
+  /**
+   * معالجة النقر على الإشعار: التنقل إلى الصفحة المحددة ووضع علامة قراءة
+   */
+  handleNotificationClick(notification: Notification): void {
+    // تحديد المسار بناءً على نوع الإشعار
+    const route = this.getNotificationRoute(notification);
+    
+    // إغلاق لوحة الإشعارات
+    this.showNotificationsPanel = false;
+    
+    // التنقل إلى الصفحة المحددة
+    this.router.navigate([route]);
+    
+    // وضع علامة قراءة على الإشعار
+    if (!notification.isRead) {
+      this.markNotificationAsRead(notification);
+    }
+  }
+
+  /**
    * وضع علامة قراءة على إشعار
    */
   markNotificationAsRead(notification: Notification): void {
