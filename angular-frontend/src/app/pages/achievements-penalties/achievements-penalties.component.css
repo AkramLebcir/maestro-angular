@@ -2,12 +2,7 @@
   padding: 2rem;
   max-width: 1600px; /* Significantly increased to use full screen width */
   margin: 0 auto;
-  background-color: transparent;
-}
-
-/* Dark mode support - override with Tailwind if needed */
-.dark .page {
-  background-color: transparent;
+  /* Background is handled by Tailwind classes in HTML */
 }
 
 .page-header {
@@ -68,6 +63,12 @@
   box-shadow: 0 10px 20px rgba(14, 165, 233, 0.35);
 }
 
+.dark .tabs button.active {
+  background: #0ea5e9;
+  color: white;
+  box-shadow: 0 10px 20px rgba(14, 165, 233, 0.4);
+}
+
 .cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -79,13 +80,13 @@
   background: #fff;
   border-radius: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.1);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
 }
 
 /* Dark mode is now handled by Tailwind classes in HTML */
 .dark .certificate-region {
   background: #1f2937;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .certificate-region h3 {
@@ -189,12 +190,23 @@
   border: 1px solid #d1d5db;
   background: white;
   color: #1f2937;
+  transition: all 0.2s ease;
+}
+
+.controls select:focus {
+  outline: none;
+  ring: 2px;
+  ring-color: #0ea5e9;
 }
 
 .dark .controls select {
   border-color: #4b5563;
   background: #374151;
   color: #f3f4f6;
+}
+
+.dark .controls select:focus {
+  ring-color: #38bdf8;
 }
 
 .dark .controls select option {
@@ -218,10 +230,20 @@ section {
   cursor: pointer;
   font-size: 0.9rem;
   white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.controls .btn-export-pdf:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .controls .btn-export-pdf:hover:not(:disabled) {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .controls .btn-export-pdf:disabled {
-  opacity: 0.5;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 

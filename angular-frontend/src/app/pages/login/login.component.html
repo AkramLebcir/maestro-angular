@@ -48,6 +48,16 @@
           />
         </div>
 
+        <!-- reCAPTCHA -->
+        <div class="flex justify-center">
+          <re-captcha
+            [siteKey]="recaptchaSiteKey"
+            (resolved)="onCaptchaResolved($event)"
+            (expired)="onCaptchaExpired()"
+            (error)="onCaptchaError()"
+          ></re-captcha>
+        </div>
+
         <!-- Submit Button -->
         <button
           type="submit"

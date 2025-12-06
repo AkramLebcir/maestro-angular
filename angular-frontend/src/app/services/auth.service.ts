@@ -36,10 +36,11 @@ export class AuthService {
     private router: Router
   ) {}
 
-  login(identifier: string, password: string): Observable<LoginResponse> {
+  login(identifier: string, password: string, captchaToken: string): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/auth/login`, {
       identifier,
-      password
+      password,
+      captchaToken
     }).pipe(
       tap(response => {
         this.setToken(response.accessToken);

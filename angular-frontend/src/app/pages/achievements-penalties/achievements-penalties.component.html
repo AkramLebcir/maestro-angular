@@ -49,6 +49,15 @@
         class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
         <option *ngFor="let cls of classes" [value]="cls.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ cls.name }}</option>
       </select>
+      <button 
+        type="button" 
+        class="btn-export-pdf px-4 py-2 rounded-lg font-semibold bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white transition-all"
+        (click)="exportCertificatesToPDF()"
+        [disabled]="isExportingCertificatesPdf || certificateHistory.length === 0"
+        [title]="translate('achievementsPenalties.exportPDF')"
+      >
+        {{ isExportingCertificatesPdf ? translate('achievementsPenalties.exporting') : translate('achievementsPenalties.exportPDF') }}
+      </button>
     </div>
 
     <div *ngIf="isLoadingCertificates" class="status bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-4 py-3 rounded-lg mb-4">
@@ -86,7 +95,7 @@
       </select>
       <button 
         type="button" 
-        class="btn-export-pdf px-4 py-2 rounded-lg font-semibold"
+        class="btn-export-pdf px-4 py-2 rounded-lg font-semibold bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white transition-all"
         (click)="exportPenaltiesToPDF()"
         [disabled]="isExportingPdf || behaviorReports.length === 0"
         [title]="translate('achievementsPenalties.exportPenaltiesToPDF')"
