@@ -331,6 +331,12 @@ textarea {
   @apply flex justify-between items-center bg-blue-500 text-white p-6 rounded-2xl shadow;
 }
 
+.print-header h1,
+.print-header p {
+  @apply text-white;
+  color: white !important;
+}
+
 .print-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -430,7 +436,11 @@ textarea {
   }
 
   .print-header h1 {
-    @apply text-2xl font-bold;
+    @apply text-2xl font-bold text-white;
+  }
+
+  .print-header p {
+    @apply text-white;
   }
 
   .print-grid {

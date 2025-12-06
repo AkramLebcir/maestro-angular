@@ -54,7 +54,8 @@
   <div class="bg-gradient-to-r from-blue-500 to-blue-400 text-white rounded-3xl p-6 shadow flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
     <div class="flex items-center gap-4">
       <div class="w-20 h-20 rounded-2xl bg-white dark:bg-gray-800/20 flex items-center justify-center text-3xl font-bold">
-        {{ currentClass!.name.charAt(0) || 'C' }}
+        <span *ngIf="currentClass!.labId" class="text-blue-500 dark:text-blue-400">{{ currentClass!.labId }}</span>
+        <span *ngIf="!currentClass!.labId" class="text-blue-500 dark:text-blue-400">{{ currentClass!.name.charAt(0) || 'C' }}</span>
       </div>
       <div>
         <p class="uppercase text-sm tracking-wider opacity-80">
@@ -403,6 +404,7 @@
         <div>
           <h1>{{ classBlock.class.name }}</h1>
           <p>{{ classBlock.class.subject }}</p>
+          <p class="text-sm text-white/90 mt-1" *ngIf="classBlock.class.labName">{{ classBlock.class.labName }}</p>
         </div>
         <div class="text-left">
           <p class="text-lg font-bold">{{ translate('seatingChart.group') }} {{ groupBlock.group }}</p>
