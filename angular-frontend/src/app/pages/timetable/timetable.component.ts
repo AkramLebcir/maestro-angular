@@ -522,7 +522,8 @@ export class TimetableComponent implements OnInit {
       weekday: 'long', 
       year: 'numeric', 
       month: 'long', 
-      day: 'numeric' 
+      day: 'numeric',
+      numberingSystem: 'latn'
     });
   }
 
@@ -747,7 +748,7 @@ export class TimetableComponent implements OnInit {
       'TR': 'tr-TR'
     };
     const locale = localeMap[lang] || 'en-US';
-    return date.toLocaleDateString(locale, { year: 'numeric', month: 'long' });
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'long', numberingSystem: 'latn' });
   }
 }
 

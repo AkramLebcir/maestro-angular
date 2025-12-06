@@ -2115,7 +2115,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     return d.toLocaleDateString('ar-EG', { 
       year: 'numeric', 
       month: 'long', 
-      day: 'numeric' 
+      day: 'numeric',
+      numberingSystem: 'latn'
     });
   }
 
@@ -2240,7 +2241,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       info.style.color = '#6b7280';
       
       const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
-      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       info.innerHTML = `${classInfo}<br>${dateInfo}`;
       
       exportContainer.appendChild(title);
@@ -3948,7 +3949,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
   // Get formatted report date
   getReportDate(): string {
-    return new Date().toLocaleDateString('ar-EG');
+    return new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
   }
 
   // Export grade monitoring report to PDF
@@ -3976,7 +3977,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       // Date
       pdf.setFontSize(10);
       pdf.setTextColor(100, 100, 100);
-      const date = new Date().toLocaleDateString('ar-EG');
+      const date = new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
       pdf.text(`${this.translate('report.reportDate')} ${date}`, pageWidth / 2, yPosition, { align: 'center' });
       yPosition += 10;
 

@@ -170,7 +170,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
             id: event.id,
             studentName: this.buildStudentLabel(event.student),
             className: event.class?.name,
-            date: new Date(event.date).toLocaleDateString('ar-EG'),
+            date: new Date(event.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' }),
             description: event.description || this.translate('achievementsPenalties.noAdditionalDetails'),
           }));
           this.isLoadingReports = false;
@@ -199,7 +199,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
           studentName: `${cert.student.firstName} ${cert.student.lastName}`,
           className: cert.className || '',
           templateName: cert.template?.name || this.translate('achievementsPenalties.certificate'),
-          issueDate: new Date(cert.issueDate).toLocaleDateString('ar-EG')
+          issueDate: new Date(cert.issueDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' })
         }));
         this.isLoadingCertificates = false;
       },
@@ -244,7 +244,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
               report: {
                 studentName: this.buildStudentLabel(event.student),
                 className: cls.name,
-                date: new Date(event.date).toLocaleDateString('ar-EG'),
+                date: new Date(event.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' }),
                 description: event.description || this.translate('achievementsPenalties.noAdditionalDetails')
               },
               className: cls.name
@@ -288,7 +288,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       info.style.marginBottom = '30px';
       info.style.fontSize = '16px';
       info.style.color = '#6b7280';
-      const dateInfo = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      const dateInfo = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       info.innerHTML = `<div>${dateInfo}</div>`;
 
       exportContainer.appendChild(title);
@@ -504,7 +504,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
       info.style.marginBottom = '30px';
       info.style.fontSize = '16px';
       info.style.color = '#6b7280';
-      const dateInfo = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      const dateInfo = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       info.innerHTML = `<div>${dateInfo}</div>`;
 
       exportContainer.appendChild(title);
@@ -565,7 +565,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
           
           const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
           const templateName = cert.template?.name || this.translate('achievementsPenalties.certificate');
-          const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
+          const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
           
           [studentName, templateName, issueDate].forEach(cellText => {
             const td = document.createElement('td');

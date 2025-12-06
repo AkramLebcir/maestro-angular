@@ -633,7 +633,7 @@ export class AttendanceComponent implements OnInit {
     // Statistics by Day
     allRecords.forEach(record => {
       const date = typeof record.date === 'string' ? new Date(record.date) : record.date;
-      const dayKey = date.toLocaleDateString('ar-EG', { weekday: 'long' });
+      const dayKey = date.toLocaleDateString('ar-EG', { weekday: 'long', numberingSystem: 'latn' });
       
       if (!stats.byDay[dayKey]) {
         stats.byDay[dayKey] = {
@@ -657,7 +657,7 @@ export class AttendanceComponent implements OnInit {
     // Statistics by Month
     allRecords.forEach(record => {
       const date = typeof record.date === 'string' ? new Date(record.date) : record.date;
-      const monthKey = date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long' });
+      const monthKey = date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', numberingSystem: 'latn' });
       
       if (!stats.byMonth[monthKey]) {
         stats.byMonth[monthKey] = {

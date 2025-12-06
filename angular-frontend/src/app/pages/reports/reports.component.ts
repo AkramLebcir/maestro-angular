@@ -104,7 +104,7 @@ export class ReportsComponent {
 
       // Add date
       const dateInfo = document.createElement('p');
-      dateInfo.textContent = `التاريخ: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.textContent = `التاريخ: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       dateInfo.style.textAlign = 'center';
       dateInfo.style.fontSize = '12px';
       dateInfo.style.color = '#6b7280';
@@ -207,8 +207,8 @@ export class ReportsComponent {
                           'ملغي';
         
         const planName = subscription.plan?.name || '-';
-        const startDate = subscription.startDate ? new Date(subscription.startDate).toLocaleDateString('ar-EG') : '-';
-        const endDate = subscription.endDate ? new Date(subscription.endDate).toLocaleDateString('ar-EG') : '-';
+        const startDate = subscription.startDate ? new Date(subscription.startDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' }) : '-';
+        const endDate = subscription.endDate ? new Date(subscription.endDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' }) : '-';
         
         const cells = [
           endDate,
@@ -389,7 +389,7 @@ export class ReportsComponent {
 
       // Add date
       const dateInfo = document.createElement('div');
-      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       dateInfo.style.textAlign = 'center';
       dateInfo.style.marginBottom = '30px';
       dateInfo.style.fontSize = '14px';
@@ -453,7 +453,7 @@ export class ReportsComponent {
               const row = document.createElement('tr');
               const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
               const templateName = cert.template?.name || 'شهادة';
-              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
+              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
               
               [studentName, templateName, issueDate].forEach(cellText => {
                 const td = document.createElement('td');
@@ -516,7 +516,7 @@ export class ReportsComponent {
               const studentName = event.student 
                 ? `${event.student.firstName || ''} ${event.student.lastName || ''}`.trim() 
                 : 'غير معروف';
-              const date = new Date(event.date).toLocaleDateString('ar-EG');
+              const date = new Date(event.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
               const description = event.description || 'لا يوجد تفاصيل';
               
               [studentName, date, description].forEach(cellText => {
@@ -646,7 +646,7 @@ export class ReportsComponent {
       exportContainer.appendChild(title);
 
       const dateInfo = document.createElement('div');
-      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       dateInfo.style.textAlign = 'center';
       dateInfo.style.marginBottom = '30px';
       dateInfo.style.fontSize = '14px';
@@ -694,7 +694,7 @@ export class ReportsComponent {
               const row = document.createElement('tr');
               const studentName = `${cert.student.firstName} ${cert.student.lastName}`;
               const templateName = cert.template?.name || 'شهادة';
-              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG');
+              const issueDate = new Date(cert.issueDate).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
               
               [studentName, templateName, issueDate].forEach(cellText => {
                 const td = document.createElement('td');
@@ -823,7 +823,7 @@ export class ReportsComponent {
       exportContainer.appendChild(title);
 
       const dateInfo = document.createElement('div');
-      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`;
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
       dateInfo.style.textAlign = 'center';
       dateInfo.style.marginBottom = '30px';
       dateInfo.style.fontSize = '14px';
@@ -872,7 +872,7 @@ export class ReportsComponent {
               const studentName = event.student 
                 ? `${event.student.firstName || ''} ${event.student.lastName || ''}`.trim() 
                 : 'غير معروف';
-              const date = new Date(event.date).toLocaleDateString('ar-EG');
+              const date = new Date(event.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
               const description = event.description || 'لا يوجد تفاصيل';
               
               [studentName, date, description].forEach(cellText => {

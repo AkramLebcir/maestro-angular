@@ -629,7 +629,8 @@ export class NotebooksComponent implements OnInit {
     return d.toLocaleDateString('ar-EG', { 
       year: 'numeric', 
       month: 'long', 
-      day: 'numeric' 
+      day: 'numeric',
+      numberingSystem: 'latn'
     });
   }
 
