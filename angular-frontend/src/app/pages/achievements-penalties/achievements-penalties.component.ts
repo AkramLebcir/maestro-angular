@@ -242,10 +242,14 @@ export class AchievementsPenaltiesComponent implements OnInit {
           behaviorEvents.forEach(event => {
             allBehaviorReports.push({ 
               report: {
+                id: event.id,
                 studentName: this.buildStudentLabel(event.student),
                 className: cls.name,
                 date: new Date(event.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' }),
-                description: event.description || this.translate('achievementsPenalties.noAdditionalDetails')
+                description: event.description || this.translate('achievementsPenalties.noAdditionalDetails'),
+                type: event.type || 'BEHAVIORAL',
+                reason: event.reason || '',
+                recommendations: event.recommendations || ''
               },
               className: cls.name
             });
@@ -273,28 +277,38 @@ export class AchievementsPenaltiesComponent implements OnInit {
       exportContainer.style.direction = 'rtl';
       exportContainer.style.textAlign = 'right';
 
-      // Add title
+      // Add header with school info
+      const header = document.createElement('div');
+      header.style.textAlign = 'center';
+      header.style.marginBottom = '30px';
+      header.style.paddingBottom = '20px';
+      header.style.borderBottom = '3px solid #dc2626';
+      
       const title = document.createElement('h1');
-      title.textContent = this.translate('achievementsPenalties.penaltiesReportTitle');
-      title.style.textAlign = 'center';
-      title.style.fontSize = '28px';
+      title.textContent = this.translate('achievementsPenalties.penaltiesReportTitle') || 'تقرير العقوبات والسلوك';
+      title.style.fontSize = '32px';
       title.style.fontWeight = 'bold';
-      title.style.marginBottom = '15px';
+      title.style.marginBottom = '10px';
       title.style.color = '#111827';
+      
+      const subtitle = document.createElement('p');
+      subtitle.textContent = 'جمهورية الجزائر الديمقراطية الشعبية - وزارة التربية الوطنية';
+      subtitle.style.fontSize = '14px';
+      subtitle.style.color = '#6b7280';
+      subtitle.style.marginBottom = '10px';
+      
+      const dateInfo = document.createElement('div');
+      dateInfo.style.fontSize = '16px';
+      dateInfo.style.color = '#374151';
+      dateInfo.style.fontWeight = '600';
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
+      
+      header.appendChild(title);
+      header.appendChild(subtitle);
+      header.appendChild(dateInfo);
+      exportContainer.appendChild(header);
 
-      // Add date
-      const info = document.createElement('div');
-      info.style.textAlign = 'center';
-      info.style.marginBottom = '30px';
-      info.style.fontSize = '16px';
-      info.style.color = '#6b7280';
-      const dateInfo = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
-      info.innerHTML = `<div>${dateInfo}</div>`;
-
-      exportContainer.appendChild(title);
-      exportContainer.appendChild(info);
-
-      // Group reports by class
+      // Group reports by class first
       const reportsByClass = new Map<string, any[]>();
       allBehaviorReports.forEach(({ report, className }) => {
         if (!reportsByClass.has(className)) {
@@ -303,20 +317,56 @@ export class AchievementsPenaltiesComponent implements OnInit {
         reportsByClass.get(className)!.push(report);
       });
 
+      // Add summary statistics
+      const totalReports = allBehaviorReports.length;
+      const statsDiv = document.createElement('div');
+      statsDiv.style.background = '#f8fafc';
+      statsDiv.style.padding = '15px';
+      statsDiv.style.borderRadius = '8px';
+      statsDiv.style.marginBottom = '25px';
+      statsDiv.style.border = '1px solid #e5e7eb';
+      statsDiv.innerHTML = `
+        <div style="display: flex; justify-content: space-around; text-align: center;">
+          <div>
+            <div style="font-size: 24px; font-weight: bold; color: #dc2626;">${totalReports}</div>
+            <div style="font-size: 14px; color: #6b7280;">إجمالي التقارير</div>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: bold; color: #dc2626;">${reportsByClass.size}</div>
+            <div style="font-size: 14px; color: #6b7280;">عدد الأقسام</div>
+          </div>
+        </div>
+      `;
+      exportContainer.appendChild(statsDiv);
+
       // Create reports for each class
       let classIndex = 0;
       for (const [className, reports] of reportsByClass) {
-        // Add class header
+        // Add class header with count
+        const classHeaderDiv = document.createElement('div');
+        classHeaderDiv.style.marginTop = classIndex > 0 ? '40px' : '0';
+        classHeaderDiv.style.marginBottom = '20px';
+        classHeaderDiv.style.padding = '15px';
+        classHeaderDiv.style.background = '#fee2e2';
+        classHeaderDiv.style.borderRadius = '8px';
+        classHeaderDiv.style.borderRight = '4px solid #dc2626';
+        
         const classHeader = document.createElement('h2');
         classHeader.textContent = `القسم: ${className}`;
-        classHeader.style.fontSize = '20px';
+        classHeader.style.fontSize = '22px';
         classHeader.style.fontWeight = 'bold';
-        classHeader.style.marginTop = classIndex > 0 ? '30px' : '0';
-        classHeader.style.marginBottom = '15px';
-        classHeader.style.color = '#1f2937';
-        classHeader.style.borderBottom = '2px solid #e5e7eb';
-        classHeader.style.paddingBottom = '5px';
-        exportContainer.appendChild(classHeader);
+        classHeader.style.margin = '0 0 5px 0';
+        classHeader.style.color = '#991b1b';
+        
+        const classCount = document.createElement('p');
+        classCount.textContent = `عدد التقارير: ${reports.length}`;
+        classCount.style.fontSize = '14px';
+        classCount.style.color = '#7f1d1d';
+        classCount.style.margin = '0';
+        
+        classHeaderDiv.appendChild(classHeader);
+        classHeaderDiv.appendChild(classCount);
+        exportContainer.appendChild(classHeaderDiv);
 
         // Create reports list
         const reportsList = document.createElement('ul');
@@ -330,54 +380,147 @@ export class AchievementsPenaltiesComponent implements OnInit {
         reports.forEach((report, index) => {
         const reportItem = document.createElement('li');
         reportItem.style.background = 'white';
-        reportItem.style.borderRadius = '8px';
+        reportItem.style.borderRadius = '10px';
         reportItem.style.padding = '20px';
         reportItem.style.border = '1px solid #e5e7eb';
-        reportItem.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+        reportItem.style.borderRight = '4px solid #dc2626';
+        reportItem.style.boxShadow = '0 2px 6px rgba(0,0,0,0.08)';
+        reportItem.style.marginBottom = '15px';
+
+        // Report number badge
+        const reportNumber = document.createElement('div');
+        reportNumber.style.display = 'inline-block';
+        reportNumber.style.background = '#dc2626';
+        reportNumber.style.color = 'white';
+        reportNumber.style.padding = '4px 12px';
+        reportNumber.style.borderRadius = '12px';
+        reportNumber.style.fontSize = '12px';
+        reportNumber.style.fontWeight = '600';
+        reportNumber.style.marginBottom = '12px';
+        reportNumber.textContent = `تقرير #${index + 1}`;
 
         const reportHeader = document.createElement('div');
         reportHeader.style.display = 'flex';
         reportHeader.style.justifyContent = 'space-between';
-        reportHeader.style.alignItems = 'center';
-        reportHeader.style.marginBottom = '10px';
+        reportHeader.style.alignItems = 'flex-start';
+        reportHeader.style.marginBottom = '15px';
+        reportHeader.style.paddingBottom = '12px';
+        reportHeader.style.borderBottom = '1px dashed #e5e7eb';
 
         const studentInfo = document.createElement('div');
         const studentName = document.createElement('p');
         studentName.textContent = report.studentName;
-        studentName.style.margin = '0';
-        studentName.style.fontWeight = '600';
+        studentName.style.margin = '0 0 5px 0';
+        studentName.style.fontWeight = '700';
         studentName.style.fontSize = '18px';
         studentName.style.color = '#111827';
 
         const classInfo = document.createElement('small');
-        classInfo.textContent = report.className || this.translate('common.notSpecified');
+        classInfo.textContent = `القسم: ${report.className || this.translate('common.notSpecified')}`;
         classInfo.style.color = '#6b7280';
         classInfo.style.fontSize = '14px';
         classInfo.style.display = 'block';
-        classInfo.style.marginTop = '5px';
 
         studentInfo.appendChild(studentName);
         studentInfo.appendChild(classInfo);
 
-        const date = document.createElement('span');
+        const dateDiv = document.createElement('div');
+        dateDiv.style.textAlign = 'left';
+        const dateLabel = document.createElement('div');
+        dateLabel.textContent = 'التاريخ:';
+        dateLabel.style.fontSize = '12px';
+        dateLabel.style.color = '#6b7280';
+        dateLabel.style.marginBottom = '3px';
+        const date = document.createElement('div');
         date.textContent = report.date;
-        date.style.color = '#0ea5e9';
-        date.style.fontWeight = '600';
-        date.style.fontSize = '14px';
+        date.style.color = '#dc2626';
+        date.style.fontWeight = '700';
+        date.style.fontSize = '16px';
+        dateDiv.appendChild(dateLabel);
+        dateDiv.appendChild(date);
 
         reportHeader.appendChild(studentInfo);
-        reportHeader.appendChild(date);
+        reportHeader.appendChild(dateDiv);
 
-        const description = document.createElement('p');
-        description.textContent = report.description;
-        description.style.margin = '10px 0 0 0';
-        description.style.color = '#334155';
-        description.style.fontSize = '15px';
-        description.style.lineHeight = '1.6';
+        // Type and Reason section
+        const typeReasonDiv = document.createElement('div');
+        typeReasonDiv.style.marginBottom = '12px';
+        typeReasonDiv.style.padding = '10px';
+        typeReasonDiv.style.background = '#fef2f2';
+        typeReasonDiv.style.borderRadius = '6px';
+        
+        if (report.type) {
+          const typeLabel = document.createElement('div');
+          typeLabel.style.fontSize = '13px';
+          typeLabel.style.color = '#991b1b';
+          typeLabel.style.fontWeight = '600';
+          typeLabel.style.marginBottom = '5px';
+          const typeNames: Record<string, string> = {
+            'BEHAVIORAL': 'سلوكي',
+            'ACADEMIC': 'أكاديمي',
+            'FOLLOW_UP': 'متابعة',
+            'CHEATING': 'غش'
+          };
+          typeLabel.textContent = `نوع التقرير: ${typeNames[report.type] || report.type}`;
+          typeReasonDiv.appendChild(typeLabel);
+        }
+        
+        if (report.reason) {
+          const reasonLabel = document.createElement('div');
+          reasonLabel.style.fontSize = '13px';
+          reasonLabel.style.color = '#7f1d1d';
+          reasonLabel.textContent = `السبب: ${report.reason}`;
+          typeReasonDiv.appendChild(reasonLabel);
+        }
 
-          reportItem.appendChild(reportHeader);
-          reportItem.appendChild(description);
-          reportsList.appendChild(reportItem);
+        const description = document.createElement('div');
+        description.style.marginTop = '12px';
+        const descLabel = document.createElement('div');
+        descLabel.textContent = 'التفاصيل:';
+        descLabel.style.fontSize = '14px';
+        descLabel.style.fontWeight = '600';
+        descLabel.style.color = '#374151';
+        descLabel.style.marginBottom = '8px';
+        const descText = document.createElement('p');
+        descText.textContent = report.description;
+        descText.style.margin = '0';
+        descText.style.color = '#334155';
+        descText.style.fontSize = '15px';
+        descText.style.lineHeight = '1.8';
+        descText.style.textAlign = 'justify';
+        description.appendChild(descLabel);
+        description.appendChild(descText);
+
+        // Recommendations if available
+        if (report.recommendations) {
+          const recDiv = document.createElement('div');
+          recDiv.style.marginTop = '15px';
+          recDiv.style.padding = '12px';
+          recDiv.style.background = '#eff6ff';
+          recDiv.style.borderRadius = '6px';
+          recDiv.style.borderRight = '3px solid #3b82f6';
+          const recLabel = document.createElement('div');
+          recLabel.textContent = 'التوصيات:';
+          recLabel.style.fontSize = '14px';
+          recLabel.style.fontWeight = '600';
+          recLabel.style.color = '#1e40af';
+          recLabel.style.marginBottom = '6px';
+          const recText = document.createElement('p');
+          recText.textContent = report.recommendations;
+          recText.style.margin = '0';
+          recText.style.color = '#1e3a8a';
+          recText.style.fontSize = '14px';
+          recText.style.lineHeight = '1.6';
+          recDiv.appendChild(recLabel);
+          recDiv.appendChild(recText);
+          description.appendChild(recDiv);
+        }
+
+        reportItem.appendChild(reportNumber);
+        reportItem.appendChild(reportHeader);
+        reportItem.appendChild(typeReasonDiv);
+        reportItem.appendChild(description);
+        reportsList.appendChild(reportItem);
         });
 
         exportContainer.appendChild(reportsList);

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
@@ -29,6 +29,7 @@ export interface AttendanceRecord {
   notes?: string;
   createdAt: Date;
   updatedAt: Date;
+  _dirty?: boolean;
 }
 
 export interface CreateAttendanceRecordDto {
@@ -118,7 +119,8 @@ export class AttendanceComponent implements OnInit {
   constructor(
     private apiService: ApiService,
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private cdr: ChangeDetectorRef
   ) {
     this.updateWeekDays();
   }
@@ -183,7 +185,12 @@ export class AttendanceComponent implements OnInit {
     this.apiService.get<Student[]>(`/classes/${classId}/students`).subscribe({
       next: (data) => {
         this.students = data;
-        this.loadAttendanceForDate();
+        // تحميل السجلات حسب نوع العرض (يومي أو أسبوعي)
+        if (this.showWeeklyView) {
+          this.loadAttendanceForWeek();
+        } else {
+          this.loadAttendanceForDate();
+        }
       },
       error: (error) => {
         console.error('Error loading students:', error);
@@ -191,7 +198,12 @@ export class AttendanceComponent implements OnInit {
         this.apiService.get<Student[]>('/students').subscribe({
           next: (allStudents) => {
             this.students = allStudents.filter(s => s.classId === classId);
-            this.loadAttendanceForDate();
+            // تحميل السجلات حسب نوع العرض (يومي أو أسبوعي)
+            if (this.showWeeklyView) {
+              this.loadAttendanceForWeek();
+            } else {
+              this.loadAttendanceForDate();
+            }
           },
           error: (error2) => {
             console.error('Error loading students:', error2);
@@ -208,23 +220,116 @@ export class AttendanceComponent implements OnInit {
     const dateStr = this.formatDateForAPI(this.selectedDate);
     this.apiService.get<AttendanceRecord[]>(`/attendance?classId=${this.selectedClass.id}&date=${dateStr}`).subscribe({
       next: (data) => {
-        // Update records for current date only (remove old records for this date and class)
-        const existingRecords = this.attendanceRecords.filter(r => 
+        // الاحتفاظ بالسجلات المعدلة محلياً (سواء كانت جديدة أو محفوظة ومعدلة)
+        // والتي لم يتم مزامنتها بعد أو تم تعديلها مؤخراً
+        const dirtyRecords = this.attendanceRecords.filter(r => 
+          r.date === dateStr && 
+          r.classId === this.selectedClass!.id &&
+          (r._dirty || !r.id || r.id === 0)
+        );
+        
+        // الاحتفاظ بالسجلات الأخرى (تواريخ أخرى أو فصول أخرى)
+        const otherRecords = this.attendanceRecords.filter(r => 
           !(r.date === dateStr && r.classId === this.selectedClass!.id)
         );
-        this.attendanceRecords = [...existingRecords, ...data];
+        
+        // تصفية البيانات القادمة من API: لا نأخذ السجلات التي لدينا نسخة dirty منها محلياً
+        const newData = data.filter(apiRecord => 
+          !dirtyRecords.some(local => local.studentId === apiRecord.studentId)
+        );
+        
+        // دمج السجلات: الأولوية للسجلات المحلية المعدلة (dirty)
+        this.attendanceRecords = [...otherRecords, ...dirtyRecords, ...newData];
         
         // Map attendance status to students for current date
+        // أولوية للسجلات المحلية ثم السجلات من API
         this.students.forEach(student => {
-          const record = data.find(r => r.studentId === student.id);
+          // البحث في المصفوفة المحدثة
+          const record = this.attendanceRecords.find(r => 
+            r.studentId === student.id && 
+            r.date === dateStr &&
+            r.classId === this.selectedClass!.id
+          );
           student.attendanceStatus = record ? record.status : 'unrecorded';
         });
+        
+        // إجبار Angular على اكتشاف التغييرات
+        this.cdr.markForCheck();
       },
       error: (error) => {
         console.error('Error loading attendance:', error);
         // Set all students to unrecorded for current date
         this.students.forEach(student => {
           student.attendanceStatus = 'unrecorded';
+        });
+      }
+    });
+  }
+
+  loadAttendanceForWeek(): void {
+    if (!this.selectedClass || this.weekDays.length === 0) return;
+
+    // تحميل سجلات الحضور لجميع أيام الأسبوع
+    const weekDates = this.weekDays.map(day => this.formatDateForAPI(day));
+    const weekDatesSet = new Set(weekDates);
+
+    // الاحتفاظ بالسجلات المعدلة محلياً (dirty) أو الجديدة للأسبوع الحالي
+    const dirtyRecords = this.attendanceRecords.filter(r => 
+      r.classId === this.selectedClass!.id &&
+      weekDatesSet.has(r.date) &&
+      (r._dirty || !r.id || r.id === 0)
+    );
+
+    // الاحتفاظ بالسجلات التي خارج الأسبوع الحالي أو لفصل آخر
+    const otherRecords = this.attendanceRecords.filter(r => 
+      !(r.classId === this.selectedClass!.id && 
+        weekDatesSet.has(r.date))
+    );
+
+    // تحميل السجلات لكل يوم في الأسبوع
+    const loadPromises = weekDates.map(dateStr => {
+      return new Promise<AttendanceRecord[]>((resolve) => {
+        this.apiService.get<AttendanceRecord[]>(`/attendance?classId=${this.selectedClass!.id}&date=${dateStr}`).subscribe({
+          next: (data) => {
+            resolve(data);
+          },
+          error: (error) => {
+            console.error(`Error loading attendance for ${dateStr}:`, error);
+            resolve([]);
+          }
+        });
+      });
+    });
+
+    // انتظار تحميل جميع السجلات
+    Promise.all(loadPromises).then((allApiRecordsArrays) => {
+      // دمج جميع السجلات من API
+      const allApiRecords = allApiRecordsArrays.flat();
+      
+      // تصفية سجلات API: تجاهل السجلات التي لدينا نسخة dirty منها محلياً
+      const validApiRecords = allApiRecords.filter(apiRecord => 
+        !dirtyRecords.some(local => 
+          local.studentId === apiRecord.studentId && 
+          local.date === apiRecord.date
+        )
+      );
+      
+      // دمج السجلات: الأولوية لـ dirtyRecords
+      this.attendanceRecords = [...otherRecords, ...dirtyRecords, ...validApiRecords];
+      
+      // إجبار Angular على اكتشاف التغييرات
+      this.cdr.markForCheck();
+      
+      // بعد تحميل جميع السجلات، تحديث حالة الطلاب لليوم المحدد في العرض اليومي
+      if (!this.showWeeklyView && this.selectedDate) {
+        const dateStr = this.formatDateForAPI(this.selectedDate);
+        this.students.forEach(student => {
+          const record = this.attendanceRecords.find(r => 
+            r.studentId === student.id && 
+            r.date === dateStr &&
+            r.classId === this.selectedClass!.id
+          );
+          student.attendanceStatus = record ? record.status : 'unrecorded';
         });
       }
     });
@@ -259,6 +364,30 @@ export class AttendanceComponent implements OnInit {
     this.loadAttendanceForDate();
   }
 
+  toggleWeeklyView(): void {
+    this.showWeeklyView = !this.showWeeklyView;
+    // عند التبديل للعرض الأسبوعي، تحديث أيام الأسبوع بناءً على التاريخ المحدد
+    if (this.showWeeklyView) {
+      // تحديث أيام الأسبوع لتكون الأسبوع الذي يحتوي على التاريخ المحدد
+      const selectedDate = this.selectedDate;
+      const dayOfWeek = selectedDate.getDay();
+      const startOfWeek = new Date(selectedDate);
+      startOfWeek.setDate(selectedDate.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Monday
+      
+      this.weekDays = [];
+      for (let i = 0; i < 7; i++) {
+        const date = new Date(startOfWeek);
+        date.setDate(startOfWeek.getDate() + i);
+        this.weekDays.push(date);
+      }
+      // تحميل سجلات الحضور للأسبوع
+      this.loadAttendanceForWeek();
+    } else {
+      // عند العودة للعرض اليومي، تحميل سجلات الحضور لليوم المحدد
+      this.loadAttendanceForDate();
+    }
+  }
+
   navigateDate(direction: 'prev' | 'next'): void {
     const days = direction === 'next' ? 1 : -1;
     this.selectedDate = new Date(this.selectedDate.getTime() + days * 24 * 60 * 60 * 1000);
@@ -291,6 +420,8 @@ export class AttendanceComponent implements OnInit {
       newDate.setDate(date.getDate() + days);
       return newDate;
     });
+    // تحميل سجلات الحضور للأسبوع الجديد
+    this.loadAttendanceForWeek();
   }
 
   recordAttendance(student: Student, status: AttendanceStatus | string): void {
@@ -318,14 +449,51 @@ export class AttendanceComponent implements OnInit {
       lessonSubject: this.selectedLessonSubject || undefined
     };
 
+    // تحديث محلي فوري للسجل حتى يظهر في العرض الأسبوعي مباشرة
+    if (existingRecord) {
+      existingRecord.status = attendanceStatus;
+      existingRecord.lessonTime = this.selectedLessonTime;
+      existingRecord.lessonSubject = this.selectedLessonSubject || undefined;
+      existingRecord._dirty = true;
+    } else {
+      // إضافة سجل جديد محلياً
+      this.attendanceRecords.push({
+        id: 0, // سيتم استبداله بالقيمة الصحيحة عند إعادة التحميل من API
+        studentId: student.id,
+        classId: this.selectedClass.id,
+        date: dateStr,
+        status: attendanceStatus,
+        lessonTime: this.selectedLessonTime,
+        lessonSubject: this.selectedLessonSubject || undefined,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        _dirty: true
+      } as AttendanceRecord);
+    }
+
+    // تحديث حالة الطالب محلياً
+    student.attendanceStatus = attendanceStatus;
+    
+    // إجبار Angular على اكتشاف التغييرات
+    this.cdr.markForCheck();
+
     // التحقق من أن السجل موجود وله ID صحيح (أكبر من 0)
     // إذا كان ID = 0 فهذا يعني أنه سجل محلي مؤقت لم يتم حفظه بعد في الـAPI
     if (existingRecord && existingRecord.id && existingRecord.id > 0) {
       // Update existing record
       this.apiService.patch<AttendanceRecord>(`/attendance/${existingRecord.id}`, recordData).subscribe({
-        next: () => {
-          student.attendanceStatus = attendanceStatus;
+        next: (updatedRecord) => {
+          // تحديث السجل المحلي بالبيانات المحدثة من الـAPI
+          if (existingRecord) {
+            Object.assign(existingRecord, updatedRecord);
+            existingRecord._dirty = false;
+          }
+          // تحديث العرض اليومي
           this.loadAttendanceForDate();
+          // إذا كان العرض الأسبوعي مفتوحاً، تحديثه أيضاً
+          if (this.showWeeklyView) {
+            // لا حاجة لإعادة تحميل كامل، السجلات المحلية محدثة بالفعل
+          }
         },
         error: (error) => {
           console.error('Error updating attendance:', error);
@@ -358,9 +526,27 @@ export class AttendanceComponent implements OnInit {
     } else {
       // Create new record
       this.apiService.post<AttendanceRecord>('/attendance', recordData).subscribe({
-        next: () => {
-          student.attendanceStatus = attendanceStatus;
+        next: (newRecord) => {
+          // تحديث السجل المحلي بالبيانات الجديدة من الـAPI
+          const localRecord = this.attendanceRecords.find(r => 
+            r.studentId === student.id && 
+            r.date === dateStr &&
+            r.classId === this.selectedClass!.id &&
+            r.id === 0
+          );
+          if (localRecord) {
+            Object.assign(localRecord, newRecord);
+            localRecord._dirty = false;
+          } else {
+            // إذا لم يتم العثور على السجل المحلي، أضفه
+            this.attendanceRecords.push(newRecord);
+          }
+          // تحديث العرض اليومي
           this.loadAttendanceForDate();
+          // إذا كان العرض الأسبوعي مفتوحاً، تحديث حالة الطالب لليوم المحدد
+          if (this.showWeeklyView) {
+            // السجلات المحلية محدثة بالفعل، لا حاجة لإعادة تحميل
+          }
         },
         error: (error) => {
           console.error('Error creating attendance:', error);
@@ -687,12 +873,37 @@ export class AttendanceComponent implements OnInit {
   }
 
   getAttendanceForStudentAndDate(studentId: number, date: Date): AttendanceStatus {
+    if (!this.selectedClass) return 'unrecorded';
     const dateStr = this.formatDateForAPI(date);
+    const validStatuses: AttendanceStatus[] = ['present', 'absent', 'late', 'excused', 'left_early', 'unrecorded'];
+    
+    // إعطاء أولوية للسجلات المحلية (id = 0 أو غير موجود)
+    const localRecord = this.attendanceRecords.find(r => 
+      r.studentId === studentId && 
+      r.date === dateStr &&
+      r.classId === this.selectedClass!.id &&
+      (!r.id || r.id === 0)
+    );
+    
+    if (localRecord && localRecord.status) {
+      const status = localRecord.status as AttendanceStatus;
+      return validStatuses.includes(status) ? status : 'unrecorded';
+    }
+    
+    // إذا لم يكن هناك سجل محلي، البحث في السجلات المحفوظة
     const record = this.attendanceRecords.find(r => 
       r.studentId === studentId && 
-      r.date === dateStr
+      r.date === dateStr &&
+      r.classId === this.selectedClass!.id
     );
-    return record ? record.status : 'unrecorded';
+    
+    if (!record || !record.status) {
+      return 'unrecorded';
+    }
+    
+    const status = record.status as AttendanceStatus;
+    // التأكد من أن القيمة المرجعة تطابق إحدى القيم في attendanceStatuses
+    return validStatuses.includes(status) ? status : 'unrecorded';
   }
 
   /**
@@ -945,17 +1156,42 @@ export class AttendanceComponent implements OnInit {
   onWeeklyAttendanceChange(day: Date, student: Student, event: Event): void {
     const target = event.target as HTMLSelectElement;
     if (target && target.value) {
-      this.selectedDate = day;
       const status = target.value as AttendanceStatus;
       // تحديث محلي فوري لسجلات الأسبوع ليتحدّث العداد مباشرة
       this.updateWeeklyAttendanceLocally(student.id, day, status);
+      
+      // حفظ التاريخ المحدد مؤقتاً
+      const originalDate = new Date(this.selectedDate);
+      this.selectedDate = day;
+      
+      // حفظ الحضور
       this.recordAttendance(student, status);
+      
+      // استعادة التاريخ الأصلي إذا كان العرض اليومي مفتوحاً
+      if (!this.showWeeklyView) {
+        this.selectedDate = originalDate;
+      }
     }
   }
 
   formatDateFromString(dateString: string): string {
     const date = new Date(dateString);
     return this.formatDate(date);
+  }
+
+  trackByStudentId(index: number, student: Student): number {
+    return student.id;
+  }
+
+  trackByDay = (index: number, day: Date): string => {
+    return this.formatDateForAPI(day);
+  }
+
+  getAttendanceStatusForDisplay(studentId: number, date: Date): AttendanceStatus {
+    const status = this.getAttendanceForStudentAndDate(studentId, date);
+    // التأكد من أن القيمة المرجعة تطابق إحدى القيم في attendanceStatuses
+    const validStatuses: AttendanceStatus[] = ['present', 'absent', 'late', 'excused', 'left_early', 'unrecorded'];
+    return validStatuses.includes(status) ? status : 'unrecorded';
   }
 }
 

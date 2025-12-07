@@ -32,6 +32,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
       active: false
     },
     { 
+      labelKey: 'menu.timetable',
+      route: '/timetable', 
+      icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z',
+      active: false
+    },
+    { 
       labelKey: 'menu.classes',
       route: '/classes', 
       icon: 'M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z',

@@ -231,20 +231,53 @@ section {
   font-size: 0.9rem;
   white-space: nowrap;
   transition: all 0.2s ease;
+  background-color: #dc2626 !important; /* red-600 */
+  color: #ffffff !important;
+}
+
+.dark .controls .btn-export-pdf {
+  background-color: #dc2626 !important; /* red-600 */
 }
 
 .controls .btn-export-pdf:hover:not(:disabled) {
   transform: translateY(-1px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: #b91c1c !important; /* red-700 */
 }
 
 .dark .controls .btn-export-pdf:hover:not(:disabled) {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  background-color: #b91c1c !important; /* red-700 */
 }
 
 .controls .btn-export-pdf:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* زر تصدير PDF في تبويب العقوبات - لون أحمر */
+.controls .btn-penalties-export {
+  background-color: #dc2626 !important; /* red-600 */
+  color: #ffffff !important;
+  border-color: #dc2626 !important;
+}
+
+.dark .controls .btn-penalties-export {
+  background-color: #dc2626 !important; /* red-600 */
+  color: #ffffff !important;
+}
+
+.controls .btn-penalties-export:hover:not(:disabled) {
+  background-color: #b91c1c !important; /* red-700 */
+  border-color: #b91c1c !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dark .controls .btn-penalties-export:hover:not(:disabled) {
+  background-color: #b91c1c !important; /* red-700 */
+  border-color: #b91c1c !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
 .status {

@@ -1,5 +1,5 @@
-<aside class="bg-white dark:bg-gray-800 w-64 shadow-lg p-4 h-full md:h-auto fixed md:static top-16 bottom-0 md:top-auto right-0 z-30">
-  <nav class="space-y-2">
+<aside class="bg-white dark:bg-gray-800 w-64 shadow-lg p-4 h-full md:h-auto fixed md:static top-16 bottom-0 md:top-auto right-0 z-30 flex flex-col">
+  <nav class="space-y-2 overflow-y-auto flex-1">
     <ng-container *ngFor="let item of menuItems; let i = index">
       <a
         *ngIf="!item.adminOnly || isAdmin"
