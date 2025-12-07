@@ -165,10 +165,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
     this.notificationsLoaded = false;
 
-    // تحميل الإشعارات
-    this.notificationService.getNotifications().subscribe({
+    // تحميل الإشعارات (غير المقروءة فقط حتى تختفي بعد قراءتها)
+    this.notificationService.getNotifications(true).subscribe({
       next: notifications => {
-        this.notifications = notifications || [];
+        // نعرض فقط الإشعارات غير المقروءة (احتياط إضافي)
+        this.notifications = (notifications || []).filter(n => !n.isRead);
         this.notificationsLoaded = true;
       },
       error: err => {
@@ -251,20 +252,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * وضع علامة قراءة على إشعار
+   * عند قراءة/فتح الإشعار: نعلّمه كمقروء ونخفيه من القائمة
    */
   markNotificationAsRead(notification: Notification): void {
     if (!notification.isRead) {
       this.notificationService.markAsRead(notification.id).subscribe({
         next: updatedNotification => {
-          const index = this.notifications.findIndex(n => n.id === notification.id);
-          if (index !== -1) {
-            this.notifications[index] = updatedNotification;
-            // تحديث الإحصائيات
-            if (this.notificationStats) {
-              this.notificationStats.unread = Math.max(0, this.notificationStats.unread - 1);
-              this.notificationCount = this.notificationStats.unread;
-            }
+          // إزالة الإشعار من القائمة (لأننا نعرض غير المقروء فقط)
+          this.notifications = this.notifications.filter(n => n.id !== notification.id);
+
+          // تحديث الإحصائيات المحلية
+          if (this.notificationStats) {
+            this.notificationStats.unread = Math.max(0, this.notificationStats.unread - 1);
+            this.notificationCount = this.notificationStats.unread;
+          } else {
+            // في حال عدم وجود إحصائيات، نحدّث عدّاد الشارة يدوياً
+            this.notificationCount = Math.max(0, this.notificationCount - 1);
           }
         },
         error: err => {
