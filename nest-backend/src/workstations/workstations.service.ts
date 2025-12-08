@@ -161,6 +161,7 @@ export class WorkstationsService {
         behaviorStatus:
           assignment.behaviorStatus ?? BehaviorStatus.NEUTRAL,
         behaviorNotes: assignment.behaviorNotes ?? null,
+        quickGrade: assignment.quickGrade ?? null,
       });
     });
 

@@ -40,6 +40,7 @@ interface StudentSeat {
   attendanceStatus: AttendanceStatus;
   behaviorStatus: BehaviorStatus;
   behaviorNotes?: string | null;
+  quickGrade?: number | null;
   assignmentId?: number;
 }
 
@@ -51,6 +52,7 @@ interface SeatAssignmentResponse {
   attendanceStatus: AttendanceStatus;
   behaviorStatus: BehaviorStatus;
   behaviorNotes?: string;
+  quickGrade?: number | null;
   student: Student;
 }
 
@@ -401,6 +403,7 @@ export class SeatingChartComponent implements OnInit {
           attendanceStatus: assignment.attendanceStatus,
           behaviorStatus: assignment.behaviorStatus,
           behaviorNotes: assignment.behaviorNotes ?? '',
+          quickGrade: assignment.quickGrade ?? null,
           assignmentId: assignment.id,
           expanded: false,
         }));
@@ -443,6 +446,7 @@ export class SeatingChartComponent implements OnInit {
       attendanceStatus: 'present',
       behaviorStatus: 'neutral',
       behaviorNotes: '',
+      quickGrade: null,
     };
   }
 
@@ -560,6 +564,42 @@ export class SeatingChartComponent implements OnInit {
     this.activeSeat = null;
   }
 
+  validateQuickGrade(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = parseFloat(input.value);
+
+    // منع الأرقام السالبة والقيم أكبر من 20
+    if (!isNaN(value)) {
+      if (value < 0) {
+        input.value = '0';
+        if (this.activeSeat) {
+          this.activeSeat.seat.quickGrade = 0;
+        }
+      } else if (value > 20) {
+        input.value = '20';
+        if (this.activeSeat) {
+          this.activeSeat.seat.quickGrade = 20;
+        }
+      }
+    }
+  }
+
+  validateQuickGradeOnBlur(): void {
+    if (this.activeSeat && this.activeSeat.seat.quickGrade !== null && this.activeSeat.seat.quickGrade !== undefined) {
+      let grade = this.activeSeat.seat.quickGrade;
+      
+      // التأكد من أن القيمة ضمن النطاق
+      if (grade < 0) {
+        this.activeSeat.seat.quickGrade = 0;
+      } else if (grade > 20) {
+        this.activeSeat.seat.quickGrade = 20;
+      }
+      
+      // تقريب القيمة إلى أقرب 0.5
+      this.activeSeat.seat.quickGrade = Math.round(this.activeSeat.seat.quickGrade * 2) / 2;
+    }
+  }
+
   matchesSearch(studentSeat: StudentSeat): boolean {
     if (!this.searchTerm.trim()) {
       return true;
@@ -634,6 +674,7 @@ export class SeatingChartComponent implements OnInit {
         attendanceStatus: seat.attendanceStatus,
         behaviorStatus: seat.behaviorStatus,
         behaviorNotes: seat.behaviorNotes,
+        quickGrade: seat.quickGrade,
       })),
     );
 

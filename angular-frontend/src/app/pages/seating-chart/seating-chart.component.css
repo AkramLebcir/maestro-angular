@@ -258,8 +258,19 @@ textarea {
 }
 
 .popup-field select,
-.popup-field textarea {
+.popup-field textarea,
+.popup-field input[type="number"] {
   @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-sm;
+}
+
+.popup-field input[type="number"]::-webkit-inner-spin-button,
+.popup-field input[type="number"]::-webkit-outer-spin-button {
+  opacity: 1;
+}
+
+/* تحذير عند إدخال قيمة غير صالحة */
+.popup-field input[type="number"]:invalid {
+  @apply border-red-300 bg-red-50;
 }
 
 .popup-actions {

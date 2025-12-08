@@ -170,6 +170,10 @@ export class CreateGradingSettingsDto {
   includeOralExpression?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  autoFillOralExpressionFromSeating?: boolean;
+
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RatingRangeConfigDto)
@@ -226,6 +230,10 @@ export class UpdateGradingSettingsDto {
   @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  autoFillOralExpressionFromSeating?: boolean;
 
   @IsOptional()
   @IsArray()
@@ -293,6 +301,10 @@ export class BulkApplySettingsDto {
   @IsOptional()
   @IsBoolean()
   includeOralExpression?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  autoFillOralExpressionFromSeating?: boolean;
 
   @IsOptional()
   @IsArray()

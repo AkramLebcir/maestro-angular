@@ -4,7 +4,9 @@ import {
   IsArray,
   IsEnum,
   IsInt,
+  IsNumber,
   IsOptional,
+  Max,
   Min,
   ValidateNested,
 } from 'class-validator';
@@ -37,6 +39,13 @@ class AssignmentInput {
 
   @IsOptional()
   behaviorNotes?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  @Max(20)
+  quickGrade?: number | null;
 }
 
 export class SaveAssignmentsDto {

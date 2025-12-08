@@ -25,3 +25,4 @@
 
 The login page currently uses an icon-based logo (letter "M" in a blue rounded square) with the text "المايسترو" next to it.
 
+

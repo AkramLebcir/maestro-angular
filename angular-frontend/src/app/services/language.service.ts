@@ -2549,6 +2549,24 @@ export class LanguageService {
         'DE': 'Beim Entfernen dieser Spalte wird die Berechnungsmethode des Durchschnitts geändert',
         'TR': 'Bu sütun kaldırıldığında, ortalama hesaplama yöntemi değiştirilecek'
       },
+      'gradebook.autoFillOralFromSeating': {
+        'AR': 'ملء عمود التعبير الشفهي/العمل العملي تلقائياً من درجة سريعة في مخطط المقاعد',
+        'FR': 'Remplir automatiquement la colonne expression orale / TP depuis la note rapide du plan de classe',
+        'EN': 'Auto-fill oral/practical column from seating chart quick grade',
+        'ES': 'Rellenar automáticamente la columna oral/práctica desde la nota rápida del plano',
+        'IT': 'Compila automaticamente la colonna orale/pratica dal voto rapido del piano dei posti',
+        'DE': 'Spalte Mündlich/Praktisch automatisch aus Schnellnote des Sitzplans füllen',
+        'TR': 'Oturma planındaki hızlı nottan sözlü/pratik sütununu otomatik doldur'
+      },
+      'gradebook.autoFillOralFromSeatingHint': {
+        'AR': 'عند التفعيل سيتم جلب درجة سريعة لكل تلميذ من مخطط المقاعد ووضعها في عمود التعبير الشفهي/العمل العملي للفصل الحالي دون إدخال يدوي.',
+        'FR': 'En activant, la note rapide du plan de classe sera appliquée automatiquement à la colonne expression orale / TP du trimestre courant.',
+        'EN': 'When enabled, the quick grade from the seating chart is applied automatically to the oral/practical column for the current term.',
+        'ES': 'Al activarlo, la nota rápida del plano de asientos se aplica automáticamente a la columna oral/práctica del trimestre actual.',
+        'IT': 'Se abilitato, il voto rapido del piano dei posti viene applicato automaticamente alla colonna orale/pratica del trimestre corrente.',
+        'DE': 'Wenn aktiviert, wird die Schnellnote aus dem Sitzplan automatisch in die Spalte Mündlich/Praktisch des aktuellen Trimesters übernommen.',
+        'TR': 'Etkinleştirildiğinde, oturma planındaki hızlı not mevcut dönem için sözlü/pratik sütununa otomatik olarak işlenir.'
+      },
       'gradebook.attendanceBehavior': {
         'AR': 'الحضور والسلوك',
         'FR': 'Présence et comportement',
@@ -6848,6 +6866,33 @@ export class LanguageService {
         'IT': 'Note',
         'DE': 'Notizen',
         'TR': 'Notlar'
+      },
+      'seatingChart.quickGrade': {
+        'AR': 'درجة سريعة',
+        'FR': 'Note rapide',
+        'EN': 'Quick Grade',
+        'ES': 'Calificación rápida',
+        'IT': 'Voto rapido',
+        'DE': 'Schnellnote',
+        'TR': 'Hızlı Not'
+      },
+      'seatingChart.optional': {
+        'AR': 'اختياري',
+        'FR': 'Optionnel',
+        'EN': 'Optional',
+        'ES': 'Opcional',
+        'IT': 'Opzionale',
+        'DE': 'Optional',
+        'TR': 'İsteğe bağlı'
+      },
+      'seatingChart.gradeRange': {
+        'AR': 'الدرجة محصورة بين 0 و 20',
+        'FR': 'La note doit être entre 0 et 20',
+        'EN': 'Grade must be between 0 and 20',
+        'ES': 'La calificación debe estar entre 0 y 20',
+        'IT': 'Il voto deve essere tra 0 e 20',
+        'DE': 'Note muss zwischen 0 und 20 liegen',
+        'TR': 'Not 0 ile 20 arasında olmalıdır'
       },
       'seatingChart.done': {
         'AR': 'تم',

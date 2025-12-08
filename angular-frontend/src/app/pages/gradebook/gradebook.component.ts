@@ -229,6 +229,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   applyToAllClasses: boolean = false;
   selectedRatingsLanguage: string = '';
   selectedGuidanceLanguage: string = '';
+  autoFillOralExpressionSynced = false;
+  autoFillOralExpressionLoading = false;
   gradingSettings: GradingSettings = {
     classId: 0,
     notebookCorrectionMaxScore: 5,
@@ -240,6 +242,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     customAssessmentColumns: [],
     baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
     includeOralExpression: true,
+    autoFillOralExpressionFromSeating: false,
   };
   
   // Current class grading settings (loaded when class is selected)
@@ -398,6 +401,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         if (data.length > 0 && !this.selectedClass) {
           this.selectedClass = data[0];
           this.loadStudentsForClass(data[0].id);
+          this.loadCurrentClassGradingSettings();
         }
       },
       error: (error) => {
@@ -415,6 +419,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         } else {
           this.assessments = this.assessmentTypes;
         }
+        this.maybeAutoFillOralExpressionFromSeating();
       },
       error: (error) => {
         console.error('Error loading assessments:', error);
@@ -458,6 +463,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         this.students.forEach(student => {
           student.grades = this.grades.filter(g => g.studentId === student.id);
         });
+        this.autoFillOralExpressionSynced = false;
+        this.maybeAutoFillOralExpressionFromSeating();
         // Load attendance and behavior data
         // سيتم استدعاء calculateAllGrades() من loadAttendanceForClass و loadBehaviorForClass
         this.loadAttendanceForClass(classId);
@@ -507,6 +514,57 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     });
   }
 
+  private maybeAutoFillOralExpressionFromSeating(): void {
+    if (this.autoFillOralExpressionLoading || this.autoFillOralExpressionSynced) {
+      return;
+    }
+    if (!this.selectedClass) return;
+    if (!this.currentClassGradingSettings?.autoFillOralExpressionFromSeating) return;
+    if (!this.shouldShowOralExpressionColumn()) return;
+    if (!this.students || this.students.length === 0) return;
+
+    const oralAssessmentId = this.getAssessmentIdByType('oral_expression');
+    if (!oralAssessmentId) return;
+
+    this.autoFillOralExpressionLoading = true;
+
+    this.apiService.get<any>(`/workstations/layout?classId=${this.selectedClass.id}`).subscribe({
+      next: (layout) => {
+        const assignments = (layout?.workstations || []).flatMap((ws: any) => ws.assignments || []);
+        const quickGradeMap = new Map<number, number>();
+
+        assignments.forEach((assignment: any) => {
+          const studentId = assignment?.studentId;
+          const quickGrade = assignment?.quickGrade;
+          if (studentId && quickGrade !== null && quickGrade !== undefined && !isNaN(Number(quickGrade))) {
+            quickGradeMap.set(studentId, Number(quickGrade));
+          }
+        });
+
+        quickGradeMap.forEach((quickGrade, studentId) => {
+          const existing = this.grades.find(g =>
+            g.studentId === studentId &&
+            g.assessmentId === oralAssessmentId &&
+            g.classId === this.selectedClass!.id &&
+            g.term === this.selectedTerm
+          );
+
+          if (!existing || existing.score !== quickGrade) {
+            this.saveGrade(studentId, oralAssessmentId, quickGrade);
+          }
+        });
+
+        this.autoFillOralExpressionSynced = true;
+      },
+      error: (error) => {
+        console.error('Error auto-filling oral/practical grades from seating chart:', error);
+      },
+      complete: () => {
+        this.autoFillOralExpressionLoading = false;
+      }
+    });
+  }
+
   isBehaviorPositive(behaviorId: number): boolean {
     // السلوكيات الإيجابية: IDs 1-5
     // السلوكيات السلبية: IDs 6-10
@@ -514,6 +572,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   onClassChange(): void {
+    this.autoFillOralExpressionSynced = false;
+    this.autoFillOralExpressionLoading = false;
+    this.currentClassGradingSettings = null;
     if (this.selectedClass) {
       this.loadStudentsForClass(this.selectedClass.id);
       this.loadCurrentClassGradingSettings();
@@ -543,12 +604,17 @@ export class GradebookComponent implements OnInit, AfterViewInit {
             behaviorAutoApply: true,
             customAssessmentColumns: [],
             baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
-            includeOralExpression: true,
+          includeOralExpression: true,
+          autoFillOralExpressionFromSeating: false,
           };
         }
         if (this.currentClassGradingSettings) {
+        this.currentClassGradingSettings.autoFillOralExpressionFromSeating =
+          this.currentClassGradingSettings.autoFillOralExpressionFromSeating ?? false;
           this.currentClassGradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.currentClassGradingSettings.baseColumnSettings);
         }
+      this.autoFillOralExpressionSynced = false;
+      this.maybeAutoFillOralExpressionFromSeating();
         // Recalculate grades with new settings
         this.calculateAllGrades();
       },
@@ -565,7 +631,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
           behaviorAutoApply: true,
           customAssessmentColumns: [],
           baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
-          includeOralExpression: true,
+        includeOralExpression: true,
+        autoFillOralExpressionFromSeating: false,
         };
         this.currentClassGradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.currentClassGradingSettings.baseColumnSettings);
       }
@@ -574,6 +641,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
   onTermChange(): void {
     if (this.selectedClass) {
+      this.autoFillOralExpressionSynced = false;
       // إعادة حساب الدرجات للفصل الدراسي الجديد
       // استخدام setTimeout لضمان تحديث this.selectedTerm قبل الحساب
       setTimeout(() => {
@@ -1844,6 +1912,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   // Reports
   openReportModal(): void {
     this.showReportModal = true;
+    // تأكد من تحديث الرسوم البيانية قبل العرض أو التصدير
+    setTimeout(() => {
+      this.updateAllCharts();
+      this.cdr.detectChanges();
+    }, 0);
   }
 
   closeReportModal(): void {
@@ -2191,112 +2264,179 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       return;
     }
 
+    // تأكد من أن الرسوم البيانية محدثة قبل الالتقاط
+    this.updateAllCharts();
+    await this.waitForReportCharts();
+
     try {
-      // Find the reports modal content
-      const modalContent = document.querySelector('.bg-white.rounded-lg.shadow-xl') as HTMLElement;
+      const modalContent = document.querySelector('.reports-modal-content') as HTMLElement;
       if (!modalContent) {
         alert('لم يتم العثور على محتوى التقارير للتصدير');
         return;
       }
 
-      // Create a temporary container for export
-      const exportContainer = document.createElement('div');
-      exportContainer.style.position = 'absolute';
-      exportContainer.style.left = '-9999px';
-      exportContainer.style.top = '0';
-      exportContainer.style.width = modalContent.offsetWidth + 'px';
-      exportContainer.style.backgroundColor = '#ffffff';
-      exportContainer.style.padding = '20px';
-      exportContainer.style.fontFamily = 'Arial, sans-serif';
-      exportContainer.style.direction = 'rtl';
-      exportContainer.style.textAlign = 'right';
+      // حفظ إعدادات الارتفاع الأصلية
+      const originalMaxHeight = modalContent.style.maxHeight;
+      const originalOverflow = modalContent.style.overflow;
+      const originalHeight = modalContent.style.height;
 
-      // Clone the modal content
-      const clonedContent = modalContent.cloneNode(true) as HTMLElement;
-      
-      // Remove the header buttons (export and close buttons)
-      const headerButtons = clonedContent.querySelector('.flex.gap-2');
-      if (headerButtons) {
-        headerButtons.remove();
-      }
+      // إزالة القيود حتى تصبح كل الأقسام مرئية لـ html2canvas
+      modalContent.style.maxHeight = 'none';
+      modalContent.style.overflow = 'visible';
+      modalContent.style.height = 'auto';
+      modalContent.scrollTop = 0;
 
-      // Style the cloned content
-      clonedContent.style.width = '100%';
-      clonedContent.style.backgroundColor = '#ffffff';
-      
-      // Add title
-      const title = document.createElement('h2');
-      title.textContent = 'تقارير الدرجات';
-      title.style.textAlign = 'right';
-      title.style.fontSize = '24px';
-      title.style.fontWeight = 'bold';
-      title.style.marginBottom = '20px';
-      title.style.color = '#111827';
-      
-      // Add class name and date (translated)
-      const info = document.createElement('div');
-      info.style.textAlign = 'right';
-      info.style.marginBottom = '20px';
-      info.style.fontSize = '14px';
-      info.style.color = '#6b7280';
-      
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const availableWidth = pageWidth - 2 * margin;
+      const availableHeight = pageHeight - 2 * margin;
+      const globalScaleFactor = 0.9; // تصغير عام بسيط حتى تتسع الأقسام في صفحتين قدر الإمكان
+
+      let currentY = margin;
+
+      // إنشاء رأس التقرير كصورة حتى تظهر العربية بشكل صحيح داخل PDF
+      const headerContainer = document.createElement('div');
+      headerContainer.style.position = 'absolute';
+      headerContainer.style.left = '-9999px';
+      headerContainer.style.top = '0';
+      headerContainer.style.width = '600px';
+      headerContainer.style.backgroundColor = '#ffffff';
+      headerContainer.style.padding = '16px';
+      headerContainer.style.direction = 'rtl';
+      headerContainer.style.textAlign = 'right';
+      headerContainer.style.fontFamily = getComputedStyle(document.body).fontFamily || 'Arial, sans-serif';
+
+      const headerTitle = document.createElement('h2');
+      headerTitle.textContent = 'تقارير الدرجات';
+      headerTitle.style.margin = '0 0 8px 0';
+      headerTitle.style.fontSize = '22px';
+      headerTitle.style.fontWeight = 'bold';
+      headerTitle.style.color = '#111827';
+
+      const headerInfo = document.createElement('p');
       const classInfo = this.selectedClass ? `القسم: ${this.selectedClass.name}` : '';
       const dateInfo = `التاريخ: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
-      info.innerHTML = `${classInfo}<br>${dateInfo}`;
-      
-      exportContainer.appendChild(title);
-      exportContainer.appendChild(info);
-      exportContainer.appendChild(clonedContent);
-      
-      document.body.appendChild(exportContainer);
+      headerInfo.textContent = `${classInfo}  |  ${dateInfo}`;
+      headerInfo.style.margin = '0';
+      headerInfo.style.fontSize = '13px';
+      headerInfo.style.color = '#4b5563';
 
-      // Use html2canvas to capture the content
-      const canvas = await html2canvas(exportContainer, {
-        scale: 1.5,
+      headerContainer.appendChild(headerTitle);
+      headerContainer.appendChild(headerInfo);
+      document.body.appendChild(headerContainer);
+
+      const headerCanvas = await html2canvas(headerContainer, {
+        scale: 2,
         useCORS: true,
         logging: false,
-        backgroundColor: '#ffffff',
-        width: exportContainer.offsetWidth,
-        height: exportContainer.offsetHeight
+        backgroundColor: '#ffffff'
       });
 
-      // Clean up
-      document.body.removeChild(exportContainer);
+      document.body.removeChild(headerContainer);
 
-      // Calculate PDF dimensions (portrait A4)
-      const imgWidth = 210; // A4 width in mm (portrait)
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      // Calculate scale to fit on page(s)
-      const pageHeight = 297; // A4 height in mm (portrait)
-      const pageWidth = 210; // A4 width in mm (portrait)
-      const margin = 10; // Margin on all sides
-      const availableHeight = pageHeight - (2 * margin);
-      const availableWidth = pageWidth - (2 * margin);
-      
-      // Scale to fit width first
-      let finalWidth = Math.min(imgWidth, availableWidth);
-      let finalHeight = (canvas.height * finalWidth) / canvas.width;
-      
-      // If height exceeds available height, we'll split across pages (don't scale down)
-      // Position content from top
-      const xOffset = (pageWidth - finalWidth) / 2; // Center horizontally
-      const yOffset = margin; // Start from top with margin
-
-      // Add first page
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
-      
-      // Add additional pages if content is taller than one page
-      let heightLeft = finalHeight - availableHeight;
-      let position = -availableHeight;
-
-      while (heightLeft > 0) {
-        position = position - availableHeight;
-        pdf.addPage();
-        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, position, finalWidth, finalHeight);
-        heightLeft -= availableHeight;
+      let headerWidth = availableWidth;
+      let headerHeight = (headerCanvas.height * headerWidth) / headerCanvas.width;
+      if (headerHeight > availableHeight) {
+        const ratio = availableHeight / headerHeight;
+        headerWidth = headerWidth * ratio;
+        headerHeight = headerHeight * ratio;
       }
+
+      headerWidth = headerWidth * globalScaleFactor;
+      headerHeight = headerHeight * globalScaleFactor;
+
+      const headerImg = headerCanvas.toDataURL('image/png');
+      pdf.addImage(headerImg, 'PNG', pageWidth - margin - headerWidth, currentY, headerWidth, headerHeight);
+      currentY += headerHeight + 6;
+
+      // نلتقط كل قسم على حدة حتى لا يُقطع الجزء السفلي من التقرير
+      const sectionElements = Array.from(
+        modalContent.querySelectorAll('.grade-report-section')
+      ) as HTMLElement[];
+
+      // نعطي أولوية للأقسام المطلوبة لتكون في الصفحة الأولى قدر الإمكان
+      const prioritySections: HTMLElement[] = [];
+      const otherSections: HTMLElement[] = [];
+
+      sectionElements.forEach((section) => {
+        if (
+          section.classList.contains('grade-report-summary-range') || // توزيع التلاميذ حسب الفئات
+          section.classList.contains('grade-report-summary-highlow') || // أعلى / أقل درجة
+          section.classList.contains('grade-report-summary-main') // معدل القسم + عدد التلاميذ ≥ / ≤ 10
+        ) {
+          prioritySections.push(section);
+        } else {
+          otherSections.push(section);
+        }
+      });
+
+      // يبدأ التقرير بالإحصائيات، ثم الأقسام ذات الأولوية، ثم باقي الأقسام
+      const orderedTargets: HTMLElement[] = [];
+      const statsSection = sectionElements.find(s => s.classList.contains('grade-report-stats'));
+      if (statsSection) {
+        orderedTargets.push(statsSection);
+      }
+
+      prioritySections.forEach(sec => {
+        if (!orderedTargets.includes(sec)) {
+          orderedTargets.push(sec);
+        }
+      });
+
+      otherSections.forEach(sec => {
+        if (!orderedTargets.includes(sec)) {
+          orderedTargets.push(sec);
+        }
+      });
+
+      const targets = orderedTargets.length > 0 ? orderedTargets : [modalContent];
+
+      for (const section of targets) {
+        // نتأكد أن القسم مرئي بالكامل قبل الالتقاط
+        section.scrollIntoView({ block: 'start' });
+        await new Promise(resolve => setTimeout(resolve, 150));
+
+        const canvas = await html2canvas(section, {
+          scale: 2,
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#ffffff'
+        });
+
+        let imgWidth = availableWidth;
+        let imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+        // إذا كان القسم طويلاً جداً، نقوم بتصغيره ليلائم ارتفاع الصفحة
+        if (imgHeight > availableHeight) {
+          const ratio = availableHeight / imgHeight;
+          imgWidth = imgWidth * ratio;
+          imgHeight = imgHeight * ratio;
+        }
+
+        // تطبيق عامل تصغير عام لزيادة احتمال تجمع التقرير في صفحتين
+        imgWidth = imgWidth * globalScaleFactor;
+        imgHeight = imgHeight * globalScaleFactor;
+
+        // إذا لم يتبقَّ مكان كافٍ في الصفحة الحالية ننتقل إلى صفحة جديدة
+        if (currentY + imgHeight > pageHeight - margin) {
+          pdf.addPage();
+          currentY = margin;
+        }
+
+        const imgData = canvas.toDataURL('image/png');
+        pdf.addImage(imgData, 'PNG', pageWidth - margin - imgWidth, currentY, imgWidth, imgHeight);
+        currentY += imgHeight + 6;
+      }
+
+      // استعادة إعدادات الـ modal الأصلية
+      modalContent.style.maxHeight = originalMaxHeight;
+      modalContent.style.overflow = originalOverflow;
+      modalContent.style.height = originalHeight;
+      modalContent.scrollTop = 0;
 
       const fileName = `تقارير_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
@@ -2304,6 +2444,11 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       console.error('Error exporting to PDF:', error);
       alert('حدث خطأ أثناء تصدير PDF');
     }
+  }
+
+  // Small wait to let charts render after updateAllCharts before capture
+  private waitForReportCharts(): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, 500));
   }
 
   async exportGradesToPDF(): Promise<void> {
@@ -4315,7 +4460,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         logging: false,
         backgroundColor: '#ffffff',
         width: exportContainer.offsetWidth,
-        height: exportContainer.offsetHeight
+        height: exportContainer.scrollHeight, // Capture full scroll height
+        windowWidth: exportContainer.scrollWidth,
+        windowHeight: exportContainer.scrollHeight
       });
 
       // Clean up
@@ -4390,8 +4537,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
             customAssessmentColumns: [],
             baseColumnSettings: DEFAULT_BASE_COLUMN_SETTINGS.map(column => ({ ...column })),
             includeOralExpression: true,
+            autoFillOralExpressionFromSeating: false,
           };
         }
+        this.gradingSettings.autoFillOralExpressionFromSeating = this.gradingSettings.autoFillOralExpressionFromSeating ?? false;
         this.gradingSettings.baseColumnSettings = this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings);
         // Initialize default ratings and guidance if not present
         this.initializeDefaultRatingsAndGuidance();
@@ -4481,6 +4630,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       customAssessmentColumns: customColumns,
       baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
+      autoFillOralExpressionFromSeating: this.gradingSettings.autoFillOralExpressionFromSeating ?? false,
       customRatings: this.gradingSettings.customRatings || [],
       customGuidance: this.gradingSettings.customGuidance || [],
     };
@@ -5326,6 +5476,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       customAssessmentColumns: this.gradingSettings.customAssessmentColumns,
       baseColumnSettings: this.normalizeBaseColumnSettings(this.gradingSettings.baseColumnSettings),
       includeOralExpression: this.gradingSettings.includeOralExpression,
+      autoFillOralExpressionFromSeating: this.gradingSettings.autoFillOralExpressionFromSeating,
       customRatings: this.gradingSettings.customRatings,
       customGuidance: this.gradingSettings.customGuidance,
     };

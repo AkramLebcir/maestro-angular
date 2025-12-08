@@ -253,9 +253,14 @@
                         <p class="name">{{ occupant.student.firstName }} {{ occupant.student.lastName }}</p>
                         <button class="remove-btn inline" type="button" (click)="clearSeat(slot, i)">✕</button>
                       </div>
-                      <span class="text-xs text-gray-400" *ngIf="slot.capacity === 2">
-                        {{ i === 0 ? translate('seatingChart.left') : translate('seatingChart.right') }}
-                      </span>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs text-gray-400" *ngIf="slot.capacity === 2">
+                          {{ i === 0 ? translate('seatingChart.left') : translate('seatingChart.right') }}
+                        </span>
+                        <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-0.5 rounded" *ngIf="occupant.quickGrade !== null && occupant.quickGrade !== undefined">
+                          {{ occupant.quickGrade }}/20
+                        </span>
+                      </div>
                     </div>
                   </div>
                   <div
@@ -302,6 +307,20 @@
                 <select [(ngModel)]="activeSeat!.seat.behaviorStatus">
                   <option *ngFor="let option of behaviorOptions" [value]="option.value">{{ option.label }}</option>
                 </select>
+              </div>
+              <div class="popup-field">
+                <label>{{ translate('seatingChart.quickGrade') }} ({{ translate('seatingChart.optional') }})</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  max="20" 
+                  step="0.5" 
+                  [(ngModel)]="activeSeat!.seat.quickGrade" 
+                  (input)="validateQuickGrade($event)"
+                  (blur)="validateQuickGradeOnBlur()"
+                  placeholder="0 - 20"
+                  class="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm">
+                <p class="text-xs text-gray-500 mt-1">{{ translate('seatingChart.gradeRange') }}</p>
               </div>
               <div class="popup-field">
                 <label>{{ translate('seatingChart.notes') }}</label>

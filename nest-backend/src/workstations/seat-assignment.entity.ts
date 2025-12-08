@@ -66,6 +66,9 @@ export class SeatAssignment extends TenantOwnedEntity {
   @Column({ type: 'text', nullable: true })
   behaviorNotes?: string;
 
+  @Column({ type: 'float', nullable: true })
+  quickGrade?: number | null;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   assignedAt: Date;
 

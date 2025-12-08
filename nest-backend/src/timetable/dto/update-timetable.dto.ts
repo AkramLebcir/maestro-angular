@@ -7,3 +7,4 @@ export class UpdateTimetableDto extends PartialType(CreateTimetableDto) {}
 
 
 
+

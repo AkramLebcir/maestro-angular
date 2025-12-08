@@ -574,3 +574,4 @@ Ajoutez ces traductions dans `angular-frontend/src/app/services/language.service
 
 5. **Templates de certificats**: Les noms et descriptions des templates sont actuellement en arabe dans le backend. Vous devrez soit traduire côté backend, soit créer un mapping côté frontend.
 
+

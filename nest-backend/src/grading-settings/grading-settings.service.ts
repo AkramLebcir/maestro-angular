@@ -37,6 +37,8 @@ export class GradingSettingsService {
     });
     if (!settings) return null;
     settings.baseColumnSettings = normalizeBaseColumnSettings(settings.baseColumnSettings);
+    settings.autoFillOralExpressionFromSeating =
+      settings.autoFillOralExpressionFromSeating ?? false;
     return settings;
   }
 
@@ -47,6 +49,8 @@ export class GradingSettingsService {
     });
     settings.forEach(setting => {
       setting.baseColumnSettings = normalizeBaseColumnSettings(setting.baseColumnSettings);
+      setting.autoFillOralExpressionFromSeating =
+        setting.autoFillOralExpressionFromSeating ?? false;
     });
     return settings;
   }
@@ -82,6 +86,8 @@ export class GradingSettingsService {
       customAssessmentColumns: createDto.customAssessmentColumns ?? [],
       baseColumnSettings: normalizeBaseColumnSettings(createDto.baseColumnSettings),
       includeOralExpression: createDto.includeOralExpression ?? true,
+      autoFillOralExpressionFromSeating:
+        createDto.autoFillOralExpressionFromSeating ?? false,
       customRatings: createDto.customRatings ?? null,
       customGuidance: createDto.customGuidance ?? null,
     });
@@ -136,6 +142,10 @@ export class GradingSettingsService {
     }
     if (updateDto.includeOralExpression !== undefined) {
       settings.includeOralExpression = updateDto.includeOralExpression;
+    }
+    if (updateDto.autoFillOralExpressionFromSeating !== undefined) {
+      settings.autoFillOralExpressionFromSeating =
+        updateDto.autoFillOralExpressionFromSeating;
     }
     if (updateDto.customRatings !== undefined) {
       settings.customRatings = updateDto.customRatings;
@@ -221,6 +231,8 @@ export class GradingSettingsService {
         customAssessmentColumns: bulkDto.customAssessmentColumns,
         baseColumnSettings: bulkDto.baseColumnSettings,
         includeOralExpression: bulkDto.includeOralExpression,
+        autoFillOralExpressionFromSeating:
+          bulkDto.autoFillOralExpressionFromSeating,
         customRatings,
         customGuidance,
       };

@@ -89,6 +89,8 @@ export class GradingSettings extends TenantOwnedEntity {
   // Oral Expression/Practical Work
   @Column({ type: 'boolean', default: true })
   includeOralExpression: boolean;
+  @Column({ type: 'boolean', default: false })
+  autoFillOralExpressionFromSeating: boolean;
 
   // Custom Ratings Configuration
   @Column({ type: 'json', nullable: true })

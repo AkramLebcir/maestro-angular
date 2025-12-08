@@ -65,6 +65,7 @@ export interface GradingSettings {
   customAssessmentColumns?: CustomAssessmentColumn[];
   baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression: boolean;
+  autoFillOralExpressionFromSeating?: boolean;
   customRatings?: RatingRangeConfig[];
   customGuidance?: GuidanceRangeConfig[];
 }
@@ -81,6 +82,7 @@ export interface BulkApplySettingsDto {
   customAssessmentColumns?: CustomAssessmentColumn[];
   baseColumnSettings?: BaseColumnConfig[];
   includeOralExpression?: boolean;
+  autoFillOralExpressionFromSeating?: boolean;
   customRatings?: RatingRangeConfig[];
   ratingsLanguage?: LanguageCode;
   customGuidance?: GuidanceRangeConfig[];
