@@ -1,10 +1,11 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
 import { AuthUser, JwtPayload } from './interfaces/auth-user.interface';
 import axios from 'axios';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -48,9 +49,17 @@ export class AuthService {
     await this.usersService.setLastLogin(user.id);
 
     const safeUser = await this.usersService.findOne(user.id);
+    const authUser = this.mapToAuthUser(safeUser);
+
+    // Generate tokens
+    const accessToken = this.generateAccessToken(authUser);
+    const { refreshToken, expiresAt } = await this.generateAndStoreRefreshToken(authUser.id);
+
     return {
-      accessToken: this.generateAccessToken(safeUser),
-      user: this.mapToAuthUser(safeUser),
+      accessToken,
+      refreshToken,
+      refreshTokenExpiresAt: expiresAt,
+      user: authUser,
     };
   }
 
@@ -128,6 +137,74 @@ export class AuthService {
       allowedModules: user.allowedModules,
       isActive: user.isActive,
     };
+  }
+
+  private async generateAndStoreRefreshToken(userId: number) {
+    const ttl = this.configService.get<string>('REFRESH_TOKEN_TTL', '7d');
+    const secret = this.configService.get<string>('JWT_REFRESH_SECRET', 'super-refresh-secret');
+
+    const payload = { sub: userId };
+    const refreshToken = this.jwtService.sign(payload, {
+      secret,
+      expiresIn: ttl,
+    });
+
+    // Decode to get exact expiration date
+    const decoded: any = this.jwtService.decode(refreshToken);
+    const expiresAt = decoded?.exp ? new Date(decoded.exp * 1000) : null;
+
+    const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+    const hash = await bcrypt.hash(refreshToken, saltRounds);
+
+    await this.usersService.setRefreshToken(userId, hash, expiresAt ?? null);
+
+    return { refreshToken, expiresAt };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Missing refresh token');
+    }
+
+    const secret = this.configService.get<string>('JWT_REFRESH_SECRET', 'super-refresh-secret');
+    let payload: any;
+    try {
+      payload = this.jwtService.verify(refreshToken, { secret });
+    } catch {
+      throw new ForbiddenException('Invalid refresh token');
+    }
+
+    const user = await this.usersService.findByIdWithRefreshToken(payload.sub);
+    if (!user || !user.isActive || !user.refreshTokenHash) {
+      throw new ForbiddenException('Refresh token not valid');
+    }
+
+    if (user.refreshTokenExpiresAt && user.refreshTokenExpiresAt.getTime() < Date.now()) {
+      await this.usersService.clearRefreshToken(user.id);
+      throw new ForbiddenException('Refresh token expired');
+    }
+
+    const isMatch = await bcrypt.compare(refreshToken, user.refreshTokenHash);
+    if (!isMatch) {
+      throw new ForbiddenException('Refresh token mismatch');
+    }
+
+    const safeUser = await this.usersService.findOne(user.id);
+    const authUser = this.mapToAuthUser(safeUser);
+
+    const accessToken = this.generateAccessToken(authUser);
+    const { refreshToken: newRefreshToken, expiresAt } = await this.generateAndStoreRefreshToken(authUser.id);
+
+    return {
+      accessToken,
+      refreshToken: newRefreshToken,
+      refreshTokenExpiresAt: expiresAt,
+      user: authUser,
+    };
+  }
+
+  async logout(userId: number) {
+    await this.usersService.clearRefreshToken(userId);
   }
 }
 

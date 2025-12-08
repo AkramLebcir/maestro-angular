@@ -119,6 +119,28 @@ export class UsersService {
     await this.usersRepository.update(id, { lastLoginAt: new Date() });
   }
 
+  async setRefreshToken(id: number, refreshTokenHash: string, expiresAt: Date): Promise<void> {
+    await this.usersRepository.update(id, {
+      refreshTokenHash,
+      refreshTokenExpiresAt: expiresAt,
+    });
+  }
+
+  async clearRefreshToken(id: number): Promise<void> {
+    await this.usersRepository.update(id, {
+      refreshTokenHash: null,
+      refreshTokenExpiresAt: null,
+    });
+  }
+
+  async findByIdWithRefreshToken(id: number): Promise<User | null> {
+    return this.usersRepository
+      .createQueryBuilder('user')
+      .addSelect(['user.refreshTokenHash', 'user.refreshTokenExpiresAt'])
+      .where('user.id = :id', { id })
+      .getOne();
+  }
+
   private async hashPassword(password: string): Promise<string> {
     const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || DEFAULT_SALT_ROUNDS;
     return bcrypt.hash(password, saltRounds);

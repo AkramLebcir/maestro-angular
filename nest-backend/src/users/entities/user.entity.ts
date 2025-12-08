@@ -50,6 +50,13 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   lastLoginAt?: Date;
 
+  // Single active session support using refresh token (stored hashed)
+  @Column({ type: 'varchar', length: 255, nullable: true, select: false })
+  refreshTokenHash?: string | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  refreshTokenExpiresAt?: Date | null;
+
   @Column({ type: 'jsonb', nullable: true })
   profile?: Record<string, unknown>;
 

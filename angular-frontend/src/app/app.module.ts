@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { AppRoutingModule } from './app-routing.module';
@@ -40,6 +40,7 @@ import { SubscriptionStatusComponent } from './pages/subscription-status/subscri
 import { SubscriptionPaymentComponent } from './pages/subscription-payment/subscription-payment.component';
 import { ReportGeneratorComponent } from './pages/report-generator/report-generator.component';
 import { ClubsComponent } from './pages/clubs/clubs.component';
+import { AuthInterceptor } from './services/auth-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -87,7 +88,13 @@ import { ClubsComponent } from './pages/clubs/clubs.component';
     NgChartsModule,
     RecaptchaModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptor,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

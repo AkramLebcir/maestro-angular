@@ -41,6 +41,8 @@ export class AuthService {
       identifier,
       password,
       captchaToken
+    }, {
+      withCredentials: true
     }).pipe(
       tap(response => {
         this.setToken(response.accessToken);
@@ -86,6 +88,18 @@ export class AuthService {
       tap(user => {
         this.setUser(user);
         this.currentUserSubject.next(user);
+      })
+    );
+  }
+
+  refreshToken(): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/auth/refresh`, {}, {
+      withCredentials: true
+    }).pipe(
+      tap(response => {
+        this.setToken(response.accessToken);
+        this.setUser(response.user);
+        this.currentUserSubject.next(response.user);
       })
     );
   }
