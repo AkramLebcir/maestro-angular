@@ -57,6 +57,10 @@ export class User {
   @Column({ type: 'timestamp', nullable: true })
   refreshTokenExpiresAt?: Date | null;
 
+  // Current active session identifier (used to invalidate old tokens on new login)
+  @Column({ type: 'varchar', length: 100, nullable: true })
+  sessionId?: string | null;
+
   @Column({ type: 'jsonb', nullable: true })
   profile?: Record<string, unknown>;
 

@@ -9,6 +9,7 @@ export interface AuthUser {
   role: UserRole;
   allowedModules?: string[];
   isActive: boolean;
+  sessionId?: string;
 }
 
 export interface JwtPayload {
@@ -19,6 +20,7 @@ export interface JwtPayload {
   isActive: boolean;
   firstName?: string;
   lastName?: string;
+   sessionId: string;
 }
 
 

@@ -25,6 +25,11 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       return null;
     }
 
+    // Enforce single active session: token's sessionId must match current one
+    if (!payload.sessionId || !user.sessionId || payload.sessionId !== user.sessionId) {
+      return null;
+    }
+
     return {
       id: user.id,
       email: user.email,

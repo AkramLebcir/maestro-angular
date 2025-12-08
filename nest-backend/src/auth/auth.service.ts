@@ -6,6 +6,7 @@ import { LoginDto } from './dto/login.dto';
 import { AuthUser, JwtPayload } from './interfaces/auth-user.interface';
 import axios from 'axios';
 import * as bcrypt from 'bcrypt';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class AuthService {
@@ -51,9 +52,9 @@ export class AuthService {
     const safeUser = await this.usersService.findOne(user.id);
     const authUser = this.mapToAuthUser(safeUser);
 
-    // Generate tokens
-    const accessToken = this.generateAccessToken(authUser);
-    const { refreshToken, expiresAt } = await this.generateAndStoreRefreshToken(authUser.id);
+    // Generate new session and tokens (invalidates previous session)
+    const { refreshToken, expiresAt, sessionId } = await this.generateAndStoreRefreshToken(authUser.id);
+    const accessToken = this.generateAccessToken(authUser, sessionId);
 
     return {
       accessToken,
@@ -112,7 +113,7 @@ export class AuthService {
     return user;
   }
 
-  private generateAccessToken(user: AuthUser) {
+  private generateAccessToken(user: AuthUser, sessionId: string) {
     const payload: JwtPayload = {
       sub: user.id,
       email: user.email,
@@ -121,6 +122,7 @@ export class AuthService {
       isActive: user.isActive,
       firstName: user.firstName,
       lastName: user.lastName,
+      sessionId,
     };
 
     return this.jwtService.sign(payload);
@@ -139,11 +141,12 @@ export class AuthService {
     };
   }
 
-  private async generateAndStoreRefreshToken(userId: number) {
+  private async generateAndStoreRefreshToken(userId: number, existingSessionId?: string) {
     const ttl = this.configService.get<string>('REFRESH_TOKEN_TTL', '7d');
     const secret = this.configService.get<string>('JWT_REFRESH_SECRET', 'super-refresh-secret');
+    const sessionId = existingSessionId ?? randomUUID();
 
-    const payload = { sub: userId };
+    const payload = { sub: userId, sessionId };
     const refreshToken = this.jwtService.sign(payload, {
       secret,
       expiresIn: ttl,
@@ -156,9 +159,9 @@ export class AuthService {
     const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
     const hash = await bcrypt.hash(refreshToken, saltRounds);
 
-    await this.usersService.setRefreshToken(userId, hash, expiresAt ?? null);
+    await this.usersService.setRefreshToken(userId, hash, expiresAt ?? null, sessionId);
 
-    return { refreshToken, expiresAt };
+    return { refreshToken, expiresAt, sessionId };
   }
 
   async refreshTokens(refreshToken: string) {
@@ -184,6 +187,11 @@ export class AuthService {
       throw new ForbiddenException('Refresh token expired');
     }
 
+    // Ensure refresh token is for current session
+    if (!payload.sessionId || !user.sessionId || payload.sessionId !== user.sessionId) {
+      throw new ForbiddenException('Refresh token session invalid');
+    }
+
     const isMatch = await bcrypt.compare(refreshToken, user.refreshTokenHash);
     if (!isMatch) {
       throw new ForbiddenException('Refresh token mismatch');
@@ -192,8 +200,11 @@ export class AuthService {
     const safeUser = await this.usersService.findOne(user.id);
     const authUser = this.mapToAuthUser(safeUser);
 
-    const accessToken = this.generateAccessToken(authUser);
-    const { refreshToken: newRefreshToken, expiresAt } = await this.generateAndStoreRefreshToken(authUser.id);
+    const { refreshToken: newRefreshToken, expiresAt, sessionId } = await this.generateAndStoreRefreshToken(
+      authUser.id,
+      user.sessionId ?? payload.sessionId,
+    );
+    const accessToken = this.generateAccessToken(authUser, sessionId);
 
     return {
       accessToken,

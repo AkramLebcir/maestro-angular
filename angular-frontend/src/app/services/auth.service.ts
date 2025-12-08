@@ -53,6 +53,14 @@ export class AuthService {
   }
 
   logout(): void {
+    // Try to notify backend to clear refresh token cookie/session
+    this.http.post(`${this.apiUrl}/auth/logout`, {}, {
+      withCredentials: true
+    }).subscribe({
+      next: () => {},
+      error: () => {}
+    });
+
     this.removeToken();
     this.removeUser();
     this.currentUserSubject.next(null);

@@ -4,6 +4,7 @@ import { filter } from 'rxjs/operators';
 import { LanguageService, LanguageCode } from './services/language.service';
 import { AuthService } from './services/auth.service';
 import { ThemeService } from './services/theme.service';
+import { InactivityService } from './services/inactivity.service';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -23,7 +24,9 @@ export class AppComponent implements OnInit, OnDestroy {
     private languageService: LanguageService,
     private router: Router,
     private authService: AuthService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    // Inject InactivityService so it is initialized for the whole app
+    private inactivityService: InactivityService
   ) {
     // Initialize theme service - it will apply theme on construction
   }
