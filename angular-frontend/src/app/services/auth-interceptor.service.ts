@@ -15,11 +15,16 @@ export class AuthInterceptor implements HttpInterceptor {
 
   constructor(private authService: AuthService) {}
 
+  private isAuthEndpoint(url: string): boolean {
+    // Do not run refresh logic on auth endpoints themselves
+    return url.includes('/auth/login') || url.includes('/auth/refresh') || url.includes('/auth/logout');
+  }
+
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const token = this.authService.getToken();
     let authReq = req;
 
-    if (token) {
+    if (token && !this.isAuthEndpoint(req.url)) {
       authReq = req.clone({
         setHeaders: {
           Authorization: `Bearer ${token}`,
@@ -34,7 +39,8 @@ export class AuthInterceptor implements HttpInterceptor {
 
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401 && !this.isRefreshing) {
+        // Avoid infinite loops: never try to refresh on auth endpoints
+        if (error.status === 401 && !this.isRefreshing && !this.isAuthEndpoint(req.url)) {
           this.isRefreshing = true;
 
           return this.authService.refreshToken().pipe(
