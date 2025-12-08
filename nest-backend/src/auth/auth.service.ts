@@ -1,5 +1,5 @@
 import { Injectable, UnauthorizedException, ForbiddenException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService, JwtSignOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -142,7 +142,12 @@ export class AuthService {
   }
 
   private async generateAndStoreRefreshToken(userId: number, existingSessionId?: string) {
-    const ttl = this.configService.get<string>('REFRESH_TOKEN_TTL', '7d');
+    // TTL can be provided either as a string (e.g. "7d") or a number of seconds.
+    // We type it as JwtSignOptions['expiresIn'] so it matches jsonwebtoken's supported formats.
+    const ttl = this.configService.get<JwtSignOptions['expiresIn']>(
+      'REFRESH_TOKEN_TTL',
+      '7d' as JwtSignOptions['expiresIn'],
+    );
     const secret = this.configService.get<string>('JWT_REFRESH_SECRET', 'super-refresh-secret');
     const sessionId = existingSessionId ?? randomUUID();
 
