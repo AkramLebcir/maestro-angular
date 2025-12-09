@@ -55,6 +55,7 @@ export class ModuleAccessGuard implements CanActivate {
         'timetable': 'الجدول الزمني',
         'notifications': 'الإشعارات',
         'labs': 'المخابر',
+        'clubs': 'النوادي',
       };
       
       const moduleName = moduleNames[requiredModule] || requiredModule;

@@ -12211,6 +12211,24 @@ export class LanguageService {
         'DE': 'Benachrichtigungen verwalten',
         'TR': 'Bildirimleri yönet'
       },
+      'moduleAccess.module.clubs.name': {
+        'AR': 'النوادي',
+        'FR': 'Clubs',
+        'EN': 'Clubs',
+        'ES': 'Clubes',
+        'IT': 'Club',
+        'DE': 'Clubs',
+        'TR': 'Klüpler'
+      },
+      'moduleAccess.module.clubs.description': {
+        'AR': 'إدارة النوادي المدرسية والأنشطة المرتبطة بها',
+        'FR': 'Gérer les clubs scolaires et leurs activités',
+        'EN': 'Manage school clubs and their activities',
+        'ES': 'Gestionar los clubes escolares y sus actividades',
+        'IT': 'Gestire i club scolastici e le loro attività',
+        'DE': 'Schulclubs und ihre Aktivitäten verwalten',
+        'TR': 'Okul kulüplerini ve faaliyetlerini yönet'
+      },
       'header.priorityUrgent': {
         'AR': 'عاجل',
         'FR': 'Urgent',

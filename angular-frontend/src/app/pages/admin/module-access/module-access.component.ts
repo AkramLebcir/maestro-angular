@@ -45,6 +45,7 @@ export class ModuleAccessComponent implements OnInit {
     { key: 'certificate-generator', name: 'الشهادات', description: 'إنشاء وإدارة الشهادات' },
     { key: 'annual-planning', name: 'التخطيط السنوي', description: 'التخطيط السنوي للمنهاج' },
     { key: 'notifications', name: 'الإشعارات', description: 'إدارة الإشعارات' },
+    { key: 'clubs', name: 'النوادي', description: 'إدارة النوادي المدرسية' },
   ];
 
   constructor(
