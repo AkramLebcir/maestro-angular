@@ -274,6 +274,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   finalStudentsWithDecisions: (Student & { finalDecision?: FinalCouncilDecision })[] = [];
   editingCouncilRecord: { [key: string]: boolean } = {};
   editingFinalDecision: { [key: string]: boolean } = {};
+  // Cache Arabic font to avoid repeated fetches and to register bold style safely
+  private amiriFontBase64?: string;
   
   // Settings variables
   settingsSelectedClass: Class | null = null;
@@ -5838,14 +5840,15 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     });
   }
 
-  exportCouncilSemesterPDF(): void {
+  async exportCouncilSemesterPDF(): Promise<void> {
     if (!this.councilSelectedClass) return;
 
     const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
     const currentLang = this.languageService.getCurrentLanguage();
 
-    // Set font for Arabic
-    pdf.setFont('Arial', 'normal');
+    // Try to load Arabic-capable font when needed; fallback to helvetica
+    const arabicFontLoaded = currentLang === 'AR' ? await this.ensureArabicFont(pdf) : false;
+    pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'bold');
     pdf.setFontSize(16);
 
     // Title
@@ -5858,6 +5861,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Date
     const date = new Date().toLocaleDateString(currentLang === 'AR' ? 'ar-DZ' : 'en-US');
     pdf.setFontSize(10);
+    pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'normal');
     pdf.text(date, pdf.internal.pageSize.width - 20, 10, { align: 'right' });
 
     // Table headers
@@ -5878,8 +5882,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString() : '',
       student.gender === 'male' ? (currentLang === 'AR' ? 'ذكر' : 'Male') : (currentLang === 'AR' ? 'أنثى' : 'Female'),
       student.isRepeater ? (currentLang === 'AR' ? 'نعم' : 'Yes') : (currentLang === 'AR' ? 'لا' : 'No'),
-      student.councilRecord?.teacherAverage?.toFixed(2) || '',
-      student.councilRecord?.semesterAverage?.toFixed(2) || '',
+      this.formatCouncilAverage(student.councilRecord?.teacherAverage),
+      this.formatCouncilAverage(student.councilRecord?.semesterAverage),
       '⭐'.repeat(student.councilRecord?.behaviorRating || 0),
       this.translateAbsencesLevel(student.councilRecord?.absencesLevel, currentLang),
       this.translateAward(student.councilRecord?.award, currentLang),
@@ -5892,9 +5896,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       body: data,
       startY: 25,
       styles: {
-        font: 'Arial',
+        font: arabicFontLoaded ? 'Amiri' : 'helvetica',
         fontSize: 8,
-        cellPadding: 2
+        cellPadding: 2,
+        textColor: 0,
+        halign: currentLang === 'AR' ? 'right' : 'left',
+        textDirection: currentLang === 'AR' ? 'rtl' : 'ltr',
       },
       headStyles: {
         fillColor: [41, 128, 185],
@@ -5915,6 +5922,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Save PDF
     const filename = `council_semester_${this.councilSelectedClass.name}_term${this.councilSelectedTerm}_${Date.now()}.pdf`;
     pdf.save(filename);
+  }
+
+  private formatCouncilAverage(value: any): string {
+    const num = Number(value);
+    if (isNaN(num)) return '';
+    return num.toFixed(2);
   }
 
   translateAward(award: string | undefined, lang: string): string {
@@ -6154,14 +6167,15 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     });
   }
 
-  exportFinalDecisionPDF(): void {
+  async exportFinalDecisionPDF(): Promise<void> {
     if (!this.councilSelectedClass) return;
 
     const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
     const currentLang = this.languageService.getCurrentLanguage();
 
-    // Set font for Arabic
-    pdf.setFont('Arial', 'normal');
+    // Try to load Arabic-capable font when needed; fallback to helvetica
+    const arabicFontLoaded = currentLang === 'AR' ? await this.ensureArabicFont(pdf) : false;
+    pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'normal');
     pdf.setFontSize(16);
 
     // Title
@@ -6202,9 +6216,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       body: data,
       startY: 25,
       styles: {
-        font: 'Arial',
+        font: arabicFontLoaded ? 'Amiri' : 'helvetica',
         fontSize: 9,
-        cellPadding: 2
+        cellPadding: 2,
+        textColor: 0,
+        halign: currentLang === 'AR' ? 'right' : 'left',
+        textDirection: currentLang === 'AR' ? 'rtl' : 'ltr',
       },
       headStyles: {
         fillColor: [41, 128, 185],
@@ -6224,6 +6241,44 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Save PDF
     const filename = `final_decision_${this.councilSelectedClass.name}_${Date.now()}.pdf`;
     pdf.save(filename);
+  }
+
+  // Attempts to load an Arabic-supporting font from assets; falls back gracefully
+  private async ensureArabicFont(pdf: any): Promise<boolean> {
+    try {
+      if (this.amiriFontBase64) {
+        pdf.addFileToVFS('Amiri-Regular.ttf', this.amiriFontBase64);
+        pdf.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+        pdf.addFont('Amiri-Regular.ttf', 'Amiri', 'bold');
+        return true;
+      }
+
+      // Expect font file at assets/fonts/Amiri-Regular.ttf (you need to add it)
+      const response = await fetch('assets/fonts/Amiri-Regular.ttf');
+      if (!response.ok) return false;
+      const buffer = await response.arrayBuffer();
+      const base64 = this.arrayBufferToBase64(buffer);
+      this.amiriFontBase64 = base64;
+      pdf.addFileToVFS('Amiri-Regular.ttf', base64);
+      pdf.addFont('Amiri-Regular.ttf', 'Amiri', 'normal');
+      // Use the same glyphs for bold so jsPDF can resolve widths/lookups
+      pdf.addFont('Amiri-Regular.ttf', 'Amiri', 'bold');
+      return true;
+    } catch (error) {
+      console.warn('Arabic font load failed, falling back to helvetica:', error);
+      return false;
+    }
+  }
+
+  private arrayBufferToBase64(buffer: ArrayBuffer): string {
+    let binary = '';
+    const bytes = new Uint8Array(buffer);
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      const chunk = bytes.subarray(i, i + chunkSize);
+      binary += String.fromCharCode(...chunk);
+    }
+    return btoa(binary);
   }
 
   translateDecision(decision: string | undefined, lang: string): string {
