@@ -6040,9 +6040,13 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       next: (averages) => {
         const student = this.finalStudentsWithDecisions.find(s => s.id === studentId);
         if (student && student.finalDecision) {
-          student.finalDecision.term1Average = averages.term1 || student.finalDecision.term1Average;
-          student.finalDecision.term2Average = averages.term2 || student.finalDecision.term2Average;
-          student.finalDecision.term3Average = averages.term3 || student.finalDecision.term3Average;
+          const term1 = averages.term1 ?? student.finalDecision.term1Average ?? 0;
+          const term2 = averages.term2 ?? student.finalDecision.term2Average ?? 0;
+          const term3 = averages.term3 ?? student.finalDecision.term3Average ?? 0;
+
+          student.finalDecision.term1Average = Number(term1);
+          student.finalDecision.term2Average = Number(term2);
+          student.finalDecision.term3Average = Number(term3);
           this.calculateFinalAnnualAverage(student.finalDecision);
           this.determineAutoDecision(student.finalDecision);
         }
@@ -6055,9 +6059,9 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
   calculateFinalAnnualAverage(decision: FinalCouncilDecision): void {
     // المعدل السنوي = (معدل الفصل 1 + معدل الفصل 2 + معدل الفصل 3) / 3
-    const term1 = decision.term1Average || 0;
-    const term2 = decision.term2Average || 0;
-    const term3 = decision.term3Average || 0;
+    const term1 = Number(decision.term1Average ?? 0);
+    const term2 = Number(decision.term2Average ?? 0);
+    const term3 = Number(decision.term3Average ?? 0);
     
     decision.annualAverage = (term1 + term2 + term3) / 3;
   }

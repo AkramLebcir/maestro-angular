@@ -140,11 +140,22 @@ export class CouncilService {
     dto: CreateFinalCouncilDecisionDto,
     ownerId: number,
   ): Promise<FinalCouncilDecision> {
+    // Always source term averages from council semester records when available
+    const syncedTerms = await this.syncTermAveragesFromCouncilRecords(
+      dto.studentId,
+      dto.classId,
+      ownerId,
+    );
+
+    const term1Average = this.pickNumeric(syncedTerms.term1, dto.term1Average, 0);
+    const term2Average = this.pickNumeric(syncedTerms.term2, dto.term2Average, 0);
+    const term3Average = this.pickNumeric(syncedTerms.term3, dto.term3Average, 0);
+
     // حساب المعدل السنوي تلقائياً
     const annualAverage = this.calculateAnnualAverage(
-      dto.term1Average,
-      dto.term2Average,
-      dto.term3Average,
+      term1Average,
+      term2Average,
+      term3Average,
     );
 
     // حساب القرار التلقائي إذا لم يكن يدوياً
@@ -155,6 +166,9 @@ export class CouncilService {
 
     const decision = this.finalCouncilDecisionRepository.create({
       ...dto,
+      term1Average,
+      term2Average,
+      term3Average,
       annualAverage,
       finalDecision,
       ownerId,
@@ -194,11 +208,33 @@ export class CouncilService {
   ): Promise<FinalCouncilDecision> {
     const decision = await this.findOneFinalCouncilDecision(id, ownerId);
 
+    const syncedTerms = await this.syncTermAveragesFromCouncilRecords(
+      dto.studentId ?? decision.studentId,
+      dto.classId ?? decision.classId,
+      ownerId,
+    );
+
+    const term1Average = this.pickNumeric(
+      syncedTerms.term1,
+      dto.term1Average,
+      decision.term1Average,
+    );
+    const term2Average = this.pickNumeric(
+      syncedTerms.term2,
+      dto.term2Average,
+      decision.term2Average,
+    );
+    const term3Average = this.pickNumeric(
+      syncedTerms.term3,
+      dto.term3Average,
+      decision.term3Average,
+    );
+
     // إعادة حساب المعدل السنوي
     const annualAverage = this.calculateAnnualAverage(
-      dto.term1Average ?? decision.term1Average,
-      dto.term2Average ?? decision.term2Average,
-      dto.term3Average ?? decision.term3Average,
+      term1Average,
+      term2Average,
+      term3Average,
     );
 
     // إعادة حساب القرار إذا لم يكن يدوياً
@@ -207,7 +243,13 @@ export class CouncilService {
       finalDecision = this.determineDecision(annualAverage);
     }
 
-    Object.assign(decision, dto, { annualAverage, finalDecision });
+    Object.assign(decision, dto, {
+      term1Average,
+      term2Average,
+      term3Average,
+      annualAverage,
+      finalDecision,
+    });
     return await this.finalCouncilDecisionRepository.save(decision);
   }
 
@@ -226,6 +268,12 @@ export class CouncilService {
     const results: FinalCouncilDecision[] = [];
     
     for (const dto of decisions) {
+      const syncedTerms = await this.syncTermAveragesFromCouncilRecords(
+        dto.studentId,
+        dto.classId,
+        ownerId,
+      );
+
       const existing = await this.finalCouncilDecisionRepository.findOne({
         where: {
           studentId: dto.studentId,
@@ -235,9 +283,25 @@ export class CouncilService {
       });
 
       const annualAverage = this.calculateAnnualAverage(
+        this.pickNumeric(syncedTerms.term1, dto.term1Average, existing?.term1Average),
+        this.pickNumeric(syncedTerms.term2, dto.term2Average, existing?.term2Average),
+        this.pickNumeric(syncedTerms.term3, dto.term3Average, existing?.term3Average),
+      );
+
+      const term1Average = this.pickNumeric(
+        syncedTerms.term1,
         dto.term1Average,
+        existing?.term1Average,
+      );
+      const term2Average = this.pickNumeric(
+        syncedTerms.term2,
         dto.term2Average,
+        existing?.term2Average,
+      );
+      const term3Average = this.pickNumeric(
+        syncedTerms.term3,
         dto.term3Average,
+        existing?.term3Average,
       );
 
       let finalDecision = dto.finalDecision;
@@ -246,11 +310,20 @@ export class CouncilService {
       }
 
       if (existing) {
-        Object.assign(existing, dto, { annualAverage, finalDecision });
+        Object.assign(existing, dto, {
+          term1Average,
+          term2Average,
+          term3Average,
+          annualAverage,
+          finalDecision,
+        });
         results.push(await this.finalCouncilDecisionRepository.save(existing));
       } else {
         const newDecision = this.finalCouncilDecisionRepository.create({
           ...dto,
+          term1Average,
+          term2Average,
+          term3Average,
           annualAverage,
           finalDecision,
           ownerId,
@@ -269,7 +342,10 @@ export class CouncilService {
     term2?: number,
     term3?: number,
   ): number {
-    const terms = [term1, term2, term3].filter(t => t !== null && t !== undefined);
+    const terms = [term1, term2, term3]
+      .filter(t => t !== null && t !== undefined)
+      .map(t => Number(t))
+      .filter(t => !isNaN(t));
     if (terms.length === 0) return 0;
     return terms.reduce((sum, t) => sum + t, 0) / terms.length;
   }
@@ -296,12 +372,24 @@ export class CouncilService {
 
     const result: any = {};
     for (const record of records) {
-      if (record.term === 1) result.term1 = record.semesterAverage;
-      if (record.term === 2) result.term2 = record.semesterAverage;
-      if (record.term === 3) result.term3 = record.semesterAverage;
+      if (record.term === 1) result.term1 = this.pickNumeric(record.semesterAverage);
+      if (record.term === 2) result.term2 = this.pickNumeric(record.semesterAverage);
+      if (record.term === 3) result.term3 = this.pickNumeric(record.semesterAverage);
     }
 
     return result;
+  }
+
+  // Ensure numeric values while preserving zeros and undefined
+  private pickNumeric(...values: Array<number | string | null | undefined>): number | undefined {
+    for (const value of values) {
+      if (value === null || value === undefined) continue;
+      const num = Number(value);
+      if (!isNaN(num)) {
+        return num;
+      }
+    }
+    return undefined;
   }
 }
 
