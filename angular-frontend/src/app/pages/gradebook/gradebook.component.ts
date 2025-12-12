@@ -14,6 +14,7 @@ import {
 } from '../../services/grading-settings.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
 import { ChartConfiguration, ChartData, ChartType, Chart } from 'chart.js';
 
@@ -84,6 +85,8 @@ export interface Student {
   idNumber?: string; // رقم الهوية أو الكود
   dateOfBirth?: Date | string; // تاريخ الميلاد
   gender?: 'male' | 'female';
+  photo?: string; // صورة التلميذ
+  isRepeater?: boolean; // هل التلميذ معيد
   classId?: number;
   class?: {
     id: number;
@@ -146,6 +149,42 @@ export interface GradeRangeDistribution {
   remarks: number; // <10
 }
 
+// Council Semester Record Interface
+export interface CouncilSemesterRecord {
+  id?: number;
+  studentId: number;
+  student?: Student;
+  classId: number;
+  class?: Class;
+  term: number; // 1, 2, 3
+  teacherAverage?: number; // معدل الأستاذ (محسوب تلقائياً)
+  semesterAverage?: number; // معدل الفصل (يدوي)
+  behaviorRating?: number; // 1-5 نجوم
+  absencesLevel?: 'disciplined' | 'average' | 'frequent'; // منضبط - متوسط - كثير
+  award?: 'excellence' | 'congratulation' | 'encouragement' | 'honor_roll' | 'none'; // الإجازات
+  councilNotes?: string; // ملاحظات مجلس القسم
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+// Final Council Decision Interface
+export interface FinalCouncilDecision {
+  id?: number;
+  studentId: number;
+  student?: Student;
+  classId: number;
+  class?: Class;
+  term1Average?: number;
+  term2Average?: number;
+  term3Average?: number;
+  annualAverage?: number; // محسوب تلقائياً
+  finalDecision?: 'pass' | 'repeat' | 'remedial' | 'redirect' | 'vocational_redirect';
+  isManualDecision?: boolean;
+  notes?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
 @Component({
   selector: 'app-gradebook',
   templateUrl: './gradebook.component.html',
@@ -175,6 +214,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   autoGenerateObsCons: boolean = true;
   processedExcelData: any[] = [];
   processedSheetsData: { sheetName: string; data: any[] }[] = [];
+  // نتائج أخطاء النقاط المستخدمة في تقرير مراقبة النقاط
+  gradeMonitoringErrors: any[] = [];
   isProcessing = false;
   
   // Import options
@@ -221,7 +262,18 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   ];
 
   // View mode
-  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'settings' = 'entry';
+  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'settings' | 'council' | 'finalDecision' = 'entry';
+  
+  // Council variables
+  councilRecords: CouncilSemesterRecord[] = [];
+  finalDecisions: FinalCouncilDecision[] = [];
+  councilSelectedClass: Class | null = null;
+  councilSelectedTerm: number = 1;
+  councilActiveTab: 'semester' | 'final' = 'semester';
+  councilStudentsWithRecords: (Student & { councilRecord?: CouncilSemesterRecord })[] = [];
+  finalStudentsWithDecisions: (Student & { finalDecision?: FinalCouncilDecision })[] = [];
+  editingCouncilRecord: { [key: string]: boolean } = {};
+  editingFinalDecision: { [key: string]: boolean } = {};
   
   // Settings variables
   settingsSelectedClass: Class | null = null;
@@ -3422,7 +3474,31 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Create workbook
     const wb = XLSX.utils.book_new();
 
-    // Process each sheet
+    // Sheet 0: تقرير أخطاء النقاط (للاطلاع مباشرة بعد الاستيراد)
+    const gradeErrors = this.getStudentsWithGradeErrors();
+    if (gradeErrors && gradeErrors.length > 0) {
+      const errorSheetData: any[] = [
+        ['#', 'الاسم', 'الصفحة', 'العمود', 'القيمة', 'الخطأ']
+      ];
+
+      gradeErrors.forEach((student: any, studentIndex: number) => {
+        student.errors.forEach((error: any) => {
+          errorSheetData.push([
+            studentIndex + 1,
+            `${student.firstName || ''} ${student.lastName || ''}`.trim() || '-',
+            student.sheetName || '-',
+            error.columnHeader || '-',
+            error.value !== null && error.value !== undefined && error.value !== '' ? error.value : '-',
+            error.error || '-'
+          ]);
+        });
+      });
+
+      const errorsWs = XLSX.utils.aoa_to_sheet(errorSheetData);
+      XLSX.utils.book_append_sheet(wb, errorsWs, 'GradeErrors');
+    }
+
+    // Process each sheet (الصفحات الأصلية مع الدرجات الملوّنة)
     if (this.processedSheetsData && this.processedSheetsData.length > 0) {
       // If we have multiple sheets, create a sheet for each
       this.processedSheetsData.forEach((sheetInfo, sheetIndex) => {
@@ -4042,43 +4118,121 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
   // Get all students with grade errors
   getStudentsWithGradeErrors(): any[] {
-    if (!this.processedExcelData || this.processedExcelData.length === 0) {
-      return [];
-    }
+    // أولاً: حاول من البيانات المؤقتة (processedExcelData) إذا كانت متوفرة
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      const errors: any[] = [];
+      const gradeHeaders = this.getAllGradeColumnHeaders();
 
-    const errors: any[] = [];
-    const gradeHeaders = this.getAllGradeColumnHeaders();
+      this.processedExcelData.forEach((row: any) => {
+        const studentErrors: any[] = [];
 
-    this.processedExcelData.forEach((row: any) => {
-      const studentErrors: any[] = [];
+        gradeHeaders.forEach(header => {
+          const value = this.getGradeValueForColumn(row, header);
+          
+          if (!this.isValidGrade(value)) {
+            studentErrors.push({
+              columnHeader: header,
+              value: value,
+              error: this.getGradeError(value)
+            });
+          }
+        });
 
-      gradeHeaders.forEach(header => {
-        const value = this.getGradeValueForColumn(row, header);
-        
-        if (!this.isValidGrade(value)) {
-          studentErrors.push({
-            columnHeader: header,
-            value: value,
-            error: this.getGradeError(value)
+        if (studentErrors.length > 0) {
+          errors.push({
+            firstName: row.firstName || '-',
+            lastName: row.lastName || '-',
+            sheetName: row.sheetName || '-',
+            errors: studentErrors
           });
         }
       });
 
+      return errors;
+    }
+
+    // ثانياً: إذا لم تكن البيانات المؤقتة متوفرة، استخدم البيانات المحفوظة في قاعدة البيانات
+    return this.getStudentsWithGradeErrorsFromDatabase();
+  }
+
+  // Get all students with grade errors from database
+  getStudentsWithGradeErrorsFromDatabase(): any[] {
+    console.log('=== getStudentsWithGradeErrorsFromDatabase ===');
+    console.log('Students:', this.students?.length);
+    console.log('Assessments:', this.assessments?.length);
+    console.log('Grades:', this.grades?.length);
+    console.log('Selected Term:', this.selectedTerm);
+
+    if (!this.students || this.students.length === 0 || !this.assessments || this.assessments.length === 0) {
+      console.log('No students or assessments found');
+      return [];
+    }
+
+    const errors: any[] = [];
+
+    this.students.forEach(student => {
+      const studentErrors: any[] = [];
+
+      // فحص جميع أنواع التقييمات
+      this.assessments.forEach(assessment => {
+        // البحث عن الدرجة المحفوظة لهذا التلميذ وهذا التقييم
+        const grade = this.grades.find(g => 
+          g.studentId === student.id && 
+          g.assessmentId === assessment.id &&
+          g.term === this.selectedTerm
+        );
+
+        if (grade) {
+          const value = grade.score;
+          const isValid = this.isValidGrade(value);
+          
+          console.log(`Student: ${student.firstName} ${student.lastName}, Assessment: ${assessment.nameAr}, Score: ${value}, Valid: ${isValid}`);
+          
+          // التحقق من صحة الدرجة
+          if (!isValid) {
+            const errorMsg = this.getGradeError(value);
+            console.log(`  -> ERROR: ${errorMsg}`);
+            studentErrors.push({
+              columnHeader: this.getAssessmentDisplayName(assessment),
+              value: value,
+              error: errorMsg
+            });
+          }
+        }
+      });
+
+      // إضافة التلميذ إلى قائمة الأخطاء إذا كانت لديه أخطاء
       if (studentErrors.length > 0) {
+        console.log(`Adding student ${student.firstName} ${student.lastName} with ${studentErrors.length} errors`);
         errors.push({
-          firstName: row.firstName || '-',
-          lastName: row.lastName || '-',
-          sheetName: row.sheetName || '-',
+          firstName: student.firstName || '-',
+          lastName: student.lastName || '-',
+          sheetName: this.selectedClass?.name || '-',
           errors: studentErrors
         });
       }
     });
 
+    console.log('Total students with errors:', errors.length);
     return errors;
+  }
+
+  // Get display name for assessment
+  getAssessmentDisplayName(assessment: Assessment): string {
+    // استخدم الاسم العربي أولاً، ثم الاسم الافتراضي
+    return assessment.nameAr || assessment.name;
   }
 
   // Open grade monitoring modal
   openGradeMonitoringModal(): void {
+    // احسب الأخطاء مرة واحدة وخزنها في متغيّر حتى تُستعمل في الجدول و الـ PDF
+    this.gradeMonitoringErrors = this.getStudentsWithGradeErrors();
+    console.log('Grade Monitoring Errors:', this.gradeMonitoringErrors);
+    console.log('Total errors:', this.gradeMonitoringErrors.length);
+    console.log('Students:', this.students.length);
+    console.log('Assessments:', this.assessments.length);
+    console.log('Grades:', this.grades.length);
+    console.log('ProcessedExcelData:', this.processedExcelData.length);
     this.showGradeMonitoringModal = true;
   }
 
@@ -4098,8 +4252,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   // Export grade monitoring report to PDF
-  exportGradeMonitoringPDF(): void {
-    const errors = this.getStudentsWithGradeErrors();
+  async exportGradeMonitoringPDF(): Promise<void> {
+    const errors = this.gradeMonitoringErrors && this.gradeMonitoringErrors.length > 0
+      ? this.gradeMonitoringErrors
+      : this.getStudentsWithGradeErrors();
 
     if (errors.length === 0) {
       alert('لا توجد أخطاء في النقاط. جميع النقاط صحيحة!');
@@ -4107,101 +4263,59 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }
 
     try {
+      const reportElement = document.getElementById('gradeMonitoringReport');
+
+      if (!reportElement) {
+        console.error('Grade monitoring report element not found');
+        alert('تعذر العثور على محتوى التقرير في الصفحة');
+        return;
+      }
+
+      // استخدم html2canvas لالتقاط نفس محتوى التقرير الظاهر على الشاشة مع دعم العربية بالكامل
+      const canvas = await html2canvas(reportElement, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: reportElement.offsetWidth,
+        height: reportElement.scrollHeight,
+        windowWidth: reportElement.scrollWidth,
+        windowHeight: reportElement.scrollHeight
+      });
+
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15;
-      let yPosition = margin;
+      const margin = 10;
 
-      // Title
-      pdf.setFontSize(18);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(this.translate('reports.gradeMonitoring'), pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 10;
+      const imgWidth = pageWidth - 2 * margin;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-      // Date
-      pdf.setFontSize(10);
-      pdf.setTextColor(100, 100, 100);
-      const date = new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
-      pdf.text(`${this.translate('report.reportDate')} ${date}`, pageWidth / 2, yPosition, { align: 'center' });
-      yPosition += 10;
+      const imgData = canvas.toDataURL('image/png');
 
-      // Summary
-      pdf.setFontSize(12);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(`عدد التلاميذ الذين لديهم أخطاء: ${errors.length}`, margin, yPosition, { align: 'right' });
-      yPosition += 10;
+      let remainingHeight = imgHeight;
+      let yOffset = margin;
 
-      // Table headers
-      pdf.setFontSize(10);
-      pdf.setFillColor(59, 130, 246); // Blue
-      pdf.rect(margin, yPosition, pageWidth - 2 * margin, 8, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont('helvetica', 'bold');
-      
-      pdf.text('الاسم', margin + pageWidth - 2 * margin - 5, yPosition + 5, { align: 'right' });
-      pdf.text('العمود', margin + pageWidth - 2 * margin - 50, yPosition + 5, { align: 'right' });
-      pdf.text('الخطأ', margin + 5, yPosition + 5, { align: 'right' });
-      
-      yPosition += 8;
-      pdf.setTextColor(0, 0, 0);
-      pdf.setFont('helvetica', 'normal');
+      while (remainingHeight > 0) {
+        pdf.addImage(
+          imgData,
+          'PNG',
+          margin,
+          yOffset,
+          imgWidth,
+          imgHeight
+        );
 
-      // Table rows
-      errors.forEach((student, studentIndex) => {
-        student.errors.forEach((error: any, errorIndex: number) => {
-          // Check if we need a new page
-          if (yPosition > pageHeight - 20) {
-            pdf.addPage();
-            yPosition = margin;
-            
-            // Repeat headers on new page
-            pdf.setFillColor(59, 130, 246);
-            pdf.rect(margin, yPosition, pageWidth - 2 * margin, 8, 'F');
-            pdf.setTextColor(255, 255, 255);
-            pdf.setFont('helvetica', 'bold');
-            pdf.text('الاسم', margin + pageWidth - 2 * margin - 5, yPosition + 5, { align: 'right' });
-            pdf.text('العمود', margin + pageWidth - 2 * margin - 50, yPosition + 5, { align: 'right' });
-            pdf.text('الخطأ', margin + 5, yPosition + 5, { align: 'right' });
-            yPosition += 8;
-            pdf.setTextColor(0, 0, 0);
-            pdf.setFont('helvetica', 'normal');
-          }
+        remainingHeight -= (pageHeight - 2 * margin);
+        if (remainingHeight > 0) {
+          pdf.addPage();
+          yOffset = margin;
+        }
+      }
 
-          // Student name (only show once per student)
-          const studentName = errorIndex === 0 
-            ? `${student.firstName} ${student.lastName}`.trim()
-            : '';
-          
-          // Column header
-          const columnHeader = error.columnHeader || '-';
-          
-          // Error description
-          const errorDesc = error.error || '-';
-
-          // Draw row background (alternating colors)
-          if ((studentIndex + errorIndex) % 2 === 0) {
-            pdf.setFillColor(245, 245, 245);
-            pdf.rect(margin, yPosition - 3, pageWidth - 2 * margin, 6, 'F');
-          }
-
-          // Draw text
-          pdf.setFontSize(9);
-          pdf.text(studentName || '', margin + pageWidth - 2 * margin - 5, yPosition, { align: 'right' });
-          pdf.text(columnHeader, margin + pageWidth - 2 * margin - 50, yPosition, { align: 'right' });
-          
-          // Error text (may need to wrap)
-          const errorText = errorDesc.length > 30 ? errorDesc.substring(0, 30) + '...' : errorDesc;
-          pdf.text(errorText, margin + 5, yPosition, { align: 'right', maxWidth: 50 });
-          
-          yPosition += 6;
-        });
-      });
-
-      // Save PDF
       const fileName = `تقرير_مراقبة_النقاط_${new Date().toISOString().split('T')[0]}.pdf`;
       pdf.save(fileName);
-      
+
       alert(`تم تصدير التقرير بنجاح! تم العثور على ${errors.length} تلميذ لديهم أخطاء في النقاط.`);
     } catch (error) {
       console.error('Error exporting grade monitoring PDF:', error);
@@ -5509,6 +5623,637 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         alert('حدث خطأ أثناء تطبيق الإعدادات');
       }
     });
+  }
+
+  // =================== Council Semester Records Methods ===================
+
+  onCouncilClassChange(): void {
+    if (!this.councilSelectedClass) return;
+
+    // Respect the active tab so the correct dataset is refreshed
+    if (this.councilActiveTab === 'final') {
+      this.loadFinalCouncilDecisions();
+    } else {
+      this.loadCouncilSemesterData();
+    }
+  }
+
+  onCouncilTermChange(): void {
+    if (!this.councilSelectedClass) return;
+
+    if (this.councilActiveTab === 'final') {
+      // Final decisions need to re-sync averages when context changes
+      this.loadFinalCouncilDecisions();
+    } else {
+      this.loadCouncilSemesterData();
+    }
+  }
+
+  loadCouncilSemesterData(): void {
+    if (!this.councilSelectedClass) return;
+
+    // Load council semester records
+    this.apiService.get<CouncilSemesterRecord[]>(
+      `/council/semester-records?classId=${this.councilSelectedClass.id}&term=${this.councilSelectedTerm}`
+    ).subscribe({
+      next: (records) => {
+        this.councilRecords = records;
+        this.loadCouncilStudents();
+      },
+      error: (error) => {
+        console.error('Error loading council semester records:', error);
+        // Load students even if council records fail (might be empty)
+        this.councilRecords = [];
+        this.loadCouncilStudents();
+      }
+    });
+  }
+
+  loadCouncilStudents(): void {
+    if (!this.councilSelectedClass) return;
+
+    // Load students and grades in parallel
+    this.apiService.get<Student[]>(`/students?classId=${this.councilSelectedClass.id}`).subscribe({
+      next: (students) => {
+        // Load grades for this class and term
+        this.apiService.get<Grade[]>(`/grades?classId=${this.councilSelectedClass!.id}&term=${this.councilSelectedTerm}`).subscribe({
+          next: (grades) => {
+            // Merge students with their council records and calculate teacher averages
+            this.councilStudentsWithRecords = students.map(student => {
+              const record = this.councilRecords.find(r => r.studentId === student.id);
+              const teacherAverage = this.calculateCouncilTeacherAverage(student.id, grades);
+              
+              const councilRecord = record || this.createEmptyCouncilRecord(student.id);
+              councilRecord.teacherAverage = teacherAverage;
+              
+              return {
+                ...student,
+                councilRecord
+              };
+            });
+          },
+          error: (error) => {
+            console.error('Error loading grades:', error);
+            // Still show students without teacher averages
+            this.councilStudentsWithRecords = students.map(student => {
+              const record = this.councilRecords.find(r => r.studentId === student.id);
+              return {
+                ...student,
+                councilRecord: record || this.createEmptyCouncilRecord(student.id)
+              };
+            });
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading students:', error);
+      }
+    });
+  }
+  
+  calculateCouncilTeacherAverage(studentId: number, grades: Grade[]): number {
+    // Filter grades for this student
+    const studentGrades = grades.filter(g => g.studentId === studentId);
+    
+    // Get grades by type
+    const notebookGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'notebook_correction')?.id);
+    const dutyGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'duty')?.id);
+    const attendanceGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'attendance')?.id);
+    const behaviorGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'behavior')?.id);
+    const oralExpressionGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'oral_expression')?.id);
+    const assignmentGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'assignment')?.id);
+    const testGrade = studentGrades.find(g => g.assessmentId === this.assessments.find(a => a.type === 'test')?.id);
+    
+    const notebook = notebookGrade?.score || 0;
+    const duty = dutyGrade?.score || 0;
+    const attendance = attendanceGrade?.score || 0;
+    const behavior = behaviorGrade?.score || 0;
+    const oralExpression = oralExpressionGrade?.score || 0;
+    const assignment = assignmentGrade?.score || 0;
+    const test = testGrade?.score || 0;
+    
+    // التقييم المستمر = الدفتر + الواجب + الحضور + السلوك (الحد الأقصى 20)
+    const continuous = Math.min(notebook + duty + attendance + behavior, 20);
+    
+    // Check if oral expression is included (default: true)
+    const includeOralExpression = this.currentClassGradingSettings?.includeOralExpression !== false;
+    
+    if (includeOralExpression && oralExpression > 0) {
+      // المعدل = ((التقييم المستمر + التعبير الشفهي + الفرض) + (الاختبار × 2)) ÷ 5
+      return (continuous + oralExpression + assignment + (test * 2)) / 5;
+    } else {
+      // المعدل = ((التقييم المستمر + الفرض) + (الاختبار × 2)) ÷ 4
+      return (continuous + assignment + (test * 2)) / 4;
+    }
+  }
+
+  createEmptyCouncilRecord(studentId: number): CouncilSemesterRecord {
+    return {
+      studentId: studentId,
+      classId: this.councilSelectedClass!.id,
+      term: this.councilSelectedTerm,
+      teacherAverage: 0,
+      semesterAverage: 0,
+      behaviorRating: 3,
+      absencesLevel: 'disciplined',
+      award: 'none',
+      councilNotes: ''
+    };
+  }
+
+  saveCouncilRecord(student: Student & { councilRecord?: CouncilSemesterRecord }): void {
+    if (!student.councilRecord) return;
+
+    const dto = {
+      studentId: Number(student.id),
+      classId: Number(this.councilSelectedClass!.id),
+      term: Number(this.councilSelectedTerm),
+      teacherAverage: student.councilRecord.teacherAverage != null ? Number(student.councilRecord.teacherAverage) : 0,
+      semesterAverage: student.councilRecord.semesterAverage != null ? Number(student.councilRecord.semesterAverage) : 0,
+      behaviorRating: student.councilRecord.behaviorRating != null ? Number(student.councilRecord.behaviorRating) : 3,
+      absencesLevel: student.councilRecord.absencesLevel || 'disciplined',
+      award: student.councilRecord.award || 'none',
+      councilNotes: student.councilRecord.councilNotes || ''
+    };
+
+    console.log('Saving council record:', dto);
+    
+    if (student.councilRecord.id) {
+      // Update existing record
+      this.apiService.patch<CouncilSemesterRecord>(
+        `/council/semester-records/${student.councilRecord.id}`,
+        dto
+      ).subscribe({
+        next: (updated) => {
+          student.councilRecord = updated;
+          alert('تم حفظ البيانات بنجاح');
+        },
+        error: (error) => {
+          console.error('Error updating council record:', error);
+          const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
+          alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+        }
+      });
+    } else {
+      // Create new record
+      this.apiService.post<CouncilSemesterRecord>('/council/semester-records', dto).subscribe({
+        next: (created) => {
+          student.councilRecord = created;
+          alert('تم حفظ البيانات بنجاح');
+        },
+        error: (error) => {
+          console.error('Error creating council record:', error);
+          const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
+          alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+        }
+      });
+    }
+  }
+
+  bulkSaveCouncilRecords(): void {
+    const records = this.councilStudentsWithRecords.map(student => ({
+      studentId: Number(student.id),
+      classId: Number(this.councilSelectedClass!.id),
+      term: Number(this.councilSelectedTerm),
+      teacherAverage: student.councilRecord?.teacherAverage != null ? Number(student.councilRecord.teacherAverage) : 0,
+      semesterAverage: student.councilRecord?.semesterAverage != null ? Number(student.councilRecord.semesterAverage) : 0,
+      behaviorRating: student.councilRecord?.behaviorRating != null ? Number(student.councilRecord.behaviorRating) : 3,
+      absencesLevel: student.councilRecord?.absencesLevel || 'disciplined',
+      award: student.councilRecord?.award || 'none',
+      councilNotes: student.councilRecord?.councilNotes || ''
+    }));
+
+    console.log('Bulk saving council records:', records);
+    
+    this.apiService.post<CouncilSemesterRecord[]>('/council/semester-records/bulk', records).subscribe({
+      next: (saved) => {
+        alert(`تم حفظ ${saved.length} سجل بنجاح`);
+        this.loadCouncilSemesterData();
+      },
+      error: (error) => {
+        console.error('Error bulk saving council records:', error);
+        const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
+        alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+      }
+    });
+  }
+
+  exportCouncilSemesterPDF(): void {
+    if (!this.councilSelectedClass) return;
+
+    const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+    const currentLang = this.languageService.getCurrentLanguage();
+
+    // Set font for Arabic
+    pdf.setFont('Arial', 'normal');
+    pdf.setFontSize(16);
+
+    // Title
+    const title = currentLang === 'AR' ? 
+      `مجلس القسم - ${this.councilSelectedClass.name} - الفصل ${this.councilSelectedTerm}` :
+      `Class Council - ${this.councilSelectedClass.name} - Term ${this.councilSelectedTerm}`;
+    
+    pdf.text(title, pdf.internal.pageSize.width / 2, 15, { align: 'center' });
+
+    // Date
+    const date = new Date().toLocaleDateString(currentLang === 'AR' ? 'ar-DZ' : 'en-US');
+    pdf.setFontSize(10);
+    pdf.text(date, pdf.internal.pageSize.width - 20, 10, { align: 'right' });
+
+    // Table headers
+    const headers = currentLang === 'AR' ? [
+      'الصورة', 'رقم التعريف', 'اللقب', 'الاسم', 'تاريخ الميلاد', 'الجنس', 'الإعادة',
+      'معدل الأستاذ', 'معدل الفصل', 'السلوك', 'الغيابات', 'الإجازات', 'ملاحظات'
+    ] : [
+      'Photo', 'ID', 'Last Name', 'First Name', 'DOB', 'Gender', 'Repeater',
+      'Teacher Avg', 'Semester Avg', 'Behavior', 'Absences', 'Award', 'Notes'
+    ];
+
+    // Table data
+    const data = this.councilStudentsWithRecords.map(student => [
+      '', // Photo placeholder
+      student.idNumber || '',
+      student.lastName,
+      student.firstName,
+      student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString() : '',
+      student.gender === 'male' ? (currentLang === 'AR' ? 'ذكر' : 'Male') : (currentLang === 'AR' ? 'أنثى' : 'Female'),
+      student.isRepeater ? (currentLang === 'AR' ? 'نعم' : 'Yes') : (currentLang === 'AR' ? 'لا' : 'No'),
+      student.councilRecord?.teacherAverage?.toFixed(2) || '',
+      student.councilRecord?.semesterAverage?.toFixed(2) || '',
+      '⭐'.repeat(student.councilRecord?.behaviorRating || 0),
+      this.translateAbsencesLevel(student.councilRecord?.absencesLevel, currentLang),
+      this.translateAward(student.councilRecord?.award, currentLang),
+      student.councilRecord?.councilNotes || ''
+    ]);
+
+    // Use autoTable plugin (you may need to install @types/jspdf-autotable)
+    (pdf as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 25,
+      styles: {
+        font: 'Arial',
+        fontSize: 8,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      columnStyles: {
+        0: { cellWidth: 15 }, // Photo
+        12: { cellWidth: 30 } // Notes
+      }
+    });
+
+    // Signature section
+    const finalY = (pdf as any).lastAutoTable.finalY + 10;
+    pdf.setFontSize(10);
+    pdf.text(currentLang === 'AR' ? 'توقيع الأستاذ: _______________' : 'Teacher Signature: _______________', 20, finalY);
+
+    // Save PDF
+    const filename = `council_semester_${this.councilSelectedClass.name}_term${this.councilSelectedTerm}_${Date.now()}.pdf`;
+    pdf.save(filename);
+  }
+
+  translateAward(award: string | undefined, lang: string): string {
+    if (!award) return '';
+    const translations: any = {
+      'AR': {
+        'excellence': 'امتياز',
+        'congratulation': 'تهنئة',
+        'encouragement': 'تشجيع',
+        'honor_roll': 'لوحة شرف',
+        'none': 'لا شيء'
+      },
+      'FR': {
+        'excellence': 'Excellence',
+        'congratulation': 'Félicitations',
+        'encouragement': 'Encouragement',
+        'honor_roll': 'Tableau d\'honneur',
+        'none': 'Aucun'
+      },
+      'EN': {
+        'excellence': 'Excellence',
+        'congratulation': 'Congratulation',
+        'encouragement': 'Encouragement',
+        'honor_roll': 'Honor Roll',
+        'none': 'None'
+      }
+    };
+    return translations[lang]?.[award] || award;
+  }
+
+  translateAbsencesLevel(level: string | undefined, lang: string): string {
+    if (!level) return '';
+    const translations: any = {
+      'AR': {
+        'disciplined': 'منضبط',
+        'average': 'متوسط',
+        'frequent': 'كثير الغياب'
+      },
+      'FR': {
+        'disciplined': 'Discipliné',
+        'average': 'Moyen',
+        'frequent': 'Fréquent'
+      },
+      'EN': {
+        'disciplined': 'Disciplined',
+        'average': 'Average',
+        'frequent': 'Frequent'
+      }
+    };
+    return translations[lang]?.[level] || level;
+  }
+
+  // =================== Final Council Decision Methods ===================
+
+  loadFinalCouncilDecisions(): void {
+    if (!this.councilSelectedClass) return;
+
+    this.apiService.get<FinalCouncilDecision[]>(
+      `/council/final-decisions?classId=${this.councilSelectedClass.id}`
+    ).subscribe({
+      next: (decisions) => {
+        this.finalDecisions = decisions;
+        this.loadFinalStudents();
+      },
+      error: (error) => {
+        console.error('Error loading final council decisions:', error);
+        // Load students even if final decisions fail (might be empty)
+        this.finalDecisions = [];
+        this.loadFinalStudents();
+      }
+    });
+  }
+
+  loadFinalStudents(): void {
+    if (!this.councilSelectedClass) return;
+
+    this.apiService.get<Student[]>(`/students?classId=${this.councilSelectedClass.id}`).subscribe({
+      next: (students) => {
+        // Merge students with their final decisions
+        this.finalStudentsWithDecisions = students.map(student => {
+          const decision = this.finalDecisions.find(d => d.studentId === student.id);
+          return {
+            ...student,
+            finalDecision: decision || this.createEmptyFinalDecision(student.id)
+          };
+        });
+
+        // Sync term averages from council records
+        this.syncAllTermAverages();
+      },
+      error: (error) => {
+        console.error('Error loading students:', error);
+      }
+    });
+  }
+
+  createEmptyFinalDecision(studentId: number): FinalCouncilDecision {
+    return {
+      studentId: studentId,
+      classId: this.councilSelectedClass!.id,
+      term1Average: 0,
+      term2Average: 0,
+      term3Average: 0,
+      annualAverage: 0,
+      finalDecision: 'pass',
+      isManualDecision: false,
+      notes: ''
+    };
+  }
+
+  syncAllTermAverages(): void {
+    this.finalStudentsWithDecisions.forEach(student => {
+      this.syncStudentTermAverages(student.id);
+    });
+  }
+
+  syncStudentTermAverages(studentId: number): void {
+    if (!this.councilSelectedClass) return;
+
+    this.apiService.get<{ term1?: number; term2?: number; term3?: number }>(
+      `/council/final-decisions/sync-term-averages/${studentId}?classId=${this.councilSelectedClass.id}`
+    ).subscribe({
+      next: (averages) => {
+        const student = this.finalStudentsWithDecisions.find(s => s.id === studentId);
+        if (student && student.finalDecision) {
+          student.finalDecision.term1Average = averages.term1 || student.finalDecision.term1Average;
+          student.finalDecision.term2Average = averages.term2 || student.finalDecision.term2Average;
+          student.finalDecision.term3Average = averages.term3 || student.finalDecision.term3Average;
+          this.calculateFinalAnnualAverage(student.finalDecision);
+          this.determineAutoDecision(student.finalDecision);
+        }
+      },
+      error: (error) => {
+        console.error('Error syncing term averages:', error);
+      }
+    });
+  }
+
+  calculateFinalAnnualAverage(decision: FinalCouncilDecision): void {
+    // المعدل السنوي = (معدل الفصل 1 + معدل الفصل 2 + معدل الفصل 3) / 3
+    const term1 = decision.term1Average || 0;
+    const term2 = decision.term2Average || 0;
+    const term3 = decision.term3Average || 0;
+    
+    decision.annualAverage = (term1 + term2 + term3) / 3;
+  }
+
+  determineAutoDecision(decision: FinalCouncilDecision): void {
+    if (decision.isManualDecision) return;
+
+    const avg = decision.annualAverage || 0;
+    if (avg >= 10) {
+      decision.finalDecision = 'pass';
+    } else if (avg >= 9) {
+      decision.finalDecision = 'remedial';
+    } else {
+      decision.finalDecision = 'repeat';
+    }
+  }
+
+  onFinalDecisionChange(decision: FinalCouncilDecision): void {
+    this.calculateFinalAnnualAverage(decision);
+    this.determineAutoDecision(decision);
+  }
+
+  saveFinalDecision(student: Student & { finalDecision?: FinalCouncilDecision }): void {
+    if (!student.finalDecision) return;
+
+    const dto = {
+      studentId: student.id,
+      classId: this.councilSelectedClass!.id,
+      term1Average: student.finalDecision.term1Average,
+      term2Average: student.finalDecision.term2Average,
+      term3Average: student.finalDecision.term3Average,
+      annualAverage: student.finalDecision.annualAverage,
+      finalDecision: student.finalDecision.finalDecision,
+      isManualDecision: student.finalDecision.isManualDecision,
+      notes: student.finalDecision.notes
+    };
+
+    if (student.finalDecision.id) {
+      // Update existing decision
+      this.apiService.patch<FinalCouncilDecision>(
+        `/council/final-decisions/${student.finalDecision.id}`,
+        dto
+      ).subscribe({
+        next: (updated) => {
+          student.finalDecision = updated;
+          alert('تم حفظ القرار بنجاح');
+        },
+        error: (error) => {
+          console.error('Error updating final decision:', error);
+          alert('حدث خطأ أثناء الحفظ');
+        }
+      });
+    } else {
+      // Create new decision
+      this.apiService.post<FinalCouncilDecision>('/council/final-decisions', dto).subscribe({
+        next: (created) => {
+          student.finalDecision = created;
+          alert('تم حفظ القرار بنجاح');
+        },
+        error: (error) => {
+          console.error('Error creating final decision:', error);
+          alert('حدث خطأ أثناء الحفظ');
+        }
+      });
+    }
+  }
+
+  bulkSaveFinalDecisions(): void {
+    const decisions = this.finalStudentsWithDecisions.map(student => ({
+      studentId: student.id,
+      classId: this.councilSelectedClass!.id,
+      term1Average: student.finalDecision?.term1Average,
+      term2Average: student.finalDecision?.term2Average,
+      term3Average: student.finalDecision?.term3Average,
+      annualAverage: student.finalDecision?.annualAverage,
+      finalDecision: student.finalDecision?.finalDecision,
+      isManualDecision: student.finalDecision?.isManualDecision,
+      notes: student.finalDecision?.notes
+    }));
+
+    this.apiService.post<FinalCouncilDecision[]>('/council/final-decisions/bulk', decisions).subscribe({
+      next: (saved) => {
+        alert(`تم حفظ ${saved.length} قرار بنجاح`);
+        this.loadFinalCouncilDecisions();
+      },
+      error: (error) => {
+        console.error('Error bulk saving final decisions:', error);
+        alert('حدث خطأ أثناء الحفظ');
+      }
+    });
+  }
+
+  exportFinalDecisionPDF(): void {
+    if (!this.councilSelectedClass) return;
+
+    const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
+    const currentLang = this.languageService.getCurrentLanguage();
+
+    // Set font for Arabic
+    pdf.setFont('Arial', 'normal');
+    pdf.setFontSize(16);
+
+    // Title
+    const title = currentLang === 'AR' ? 
+      `القرار النهائي لمجلس القسم - ${this.councilSelectedClass.name}` :
+      `Final Council Decision - ${this.councilSelectedClass.name}`;
+    
+    pdf.text(title, pdf.internal.pageSize.width / 2, 15, { align: 'center' });
+
+    // Date
+    const date = new Date().toLocaleDateString(currentLang === 'AR' ? 'ar-DZ' : 'en-US');
+    pdf.setFontSize(10);
+    pdf.text(date, pdf.internal.pageSize.width - 20, 10, { align: 'right' });
+
+    // Table headers
+    const headers = currentLang === 'AR' ? [
+      'رقم التعريف', 'اللقب', 'الاسم', 'معدل ف1', 'معدل ف2', 'معدل ف3', 'المعدل السنوي', 'القرار النهائي', 'ملاحظات'
+    ] : [
+      'ID', 'Last Name', 'First Name', 'Term 1 Avg', 'Term 2 Avg', 'Term 3 Avg', 'Annual Avg', 'Final Decision', 'Notes'
+    ];
+
+    // Table data
+    const data = this.finalStudentsWithDecisions.map(student => [
+      student.idNumber || '',
+      student.lastName,
+      student.firstName,
+      student.finalDecision?.term1Average?.toFixed(2) || '',
+      student.finalDecision?.term2Average?.toFixed(2) || '',
+      student.finalDecision?.term3Average?.toFixed(2) || '',
+      student.finalDecision?.annualAverage?.toFixed(2) || '',
+      this.translateDecision(student.finalDecision?.finalDecision, currentLang),
+      student.finalDecision?.notes || ''
+    ]);
+
+    // Use autoTable plugin
+    (pdf as any).autoTable({
+      head: [headers],
+      body: data,
+      startY: 25,
+      styles: {
+        font: 'Arial',
+        fontSize: 9,
+        cellPadding: 2
+      },
+      headStyles: {
+        fillColor: [41, 128, 185],
+        textColor: 255,
+        fontStyle: 'bold'
+      },
+      columnStyles: {
+        8: { cellWidth: 30 } // Notes
+      }
+    });
+
+    // Signature section
+    const finalY = (pdf as any).lastAutoTable.finalY + 10;
+    pdf.setFontSize(10);
+    pdf.text(currentLang === 'AR' ? 'توقيع أعضاء المجلس: _______________' : 'Council Members Signature: _______________', 20, finalY);
+
+    // Save PDF
+    const filename = `final_decision_${this.councilSelectedClass.name}_${Date.now()}.pdf`;
+    pdf.save(filename);
+  }
+
+  translateDecision(decision: string | undefined, lang: string): string {
+    if (!decision) return '';
+    const translations: any = {
+      'AR': {
+        'pass': 'يتنقل',
+        'repeat': 'يعيد',
+        'remedial': 'استدراك',
+        'redirect': 'يوجه م ت م'
+      },
+      'FR': {
+        'pass': 'Passe',
+        'repeat': 'Redouble',
+        'remedial': 'Rattrapage',
+        'redirect': 'Réorienté (Tech)'
+      },
+      'EN': {
+        'pass': 'Pass',
+        'repeat': 'Repeat',
+        'remedial': 'Remedial',
+        'redirect': 'Vocational Redirect'
+      }
+    };
+    return translations[lang]?.[decision] || decision;
+  }
+
+  onCouncilTabChange(tab: 'semester' | 'final'): void {
+    this.councilActiveTab = tab;
+    if (tab === 'semester' && this.councilSelectedClass) {
+      this.loadCouncilSemesterData();
+    } else if (tab === 'final' && this.councilSelectedClass) {
+      this.loadFinalCouncilDecisions();
+    }
   }
 }
 
