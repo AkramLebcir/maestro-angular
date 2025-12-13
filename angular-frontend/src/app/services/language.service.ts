@@ -95,6 +95,15 @@ export class LanguageService {
         'DE': 'Sprache ändern',
         'TR': 'Dili değiştir'
       },
+      'header.themeColor': {
+        'AR': 'لون الواجهة',
+        'FR': 'Couleur du thème',
+        'EN': 'Theme color',
+        'ES': 'Color del tema',
+        'IT': 'Colore tema',
+        'DE': 'Themenfarbe',
+        'TR': 'Tema rengi'
+      },
       'header.toggleMenu': {
         'AR': 'فتح وإغلاق القائمة الرئيسية',
         'FR': 'Ouvrir et fermer le menu principal',
@@ -2774,6 +2783,267 @@ export class LanguageService {
         'DE': 'Auf alle Klassen anwenden',
         'TR': 'Tüm sınıflara uygula'
       },
+      'gradebook.councilTab': {
+        'AR': 'مجلس القسم',
+        'FR': 'Conseil de classe',
+        'EN': 'Class council',
+        'ES': 'Consejo de clase',
+        'IT': 'Consiglio di classe',
+        'DE': 'Klassenkonferenz',
+        'TR': 'Sınıf konseyi'
+      },
+      'gradebook.finalDecision': {
+        'AR': 'القرار النهائي',
+        'FR': 'Décision finale',
+        'EN': 'Final decision',
+        'ES': 'Decisión final',
+        'IT': 'Decisione finale',
+        'DE': 'Endgültige Entscheidung',
+        'TR': 'Nihai karar'
+      },
+      'gradebook.councilTitle': {
+        'AR': 'مجلس القسم - {{className}} - الفصل {{term}}',
+        'FR': 'Conseil de classe - {{className}} - Trimestre {{term}}',
+        'EN': 'Class council - {{className}} - Term {{term}}',
+        'ES': 'Consejo de clase - {{className}} - Trimestre {{term}}',
+        'IT': 'Consiglio di classe - {{className}} - Trimestre {{term}}',
+        'DE': 'Klassenkonferenz - {{className}} - Trimester {{term}}',
+        'TR': 'Sınıf konseyi - {{className}} - Dönem {{term}}'
+      },
+      'gradebook.finalDecisionTitle': {
+        'AR': 'القرار النهائي - {{className}}',
+        'FR': 'Décision finale - {{className}}',
+        'EN': 'Final decision - {{className}}',
+        'ES': 'Decisión final - {{className}}',
+        'IT': 'Decisione finale - {{className}}',
+        'DE': 'Endgültige Entscheidung - {{className}}',
+        'TR': 'Nihai karar - {{className}}'
+      },
+      'gradebook.saveAll': {
+        'AR': 'حفظ الكل',
+        'FR': 'Tout enregistrer',
+        'EN': 'Save all',
+        'ES': 'Guardar todo',
+        'IT': 'Salva tutto',
+        'DE': 'Alles speichern',
+        'TR': 'Tümünü kaydet'
+      },
+      'gradebook.save': {
+        'AR': 'حفظ',
+        'FR': 'Enregistrer',
+        'EN': 'Save',
+        'ES': 'Guardar',
+        'IT': 'Salva',
+        'DE': 'Speichern',
+        'TR': 'Kaydet'
+      },
+      'gradebook.photo': {
+        'AR': 'الصورة',
+        'FR': 'Photo',
+        'EN': 'Photo',
+        'ES': 'Foto',
+        'IT': 'Foto',
+        'DE': 'Foto',
+        'TR': 'Fotoğraf'
+      },
+      'gradebook.gender': {
+        'AR': 'الجنس',
+        'FR': 'Genre',
+        'EN': 'Gender',
+        'ES': 'Género',
+        'IT': 'Genere',
+        'DE': 'Geschlecht',
+        'TR': 'Cinsiyet'
+      },
+      'gradebook.male': {
+        'AR': 'ذكر',
+        'FR': 'Homme',
+        'EN': 'Male',
+        'ES': 'Hombre',
+        'IT': 'Maschio',
+        'DE': 'Männlich',
+        'TR': 'Erkek'
+      },
+      'gradebook.female': {
+        'AR': 'أنثى',
+        'FR': 'Femme',
+        'EN': 'Female',
+        'ES': 'Mujer',
+        'IT': 'Femmina',
+        'DE': 'Weiblich',
+        'TR': 'Kadın'
+      },
+      'gradebook.repeater': {
+        'AR': 'الإعادة',
+        'FR': 'Redoublant',
+        'EN': 'Repeater',
+        'ES': 'Repetidor',
+        'IT': 'Ripetente',
+        'DE': 'Wiederholer',
+        'TR': 'Sınıf tekrarı'
+      },
+      'gradebook.teacherAverage': {
+        'AR': 'معدل الأستاذ',
+        'FR': 'Moyenne du professeur',
+        'EN': 'Teacher average',
+        'ES': 'Promedio del profesor',
+        'IT': 'Media del professore',
+        'DE': 'Lehrerdurchschnitt',
+        'TR': 'Öğretmen ortalaması'
+      },
+      'gradebook.semesterAverage': {
+        'AR': 'معدل الفصل',
+        'FR': 'Moyenne du trimestre',
+        'EN': 'Term average',
+        'ES': 'Promedio del trimestre',
+        'IT': 'Media del trimestre',
+        'DE': 'Trimesterdurchschnitt',
+        'TR': 'Dönem ortalaması'
+      },
+      'gradebook.absences': {
+        'AR': 'الغيابات',
+        'FR': 'Absences',
+        'EN': 'Absences',
+        'ES': 'Ausencias',
+        'IT': 'Assenze',
+        'DE': 'Fehlzeiten',
+        'TR': 'Devamsızlıklar'
+      },
+      'gradebook.award': {
+        'AR': 'الإجازات',
+        'FR': 'Distinctions',
+        'EN': 'Awards',
+        'ES': 'Distinciones',
+        'IT': 'Onorificenze',
+        'DE': 'Auszeichnungen',
+        'TR': 'Ödüller'
+      },
+      'gradebook.term1Average': {
+        'AR': 'معدل الفصل 1',
+        'FR': 'Moyenne trimestre 1',
+        'EN': 'Term 1 average',
+        'ES': 'Promedio trimestre 1',
+        'IT': 'Media trimestre 1',
+        'DE': 'Trimester 1 Durchschnitt',
+        'TR': '1. dönem ortalaması'
+      },
+      'gradebook.term2Average': {
+        'AR': 'معدل الفصل 2',
+        'FR': 'Moyenne trimestre 2',
+        'EN': 'Term 2 average',
+        'ES': 'Promedio trimestre 2',
+        'IT': 'Media trimestre 2',
+        'DE': 'Trimester 2 Durchschnitt',
+        'TR': '2. dönem ortalaması'
+      },
+      'gradebook.term3Average': {
+        'AR': 'معدل الفصل 3',
+        'FR': 'Moyenne trimestre 3',
+        'EN': 'Term 3 average',
+        'ES': 'Promedio trimestre 3',
+        'IT': 'Media trimestre 3',
+        'DE': 'Trimester 3 Durchschnitt',
+        'TR': '3. dönem ortalaması'
+      },
+      'gradebook.annualAverage': {
+        'AR': 'المعدل السنوي',
+        'FR': 'Moyenne annuelle',
+        'EN': 'Annual average',
+        'ES': 'Promedio anual',
+        'IT': 'Media annuale',
+        'DE': 'Jahresdurchschnitt',
+        'TR': 'Yıllık ortalama'
+      },
+      'gradebook.manualDecision': {
+        'AR': 'قرار يدوي',
+        'FR': 'Décision manuelle',
+        'EN': 'Manual decision',
+        'ES': 'Decisión manual',
+        'IT': 'Decisione manuale',
+        'DE': 'Manuelle Entscheidung',
+        'TR': 'Manuel karar'
+      },
+      'gradebook.selectClassAndTerm': {
+        'AR': 'الرجاء اختيار القسم والفصل',
+        'FR': 'Veuillez sélectionner la classe et le trimestre',
+        'EN': 'Please select class and term',
+        'ES': 'Seleccione la clase y el trimestre',
+        'IT': 'Seleziona classe e trimestre',
+        'DE': 'Bitte Klasse und Trimester auswählen',
+        'TR': 'Lütfen sınıf ve dönemi seçin'
+      },
+      'gradebook.teacherSignature': {
+        'AR': 'توقيع الأستاذ: _______________',
+        'FR': 'Signature de l\'enseignant : _______________',
+        'EN': 'Teacher signature: _______________',
+        'ES': 'Firma del profesor: _______________',
+        'IT': 'Firma dell\'insegnante: _______________',
+        'DE': 'Unterschrift des Lehrers: _______________',
+        'TR': 'Öğretmen imzası: _______________'
+      },
+      'gradebook.councilMembersSignature': {
+        'AR': 'توقيع أعضاء المجلس: _______________',
+        'FR': 'Signature des membres du conseil : _______________',
+        'EN': 'Council members signature: _______________',
+        'ES': 'Firma de los miembros del consejo: _______________',
+        'IT': 'Firma dei membri del consiglio: _______________',
+        'DE': 'Unterschrift der Ratsmitglieder: _______________',
+        'TR': 'Kurul üyeleri imzası: _______________'
+      },
+      'gradebook.saveSuccess': {
+        'AR': 'تم حفظ البيانات بنجاح',
+        'FR': 'Données enregistrées avec succès',
+        'EN': 'Data saved successfully',
+        'ES': 'Datos guardados correctamente',
+        'IT': 'Dati salvati con successo',
+        'DE': 'Daten erfolgreich gespeichert',
+        'TR': 'Veriler başarıyla kaydedildi'
+      },
+      'gradebook.saveError': {
+        'AR': 'حدث خطأ أثناء الحفظ',
+        'FR': 'Une erreur s\'est produite lors de l\'enregistrement',
+        'EN': 'An error occurred while saving',
+        'ES': 'Se produjo un error al guardar',
+        'IT': 'Si è verificato un errore durante il salvataggio',
+        'DE': 'Beim Speichern ist ein Fehler aufgetreten',
+        'TR': 'Kaydedilirken bir hata oluştu'
+      },
+      'gradebook.unknownError': {
+        'AR': 'خطأ غير معروف',
+        'FR': 'Erreur inconnue',
+        'EN': 'Unknown error',
+        'ES': 'Error desconocido',
+        'IT': 'Errore sconosciuto',
+        'DE': 'Unbekannter Fehler',
+        'TR': 'Bilinmeyen hata'
+      },
+      'gradebook.bulkSaveRecordsSuccess': {
+        'AR': 'تم حفظ {{count}} سجل بنجاح',
+        'FR': '{{count}} enregistrements ont été sauvegardés avec succès',
+        'EN': '{{count}} records saved successfully',
+        'ES': '{{count}} registros guardados correctamente',
+        'IT': '{{count}} record salvati con successo',
+        'DE': '{{count}} Datensätze erfolgreich gespeichert',
+        'TR': '{{count}} kayıt başarıyla kaydedildi'
+      },
+      'gradebook.bulkSaveDecisionsSuccess': {
+        'AR': 'تم حفظ {{count}} قرار بنجاح',
+        'FR': '{{count}} décisions ont été sauvegardées avec succès',
+        'EN': '{{count}} decisions saved successfully',
+        'ES': '{{count}} decisiones guardadas correctamente',
+        'IT': '{{count}} decisioni salvate con successo',
+        'DE': '{{count}} Entscheidungen erfolgreich gespeichert',
+        'TR': '{{count}} karar başarıyla kaydedildi'
+      },
+      'gradebook.saveDecisionSuccess': {
+        'AR': 'تم حفظ القرار بنجاح',
+        'FR': 'La décision a été enregistrée avec succès',
+        'EN': 'Decision saved successfully',
+        'ES': 'La decisión se guardó correctamente',
+        'IT': 'Decisione salvata con successo',
+        'DE': 'Entscheidung erfolgreich gespeichert',
+        'TR': 'Karar başarıyla kaydedildi'
+      },
 
       // Reports
       'reports.title': {
@@ -3486,6 +3756,60 @@ export class LanguageService {
         'IT': 'Apri rapporto monitoraggio voti',
         'DE': 'Notenüberwachungsbericht öffnen',
         'TR': 'Not izleme raporunu aç'
+      },
+      'reports.councilReport': {
+        'AR': 'تقرير مجلس القسم',
+        'FR': 'Rapport du conseil de classe',
+        'EN': 'Class council report',
+        'ES': 'Informe del consejo de clase',
+        'IT': 'Report consiglio di classe',
+        'DE': 'Klassenkonferenzbericht',
+        'TR': 'Sınıf kurulu raporu'
+      },
+      'reports.councilReportDesc': {
+        'AR': 'توليد تقرير مجلس القسم لكل قسم وفصل دراسي.',
+        'FR': 'Générer le rapport du conseil de classe par section et trimestre.',
+        'EN': 'Generate class council report by class and term.',
+        'ES': 'Generar informe del consejo de clase por sección y trimestre.',
+        'IT': 'Genera il report del consiglio di classe per sezione e trimestre.',
+        'DE': 'Erstellen Sie den Klassenkonferenzbericht nach Klasse und Trimester.',
+        'TR': 'Sınıf ve dönem bazında sınıf kurulu raporu oluşturun.'
+      },
+      'reports.openCouncilReport': {
+        'AR': 'فتح تقرير مجلس القسم',
+        'FR': 'Ouvrir le rapport du conseil de classe',
+        'EN': 'Open class council report',
+        'ES': 'Abrir informe del consejo de clase',
+        'IT': 'Apri report consiglio di classe',
+        'DE': 'Klassenkonferenzbericht öffnen',
+        'TR': 'Sınıf kurulu raporunu aç'
+      },
+      'reports.finalDecisionReport': {
+        'AR': 'تقرير القرار النهائي',
+        'FR': 'Rapport de décision finale',
+        'EN': 'Final decision report',
+        'ES': 'Informe de decisión final',
+        'IT': 'Report decisione finale',
+        'DE': 'Bericht zur finalen Entscheidung',
+        'TR': 'Nihai karar raporu'
+      },
+      'reports.finalDecisionReportDesc': {
+        'AR': 'عرض القرارات النهائية للتلاميذ حسب القسم.',
+        'FR': 'Afficher les décisions finales des élèves par section.',
+        'EN': 'View final decisions for students by class.',
+        'ES': 'Ver decisiones finales de los estudiantes por sección.',
+        'IT': 'Visualizza le decisioni finali degli studenti per classe.',
+        'DE': 'Endentscheidungen der Schüler nach Klasse anzeigen.',
+        'TR': 'Öğrencilerin nihai kararlarını sınıfa göre görüntüleyin.'
+      },
+      'reports.openFinalDecisionReport': {
+        'AR': 'فتح تقرير القرار النهائي',
+        'FR': 'Ouvrir le rapport de décision finale',
+        'EN': 'Open final decision report',
+        'ES': 'Abrir informe de decisión final',
+        'IT': 'Apri report decisione finale',
+        'DE': 'Bericht zur finalen Entscheidung öffnen',
+        'TR': 'Nihai karar raporunu aç'
       },
       'reports.dailyNotes': {
         'AR': 'تقرير دفتر الملاحظات اليومية',

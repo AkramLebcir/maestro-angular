@@ -428,8 +428,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     public languageService: LanguageService
   ) {}
 
-  translate(key: string): string {
-    return this.languageService.translate(key);
+  translate(key: string, params?: { [key: string]: string }): string {
+    return this.languageService.translate(key, params);
   }
 
   ngOnInit(): void {
@@ -439,11 +439,19 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // دعم الفتح من صفحة التقارير مع فتح تقرير مراقبة النقاط
     this.route.queryParams.subscribe((params) => {
       const openGradeMonitoring = params['openGradeMonitoring'] === '1';
+      const openCouncil = params['openCouncil'] === '1';
+      const councilTab = params['councilTab'] === 'final' ? 'final' : 'semester';
+
       if (openGradeMonitoring) {
         // انتظر قليلاً لتحميل البيانات ثم افتح الـ modal
         setTimeout(() => {
           this.openGradeMonitoringModal();
         }, 500);
+      }
+
+      if (openCouncil) {
+        this.viewMode = 'council';
+        this.councilActiveTab = councilTab;
       }
     });
   }
@@ -5788,12 +5796,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       ).subscribe({
         next: (updated) => {
           student.councilRecord = updated;
-          alert('تم حفظ البيانات بنجاح');
+          alert(this.translate('gradebook.saveSuccess'));
         },
         error: (error) => {
           console.error('Error updating council record:', error);
-          const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
-          alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+          const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+          alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
         }
       });
     } else {
@@ -5801,12 +5809,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       this.apiService.post<CouncilSemesterRecord>('/council/semester-records', dto).subscribe({
         next: (created) => {
           student.councilRecord = created;
-          alert('تم حفظ البيانات بنجاح');
+          alert(this.translate('gradebook.saveSuccess'));
         },
         error: (error) => {
           console.error('Error creating council record:', error);
-          const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
-          alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+          const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+          alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
         }
       });
     }
@@ -5829,13 +5837,13 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     
     this.apiService.post<CouncilSemesterRecord[]>('/council/semester-records/bulk', records).subscribe({
       next: (saved) => {
-        alert(`تم حفظ ${saved.length} سجل بنجاح`);
+        alert(this.translate('gradebook.bulkSaveRecordsSuccess', { count: String(saved.length) }));
         this.loadCouncilSemesterData();
       },
       error: (error) => {
         console.error('Error bulk saving council records:', error);
-        const errorMsg = error?.error?.message || error?.message || 'خطأ غير معروف';
-        alert(`حدث خطأ أثناء الحفظ: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
+        const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+        alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
       }
     });
   }
@@ -5845,32 +5853,43 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
     const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
     const currentLang = this.languageService.getCurrentLanguage();
+    const isArabic = currentLang === 'AR';
 
     // Try to load Arabic-capable font when needed; fallback to helvetica
-    const arabicFontLoaded = currentLang === 'AR' ? await this.ensureArabicFont(pdf) : false;
+    const arabicFontLoaded = isArabic ? await this.ensureArabicFont(pdf) : false;
     pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'bold');
     pdf.setFontSize(16);
 
     // Title
-    const title = currentLang === 'AR' ? 
-      `مجلس القسم - ${this.councilSelectedClass.name} - الفصل ${this.councilSelectedTerm}` :
-      `Class Council - ${this.councilSelectedClass.name} - Term ${this.councilSelectedTerm}`;
+    const title = this.translate('gradebook.councilTitle', { 
+      className: this.councilSelectedClass.name, 
+      term: String(this.councilSelectedTerm) 
+    });
     
     pdf.text(title, pdf.internal.pageSize.width / 2, 15, { align: 'center' });
 
     // Date
-    const date = new Date().toLocaleDateString(currentLang === 'AR' ? 'ar-DZ' : 'en-US');
+    const dateLocale = isArabic ? 'ar-DZ' : currentLang.toLowerCase();
+    const date = new Date().toLocaleDateString(dateLocale);
     pdf.setFontSize(10);
     pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'normal');
     pdf.text(date, pdf.internal.pageSize.width - 20, 10, { align: 'right' });
 
     // Table headers
-    const headers = currentLang === 'AR' ? [
-      'الصورة', 'رقم التعريف', 'اللقب', 'الاسم', 'تاريخ الميلاد', 'الجنس', 'الإعادة',
-      'معدل الأستاذ', 'معدل الفصل', 'السلوك', 'الغيابات', 'الإجازات', 'ملاحظات'
-    ] : [
-      'Photo', 'ID', 'Last Name', 'First Name', 'DOB', 'Gender', 'Repeater',
-      'Teacher Avg', 'Semester Avg', 'Behavior', 'Absences', 'Award', 'Notes'
+    const headers = [
+      this.translate('gradebook.photo'),
+      this.translate('gradebook.idNumber'),
+      this.translate('gradebook.lastName'),
+      this.translate('gradebook.firstName'),
+      this.translate('gradebook.birthDate'),
+      this.translate('gradebook.gender'),
+      this.translate('gradebook.repeater'),
+      this.translate('gradebook.teacherAverage'),
+      this.translate('gradebook.semesterAverage'),
+      this.translate('gradebook.behavior'),
+      this.translate('gradebook.absences'),
+      this.translate('gradebook.award'),
+      this.translate('gradebook.notes')
     ];
 
     // Table data
@@ -5879,14 +5898,14 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       student.idNumber || '',
       student.lastName,
       student.firstName,
-      student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString() : '',
-      student.gender === 'male' ? (currentLang === 'AR' ? 'ذكر' : 'Male') : (currentLang === 'AR' ? 'أنثى' : 'Female'),
-      student.isRepeater ? (currentLang === 'AR' ? 'نعم' : 'Yes') : (currentLang === 'AR' ? 'لا' : 'No'),
+      student.dateOfBirth ? new Date(student.dateOfBirth).toLocaleDateString(dateLocale) : '',
+      this.getGenderLabel(student.gender),
+      student.isRepeater ? this.translate('common.yes') : this.translate('common.no'),
       this.formatCouncilAverage(student.councilRecord?.teacherAverage),
       this.formatCouncilAverage(student.councilRecord?.semesterAverage),
       '⭐'.repeat(student.councilRecord?.behaviorRating || 0),
-      this.translateAbsencesLevel(student.councilRecord?.absencesLevel, currentLang),
-      this.translateAward(student.councilRecord?.award, currentLang),
+      this.getAbsenceLabel(student.councilRecord?.absencesLevel || ''),
+      this.getAwardLabel(student.councilRecord?.award || ''),
       student.councilRecord?.councilNotes || ''
     ]);
 
@@ -5900,8 +5919,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         fontSize: 8,
         cellPadding: 2,
         textColor: 0,
-        halign: currentLang === 'AR' ? 'right' : 'left',
-        textDirection: currentLang === 'AR' ? 'rtl' : 'ltr',
+        halign: isArabic ? 'right' : 'left',
+        textDirection: isArabic ? 'rtl' : 'ltr',
       },
       headStyles: {
         fillColor: [41, 128, 185],
@@ -5917,7 +5936,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Signature section
     const finalY = (pdf as any).lastAutoTable.finalY + 10;
     pdf.setFontSize(10);
-    pdf.text(currentLang === 'AR' ? 'توقيع الأستاذ: _______________' : 'Teacher Signature: _______________', 20, finalY);
+    pdf.text(this.translate('gradebook.teacherSignature'), 20, finalY);
 
     // Save PDF
     const filename = `council_semester_${this.councilSelectedClass.name}_term${this.councilSelectedTerm}_${Date.now()}.pdf`;
@@ -5953,6 +5972,34 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         'encouragement': 'Encouragement',
         'honor_roll': 'Honor Roll',
         'none': 'None'
+      },
+      'ES': {
+        'excellence': 'Excelencia',
+        'congratulation': 'Felicitación',
+        'encouragement': 'Ánimo',
+        'honor_roll': 'Cuadro de honor',
+        'none': 'Ninguno'
+      },
+      'IT': {
+        'excellence': 'Eccellenza',
+        'congratulation': 'Congratulazioni',
+        'encouragement': 'Incoraggiamento',
+        'honor_roll': 'Albo d\'onore',
+        'none': 'Nessuno'
+      },
+      'DE': {
+        'excellence': 'Exzellenz',
+        'congratulation': 'Glückwunsch',
+        'encouragement': 'Ermutigung',
+        'honor_roll': 'Ehrenliste',
+        'none': 'Keine'
+      },
+      'TR': {
+        'excellence': 'Mükemmellik',
+        'congratulation': 'Tebrik',
+        'encouragement': 'Teşvik',
+        'honor_roll': 'Onur listesi',
+        'none': 'Hiçbiri'
       }
     };
     return translations[lang]?.[award] || award;
@@ -5975,6 +6022,26 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         'disciplined': 'Disciplined',
         'average': 'Average',
         'frequent': 'Frequent'
+      },
+      'ES': {
+        'disciplined': 'Disciplinado',
+        'average': 'Promedio',
+        'frequent': 'Faltas frecuentes'
+      },
+      'IT': {
+        'disciplined': 'Disciplinato',
+        'average': 'Medio',
+        'frequent': 'Assenze frequenti'
+      },
+      'DE': {
+        'disciplined': 'Diszipliniert',
+        'average': 'Durchschnittlich',
+        'frequent': 'Häufig fehlend'
+      },
+      'TR': {
+        'disciplined': 'Disiplinli',
+        'average': 'Orta',
+        'frequent': 'Sık devamsız'
       }
     };
     return translations[lang]?.[level] || level;
@@ -6120,11 +6187,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       ).subscribe({
         next: (updated) => {
           student.finalDecision = updated;
-          alert('تم حفظ القرار بنجاح');
+          alert(this.translate('gradebook.saveDecisionSuccess'));
         },
         error: (error) => {
           console.error('Error updating final decision:', error);
-          alert('حدث خطأ أثناء الحفظ');
+          const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+          alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
         }
       });
     } else {
@@ -6132,11 +6200,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       this.apiService.post<FinalCouncilDecision>('/council/final-decisions', dto).subscribe({
         next: (created) => {
           student.finalDecision = created;
-          alert('تم حفظ القرار بنجاح');
+          alert(this.translate('gradebook.saveDecisionSuccess'));
         },
         error: (error) => {
           console.error('Error creating final decision:', error);
-          alert('حدث خطأ أثناء الحفظ');
+          const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+          alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
         }
       });
     }
@@ -6157,12 +6226,13 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
     this.apiService.post<FinalCouncilDecision[]>('/council/final-decisions/bulk', decisions).subscribe({
       next: (saved) => {
-        alert(`تم حفظ ${saved.length} قرار بنجاح`);
+        alert(this.translate('gradebook.bulkSaveDecisionsSuccess', { count: String(saved.length) }));
         this.loadFinalCouncilDecisions();
       },
       error: (error) => {
         console.error('Error bulk saving final decisions:', error);
-        alert('حدث خطأ أثناء الحفظ');
+        const errorMsg = error?.error?.message || error?.message || this.translate('gradebook.unknownError');
+        alert(`${this.translate('gradebook.saveError')}: ${Array.isArray(errorMsg) ? errorMsg.join(', ') : errorMsg}`);
       }
     });
   }
@@ -6172,29 +6242,35 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
     const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation
     const currentLang = this.languageService.getCurrentLanguage();
+    const isArabic = currentLang === 'AR';
 
     // Try to load Arabic-capable font when needed; fallback to helvetica
-    const arabicFontLoaded = currentLang === 'AR' ? await this.ensureArabicFont(pdf) : false;
+    const arabicFontLoaded = isArabic ? await this.ensureArabicFont(pdf) : false;
     pdf.setFont(arabicFontLoaded ? 'Amiri' : 'helvetica', 'normal');
     pdf.setFontSize(16);
 
     // Title
-    const title = currentLang === 'AR' ? 
-      `القرار النهائي لمجلس القسم - ${this.councilSelectedClass.name}` :
-      `Final Council Decision - ${this.councilSelectedClass.name}`;
+    const title = this.translate('gradebook.finalDecisionTitle', { className: this.councilSelectedClass.name });
     
     pdf.text(title, pdf.internal.pageSize.width / 2, 15, { align: 'center' });
 
     // Date
-    const date = new Date().toLocaleDateString(currentLang === 'AR' ? 'ar-DZ' : 'en-US');
+    const dateLocale = isArabic ? 'ar-DZ' : currentLang.toLowerCase();
+    const date = new Date().toLocaleDateString(dateLocale);
     pdf.setFontSize(10);
     pdf.text(date, pdf.internal.pageSize.width - 20, 10, { align: 'right' });
 
     // Table headers
-    const headers = currentLang === 'AR' ? [
-      'رقم التعريف', 'اللقب', 'الاسم', 'معدل ف1', 'معدل ف2', 'معدل ف3', 'المعدل السنوي', 'القرار النهائي', 'ملاحظات'
-    ] : [
-      'ID', 'Last Name', 'First Name', 'Term 1 Avg', 'Term 2 Avg', 'Term 3 Avg', 'Annual Avg', 'Final Decision', 'Notes'
+    const headers = [
+      this.translate('gradebook.idNumber'),
+      this.translate('gradebook.lastName'),
+      this.translate('gradebook.firstName'),
+      this.translate('gradebook.term1Average'),
+      this.translate('gradebook.term2Average'),
+      this.translate('gradebook.term3Average'),
+      this.translate('gradebook.annualAverage'),
+      this.translate('gradebook.finalDecision'),
+      this.translate('gradebook.notes')
     ];
 
     // Table data
@@ -6206,7 +6282,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
       student.finalDecision?.term2Average?.toFixed(2) || '',
       student.finalDecision?.term3Average?.toFixed(2) || '',
       student.finalDecision?.annualAverage?.toFixed(2) || '',
-      this.translateDecision(student.finalDecision?.finalDecision, currentLang),
+      this.getDecisionLabel(student.finalDecision?.finalDecision || ''),
       student.finalDecision?.notes || ''
     ]);
 
@@ -6220,8 +6296,8 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         fontSize: 9,
         cellPadding: 2,
         textColor: 0,
-        halign: currentLang === 'AR' ? 'right' : 'left',
-        textDirection: currentLang === 'AR' ? 'rtl' : 'ltr',
+        halign: isArabic ? 'right' : 'left',
+        textDirection: isArabic ? 'rtl' : 'ltr',
       },
       headStyles: {
         fillColor: [41, 128, 185],
@@ -6236,7 +6312,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     // Signature section
     const finalY = (pdf as any).lastAutoTable.finalY + 10;
     pdf.setFontSize(10);
-    pdf.text(currentLang === 'AR' ? 'توقيع أعضاء المجلس: _______________' : 'Council Members Signature: _______________', 20, finalY);
+    pdf.text(this.translate('gradebook.councilMembersSignature'), 20, finalY);
 
     // Save PDF
     const filename = `final_decision_${this.councilSelectedClass.name}_${Date.now()}.pdf`;
@@ -6301,9 +6377,51 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         'repeat': 'Repeat',
         'remedial': 'Remedial',
         'redirect': 'Vocational Redirect'
+      },
+      'ES': {
+        'pass': 'Promociona',
+        'repeat': 'Repite',
+        'remedial': 'Recuperación',
+        'redirect': 'Reorientación técnica'
+      },
+      'IT': {
+        'pass': 'Promosso',
+        'repeat': 'Ripete',
+        'remedial': 'Recupero',
+        'redirect': 'Riorientato (Tecnico)'
+      },
+      'DE': {
+        'pass': 'Bestanden',
+        'repeat': 'Wiederholt',
+        'remedial': 'Nachprüfung',
+        'redirect': 'Beruflich umgeleitet'
+      },
+      'TR': {
+        'pass': 'Geçti',
+        'repeat': 'Sınıf tekrarı',
+        'remedial': 'Telafi',
+        'redirect': 'Mesleki yönlendirme'
       }
     };
     return translations[lang]?.[decision] || decision;
+  }
+
+  getDecisionLabel(decision: string): string {
+    return this.translateDecision(decision, this.languageService.getCurrentLanguage());
+  }
+
+  getAbsenceLabel(level: string): string {
+    return this.translateAbsencesLevel(level, this.languageService.getCurrentLanguage());
+  }
+
+  getAwardLabel(award: string): string {
+    return this.translateAward(award, this.languageService.getCurrentLanguage());
+  }
+
+  getGenderLabel(gender?: 'male' | 'female'): string {
+    if (gender === 'male') return this.translate('gradebook.male');
+    if (gender === 'female') return this.translate('gradebook.female');
+    return '-';
   }
 
   onCouncilTabChange(tab: 'semester' | 'final'): void {

@@ -21,24 +21,6 @@
 
   <!-- أيقونة لغة التطبيق (علم الجزائر + رمز اللغة الحالية) ثم جرس التنبيهات ثم اسم ولقب الأستاذ ثم الصورة في الحافة -->
   <div class="flex items-center gap-3 md:gap-4">
-    <!-- زر تبديل المظهر (Dark/Light Mode) -->
-    <button
-      type="button"
-      (click)="toggleTheme()"
-      class="p-2 rounded-md hover:bg-white/20 transition-colors focus:outline-none"
-      [attr.aria-label]="currentTheme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
-      [title]="currentTheme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
-    >
-      <!-- أيقونة الشمس للوضع الداكن (للتبديل إلى الفاتح) -->
-      <svg *ngIf="currentTheme === 'dark'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-      </svg>
-      <!-- أيقونة القمر للوضع الفاتح (للتبديل إلى الداكن) -->
-      <svg *ngIf="currentTheme === 'light'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-      </svg>
-    </button>
-
     <!-- قائمة اختيار اللغة -->
     <div class="relative">
       <!-- زر اللغة: يعرض العلم + رمز اللغة الحالية -->
@@ -264,6 +246,61 @@
         </button>
       </div>
     </div>
+
+    <!-- تبديل لون الواجهة (بين اللغة والوضع الليلي) -->
+    <div class="relative">
+      <button
+        #themeMenuButton
+        type="button"
+        (click)="toggleThemeColorMenu()"
+        class="p-2 rounded-md hover:bg-white/20 transition-colors focus:outline-none flex items-center gap-2"
+        [attr.aria-label]="translate('header.themeColor') || 'تغيير لون الواجهة'"
+        [title]="translate('header.themeColor') || 'تغيير لون الواجهة'"
+      >
+        <span class="w-5 h-5 rounded-full border-2 border-white/70 shadow-sm"
+              [style.backgroundColor]="currentColorPreview"></span>
+      </button>
+
+      <div
+        *ngIf="isThemeColorMenuOpen"
+        #themeMenuPanel
+        class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-lg shadow-lg z-30 py-2 border border-gray-200 dark:border-gray-700"
+      >
+        <div class="px-4 pb-2 text-xs text-gray-500 dark:text-gray-400 font-semibold">
+          {{ translate('header.themeColor') || 'لون الواجهة' }}
+        </div>
+        <button
+          *ngFor="let option of themeColorOptions"
+          type="button"
+          (click)="setThemeColor(option.value)"
+          class="w-full px-3 py-2 flex items-center gap-3 hover:bg-gray-100 dark:hover:bg-gray-700 text-sm"
+        >
+          <span class="w-4 h-4 rounded-full border border-gray-300 dark:border-gray-600" [style.backgroundColor]="option.preview"></span>
+          <span class="font-medium">{{ option.label }}</span>
+          <svg *ngIf="option.value === currentThemeColor" class="w-4 h-4 ml-auto text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- زر تبديل المظهر (Dark/Light Mode) -->
+    <button
+      type="button"
+      (click)="toggleTheme()"
+      class="p-2 rounded-md hover:bg-white/20 transition-colors focus:outline-none"
+      [attr.aria-label]="currentTheme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
+      [title]="currentTheme === 'dark' ? 'تفعيل الوضع الفاتح' : 'تفعيل الوضع الداكن'"
+    >
+      <!-- أيقونة الشمس للوضع الداكن (للتبديل إلى الفاتح) -->
+      <svg *ngIf="currentTheme === 'dark'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+      </svg>
+      <!-- أيقونة القمر للوضع الفاتح (للتبديل إلى الداكن) -->
+      <svg *ngIf="currentTheme === 'light'" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+      </svg>
+    </button>
 
     <div class="relative">
         <button

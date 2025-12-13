@@ -310,6 +310,12 @@ export class ReportsComponent {
     });
   }
 
+  navigateToCouncilReport(tab: 'semester' | 'final' = 'semester'): void {
+    this.router.navigate(['/gradebook'], {
+      queryParams: { openCouncil: '1', councilTab: tab },
+    });
+  }
+
   navigateToAnnualDistribution(): void {
     this.router.navigate(['/annual-distribution']);
   }

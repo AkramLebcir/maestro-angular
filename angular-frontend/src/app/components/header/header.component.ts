@@ -4,7 +4,7 @@ import { Subscription } from 'rxjs';
 import { LanguageService, LanguageCode } from '../../services/language.service';
 import { AuthService, User } from '../../services/auth.service';
 import { NotificationService, Notification, NotificationStats } from '../../services/notification.service';
-import { ThemeService, ThemeMode } from '../../services/theme.service';
+import { ThemeService, ThemeMode, ThemeColor } from '../../services/theme.service';
 
 @Component({
   selector: 'app-header',
@@ -28,7 +28,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
   
   // إعدادات المظهر (Dark/Light Mode)
   currentTheme: ThemeMode = 'light';
+  currentThemeColor: ThemeColor = 'blue';
   private themeSubscription?: Subscription;
+  private themeColorSubscription?: Subscription;
+  isThemeColorMenuOpen = false;
+  themeColorOptions: Array<{ value: ThemeColor; label: string; preview: string }> = [];
+  get currentColorPreview(): string {
+    return (
+      this.themeColorOptions.find(option => option.value === this.currentThemeColor)?.preview ||
+      '#2563eb'
+    );
+  }
 
   // إعدادات الإشعارات
   notifications: Notification[] = [];
@@ -37,6 +47,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   notificationsLoaded = false;
   @ViewChild('notificationsPanel', { static: false }) notificationsPanelRef?: ElementRef;
   @ViewChild('notificationsButton', { static: false }) notificationsButtonRef?: ElementRef;
+  @ViewChild('themeMenuPanel', { static: false }) themeMenuPanelRef?: ElementRef;
+  @ViewChild('themeMenuButton', { static: false }) themeMenuButtonRef?: ElementRef;
 
   constructor(
     public languageService: LanguageService,
@@ -60,6 +72,20 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // خيارات ألوان الواجهة
+    const colorLabels: Record<ThemeColor, string> = {
+      blue: 'أزرق',
+      emerald: 'زمردي',
+      purple: 'بنفسجي',
+      amber: 'كهرماني',
+      rose: 'وردي'
+    };
+    this.themeColorOptions = this.themeService.getAvailableColors().map(color => ({
+      value: color,
+      label: colorLabels[color],
+      preview: this.themeService.getColorPreview(color)
+    }));
+
     // الاشتراك في تغييرات اللغة
     this.languageSubscription = this.languageService.currentLanguage$.subscribe((lang: LanguageCode) => {
       this.currentLanguageCode = lang;
@@ -71,6 +97,12 @@ export class HeaderComponent implements OnInit, OnDestroy {
       this.currentTheme = theme;
     });
     this.currentTheme = this.themeService.getCurrentTheme();
+
+    // الاشتراك في تغييرات لون الواجهة
+    this.themeColorSubscription = this.themeService.currentColor$.subscribe((color: ThemeColor) => {
+      this.currentThemeColor = color;
+    });
+    this.currentThemeColor = this.themeService.getCurrentColorTheme();
 
     // الاشتراك في تغييرات المستخدم
     this.userSubscription = this.authService.currentUser$.subscribe((user) => {
@@ -121,10 +153,22 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.themeSubscription) {
       this.themeSubscription.unsubscribe();
     }
+    if (this.themeColorSubscription) {
+      this.themeColorSubscription.unsubscribe();
+    }
   }
 
   toggleTheme(): void {
     this.themeService.toggleTheme();
+  }
+
+  toggleThemeColorMenu(): void {
+    this.isThemeColorMenuOpen = !this.isThemeColorMenuOpen;
+  }
+
+  setThemeColor(color: ThemeColor): void {
+    this.themeService.setColorTheme(color);
+    this.isThemeColorMenuOpen = false;
   }
 
   toggleUserMenu(): void {
@@ -344,7 +388,14 @@ export class HeaderComponent implements OnInit, OnDestroy {
         this.showNotificationsPanel = false;
       }
     }
+
+    if (this.isThemeColorMenuOpen) {
+      const clickedMenu = this.themeMenuPanelRef?.nativeElement?.contains(event.target);
+      const clickedButton = this.themeMenuButtonRef?.nativeElement?.contains(event.target);
+      if (!clickedMenu && !clickedButton) {
+        this.isThemeColorMenuOpen = false;
+      }
+    }
   }
 }
-
 

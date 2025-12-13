@@ -377,6 +377,42 @@
         </button>
       </div>
 
+      <!-- Council report -->
+      <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-gray-800 hover:shadow-md dark:shadow-gray-900/50 transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
+            {{ translate('reports.councilReport') }}
+          </h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            {{ translate('reports.councilReportDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToCouncilReport('semester')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          {{ translate('reports.openCouncilReport') }}
+        </button>
+      </div>
+
+      <!-- Final decision report -->
+      <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-gray-800 hover:shadow-md dark:shadow-gray-900/50 transition">
+        <div>
+          <h2 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-1">
+            {{ translate('reports.finalDecisionReport') }}
+          </h2>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">
+            {{ translate('reports.finalDecisionReportDesc') }}
+          </p>
+        </div>
+        <button
+          (click)="navigateToCouncilReport('final')"
+          class="mt-2 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-indigo-700 transition w-full text-center"
+        >
+          {{ translate('reports.openFinalDecisionReport') }}
+        </button>
+      </div>
+
       <!-- Grade monitoring report -->
       <div class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 flex flex-col justify-between bg-white dark:bg-gray-800 hover:shadow-md dark:shadow-gray-900/50 transition">
         <div>
