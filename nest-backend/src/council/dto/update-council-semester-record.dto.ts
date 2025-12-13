@@ -3,3 +3,4 @@ import { CreateCouncilSemesterRecordDto } from './create-council-semester-record
 
 export class UpdateCouncilSemesterRecordDto extends PartialType(CreateCouncilSemesterRecordDto) {}
 
+

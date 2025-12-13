@@ -63,3 +63,4 @@ export class CouncilSemesterRecord extends TenantOwnedEntity {
   updatedAt: Date;
 }
 
+

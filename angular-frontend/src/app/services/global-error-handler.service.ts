@@ -25,3 +25,4 @@ export class GlobalErrorHandler implements ErrorHandler {
     // this.loggingService.logError(error);
   }
 }
+

@@ -240,3 +240,4 @@ export class CreateCouncilTables1702400000000 implements MigrationInterface {
   }
 }
 
+

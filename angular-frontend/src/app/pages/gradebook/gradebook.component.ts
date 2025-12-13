@@ -1468,8 +1468,14 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   calculateClassAverage(): number {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      return this.calculateClassAverageFromExcelData();
+    }
+
+    // Fall back to regular student data
     if (this.students.length === 0) return 0;
-    
+
     // معدل القسم يجب أن يعتمد على الفصل الدراسي المحدد فقط
     const studentsWithTermAverage = this.students.filter(s => (s.averages?.termAverage || 0) > 0);
     if (studentsWithTermAverage.length === 0) return 0;
@@ -1480,6 +1486,16 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }, 0);
 
     return sum / studentsWithTermAverage.length;
+  }
+
+  calculateClassAverageFromExcelData(): number {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) return 0;
+
+    const validData = this.processedExcelData.filter(row => (row.average || 0) > 0);
+    if (validData.length === 0) return 0;
+
+    const sum = validData.reduce((acc, row) => acc + (row.average || 0), 0);
+    return sum / validData.length;
   }
 
   calculateRankings(): void {
@@ -1986,6 +2002,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   getGradeStatistics(): GradeStatistics {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      return this.getGradeStatisticsFromExcelData();
+    }
+
+    // Fall back to regular student data
     const stats: GradeStatistics = {
       lessThan4: 0,
       between4and6: 0,
@@ -2000,6 +2022,34 @@ export class GradebookComponent implements OnInit, AfterViewInit {
 
     this.students.forEach(student => {
       const average = student.averages?.termAverage || 0;
+      if (average < 4) stats.lessThan4++;
+      else if (average < 6) stats.between4and6++;
+      else if (average < 8) stats.between6and8++;
+      else if (average < 10) stats.between8and10++;
+      else if (average < 12) stats.between10and12++;
+      else if (average < 14) stats.between12and14++;
+      else if (average < 16) stats.between14and16++;
+      else stats.greaterThan16++;
+    });
+
+    return stats;
+  }
+
+  getGradeStatisticsFromExcelData(): GradeStatistics {
+    const stats: GradeStatistics = {
+      lessThan4: 0,
+      between4and6: 0,
+      between6and8: 0,
+      between8and10: 0,
+      between10and12: 0,
+      between12and14: 0,
+      between14and16: 0,
+      greaterThan16: 0,
+      total: this.processedExcelData.length
+    };
+
+    this.processedExcelData.forEach(row => {
+      const average = row.average || 0;
       if (average < 4) stats.lessThan4++;
       else if (average < 6) stats.between4and6++;
       else if (average < 8) stats.between6and8++;
@@ -2042,6 +2092,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   }
 
   getGradeRangeDistribution(): GradeRangeDistribution {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      return this.getGradeRangeDistributionFromExcelData();
+    }
+
+    // Fall back to regular student data
     const dist: GradeRangeDistribution = {
       congratulations: 0, // >16
       encouragement: 0, // 14-16
@@ -2062,7 +2118,34 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     return dist;
   }
 
+  getGradeRangeDistributionFromExcelData(): GradeRangeDistribution {
+    const dist: GradeRangeDistribution = {
+      congratulations: 0, // >16
+      encouragement: 0, // 14-16
+      honorRoll: 0, // 12-14
+      none: 0, // 10-12
+      remarks: 0 // <10
+    };
+
+    this.processedExcelData.forEach(row => {
+      const average = row.average || 0;
+      if (average > 16) dist.congratulations++;
+      else if (average >= 14) dist.encouragement++;
+      else if (average >= 12) dist.honorRoll++;
+      else if (average >= 10) dist.none++;
+      else dist.remarks++;
+    });
+
+    return dist;
+  }
+
   getStudentsAbove10(): number {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      return this.getStudentsAbove10FromExcelData();
+    }
+
+    // Fall back to regular student data
     // عدد التلاميذ بمعدل ≥ 10 في الفصل الدراسي المحدد فقط
     return this.students.filter(s => {
       const termAvg = s.averages?.termAverage || 0;
@@ -2070,7 +2153,18 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }).length;
   }
 
+  getStudentsAbove10FromExcelData(): number {
+    if (!this.processedExcelData) return 0;
+    return this.processedExcelData.filter(row => (row.average || 0) >= 10).length;
+  }
+
   getStudentsBelow10(): number {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      return this.getStudentsBelow10FromExcelData();
+    }
+
+    // Fall back to regular student data
     // عدد التلاميذ بمعدل < 10 في الفصل الدراسي المحدد فقط
     return this.students.filter(s => {
       const termAvg = s.averages?.termAverage || 0;
@@ -2078,29 +2172,100 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }).length;
   }
 
+  getStudentsBelow10FromExcelData(): number {
+    if (!this.processedExcelData) return 0;
+    return this.processedExcelData.filter(row => (row.average || 0) > 0 && (row.average || 0) < 10).length;
+  }
+
   getHighestGrade(): { student: Student; grade: number } | null {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      const result = this.getHighestGradeFromExcelData();
+      if (result) {
+        // Create a mock student object for display purposes
+        const mockStudent: Student = {
+          id: 0,
+          firstName: result.firstName || '',
+          lastName: result.lastName || '',
+          idNumber: '',
+          averages: { termAverage: result.grade }
+        } as Student;
+        return { student: mockStudent, grade: result.grade };
+      }
+    }
+
+    // Fall back to regular student data
     const studentsWithGrades = this.students
       .filter(s => s.averages?.termAverage !== undefined)
       .sort((a, b) => (b.averages?.termAverage || 0) - (a.averages?.termAverage || 0));
-    
+
     if (studentsWithGrades.length === 0) return null;
-    
+
     return {
       student: studentsWithGrades[0],
       grade: studentsWithGrades[0].averages?.termAverage || 0
     };
   }
 
+  getHighestGradeFromExcelData(): { firstName: string; lastName: string; grade: number } | null {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) return null;
+
+    const validData = this.processedExcelData.filter(row => (row.average || 0) > 0);
+    if (validData.length === 0) return null;
+
+    const sorted = validData.sort((a, b) => (b.average || 0) - (a.average || 0));
+    const highest = sorted[0];
+
+    return {
+      firstName: highest.firstName || '',
+      lastName: highest.lastName || '',
+      grade: highest.average || 0
+    };
+  }
+
   getLowestGrade(): { student: Student; grade: number } | null {
+    // Check if we have processed Excel data from enhanced import
+    if (this.processedExcelData && this.processedExcelData.length > 0) {
+      const result = this.getLowestGradeFromExcelData();
+      if (result) {
+        // Create a mock student object for display purposes
+        const mockStudent: Student = {
+          id: 0,
+          firstName: result.firstName || '',
+          lastName: result.lastName || '',
+          idNumber: '',
+          averages: { termAverage: result.grade }
+        } as Student;
+        return { student: mockStudent, grade: result.grade };
+      }
+    }
+
+    // Fall back to regular student data
     const studentsWithGrades = this.students
       .filter(s => s.averages?.termAverage !== undefined)
       .sort((a, b) => (a.averages?.termAverage || 0) - (b.averages?.termAverage || 0));
-    
+
     if (studentsWithGrades.length === 0) return null;
-    
+
     return {
       student: studentsWithGrades[0],
       grade: studentsWithGrades[0].averages?.termAverage || 0
+    };
+  }
+
+  getLowestGradeFromExcelData(): { firstName: string; lastName: string; grade: number } | null {
+    if (!this.processedExcelData || this.processedExcelData.length === 0) return null;
+
+    const validData = this.processedExcelData.filter(row => (row.average || 0) > 0);
+    if (validData.length === 0) return null;
+
+    const sorted = validData.sort((a, b) => (a.average || 0) - (b.average || 0));
+    const lowest = sorted[0];
+
+    return {
+      firstName: lowest.firstName || '',
+      lastName: lowest.lastName || '',
+      grade: lowest.average || 0
     };
   }
 
