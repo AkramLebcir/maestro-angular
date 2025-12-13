@@ -368,6 +368,77 @@ export class SubscriptionManagementComponent implements OnInit {
     this.clearMessages();
   }
 
+  // ========== Create Subscription ==========
+  showSubscriptionForm = false;
+  subscriptionForm = {
+    userId: 0,
+    planId: 0,
+    startDate: '',
+    endDate: '',
+    notes: ''
+  };
+
+  openCreateSubscriptionForm(): void {
+    this.subscriptionForm = {
+      userId: 0,
+      planId: 0,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: '',
+      notes: ''
+    };
+    this.showSubscriptionForm = true;
+    this.clearMessages();
+  }
+
+  closeSubscriptionForm(): void {
+    this.showSubscriptionForm = false;
+    this.clearMessages();
+  }
+
+  saveSubscription(): void {
+    const userId = Number(this.subscriptionForm.userId);
+    const planId = Number(this.subscriptionForm.planId);
+    const startDate = this.subscriptionForm.startDate;
+    const endDate = this.subscriptionForm.endDate;
+
+    if (!userId || !planId || !startDate || !endDate) {
+      this.errorMessage = 'يرجى ملء جميع الحقول المطلوبة للاشتراك';
+      return;
+    }
+
+    // Backend CreateSubscriptionDto expects only userId, planId and optional notes.
+    const payload = {
+      userId,
+      planId,
+      notes: this.subscriptionForm.notes || ''
+    };
+
+    this.isLoading = true;
+    this.api.post('/subscriptions', payload).subscribe({
+      next: () => {
+        this.successMessage = 'تم إنشاء الاشتراك بنجاح';
+        this.closeSubscriptionForm();
+        this.loadSubscriptions();
+        this.loadStats();
+        this.loadPayments();
+      },
+      error: (err) => {
+        console.error('Error creating subscription:', err);
+        const errorMsg = err.error?.message || err.message || 'حدث خطأ أثناء إنشاء الاشتراك';
+        if (err.error?.message) {
+          if (Array.isArray(err.error.message)) {
+            this.errorMessage = 'أخطاء في التحقق: ' + err.error.message.join(', ');
+          } else {
+            this.errorMessage = errorMsg;
+          }
+        } else {
+          this.errorMessage = errorMsg;
+        }
+        this.isLoading = false;
+      }
+    });
+  }
+
   getSubscriptionStatusClass(status: string): string {
     const classes: Record<string, string> = {
       active: 'bg-green-100 text-green-800',

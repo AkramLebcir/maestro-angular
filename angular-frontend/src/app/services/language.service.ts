@@ -13558,6 +13558,33 @@ export class LanguageService {
         'DE': 'Nicht angegeben',
         'TR': 'Belirtilmemiş'
       },
+      'subscriptionManagement.addSubscription': {
+        'AR': '+ إضافة اشتراك جديد',
+        'FR': '+ Ajouter un nouvel abonnement',
+        'EN': '+ Add new subscription',
+        'ES': '+ Agregar nueva suscripción',
+        'IT': '+ Aggiungi nuovo abbonamento',
+        'DE': '+ Neues Abonnement hinzufügen',
+        'TR': '+ Yeni abonelik ekle'
+      },
+      'subscriptionManagement.selectTeacher': {
+        'AR': 'اختر الأستاذ',
+        'FR': 'Sélectionner l\'enseignant',
+        'EN': 'Select teacher',
+        'ES': 'Seleccionar profesor',
+        'IT': 'Seleziona insegnante',
+        'DE': 'Lehrer auswählen',
+        'TR': 'Öğretmen seç'
+      },
+      'subscriptionManagement.selectPlan': {
+        'AR': 'اختر الباقة',
+        'FR': 'Sélectionner le forfait',
+        'EN': 'Select plan',
+        'ES': 'Seleccionar plan',
+        'IT': 'Seleziona piano',
+        'DE': 'Plan auswählen',
+        'TR': 'Plan seç'
+      },
 
       // Module Access - Error messages
       'moduleAccess.error.loadUsers': {

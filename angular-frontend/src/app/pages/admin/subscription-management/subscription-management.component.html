@@ -140,6 +140,14 @@
   <div *ngIf="activeSection === 'subscriptions'" class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
     <div class="flex justify-between items-center mb-6">
       <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">{{ translate('subscriptionManagement.subscriptions') }}</h3>
+      <div>
+        <button
+          (click)="openCreateSubscriptionForm()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+        >
+          {{ translate('subscriptionManagement.addSubscription') }}
+        </button>
+      </div>
     </div>
 
     <div *ngIf="isLoading" class="text-center py-8 text-gray-500 dark:text-gray-400">{{ translate('common.loading') }}</div>
@@ -325,6 +333,47 @@
         <div class="flex justify-end space-x-3">
           <button type="button" (click)="closeActivateModal()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
           <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50">{{ translate('subscriptionManagement.activate') }}</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Create Subscription Modal -->
+  <div *ngIf="showSubscriptionForm" class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50" (click)="closeSubscriptionForm()">
+    <div class="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full mx-4" (click)="$event.stopPropagation()">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">{{ translate('subscriptionManagement.addSubscription') }}</h3>
+      <form (ngSubmit)="saveSubscription()">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.teacher') }}</label>
+            <select [(ngModel)]="subscriptionForm.userId" name="userId" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
+              <option [value]="0">{{ translate('subscriptionManagement.selectTeacher') }}</option>
+              <option *ngFor="let u of users" [value]="u.id">{{ (u.firstName || '') + ' ' + (u.lastName || '') }} - {{ u.email }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.plan') }}</label>
+            <select [(ngModel)]="subscriptionForm.planId" name="planId" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
+              <option [value]="0">{{ translate('subscriptionManagement.selectPlan') }}</option>
+              <option *ngFor="let p of plans" [value]="p.id">{{ p.name }} - {{ formatCurrency(p.price) }}</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.startDate') }}</label>
+            <input type="date" [(ngModel)]="subscriptionForm.startDate" name="startDate" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.endDate') }}</label>
+            <input type="date" [(ngModel)]="subscriptionForm.endDate" name="endDate" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2" required>
+          </div>
+        </div>
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('subscriptionManagement.notes') }}</label>
+          <textarea [(ngModel)]="subscriptionForm.notes" name="notes" rows="3" class="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2"></textarea>
+        </div>
+        <div class="flex justify-end space-x-3">
+          <button type="button" (click)="closeSubscriptionForm()" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">{{ translate('common.cancel') }}</button>
+          <button type="submit" [disabled]="isLoading" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">{{ translate('common.save') }}</button>
         </div>
       </form>
     </div>
