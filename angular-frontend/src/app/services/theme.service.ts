@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { LanguageService } from './language.service';
 
 export type ThemeMode = 'light' | 'dark';
 export type ThemeColor = 'blue' | 'emerald' | 'purple' | 'amber' | 'rose';
@@ -121,7 +122,7 @@ export class ThemeService {
   private currentColorSubject = new BehaviorSubject<ThemeColor>('blue');
   public currentColor$: Observable<ThemeColor> = this.currentColorSubject.asObservable();
 
-  constructor() {
+  constructor(private languageService: LanguageService) {
     // جلب المظهر المحفوظ من localStorage أو استخدام النظام الافتراضي
     const savedTheme = localStorage.getItem('appTheme') as ThemeMode;
     if (savedTheme && ['light', 'dark'].includes(savedTheme)) {
@@ -176,6 +177,10 @@ export class ThemeService {
 
   getColorPreview(color: ThemeColor): string {
     return COLOR_PALETTES[color]?.preview || COLOR_PALETTES['blue'].preview;
+  }
+
+  getColorName(color: ThemeColor): string {
+    return this.languageService.translate(`theme.color.${color}`) || color;
   }
 
   private applyTheme(theme: ThemeMode): void {

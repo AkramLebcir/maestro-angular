@@ -104,6 +104,53 @@ export class LanguageService {
         'DE': 'Themenfarbe',
         'TR': 'Tema rengi'
       },
+
+      // Theme Colors
+      'theme.color.blue': {
+        'AR': 'أزرق',
+        'FR': 'Bleu',
+        'EN': 'Blue',
+        'ES': 'Azul',
+        'IT': 'Blu',
+        'DE': 'Blau',
+        'TR': 'Mavi'
+      },
+      'theme.color.emerald': {
+        'AR': 'زمردي',
+        'FR': 'Émeraude',
+        'EN': 'Emerald',
+        'ES': 'Esmeralda',
+        'IT': 'Smeraldo',
+        'DE': 'Smaragd',
+        'TR': 'Zümrüt'
+      },
+      'theme.color.purple': {
+        'AR': 'بنفسجي',
+        'FR': 'Violet',
+        'EN': 'Purple',
+        'ES': 'Morado',
+        'IT': 'Viola',
+        'DE': 'Lila',
+        'TR': 'Mor'
+      },
+      'theme.color.amber': {
+        'AR': 'كهرماني',
+        'FR': 'Ambre',
+        'EN': 'Amber',
+        'ES': 'Ámbar',
+        'IT': 'Ambra',
+        'DE': 'Bernstein',
+        'TR': 'Kehribar'
+      },
+      'theme.color.rose': {
+        'AR': 'وردي',
+        'FR': 'Rose',
+        'EN': 'Rose',
+        'ES': 'Rosa',
+        'IT': 'Rosa',
+        'DE': 'Rosa',
+        'TR': 'Gül'
+      },
       'header.toggleMenu': {
         'AR': 'فتح وإغلاق القائمة الرئيسية',
         'FR': 'Ouvrir et fermer le menu principal',

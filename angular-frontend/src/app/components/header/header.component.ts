@@ -72,17 +72,10 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // خيارات ألوان الواجهة
-    const colorLabels: Record<ThemeColor, string> = {
-      blue: 'أزرق',
-      emerald: 'زمردي',
-      purple: 'بنفسجي',
-      amber: 'كهرماني',
-      rose: 'وردي'
-    };
+    // خيارات ألوان الواجهة مع الترجمة
     this.themeColorOptions = this.themeService.getAvailableColors().map(color => ({
       value: color,
-      label: colorLabels[color],
+      label: this.themeService.getColorName(color),
       preview: this.themeService.getColorPreview(color)
     }));
 
