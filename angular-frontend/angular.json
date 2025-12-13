@@ -42,6 +42,7 @@
               "canvg",
               "canvg/lib/index.es",
               "html2canvas",
+              "jspdf-autotable",
               "raf",
               "rgbcolor",
               "core-js/modules/es.array.index-of.js",

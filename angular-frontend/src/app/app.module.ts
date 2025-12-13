@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
@@ -41,6 +41,7 @@ import { SubscriptionPaymentComponent } from './pages/subscription-payment/subsc
 import { ReportGeneratorComponent } from './pages/report-generator/report-generator.component';
 import { ClubsComponent } from './pages/clubs/clubs.component';
 import { AuthInterceptor } from './services/auth-interceptor.service';
+import { GlobalErrorHandler } from './services/global-error-handler.service';
 
 @NgModule({
   declarations: [
@@ -93,6 +94,10 @@ import { AuthInterceptor } from './services/auth-interceptor.service';
       provide: HTTP_INTERCEPTORS,
       useClass: AuthInterceptor,
       multi: true
+    },
+    {
+      provide: ErrorHandler,
+      useClass: GlobalErrorHandler
     }
   ],
   bootstrap: [AppComponent]
