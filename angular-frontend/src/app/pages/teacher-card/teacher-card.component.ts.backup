@@ -148,7 +148,7 @@ export class TeacherCardComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    public languageService: LanguageService
+    private languageService: LanguageService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {

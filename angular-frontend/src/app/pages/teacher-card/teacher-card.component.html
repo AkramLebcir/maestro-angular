@@ -55,13 +55,16 @@
           </div>
         </div>
         <div class="flex flex-col items-center justify-center gap-3 w-full max-w-full">
-          <div class="w-28 sm:w-32 h-36 sm:h-40 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 max-w-full" style="max-width: 100%;">
-            <ng-container *ngIf="teacherCard.photoDataUrl; else photoPlaceholder">
-              <img [src]="teacherCard.photoDataUrl" [alt]="translate('teacherCard.photo')" class="w-full h-full object-cover max-w-full" style="max-width: 100%;" />
-            </ng-container>
-            <ng-template #photoPlaceholder>{{ translate('teacherCard.photo') }}</ng-template>
+          <!-- صورة الأستاذ -->
+          <div class="flex flex-col items-center gap-2">
+            <div class="w-28 sm:w-32 h-36 sm:h-40 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900 max-w-full" style="max-width: 100%;">
+              <ng-container *ngIf="teacherCard.photoDataUrl; else photoPlaceholder">
+                <img [src]="teacherCard.photoDataUrl" [alt]="translate('teacherCard.photo')" class="w-full h-full object-cover max-w-full" style="max-width: 100%;" />
+              </ng-container>
+              <ng-template #photoPlaceholder>{{ translate('teacherCard.photo') }}</ng-template>
+            </div>
+            <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="text-xs w-full sm:w-auto max-w-full" style="max-width: 100%;" />
           </div>
-          <input type="file" accept="image/*" (change)="onPhotoSelected($event)" class="text-xs w-full sm:w-auto max-w-full" style="max-width: 100%;" />
         </div>
       </div>
 
@@ -368,6 +371,17 @@
             <label class="text-sm text-gray-700 dark:text-gray-300 sm:col-span-1">{{ translate('teacherCard.bloodType') }} :</label>
             <input class="sm:col-span-2 input-field" type="text" [(ngModel)]="teacherCard.bloodType" />
           </div>
+
+          <!-- توقيع الأستاذ - مباشرة تحت الزمرة الدموية -->
+          <div class="mt-2 flex flex-col items-center gap-1 w-full">
+            <div class="w-24 sm:w-32 h-12 sm:h-16 border-2 border-gray-400 flex items-center justify-center text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-900">
+              <ng-container *ngIf="teacherCard.signatureDataUrl; else signaturePlaceholder">
+                <img [src]="teacherCard.signatureDataUrl" [alt]="translate('teacherCard.signature')" class="w-full h-full object-contain" />
+              </ng-container>
+              <ng-template #signaturePlaceholder>{{ translate('teacherCard.signature') }}</ng-template>
+            </div>
+            <input type="file" accept="image/*" (change)="onSignatureSelected($event)" class="text-xs w-full sm:w-auto" />
+          </div>
         </div>
       </div>
 
@@ -547,6 +561,16 @@
           <div class="print-row">
             <span class="print-label">{{ translate('teacherCard.bloodType') }} :</span>
             <span class="print-value">{{ teacherCard.bloodType }}</span>
+          </div>
+
+          <!-- توقيع الأستاذ في نسخة الطباعة -->
+          <div class="print-signature-row">
+            <ng-container *ngIf="teacherCard.signatureDataUrl; else printSignaturePlaceholder">
+              <img [src]="teacherCard.signatureDataUrl" [alt]="translate('teacherCard.signature')" class="print-signature-image" />
+            </ng-container>
+            <ng-template #printSignaturePlaceholder>
+              <div class="print-signature-placeholder-small">{{ translate('teacherCard.signature') }}</div>
+            </ng-template>
           </div>
           <div class="print-row">
             <span class="print-label">{{ translate('teacherCard.address') }} :</span>

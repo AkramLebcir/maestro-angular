@@ -11050,6 +11050,15 @@ export class LanguageService {
         'DE': 'Lehrerfoto',
         'TR': 'Öğretmen fotoğrafı'
       },
+      'teacherCard.signature': {
+        'AR': 'توقيع الأستاذ',
+        'FR': 'Signature du professeur',
+        'EN': 'Teacher signature',
+        'ES': 'Firma del profesor',
+        'IT': 'Firma insegnante',
+        'DE': 'Lehrerunterschrift',
+        'TR': 'Öğretmen imzası'
+      },
       'teacherCard.familyStatus': {
         'AR': 'الحالة العائلية',
         'FR': 'Situation familiale',
