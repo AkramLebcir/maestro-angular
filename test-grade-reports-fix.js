@@ -140,3 +140,4 @@ const expectedDbAvg = (16.0 + 13.5) / 2;
 console.log('✓ Database average calculation correct:', Math.abs(avgWithoutExcel - expectedDbAvg) < 0.01);
 
 console.log('\n🎉 Grade reports fix is working correctly!');
+

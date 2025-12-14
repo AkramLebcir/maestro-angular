@@ -4,3 +4,4 @@ import { CreateFinalCouncilDecisionDto } from './create-final-council-decision.d
 export class UpdateFinalCouncilDecisionDto extends PartialType(CreateFinalCouncilDecisionDto) {}
 
 
+
