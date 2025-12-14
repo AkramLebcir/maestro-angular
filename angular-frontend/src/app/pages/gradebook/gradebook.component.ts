@@ -212,6 +212,7 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   selectedLanguage: 'AR' | 'FR' | 'EN' = 'AR';
   // التحكم في توليد الملاحظات (obs) والإرشادات (cons) تلقائياً عند الاستيراد المحسّن
   autoGenerateObsCons: boolean = true;
+  autoGenerateObsOnly: boolean = false; // تطبيق الملاحظات فقط دون الإرشادات
   processedExcelData: any[] = [];
   processedSheetsData: { sheetName: string; data: any[] }[] = [];
   // نتائج أخطاء النقاط المستخدمة في تقرير مراقبة النقاط
@@ -274,6 +275,12 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   finalStudentsWithDecisions: (Student & { finalDecision?: FinalCouncilDecision })[] = [];
   editingCouncilRecord: { [key: string]: boolean } = {};
   editingFinalDecision: { [key: string]: boolean } = {};
+
+  // Hover card variables
+  hoveredStudent: (Student & { councilRecord?: CouncilSemesterRecord }) | null = null;
+  hoverCardPosition: { top: number; left: number } | null = null;
+  studentAttendanceSummary: { present: number; total: number; percentage: number } | null = null;
+  studentBehaviorSummary: { rating: number; events: any[] } | null = null;
   // Cache Arabic font to avoid repeated fetches and to register bold style safely
   private amiriFontBase64?: string;
   
@@ -3059,7 +3066,24 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     this.processedSheetsData = [];
     this.selectedLevel = 'primary';
     this.selectedLanguage = 'AR';
-    this.autoGenerateObsCons = true;
+    this.updateAutoGenerateOptions();
+  }
+
+  onLevelChange(): void {
+    this.updateAutoGenerateOptions();
+  }
+
+  private updateAutoGenerateOptions(): void {
+    // تعيين خيارات التوليد التلقائي حسب المستوى
+    if (this.selectedLevel === 'middle') {
+      // للطور المتوسط: تطبيق الملاحظات فقط دون الإرشادات
+      this.autoGenerateObsOnly = true;
+      this.autoGenerateObsCons = false;
+    } else {
+      // للمستويات الأخرى: تطبيق الملاحظات والإرشادات معاً
+      this.autoGenerateObsCons = true;
+      this.autoGenerateObsOnly = false;
+    }
   }
 
   closeEnhancedImportModal(): void {
@@ -3419,6 +3443,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         // Generate automatically based on average
         observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
         guidance = this.generateGuidance(average, this.selectedLevel, this.selectedLanguage);
+      } else if (this.autoGenerateObsOnly) {
+        // Generate observations only, no guidance
+        observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
+        guidance = ''; // Leave guidance empty
       } else {
         // Read from Excel file if columns exist
         if (observationColIndex !== -1) {
@@ -6596,6 +6624,110 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     } else if (tab === 'final' && this.councilSelectedClass) {
       this.loadFinalCouncilDecisions();
     }
+  }
+
+  // =================== Student Hover Card Methods ===================
+
+  showStudentHoverCard(student: Student & { councilRecord?: CouncilSemesterRecord }, event?: MouseEvent): void {
+    this.hoveredStudent = student;
+
+    // Calculate position for the hover card
+    if (event) {
+      const rect = (event.target as HTMLElement).getBoundingClientRect();
+      const cardWidth = 320; // w-80 = 320px
+      const cardHeight = 200; // approximate height
+
+      // Use page offsets to account for zoom levels
+      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft || document.body.scrollLeft || 0;
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+      let left = rect.right + scrollLeft + 10; // Position to the right of the image
+      let top = rect.top + scrollTop; // Align with the top of the image
+
+      // Ensure the card stays within viewport bounds
+      const viewportWidth = window.innerWidth;
+      const viewportHeight = window.innerHeight;
+
+      // Adjust horizontal position if it goes off-screen (prefer left side if right side doesn't fit)
+      if (left + cardWidth > viewportWidth + scrollLeft) {
+        left = rect.left + scrollLeft - cardWidth - 10; // Show on the left side
+      }
+      if (left < scrollLeft + 10) {
+        left = scrollLeft + 10;
+      }
+
+      // Adjust vertical position if it goes off-screen
+      if (top + cardHeight > viewportHeight + scrollTop) {
+        top = viewportHeight + scrollTop - cardHeight - 10; // Move up to fit in viewport
+      }
+
+      this.hoverCardPosition = {
+        top: top,
+        left: left
+      };
+    }
+
+    // Load student attendance and behavior data
+    this.loadStudentAttendanceSummary(student.id);
+    this.loadStudentBehaviorSummary(student.id);
+  }
+
+  hideStudentHoverCard(): void {
+    this.hoveredStudent = null;
+    this.hoverCardPosition = null;
+    this.studentAttendanceSummary = null;
+    this.studentBehaviorSummary = null;
+  }
+
+  private loadStudentAttendanceSummary(studentId: number): void {
+    // Load attendance records for the current term/class
+    this.apiService.get<any[]>(`/attendance?studentId=${studentId}&classId=${this.councilSelectedClass?.id}`).subscribe({
+      next: (records) => {
+        const totalDays = records.length;
+        const presentDays = records.filter(r => r.status === 'present').length;
+        const percentage = totalDays > 0 ? Math.round((presentDays / totalDays) * 100) : 0;
+
+        this.studentAttendanceSummary = {
+          present: presentDays,
+          total: totalDays,
+          percentage: percentage
+        };
+      },
+      error: (error) => {
+        console.error('Error loading attendance summary:', error);
+        this.studentAttendanceSummary = { present: 0, total: 0, percentage: 0 };
+      }
+    });
+  }
+
+  private loadStudentBehaviorSummary(studentId: number): void {
+    // Load behavior events for the current term/class
+    this.apiService.get<any[]>(`/behavior-events?studentId=${studentId}&classId=${this.councilSelectedClass?.id}`).subscribe({
+      next: (events) => {
+        // Calculate behavior rating based on events (simplified logic)
+        let rating = 3; // Default neutral rating
+
+        if (events.length > 0) {
+          const positiveEvents = events.filter(e => e.behaviorType === 'positive').length;
+          const negativeEvents = events.filter(e => e.behaviorType === 'negative').length;
+
+          if (positiveEvents > negativeEvents) {
+            rating = Math.min(5, 3 + Math.floor((positiveEvents - negativeEvents) / 2));
+          } else if (negativeEvents > positiveEvents) {
+            rating = Math.max(1, 3 - Math.floor((negativeEvents - positiveEvents) / 2));
+          }
+        }
+
+        this.studentBehaviorSummary = {
+          rating: rating,
+          events: events
+        };
+      },
+      error: (error) => {
+        console.error('Error loading behavior summary:', error);
+        this.studentBehaviorSummary = { rating: 3, events: [] };
+      }
+    });
   }
 }
 

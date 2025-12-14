@@ -10,6 +10,19 @@ import { BehaviorEventResponseDto } from './dto/behavior-event-response.dto';
 
 @Injectable()
 export class BehaviorEventsService {
+  private behaviors = [
+    { id: 1, type: 'positive', name: 'Good General Behavior', nameAr: 'سلوك عام جيد' },
+    { id: 2, type: 'positive', name: 'Good Progress', nameAr: 'تقدم جيد' },
+    { id: 3, type: 'positive', name: 'Helpful', nameAr: 'متعاون' },
+    { id: 4, type: 'positive', name: 'Homework done on time', nameAr: 'إنجاز الواجب في الوقت المحدد' },
+    { id: 5, type: 'positive', name: 'Participating', nameAr: 'مشارك' },
+    { id: 6, type: 'negative', name: 'Generally Bad Behavior', nameAr: 'سلوك عام سيء' },
+    { id: 7, type: 'negative', name: 'Uses Mobile Phones Excessively', nameAr: 'استخدام الهاتف بشكل مفرط' },
+    { id: 8, type: 'negative', name: 'Fighting', nameAr: 'شجار' },
+    { id: 9, type: 'negative', name: 'Homework Issues', nameAr: 'مشاكل في الواجب' },
+    { id: 10, type: 'negative', name: 'Chatting', nameAr: 'ثرثرة' }
+  ];
+
   constructor(
     @InjectRepository(BehaviorEvent)
     private behaviorEventRepository: Repository<BehaviorEvent>,
@@ -158,6 +171,7 @@ export class BehaviorEventsService {
   }
 
   private mapToResponseDto(behaviorEvent: BehaviorEvent): BehaviorEventResponseDto {
+    const behavior = this.behaviors.find(b => b.id === behaviorEvent.behaviorId);
     return {
       id: behaviorEvent.id,
       studentId: behaviorEvent.studentId,
@@ -170,8 +184,9 @@ export class BehaviorEventsService {
           }
         : undefined,
       behaviorId: behaviorEvent.behaviorId,
-      date: behaviorEvent.date instanceof Date 
-        ? behaviorEvent.date.toISOString().split('T')[0] 
+      behaviorType: behavior?.type,
+      date: behaviorEvent.date instanceof Date
+        ? behaviorEvent.date.toISOString().split('T')[0]
         : behaviorEvent.date,
       description: behaviorEvent.description,
       classId: behaviorEvent.classId,

@@ -8,6 +8,7 @@ export class BehaviorEventResponseDto {
     photo?: string;
   };
   behaviorId: number;
+  behaviorType?: string; // positive or negative
   date: Date | string;
   description?: string;
   classId?: number;

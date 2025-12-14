@@ -2641,6 +2641,24 @@ export class LanguageService {
         'DE': 'Verhalten',
         'TR': 'Davranış'
       },
+      'gradebook.daysPresent': {
+        'AR': 'أيام الحضور',
+        'FR': 'Jours présents',
+        'EN': 'Days Present',
+        'ES': 'Días Presentes',
+        'IT': 'Giorni Presenti',
+        'DE': 'Anwesende Tage',
+        'TR': 'Mevcut Günler'
+      },
+      'gradebook.studentId': {
+        'AR': 'رقم التلميذ',
+        'FR': 'Numéro d\'étudiant',
+        'EN': 'Student ID',
+        'ES': 'ID del Estudiante',
+        'IT': 'ID Studente',
+        'DE': 'Studenten-ID',
+        'TR': 'Öğrenci Numarası'
+      },
       'gradebook.automatic': {
         'AR': 'تلقائي',
         'FR': 'Automatique',
