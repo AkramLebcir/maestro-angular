@@ -2153,10 +2153,10 @@
                 <span class="text-sm font-medium text-purple-800 dark:text-purple-200">{{ translate('gradebook.marks') }}</span>
               </div>
               <p class="text-sm text-purple-700 dark:text-purple-300">
-                {{ translate('gradebook.teacherAverage') }}: {{ (hoveredStudent?.councilRecord?.teacherAverage ?? 0).toFixed(2) }}/20
+                {{ translate('gradebook.teacherAverage') }}: {{ (hoveredStudent.councilRecord.teacherAverage ?? 0).toFixed(2) }}/20
               </p>
               <p class="text-sm text-purple-700 dark:text-purple-300">
-                {{ translate('gradebook.semesterAverage') }}: {{ (hoveredStudent?.councilRecord?.semesterAverage ?? 0).toFixed(2) }}/20
+                {{ translate('gradebook.semesterAverage') }}: {{ (hoveredStudent.councilRecord.semesterAverage ?? 0).toFixed(2) }}/20
               </p>
             </div>
           </div>
