@@ -8,6 +8,8 @@ import {
   Query,
   UploadedFile,
   UseInterceptors,
+  HttpException,
+  HttpStatus,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -21,6 +23,8 @@ import { PedagogicalDocument } from './pedagogical-document.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUser } from '../auth/interfaces/auth-user.interface';
 import { ModuleAccess } from '../auth/decorators/module-access.decorator';
+import { GeminiService } from './gemini.service';
+import { GenerateLessonPlanDto, GenerateLessonPlanResponseDto } from './dto/generate-lesson-plan.dto';
 
 const storage = diskStorage({
   destination: (_req, _file, cb) => {
@@ -51,7 +55,10 @@ const allowedMimeTypes = new Set([
 @Controller('pedagogical-docs')
 @ModuleAccess('pedagogical-docs')
 export class PedagogicalDocsController {
-  constructor(private readonly service: PedagogicalDocsService) {}
+  constructor(
+    private readonly service: PedagogicalDocsService,
+    private readonly geminiService: GeminiService,
+  ) {}
 
   @Post()
   @UseInterceptors(
@@ -105,6 +112,22 @@ export class PedagogicalDocsController {
       throw new BadRequestException('معرف الوثيقة غير صحيح.');
     }
     return this.service.delete(user.id, documentId);
+  }
+
+  @Post('generate-lesson-plan')
+  async generateLessonPlan(
+    @CurrentUser() user: AuthUser,
+    @Body() dto: GenerateLessonPlanDto,
+  ): Promise<GenerateLessonPlanResponseDto> {
+    try {
+      return await this.geminiService.generateLessonPlan(dto);
+    } catch (error: any) {
+      console.error('Error in generateLessonPlan controller:', error);
+      throw new HttpException(
+        error.message || 'فشل في توليد خطة الدرس',
+        error.status || HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }
 

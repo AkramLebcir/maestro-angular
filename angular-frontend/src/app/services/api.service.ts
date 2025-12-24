@@ -144,4 +144,23 @@ export class ApiService {
       headers: this.getHeaders()
     });
   }
+
+  /**
+   * Generate lesson plan using AI
+   */
+  generateLessonPlan(payload: {
+    level: string;
+    section: string;
+    conceptualField: string;
+    conceptualUnit: string;
+    lessonTitle: string;
+    targetCompetency: string;
+    classLevel: string;
+    subject: string;
+    sessionDuration: number;
+  }): Observable<any> {
+    return this.http.post(`${this.apiUrl}/pedagogical-docs/generate-lesson-plan`, payload, {
+      headers: this.getHeaders()
+    });
+  }
 }

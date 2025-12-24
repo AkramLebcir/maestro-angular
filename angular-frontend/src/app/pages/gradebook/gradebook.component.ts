@@ -210,6 +210,9 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   // نتائج أخطاء النقاط المستخدمة في تقرير مراقبة النقاط
   gradeMonitoringErrors: any[] = [];
   isProcessing = false;
+  // حفظ ملف Excel الأصلي لإضافته الملاحظات والإرشادات دون تغيير البنية
+  originalWorkbook: XLSX.WorkBook | null = null;
+  originalFileName: string = '';
   
   // Import options
   importMode: 'single' | 'multiple' = 'single'; // استيراد نوع واحد أو جميع الأنواع
@@ -3180,6 +3183,10 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         const data = new Uint8Array(e.target.result);
         const workbook = XLSX.read(data, { type: 'array' });
         
+        // حفظ ملف Excel الأصلي واسمه لإضافته الملاحظات والإرشادات لاحقاً
+        this.originalWorkbook = workbook;
+        this.originalFileName = file.name;
+        
         const sheetNames = workbook.SheetNames;
         
         // Process all sheets
@@ -3229,9 +3236,10 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       return [];
     }
 
-    // Find header row
+    // Find header row - يمكن أن يكون في السطر 8 أو 9 أو 10 أو قبل ذلك
     let headerRow = 0;
-    for (let i = 0; i < Math.min(10, data.length); i++) {
+    // البحث في أول 15 سطر للسماح بوجود رؤوس في السطر 8 أو 9 أو 10
+    for (let i = 0; i < Math.min(15, data.length); i++) {
       const row = data[i];
       if (Array.isArray(row) && row.some((cell: any) => {
         const cellStr = String(cell || '').toLowerCase();
@@ -3241,7 +3249,13 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
                cellStr.includes('score') ||
                cellStr.includes('درجة') ||
                cellStr.includes('note') ||
-               cellStr.includes('mark');
+               cellStr.includes('mark') ||
+               cellStr.includes('obs') ||
+               cellStr.includes('ملاحظات') ||
+               cellStr.includes('cons') ||
+               cellStr.includes('إرشادات') ||
+               cellStr.includes('observation') ||
+               cellStr.includes('guidance');
       })) {
         headerRow = i;
         break;
@@ -3748,6 +3762,12 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    // إذا كان لدينا ملف Excel الأصلي، نستخدمه ونضيف الملاحظات والإرشادات فقط
+    if (this.originalWorkbook) {
+      this.downloadProcessedExcelWithOriginalStructure();
+      return;
+    }
+
     // Create workbook
     const wb = XLSX.utils.book_new();
 
@@ -4117,6 +4137,221 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     // Save file
+    XLSX.writeFile(wb, fileName);
+  }
+
+  downloadProcessedExcelWithOriginalStructure(): void {
+    if (!this.originalWorkbook) {
+      alert('لا يوجد ملف Excel أصلي');
+      return;
+    }
+
+    // إنشاء نسخة من الملف الأصلي
+    const wb = XLSX.utils.book_new();
+
+    // معالجة كل صفحة من الملف الأصلي
+    const sheetNames = this.originalWorkbook.SheetNames;
+    
+    for (let sheetIndex = 0; sheetIndex < sheetNames.length; sheetIndex++) {
+      const sheetName = sheetNames[sheetIndex];
+      const originalSheet = this.originalWorkbook.Sheets[sheetName];
+      
+      // تحويل الصفحة إلى مصفوفة ثنائية الأبعاد مع الحفاظ على البنية
+      const sheetData: any[][] = XLSX.utils.sheet_to_json(originalSheet, { 
+        header: 1, 
+        defval: '',
+        raw: false 
+      });
+
+      if (!sheetData || sheetData.length === 0) {
+        // إذا كانت الصفحة فارغة، نضيفها كما هي
+        const ws = XLSX.utils.aoa_to_sheet(sheetData);
+        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        continue;
+      }
+
+      // البحث عن صف الرؤوس - يمكن أن يكون في السطر 8 أو 9 أو 10 أو قبل ذلك
+      let headerRow = 0;
+      // البحث في أول 15 سطر للسماح بوجود رؤوس في السطر 8 أو 9 أو 10
+      for (let i = 0; i < Math.min(15, sheetData.length); i++) {
+        const row = sheetData[i];
+        if (Array.isArray(row) && row.some((cell: any) => {
+          const cellStr = String(cell || '').toLowerCase();
+          return cellStr.includes('name') || 
+                 cellStr.includes('اسم') || 
+                 cellStr.includes('nom') ||
+                 cellStr.includes('score') ||
+                 cellStr.includes('درجة') ||
+                 cellStr.includes('obs') ||
+                 cellStr.includes('ملاحظات') ||
+                 cellStr.includes('cons') ||
+                 cellStr.includes('إرشادات') ||
+                 cellStr.includes('observation') ||
+                 cellStr.includes('guidance');
+        })) {
+          headerRow = i;
+          break;
+        }
+      }
+
+      const headers = sheetData[headerRow] || [];
+      
+      // البحث عن أعمدة الملاحظات/التقديرات والإرشادات الموجودة في الملف الأصلي
+      let notesColIndex = -1;
+      let guidanceColIndex = -1;
+      
+      for (let colIndex = 0; colIndex < headers.length; colIndex++) {
+        const header = String(headers[colIndex] || '').toLowerCase().trim();
+        if (notesColIndex === -1 && (
+          header.includes('obs') || 
+          header.includes('ملاحظات') || 
+          header.includes('observation') ||
+          header.includes('ملاحظة') ||
+          header.includes('ratings') ||
+          header.includes('تقديرات') ||
+          header.includes('rating') ||
+          header.includes('تقييم') ||
+          header.includes('appréciation') ||
+          header.includes('appreciation')
+        )) {
+          notesColIndex = colIndex;
+        }
+        if (guidanceColIndex === -1 && (
+          header.includes('cons') || 
+          header.includes('إرشادات') || 
+          header.includes('guidance') ||
+          header.includes('إرشاد') ||
+          header.includes('conseils') ||
+          header.includes('conseil')
+        )) {
+          guidanceColIndex = colIndex;
+        }
+      }
+
+      // البحث عن البيانات المعالجة لهذه الصفحة
+      const sheetProcessedData = this.processedSheetsData.find(s => s.sheetName === sheetName);
+      
+      // إنشاء خريطة للبيانات المعالجة باستخدام الاسم أو رقم الهوية
+      // نستخدم عدة مفاتيح للمطابقة الأفضل
+      const processedDataMap = new Map<string, { observation: string; guidance: string; rowIndex?: number }>();
+      
+      if (sheetProcessedData) {
+        sheetProcessedData.data.forEach((row: any, index: number) => {
+          // مفاتيح متعددة للمطابقة
+          const key1 = `${row.firstName || ''}_${row.lastName || ''}_${row.id || ''}`.trim().toLowerCase();
+          const key2 = `${row.firstName || ''}_${row.lastName || ''}`.trim().toLowerCase();
+          const key3 = `${row.lastName || ''}_${row.firstName || ''}`.trim().toLowerCase();
+          const key4 = `${row.id || ''}`.trim().toLowerCase();
+          
+          const data = {
+            observation: row.observation || '',
+            guidance: row.guidance || '',
+            rowIndex: headerRow + 1 + index // تقدير موضع الصف في الملف الأصلي
+          };
+          
+          processedDataMap.set(key1, data);
+          if (key2 !== key1) processedDataMap.set(key2, data);
+          if (key3 !== key2 && key3 !== key1) processedDataMap.set(key3, data);
+          if (key4 && key4 !== key1 && key4 !== key2 && key4 !== key3) processedDataMap.set(key4, data);
+        });
+      }
+
+      // إضافة البيانات إلى الصفوف
+      for (let rowIndex = headerRow + 1; rowIndex < sheetData.length; rowIndex++) {
+        const row = sheetData[rowIndex];
+        if (!row || row.length === 0) continue;
+
+        // البحث عن الاسم في الصف
+        let firstName = '';
+        let lastName = '';
+        let id = '';
+        
+        // البحث عن عمود الاسم
+        for (let colIndex = 0; colIndex < headers.length; colIndex++) {
+          const header = String(headers[colIndex] || '').toLowerCase();
+          if (header.includes('firstname') || (header.includes('الاسم') && !header.includes('اللقب'))) {
+            firstName = String(row[colIndex] || '').trim();
+          } else if (header.includes('lastname') || header.includes('اللقب') || (header.includes('nom') && !header.includes('prénom'))) {
+            lastName = String(row[colIndex] || '').trim();
+          } else if (header.includes('name') && !header.includes('first') && !header.includes('last') && !firstName && !lastName) {
+            const fullName = String(row[colIndex] || '').trim();
+            const nameParts = fullName.split(/\s+/);
+            if (nameParts.length >= 2) {
+              firstName = nameParts[0];
+              lastName = nameParts.slice(1).join(' ');
+            } else {
+              firstName = fullName;
+            }
+          } else if ((header.includes('id') || header.includes('رقم') || header.includes('code')) && !id) {
+            id = String(row[colIndex] || '').trim();
+          }
+        }
+
+        // البحث عن البيانات المعالجة المطابقة (نحاول عدة مفاتيح)
+        let matchedData = processedDataMap.get(`${firstName}_${lastName}_${id}`.trim().toLowerCase());
+        if (!matchedData) {
+          matchedData = processedDataMap.get(`${firstName}_${lastName}`.trim().toLowerCase());
+        }
+        if (!matchedData) {
+          matchedData = processedDataMap.get(`${lastName}_${firstName}`.trim().toLowerCase());
+        }
+        if (!matchedData && id) {
+          matchedData = processedDataMap.get(id.trim().toLowerCase());
+        }
+        
+        // إذا لم نجد مطابقة دقيقة، نبحث عن مطابقة جزئية بالاسم
+        if (!matchedData && (firstName || lastName)) {
+          for (const [mapKey, mapValue] of processedDataMap.entries()) {
+            if ((firstName && mapKey.includes(firstName.toLowerCase())) || 
+                (lastName && mapKey.includes(lastName.toLowerCase()))) {
+              matchedData = mapValue;
+              break;
+            }
+          }
+        }
+
+        // ملء أعمدة الملاحظات والإرشادات إذا كانت موجودة في الملف الأصلي
+        if (notesColIndex !== -1 && matchedData?.observation) {
+          // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
+          while (row.length <= notesColIndex) {
+            row.push('');
+          }
+          row[notesColIndex] = matchedData.observation;
+        }
+
+        if (guidanceColIndex !== -1 && matchedData?.guidance) {
+          // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
+          while (row.length <= guidanceColIndex) {
+            row.push('');
+          }
+          row[guidanceColIndex] = matchedData.guidance;
+        }
+      }
+
+      // إنشاء ورقة عمل جديدة مع الحفاظ على البيانات الأصلية
+      const ws = XLSX.utils.aoa_to_sheet(sheetData);
+
+      // نسخ التنسيق من الملف الأصلي (إن أمكن)
+      // ملاحظة: XLSX لا يدعم نسخ التنسيق الكامل، لكننا نحافظ على البيانات
+      
+      // تنظيف اسم الصفحة
+      let cleanSheetName = sheetName || `Sheet${sheetIndex + 1}`;
+      cleanSheetName = cleanSheetName.substring(0, 31);
+      cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_');
+      
+      XLSX.utils.book_append_sheet(wb, ws, cleanSheetName);
+    }
+
+    // إنشاء اسم الملف بناءً على الاسم الأصلي مع إضافة "مملوء"
+    let fileName = 'ملف_مملوء.xlsx';
+    if (this.originalFileName) {
+      // استخراج الاسم بدون الامتداد
+      const nameWithoutExt = this.originalFileName.replace(/\.(xlsx|xls)$/i, '');
+      // إضافة "مملوء" قبل الامتداد
+      fileName = `${nameWithoutExt}_مملوء.xlsx`;
+    }
+
+    // حفظ الملف
     XLSX.writeFile(wb, fileName);
   }
 
