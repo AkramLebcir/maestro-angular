@@ -6,6 +6,15 @@ import { ChartConfiguration, ChartOptions, ChartData } from 'chart.js';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 
+export interface SpecialCase {
+  category: 'health' | 'exemption' | 'learning_difficulty';
+  details: string;
+  requiredAction: string;
+  attachments?: string[];
+  startDate?: string;
+  endDate?: string;
+}
+
 export interface Student {
   id: number;
   idNumber?: string;
@@ -18,6 +27,7 @@ export interface Student {
   studentId?: string;
   photo?: string;
   generalNotes?: string;
+  specialCases?: SpecialCase[] | null;
   classId?: number;
   group?: 1 | 2 | null;
   class?: {
@@ -41,6 +51,7 @@ export interface CreateStudentDto {
   studentId?: string;
   photo?: string;
   generalNotes?: string;
+  specialCases?: SpecialCase[];
   classId?: number;
   group?: 1 | 2 | null;
   email?: string;
@@ -88,6 +99,13 @@ export class StudentsComponent implements OnInit {
   // File upload
   selectedFile: File | null = null;
   photoPreview: string | null = null;
+  
+  // Special Cases Management
+  showPrivacyMode: boolean = false; // Privacy toggle for hiding sensitive cases
+  editingSpecialCaseIndex: number | null = null;
+  currentSpecialCase: Partial<SpecialCase> = {};
+  specialCaseAttachmentFiles: File[] = [];
+  specialCaseAttachmentPreviews: string[] = [];
   
   // Excel import
   isImporting: boolean = false;
@@ -305,10 +323,12 @@ export class StudentsComponent implements OnInit {
       lastName: '',
       firstName: '',
       isRepeater: false,
-      group: null
+      group: null,
+      specialCases: []
     };
     this.photoPreview = null;
     this.selectedFile = null;
+    this.resetSpecialCaseForm();
     this.showModal = true;
   }
 
@@ -325,6 +345,7 @@ export class StudentsComponent implements OnInit {
       studentId: student.studentId,
       photo: student.photo,
       generalNotes: student.generalNotes,
+      specialCases: student.specialCases ? [...student.specialCases] : [],
       classId: student.classId,
       group: student.group || null,
       email: student.email,
@@ -332,6 +353,7 @@ export class StudentsComponent implements OnInit {
     };
     this.photoPreview = student.photo || null;
     this.selectedFile = null;
+    this.resetSpecialCaseForm();
     this.showModal = true;
   }
 
@@ -340,6 +362,182 @@ export class StudentsComponent implements OnInit {
     this.editingStudent = null;
     this.photoPreview = null;
     this.selectedFile = null;
+    this.resetSpecialCaseForm();
+  }
+
+  // Special Cases Management Methods
+  resetSpecialCaseForm(): void {
+    this.editingSpecialCaseIndex = null;
+    this.currentSpecialCase = {};
+    this.specialCaseAttachmentFiles = [];
+    this.specialCaseAttachmentPreviews = [];
+  }
+
+  addSpecialCase(): void {
+    if (!this.formData.specialCases) {
+      this.formData.specialCases = [];
+    }
+    this.editingSpecialCaseIndex = this.formData.specialCases.length;
+    this.currentSpecialCase = {
+      category: 'health',
+      details: '',
+      requiredAction: '',
+      attachments: [],
+      startDate: '',
+      endDate: ''
+    };
+  }
+
+  editSpecialCase(index: number): void {
+    if (!this.formData.specialCases || !this.formData.specialCases[index]) return;
+    this.editingSpecialCaseIndex = index;
+    this.currentSpecialCase = { ...this.formData.specialCases[index] };
+    this.specialCaseAttachmentPreviews = this.currentSpecialCase.attachments || [];
+  }
+
+  saveSpecialCase(): void {
+    if (!this.currentSpecialCase.category || !this.currentSpecialCase.details || !this.currentSpecialCase.requiredAction) {
+      alert('يرجى ملء جميع الحقول المطلوبة');
+      return;
+    }
+
+    if (!this.formData.specialCases) {
+      this.formData.specialCases = [];
+    }
+
+    const specialCase: SpecialCase = {
+      category: this.currentSpecialCase.category as 'health' | 'exemption' | 'learning_difficulty',
+      details: this.currentSpecialCase.details,
+      requiredAction: this.currentSpecialCase.requiredAction,
+      attachments: this.currentSpecialCase.attachments || [],
+      startDate: this.currentSpecialCase.startDate,
+      endDate: this.currentSpecialCase.endDate
+    };
+
+    if (this.editingSpecialCaseIndex !== null && this.editingSpecialCaseIndex < this.formData.specialCases.length) {
+      // Editing existing case
+      this.formData.specialCases[this.editingSpecialCaseIndex] = specialCase;
+    } else {
+      // Adding new case
+      this.formData.specialCases.push(specialCase);
+    }
+
+    this.resetSpecialCaseForm();
+  }
+
+  deleteSpecialCase(index: number): void {
+    if (!this.formData.specialCases) return;
+    if (confirm('هل أنت متأكد من حذف هذه الحالة الخاصة؟')) {
+      this.formData.specialCases.splice(index, 1);
+      this.resetSpecialCaseForm();
+    }
+  }
+
+  cancelSpecialCaseEdit(): void {
+    this.resetSpecialCaseForm();
+  }
+
+  async onMedicalCertificateSelected(event: any): Promise<void> {
+    const files = Array.from(event.target.files) as File[];
+    for (const file of files) {
+      if (file.type.startsWith('image/') || file.type === 'application/pdf') {
+        try {
+          const response = await this.apiService.uploadMedicalCertificate(file).toPromise();
+          
+          if (response && response.fileUrl) {
+            if (!this.currentSpecialCase.attachments) {
+              this.currentSpecialCase.attachments = [];
+            }
+            this.currentSpecialCase.attachments.push(response.fileUrl);
+            
+            // Add preview for images
+            if (file.type.startsWith('image/')) {
+              const reader = new FileReader();
+              reader.onload = (e: any) => {
+                if (!this.specialCaseAttachmentPreviews.includes(e.target.result)) {
+                  this.specialCaseAttachmentPreviews.push(e.target.result);
+                }
+              };
+              reader.readAsDataURL(file);
+            } else {
+              // For PDFs, add a placeholder
+              this.specialCaseAttachmentPreviews.push('/assets/pdf-icon.png');
+            }
+          }
+        } catch (error) {
+          console.error('Error uploading medical certificate:', error);
+          alert('فشل رفع الملف. يرجى المحاولة مرة أخرى.');
+        }
+      }
+    }
+  }
+
+  removeAttachment(index: number): void {
+    if (this.currentSpecialCase.attachments) {
+      this.currentSpecialCase.attachments.splice(index, 1);
+    }
+    if (this.specialCaseAttachmentPreviews) {
+      this.specialCaseAttachmentPreviews.splice(index, 1);
+    }
+  }
+
+  togglePrivacyMode(): void {
+    this.showPrivacyMode = !this.showPrivacyMode;
+  }
+
+  getSpecialCaseIcon(category: string): string {
+    switch (category) {
+      case 'health':
+        return '🏥';
+      case 'exemption':
+        return '🏃‍♂️';
+      case 'learning_difficulty':
+        return '⭐';
+      default:
+        return '📋';
+    }
+  }
+
+  getSpecialCaseColor(category: string): string {
+    switch (category) {
+      case 'health':
+        return 'bg-red-100 text-red-800 border-red-300';
+      case 'exemption':
+        return 'bg-blue-100 text-blue-800 border-blue-300';
+      case 'learning_difficulty':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-300';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-300';
+    }
+  }
+
+  getSpecialCaseLabel(category: string): string {
+    switch (category) {
+      case 'health':
+        return 'صحي';
+      case 'exemption':
+        return 'إعفاء';
+      case 'learning_difficulty':
+        return 'صعوبات تعلم';
+      default:
+        return category;
+    }
+  }
+
+  hasActiveSpecialCase(student: Student, category?: string): boolean {
+    if (!student.specialCases || student.specialCases.length === 0) return false;
+    const now = new Date();
+    
+    return student.specialCases.some(sc => {
+      if (category && sc.category !== category) return false;
+      
+      // Check if case is still active (if dates are provided)
+      if (sc.endDate) {
+        const endDate = new Date(sc.endDate);
+        if (endDate < now) return false;
+      }
+      return true;
+    });
   }
 
   onFileSelected(event: any): void {
@@ -367,6 +565,7 @@ export class StudentsComponent implements OnInit {
       studentId: this.formData.studentId || undefined,
       photo: this.formData.photo || undefined,
       generalNotes: this.formData.generalNotes || undefined,
+      specialCases: this.formData.specialCases && this.formData.specialCases.length > 0 ? this.formData.specialCases : undefined,
       classId: this.formData.classId || undefined,
       group: this.formData.group || undefined,
       email: this.formData.email || undefined,
@@ -1227,6 +1426,179 @@ export class StudentsComponent implements OnInit {
     } catch (error) {
       console.error('Error exporting to Excel:', error);
       alert('حدث خطأ أثناء تصدير البيانات إلى Excel');
+    }
+  }
+
+  async printSpecialNeedsStudents(): Promise<void> {
+    // Filter students with special cases
+    const specialNeedsStudents = this.filteredStudents.filter(student => 
+      student.specialCases && student.specialCases.length > 0
+    );
+
+    if (specialNeedsStudents.length === 0) {
+      alert('لا يوجد تلاميذ بحالات خاصة في القائمة المفلترة');
+      return;
+    }
+
+    try {
+      // Create print container
+      const printContainer = document.createElement('div');
+      printContainer.style.position = 'absolute';
+      printContainer.style.left = '-9999px';
+      printContainer.style.top = '0';
+      printContainer.style.width = '210mm';
+      printContainer.style.backgroundColor = '#ffffff';
+      printContainer.style.padding = '20px';
+      printContainer.style.fontFamily = 'Arial, sans-serif';
+      printContainer.style.direction = 'rtl';
+      printContainer.style.textAlign = 'right';
+      document.body.appendChild(printContainer);
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'قائمة تلاميذ الحالات الخاصة';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      printContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `التاريخ: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.fontSize = '12px';
+      dateInfo.style.color = '#6b7280';
+      dateInfo.style.marginBottom = '20px';
+      printContainer.appendChild(dateInfo);
+
+      // Add summary
+      const summary = document.createElement('p');
+      summary.textContent = `إجمالي عدد التلاميذ: ${specialNeedsStudents.length}`;
+      summary.style.textAlign = 'center';
+      summary.style.fontSize = '14px';
+      summary.style.fontWeight = 'bold';
+      summary.style.marginBottom = '20px';
+      summary.style.color = '#1f2937';
+      printContainer.appendChild(summary);
+
+      // Create table
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.fontSize = '11px';
+      table.style.marginBottom = '20px';
+      table.style.border = '1px solid #d1d5db';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#f3f4f6';
+      
+      const headers = ['الحالات الخاصة', 'الإجراء المطلوب', 'التفاصيل', 'المجموعة', 'القسم', 'رقم التلميذ', 'الجنس', 'تاريخ الميلاد', 'الاسم', 'اللقب', 'رقم الهوية'];
+      
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #d1d5db';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      specialNeedsStudents.forEach(student => {
+        // If student has multiple special cases, create a row for each
+        const cases = student.specialCases || [];
+        if (cases.length === 0) return;
+
+        cases.forEach((specialCase, caseIndex) => {
+          const row = document.createElement('tr');
+          
+          const idNumber = student.idNumber || '-';
+          const lastName = student.lastName || '-';
+          const firstName = student.firstName || '-';
+          const dateOfBirth = student.dateOfBirth ? this.formatDate(student.dateOfBirth) : '-';
+          const gender = this.getGenderLabel(student.gender);
+          const studentId = student.studentId || '-';
+          const className = this.getClassName(student.classId);
+          const group = student.group === 1 ? 'المجموعة 1' : student.group === 2 ? 'المجموعة 2' : '-';
+          const caseType = this.getSpecialCaseLabel(specialCase.category);
+          const details = specialCase.details || '-';
+          const requiredAction = specialCase.requiredAction || '-';
+
+          const cells = [
+            caseType,
+            requiredAction,
+            details,
+            group,
+            className,
+            studentId,
+            gender,
+            dateOfBirth,
+            firstName,
+            lastName,
+            idNumber
+          ];
+          
+          cells.forEach((cellText) => {
+            const td = document.createElement('td');
+            td.textContent = cellText;
+            td.style.padding = '6px';
+            td.style.border = '1px solid #d1d5db';
+            td.style.textAlign = 'right';
+            row.appendChild(td);
+          });
+          
+          tbody.appendChild(row);
+        });
+      });
+      table.appendChild(tbody);
+      printContainer.appendChild(table);
+
+      // Print
+      const printWindow = window.open('', '_blank');
+      if (printWindow) {
+        printWindow.document.write(`
+          <html>
+            <head>
+              <title>قائمة تلاميذ الحالات الخاصة</title>
+              <style>
+                @media print {
+                  @page {
+                    size: A4;
+                    margin: 1cm;
+                  }
+                  body {
+                    direction: rtl;
+                    font-family: Arial, sans-serif;
+                  }
+                }
+              </style>
+            </head>
+            <body>
+              ${printContainer.innerHTML}
+            </body>
+          </html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => {
+          printWindow.print();
+          printWindow.close();
+        }, 250);
+      }
+
+      // Clean up
+      document.body.removeChild(printContainer);
+    } catch (error) {
+      console.error('Error printing special needs students:', error);
+      alert('حدث خطأ أثناء طباعة القائمة');
     }
   }
 

@@ -126,6 +126,11 @@ export class StudentsService {
       fieldsToUpdate.generalNotes = updateStudentDto.generalNotes && typeof updateStudentDto.generalNotes === 'string' && updateStudentDto.generalNotes.trim() !== '' ? updateStudentDto.generalNotes.trim() : null;
     }
     
+    // Special cases field - update if provided
+    if (updateStudentDto.specialCases !== undefined) {
+      fieldsToUpdate.specialCases = updateStudentDto.specialCases || null;
+    }
+    
     // Date field - convert string to Date if provided
     if (updateStudentDto.dateOfBirth !== undefined) {
       fieldsToUpdate.dateOfBirth = updateStudentDto.dateOfBirth ? new Date(updateStudentDto.dateOfBirth) : null;
@@ -283,6 +288,7 @@ export class StudentsService {
       studentId: student.studentId,
       photo: student.photo,
       generalNotes: student.generalNotes,
+      specialCases: student.specialCases,
       classId: student.classId,
       group: student.group,
       class: student.class

@@ -5711,6 +5711,51 @@ export class LanguageService {
         'DE': 'Bitte wählen Sie ein Fach aus, um den Bericht anzuzeigen',
         'TR': 'Lütfen raporu görüntülemek için bir ders seçin'
       },
+      'students.specialCases': {
+        'AR': 'الحالات الخاصة',
+        'FR': 'Cas particuliers',
+        'EN': 'Special Cases',
+        'ES': 'Casos especiales',
+        'IT': 'Casi speciali',
+        'DE': 'Besondere Fälle',
+        'TR': 'Özel durumlar'
+      },
+      'students.showSpecialCase': {
+        'AR': 'إظهار الحالات الخاصة',
+        'FR': 'Afficher les cas particuliers',
+        'EN': 'Show Special Cases',
+        'ES': 'Mostrar casos especiales',
+        'IT': 'Mostra casi speciali',
+        'DE': 'Besondere Fälle anzeigen',
+        'TR': 'Özel durumları göster'
+      },
+      'students.addSpecialCase': {
+        'AR': '+ إضافة حالة',
+        'FR': '+ Ajouter un cas',
+        'EN': '+ Add Case',
+        'ES': '+ Agregar caso',
+        'IT': '+ Aggiungi caso',
+        'DE': '+ Fall hinzufügen',
+        'TR': '+ Durum ekle'
+      },
+      'students.hideSpecialCases': {
+        'AR': 'إخفاء الحالات الخاصة',
+        'FR': 'Masquer les cas particuliers',
+        'EN': 'Hide Special Cases',
+        'ES': 'Ocultar casos especiales',
+        'IT': 'Nascondi casi speciali',
+        'DE': 'Besondere Fälle ausblenden',
+        'TR': 'Özel durumları gizle'
+      },
+      'students.specialCasesColumn': {
+        'AR': 'الحالات',
+        'FR': 'Cas',
+        'EN': 'Cases',
+        'ES': 'Casos',
+        'IT': 'Casi',
+        'DE': 'Fälle',
+        'TR': 'Durumlar'
+      },
 
       // Attendance
       'attendance.title': {

@@ -12,6 +12,14 @@ export class StudentResponseDto {
   studentId?: string;
   photo?: string;
   generalNotes?: string;
+  specialCases?: Array<{
+    category: 'health' | 'exemption' | 'learning_difficulty';
+    details: string;
+    requiredAction: string;
+    attachments?: string[];
+    startDate?: string;
+    endDate?: string;
+  }> | null;
   classId?: number;
   group?: 1 | 2 | null;
   class?: {

@@ -42,6 +42,15 @@ export interface CreateAttendanceRecordDto {
   notes?: string;
 }
 
+export interface SpecialCase {
+  category: 'health' | 'exemption' | 'learning_difficulty';
+  details: string;
+  requiredAction: string;
+  attachments?: string[];
+  startDate?: string;
+  endDate?: string;
+}
+
 export interface Student {
   id: number;
   firstName: string;
@@ -54,6 +63,7 @@ export interface Student {
     name: string;
   };
   attendanceStatus?: AttendanceStatus;
+  specialCases?: SpecialCase[] | null;
 }
 
 export interface Class {
@@ -432,6 +442,18 @@ export class AttendanceComponent implements OnInit {
     const attendanceStatus = (validStatuses.includes(status as AttendanceStatus)) 
       ? status as AttendanceStatus 
       : 'unrecorded';
+
+    // Check if student is exempted and being marked as absent
+    if (attendanceStatus === 'absent' && this.isExempted(student)) {
+      const confirmMark = confirm(
+        `⚠️ تنبيه: ${student.firstName} ${student.lastName} معفى رسمياً.\n` +
+        `هل أنت متأكد من تسجيله كغائب؟\n\n` +
+        `تفاصيل الإعفاء:\n${this.getExemptionDetails(student)}`
+      );
+      if (!confirmMark) {
+        return; // Cancel the action
+      }
+    }
 
     const dateStr = this.formatDateForAPI(this.selectedDate);
     const existingRecord = this.attendanceRecords.find(r => 
@@ -1192,6 +1214,47 @@ export class AttendanceComponent implements OnInit {
     // التأكد من أن القيمة المرجعة تطابق إحدى القيم في attendanceStatuses
     const validStatuses: AttendanceStatus[] = ['present', 'absent', 'late', 'excused', 'left_early', 'unrecorded'];
     return validStatuses.includes(status) ? status : 'unrecorded';
+  }
+
+  isExempted(student: Student): boolean {
+    if (!student.specialCases || student.specialCases.length === 0) return false;
+    
+    const now = new Date();
+    return student.specialCases.some(sc => {
+      if (sc.category !== 'exemption') return false;
+      
+      // Check if exemption is still active (if dates are provided)
+      if (sc.endDate) {
+        const endDate = new Date(sc.endDate);
+        if (endDate < now) return false;
+      }
+      return true;
+    });
+  }
+
+  getExemptionDetails(student: Student): string {
+    if (!student.specialCases) return '';
+    
+    const exemptions = student.specialCases.filter(sc => sc.category === 'exemption');
+    return exemptions.map(ex => 
+      `• ${ex.details}\n  ${ex.requiredAction || ''}`
+    ).join('\n');
+  }
+
+  getSpecialCaseIcon(student: Student): string | null {
+    if (!student.specialCases || student.specialCases.length === 0) return null;
+    
+    // Check for exemption cases (priority for attendance)
+    const exemptionCase = student.specialCases.find(sc => sc.category === 'exemption');
+    if (exemptionCase) return '🏃‍♂️';
+    
+    const healthCase = student.specialCases.find(sc => sc.category === 'health');
+    if (healthCase) return '🏥';
+    
+    const learningCase = student.specialCases.find(sc => sc.category === 'learning_difficulty');
+    if (learningCase) return '⭐';
+    
+    return null;
   }
 }
 

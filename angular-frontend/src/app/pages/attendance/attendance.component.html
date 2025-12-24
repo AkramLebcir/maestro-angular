@@ -153,7 +153,10 @@
           
           <!-- Student Name -->
           <div class="text-center">
-            <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ student.firstName }}</div>
+            <div class="text-sm font-semibold text-gray-800 dark:text-gray-200">
+              {{ student.firstName }}
+              <span *ngIf="getSpecialCaseIcon(student)" class="ml-1 text-base">{{ getSpecialCaseIcon(student) }}</span>
+            </div>
             <div class="text-xs text-gray-600 dark:text-gray-400">{{ student.lastName }}</div>
           </div>
 

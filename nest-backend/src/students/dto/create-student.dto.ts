@@ -1,5 +1,6 @@
-import { IsString, IsOptional, IsEmail, IsInt, IsBoolean, IsEnum, IsDateString, IsIn, ValidateIf } from 'class-validator';
+import { IsString, IsOptional, IsEmail, IsInt, IsBoolean, IsEnum, IsDateString, IsIn, ValidateIf, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
+import { SpecialCaseDto } from './special-case.dto';
 
 export class CreateStudentDto {
   @IsString()
@@ -60,5 +61,11 @@ export class CreateStudentDto {
   @IsInt()
   @IsIn([1, 2], { message: 'Group must be either 1 or 2' })
   group?: 1 | 2 | null;
+
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => SpecialCaseDto)
+  specialCases?: SpecialCaseDto[];
 }
 

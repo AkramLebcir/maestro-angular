@@ -250,7 +250,10 @@
                     </ng-template>
                     <div class="occupant-info">
                       <div class="name-row">
-                        <p class="name">{{ occupant.student.firstName }} {{ occupant.student.lastName }}</p>
+                        <p class="name">
+                          {{ occupant.student.firstName }} {{ occupant.student.lastName }}
+                          <span *ngIf="getSpecialCaseIcon(occupant.student)" class="ml-1 text-sm">{{ getSpecialCaseIcon(occupant.student) }}</span>
+                        </p>
                         <button class="remove-btn inline" type="button" (click)="clearSeat(slot, i)">✕</button>
                       </div>
                       <div class="flex items-center gap-2">
@@ -360,7 +363,10 @@
               <div class="chip-avatar placeholder">{{ getStudentInitials(seat.student) }}</div>
             </ng-template>
             <div class="chip-info">
-              <p>{{ seat.student.firstName }} {{ seat.student.lastName }}</p>
+              <p>
+                {{ seat.student.firstName }} {{ seat.student.lastName }}
+                <span *ngIf="getSpecialCaseIcon(seat.student)" class="ml-1 text-sm">{{ getSpecialCaseIcon(seat.student) }}</span>
+              </p>
               <span>{{ translate('seatingChart.group') }} {{ seat.student.group || translate('seatingChart.groupUndefined') }}</span>
             </div>
           </div>

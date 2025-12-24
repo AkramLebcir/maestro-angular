@@ -3,6 +3,16 @@
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('students.title') }}</h1>
       <div class="flex gap-3">
+        <button 
+          (click)="togglePrivacyMode()"
+          [class]="showPrivacyMode ? 'bg-red-600 hover:bg-red-700' : 'bg-gray-600 hover:bg-gray-700'"
+          class="text-white px-4 py-2 rounded-lg flex items-center gap-2 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+          </svg>
+          <span>{{ showPrivacyMode ? (translate('students.showSpecialCase') || 'إظهار الحالات') : (translate('students.hideSpecialCases') || 'إخفاء الحالات') }}</span>
+        </button>
         <label class="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 transition cursor-pointer">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
@@ -17,6 +27,14 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
           </svg>
           <span>{{ translate('students.exportExcel') }}</span>
+        </button>
+        <button 
+          (click)="printSpecialNeedsStudents()"
+          class="bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-orange-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>طباعة قائمة الحالات الخاصة</span>
         </button>
         <button 
           (click)="openAddModal()"
@@ -124,6 +142,7 @@
             <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 cursor-pointer" (click)="sort('group')">
               {{ translate('students.group') }} {{ getSortIcon('group') }}
             </th>
+            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('students.specialCasesColumn') }}</th>
             <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.actions') }}</th>
           </tr>
         </thead>
@@ -157,6 +176,16 @@
               <span *ngIf="student.group === 1" class="px-2 py-1 bg-green-100 text-green-800 rounded text-sm">{{ translate('classes.group1') }}</span>
               <span *ngIf="student.group === 2" class="px-2 py-1 bg-purple-100 text-purple-800 rounded text-sm">{{ translate('classes.group2') }}</span>
               <span *ngIf="!student.group" class="text-gray-400">-</span>
+            </td>
+            <td class="py-3 px-4 text-center">
+              <div *ngIf="!showPrivacyMode && student.specialCases && student.specialCases.length > 0" class="flex gap-1 justify-center">
+                <span *ngFor="let sc of student.specialCases"
+                      class="inline-flex items-center gap-1 px-2 py-1 text-xs rounded border {{ getSpecialCaseColor(sc.category) }}"
+                      [title]="sc.details">
+                  <span>{{ getSpecialCaseIcon(sc.category) }}</span>
+                </span>
+              </div>
+              <span *ngIf="!student.specialCases || student.specialCases.length === 0 || showPrivacyMode" class="text-gray-400">-</span>
             </td>
             <td class="py-3 px-4">
               <div class="flex items-center gap-2">
@@ -385,6 +414,159 @@
           rows="3"
           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           [placeholder]="translate('students.notesPlaceholder')"></textarea>
+      </div>
+
+      <!-- Special Cases Section -->
+      <div class="border-t border-gray-300 dark:border-gray-600 pt-4 mt-4">
+        <div class="flex justify-between items-center mb-4">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">{{ translate('students.specialCases') || 'الحالات الخاصة' }}</label>
+          <button 
+            type="button"
+            (click)="addSpecialCase()"
+            class="px-3 py-1 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition">
+            {{ translate('students.addSpecialCase') || '+ إضافة حالة' }}
+          </button>
+        </div>
+
+        <!-- Existing Special Cases List -->
+        <div *ngIf="formData.specialCases && formData.specialCases.length > 0" class="mb-4 space-y-2">
+          <div *ngFor="let specialCase of formData.specialCases; let i = index" 
+               class="p-3 border border-gray-300 dark:border-gray-600 rounded-lg flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center gap-2 mb-2">
+                <span class="text-xl">{{ getSpecialCaseIcon(specialCase.category) }}</span>
+                <span class="px-2 py-1 text-xs rounded border {{ getSpecialCaseColor(specialCase.category) }}">
+                  {{ getSpecialCaseLabel(specialCase.category) }}
+                </span>
+              </div>
+              <p class="text-sm text-gray-700 dark:text-gray-300 mb-1"><strong>التفاصيل:</strong> {{ specialCase.details }}</p>
+              <p class="text-sm text-gray-700 dark:text-gray-300"><strong>الإجراء المطلوب:</strong> {{ specialCase.requiredAction }}</p>
+              <div *ngIf="specialCase.startDate || specialCase.endDate" class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                <span *ngIf="specialCase.startDate">من: {{ specialCase.startDate }}</span>
+                <span *ngIf="specialCase.endDate"> إلى: {{ specialCase.endDate }}</span>
+              </div>
+              <div *ngIf="specialCase.attachments && specialCase.attachments.length > 0" class="mt-2">
+                <span class="text-xs text-gray-600 dark:text-gray-400">ملفات مرفقة: {{ specialCase.attachments.length }}</span>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <button 
+                type="button"
+                (click)="editSpecialCase(i)"
+                class="px-2 py-1 bg-blue-500 text-white text-xs rounded hover:bg-blue-600">
+                تعديل
+              </button>
+              <button 
+                type="button"
+                (click)="deleteSpecialCase(i)"
+                class="px-2 py-1 bg-red-500 text-white text-xs rounded hover:bg-red-600">
+                حذف
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Special Case Form -->
+        <div *ngIf="editingSpecialCaseIndex !== null" class="border border-blue-300 dark:border-blue-600 rounded-lg p-4 bg-blue-50 dark:bg-blue-900/20">
+          <h4 class="font-medium text-gray-800 dark:text-gray-200 mb-3">
+            {{ editingSpecialCaseIndex < (formData.specialCases?.length || 0) ? 'تعديل الحالة' : 'إضافة حالة جديدة' }}
+          </h4>
+          
+          <div class="space-y-3">
+            <!-- Category -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">نوع الحالة *</label>
+              <select 
+                [(ngModel)]="currentSpecialCase.category"
+                name="specialCaseCategory"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="health">صحي</option>
+                <option value="exemption">إعفاء</option>
+                <option value="learning_difficulty">صعوبات تعلم</option>
+              </select>
+            </div>
+
+            <!-- Details -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">التفاصيل *</label>
+              <textarea 
+                [(ngModel)]="currentSpecialCase.details"
+                name="specialCaseDetails"
+                rows="2"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="مثلاً: سكري، ضعف نظر، إلخ..."></textarea>
+            </div>
+
+            <!-- Required Action -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الإجراء المطلوب *</label>
+              <textarea 
+                [(ngModel)]="currentSpecialCase.requiredAction"
+                name="specialCaseRequiredAction"
+                rows="2"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500"
+                placeholder="مثلاً: يجب الجلوس في الصف الأول، ممنوع من الرياضة..."></textarea>
+            </div>
+
+            <!-- Dates -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تاريخ البدء</label>
+                <input 
+                  type="date"
+                  [(ngModel)]="currentSpecialCase.startDate"
+                  name="specialCaseStartDate"
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تاريخ الانتهاء</label>
+                <input 
+                  type="date"
+                  [(ngModel)]="currentSpecialCase.endDate"
+                  name="specialCaseEndDate"
+                  class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+              </div>
+            </div>
+
+            <!-- Attachments -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الشهادة الطبية / المرفقات</label>
+              <input 
+                type="file"
+                accept="image/*,application/pdf"
+                (change)="onMedicalCertificateSelected($event)"
+                multiple
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <div *ngIf="specialCaseAttachmentPreviews.length > 0" class="mt-2 flex flex-wrap gap-2">
+                <div *ngFor="let preview of specialCaseAttachmentPreviews; let i = index" class="relative">
+                  <img [src]="preview" alt="Preview" class="w-20 h-20 object-cover rounded border">
+                  <button 
+                    type="button"
+                    (click)="removeAttachment(i)"
+                    class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                    ×
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex gap-2 pt-2">
+              <button 
+                type="button"
+                (click)="saveSpecialCase()"
+                class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+                حفظ
+              </button>
+              <button 
+                type="button"
+                (click)="cancelSpecialCaseEdit()"
+                class="px-4 py-2 bg-gray-400 text-white rounded-lg hover:bg-gray-500">
+                إلغاء
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="flex gap-3 pt-4">
@@ -777,6 +959,43 @@
               </canvas>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Special Cases Section -->
+      <div class="mb-6" *ngIf="reportStudent.specialCases && reportStudent.specialCases.length > 0">
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">جدول المتابعة الخاصة</h3>
+        <div class="bg-gray-50 dark:bg-gray-900 p-4 rounded-lg">
+          <table class="w-full border-collapse text-sm">
+            <thead>
+              <tr class="bg-gray-200 dark:bg-gray-700">
+                <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-right font-semibold text-gray-800 dark:text-gray-200">نوع الحالة</th>
+                <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-right font-semibold text-gray-800 dark:text-gray-200">التفاصيل</th>
+                <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-right font-semibold text-gray-800 dark:text-gray-200">الإجراء المطلوب</th>
+                <th class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-right font-semibold text-gray-800 dark:text-gray-200">الفترة</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let sc of reportStudent.specialCases" class="hover:bg-gray-100 dark:hover:bg-gray-800">
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300">
+                  <span class="inline-flex items-center gap-1">
+                    <span>{{ getSpecialCaseIcon(sc.category) }}</span>
+                    <span>{{ getSpecialCaseLabel(sc.category) }}</span>
+                  </span>
+                </td>
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300">{{ sc.details }}</td>
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300">{{ sc.requiredAction }}</td>
+                <td class="border border-gray-300 dark:border-gray-600 px-4 py-2 text-gray-700 dark:text-gray-300">
+                  <span *ngIf="sc.startDate || sc.endDate">
+                    <span *ngIf="sc.startDate">{{ sc.startDate }}</span>
+                    <span *ngIf="sc.startDate && sc.endDate"> - </span>
+                    <span *ngIf="sc.endDate">{{ sc.endDate }}</span>
+                  </span>
+                  <span *ngIf="!sc.startDate && !sc.endDate" class="text-gray-400">دائمة</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

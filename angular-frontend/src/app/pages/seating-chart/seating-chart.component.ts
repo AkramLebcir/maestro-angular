@@ -26,6 +26,15 @@ interface ClassSummary {
   labId?: number;
 }
 
+interface SpecialCase {
+  category: 'health' | 'exemption' | 'learning_difficulty';
+  details: string;
+  requiredAction: string;
+  attachments?: string[];
+  startDate?: string;
+  endDate?: string;
+}
+
 interface Student {
   id: number;
   firstName: string;
@@ -33,6 +42,7 @@ interface Student {
   photo?: string;
   group?: 1 | 2 | null;
   classId?: number;
+  specialCases?: SpecialCase[] | null;
 }
 
 interface StudentSeat {
@@ -525,6 +535,25 @@ export class SeatingChartComponent implements OnInit {
       return;
     }
 
+    // Check for special cases before moving student
+    const draggedStudent = event.previousContainer.data[event.previousIndex]?.student;
+    if (draggedStudent && targetSlot && event.previousContainer !== event.container) {
+      // Check if student has vision problems and is being moved away from first row
+      if (this.hasVisionProblem(draggedStudent)) {
+        const isFirstRow = this.isFirstRowSlot(targetSlot);
+        if (!isFirstRow) {
+          const confirmMove = confirm(
+            `⚠️ تنبيه: ${draggedStudent.firstName} ${draggedStudent.lastName} يعاني من مشاكل في البصر.\n` +
+            `يُنصح بوضعه في الصف الأول.\n\n` +
+            `هل تريد المتابعة على أي حال؟`
+          );
+          if (!confirmMove) {
+            return; // Cancel the move
+          }
+        }
+      }
+    }
+
     transferArrayItem(
       event.previousContainer.data,
       event.container.data,
@@ -541,6 +570,45 @@ export class SeatingChartComponent implements OnInit {
     if (targetSlot && event.previousContainer !== event.container) {
       this.layoutDirty = true;
     }
+  }
+
+  hasVisionProblem(student: Student): boolean {
+    if (!student.specialCases || student.specialCases.length === 0) return false;
+    
+    const visionKeywords = ['نظر', 'بصر', 'عين', 'رؤية', 'ضعف نظر', 'قصر نظر', 'طول نظر'];
+    return student.specialCases.some(sc => {
+      const details = (sc.details || '').toLowerCase();
+      const action = (sc.requiredAction || '').toLowerCase();
+      return visionKeywords.some(keyword => 
+        details.includes(keyword.toLowerCase()) || action.includes(keyword.toLowerCase())
+      );
+    });
+  }
+
+  isFirstRowSlot(slot: WorkstationSlot): boolean {
+    // Check if slot is in the first row based on y position
+    // Assuming first row has lowest y values
+    if (this.workstationSlots.length === 0) return false;
+    
+    const minY = Math.min(...this.workstationSlots.map(s => s.y));
+    const tolerance = 50; // Allow some tolerance for positioning
+    return Math.abs(slot.y - minY) < tolerance;
+  }
+
+  getSpecialCaseIcon(student: Student): string | null {
+    if (!student.specialCases || student.specialCases.length === 0) return null;
+    
+    // Check for health cases first (priority)
+    const healthCase = student.specialCases.find(sc => sc.category === 'health');
+    if (healthCase) return '🏥';
+    
+    const exemptionCase = student.specialCases.find(sc => sc.category === 'exemption');
+    if (exemptionCase) return '🏃‍♂️';
+    
+    const learningCase = student.specialCases.find(sc => sc.category === 'learning_difficulty');
+    if (learningCase) return '⭐';
+    
+    return null;
   }
 
   clearSeat(slot: WorkstationSlot, index: number): void {

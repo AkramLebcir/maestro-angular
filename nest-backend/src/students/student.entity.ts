@@ -43,6 +43,16 @@ export class Student extends TenantOwnedEntity {
   @Column({ type: 'text', nullable: true })
   generalNotes: string;
 
+  @Column({ type: 'json', nullable: true })
+  specialCases: Array<{
+    category: 'health' | 'exemption' | 'learning_difficulty';
+    details: string;
+    requiredAction: string;
+    attachments?: string[];
+    startDate?: string;
+    endDate?: string;
+  }> | null;
+
   @ManyToOne(() => Class, (classEntity) => classEntity.students, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'classId' })
   class: Class;

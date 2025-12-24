@@ -970,6 +970,241 @@ export class ReportsComponent {
       this.isExportingPenalties = false;
     }
   }
+
+  async exportSpecialNeedsStudentsToPDF(): Promise<void> {
+    if (this.isExportingPDF) {
+      return;
+    }
+
+    this.isExportingPDF = true;
+
+    try {
+      // Load all students
+      const students = await firstValueFrom(this.apiService.get<any[]>('/students'));
+      if (!students || students.length === 0) {
+        alert('لا توجد بيانات تلاميذ متاحة');
+        this.isExportingPDF = false;
+        return;
+      }
+
+      // Filter students with special cases
+      const specialNeedsStudents = students.filter((student: any) => 
+        student.specialCases && student.specialCases.length > 0
+      );
+
+      if (specialNeedsStudents.length === 0) {
+        alert('لا يوجد تلاميذ بحالات خاصة');
+        this.isExportingPDF = false;
+        return;
+      }
+
+      // Load classes for class names
+      const classes = await firstValueFrom(this.apiService.get<any[]>('/classes'));
+      const classMap = new Map(classes.map((c: any) => [c.id, c.name]));
+
+      // Helper function to get class name
+      const getClassName = (classId?: number) => {
+        if (!classId) return '-';
+        return classMap.get(classId) || '-';
+      };
+
+      // Helper function to get gender label
+      const getGenderLabel = (gender?: string) => {
+        if (!gender) return '-';
+        return gender === 'male' ? 'ذكر' : 'أنثى';
+      };
+
+      // Helper function to format date
+      const formatDate = (date: Date | string) => {
+        if (!date) return '-';
+        const d = typeof date === 'string' ? new Date(date) : date;
+        return d.toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
+      };
+
+      // Helper function to get special case label
+      const getSpecialCaseLabel = (category: string) => {
+        switch (category) {
+          case 'health':
+            return 'صحية';
+          case 'exemption':
+            return 'إعفاء';
+          case 'learning_difficulty':
+            return 'صعوبة تعلم';
+          default:
+            return category;
+        }
+      };
+
+      // Create export container
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير تلاميذ الحالات الخاصة';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `التاريخ: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.fontSize = '12px';
+      dateInfo.style.color = '#6b7280';
+      dateInfo.style.marginBottom = '20px';
+      exportContainer.appendChild(dateInfo);
+
+      // Add summary
+      const summary = document.createElement('div');
+      summary.style.marginBottom = '20px';
+      summary.style.padding = '10px';
+      summary.style.backgroundColor = '#f3f4f6';
+      summary.style.borderRadius = '5px';
+      
+      const summaryText = document.createElement('p');
+      summaryText.textContent = `إجمالي عدد التلاميذ بحالات خاصة: ${specialNeedsStudents.length}`;
+      summaryText.style.fontSize = '14px';
+      summaryText.style.fontWeight = 'bold';
+      summaryText.style.textAlign = 'center';
+      summaryText.style.color = '#1f2937';
+      summary.appendChild(summaryText);
+      exportContainer.appendChild(summary);
+
+      // Create table
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.fontSize = '10px';
+      table.style.marginBottom = '20px';
+      table.style.border = '1px solid #d1d5db';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#f3f4f6';
+      
+      const headers = ['الحالات الخاصة', 'الإجراء المطلوب', 'التفاصيل', 'المجموعة', 'القسم', 'رقم التلميذ', 'الجنس', 'تاريخ الميلاد', 'الاسم', 'اللقب', 'رقم الهوية'];
+      
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #d1d5db';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      specialNeedsStudents.forEach((student: any) => {
+        const cases = student.specialCases || [];
+        if (cases.length === 0) return;
+
+        cases.forEach((specialCase: any) => {
+          const row = document.createElement('tr');
+          
+          const idNumber = student.idNumber || '-';
+          const lastName = student.lastName || '-';
+          const firstName = student.firstName || '-';
+          const dateOfBirth = formatDate(student.dateOfBirth);
+          const gender = getGenderLabel(student.gender);
+          const studentId = student.studentId || '-';
+          const className = getClassName(student.classId);
+          const group = student.group === 1 ? 'المجموعة 1' : student.group === 2 ? 'المجموعة 2' : '-';
+          const caseType = getSpecialCaseLabel(specialCase.category);
+          const details = specialCase.details || '-';
+          const requiredAction = specialCase.requiredAction || '-';
+
+          const cells = [
+            caseType,
+            requiredAction,
+            details,
+            group,
+            className,
+            studentId,
+            gender,
+            dateOfBirth,
+            firstName,
+            lastName,
+            idNumber
+          ];
+          
+          cells.forEach((cellText) => {
+            const td = document.createElement('td');
+            td.textContent = cellText;
+            td.style.padding = '6px';
+            td.style.border = '1px solid #d1d5db';
+            td.style.textAlign = 'right';
+            row.appendChild(td);
+          });
+          
+          tbody.appendChild(row);
+        });
+      });
+      table.appendChild(tbody);
+      exportContainer.appendChild(table);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Calculate PDF dimensions
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const doc = new jsPDF('p', 'mm', 'a4');
+      let position = 0;
+
+      // Add first page
+      doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save PDF
+      const fileName = `تقرير_تلاميذ_الحالات_الخاصة_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      this.isExportingPDF = false;
+    } catch (error) {
+      console.error('Error exporting special needs students PDF:', error);
+      alert('حدث خطأ أثناء تصدير التقرير');
+      this.isExportingPDF = false;
+    }
+  }
 }
 
 
