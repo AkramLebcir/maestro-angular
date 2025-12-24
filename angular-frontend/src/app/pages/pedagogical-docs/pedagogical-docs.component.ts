@@ -199,6 +199,33 @@ export class PedagogicalDocsComponent implements OnInit {
     }
     return `${backendBase}${doc.fileUrl}`;
   }
+
+  deleteDoc(doc: PedagogicalDocument): void {
+    if (confirm(`هل أنت متأكد من حذف الوثيقة "${doc.title}"؟\n\nلا يمكن التراجع عن هذا الإجراء.`)) {
+      this.api.deletePedagogicalDocument(doc.id).subscribe({
+        next: () => {
+          this.loadDocs();
+        },
+        error: (error) => {
+          console.error('Error deleting pedagogical document:', error);
+          let errorMessage = 'فشل في حذف الوثيقة البيداغوجية.';
+
+          if (error?.error?.message) {
+            errorMessage += ` ${error.error.message}`;
+          } else if (error?.status === 404) {
+            errorMessage = 'الوثيقة غير موجودة أو تم حذفها مسبقاً.';
+          } else if (error?.status === 403) {
+            errorMessage = 'ليس لديك صلاحية لحذف هذه الوثيقة.';
+          }
+
+          this.errorMessage = errorMessage;
+          setTimeout(() => {
+            this.errorMessage = '';
+          }, 5000);
+        },
+      });
+    }
+  }
 }
 
 

@@ -169,11 +169,20 @@
           <span class="text-[11px] text-gray-400">
             {{ doc.createdAt | date:'yyyy/MM/dd HH:mm' }}
           </span>
-          <button
-            class="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-semibold"
-          >
-            {{ translate('pedagogicalDocs.openAsBook') }}
-          </button>
+          <div class="flex gap-2">
+            <button
+              (click)="deleteDoc(doc); $event.stopPropagation()"
+              class="text-xs text-red-600 hover:text-red-700 font-semibold"
+              title="حذف الوثيقة"
+            >
+              حذف
+            </button>
+            <button
+              class="text-xs text-[var(--primary-600)] hover:text-[var(--primary-700)] font-semibold"
+            >
+              {{ translate('pedagogicalDocs.openAsBook') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,9 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
+  Param,
   Post,
   Query,
   UploadedFile,
@@ -91,6 +93,18 @@ export class PedagogicalDocsController {
     @Query() filters: PedagogicalDocumentFilterDto,
   ): Promise<PedagogicalDocument[]> {
     return this.service.findAll(user.id, filters);
+  }
+
+  @Delete(':id')
+  async deleteDocument(
+    @CurrentUser() user: AuthUser,
+    @Param('id') id: string,
+  ): Promise<void> {
+    const documentId = parseInt(id, 10);
+    if (isNaN(documentId)) {
+      throw new BadRequestException('معرف الوثيقة غير صحيح.');
+    }
+    return this.service.delete(user.id, documentId);
   }
 }
 

@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PedagogicalDocument } from './pedagogical-document.entity';
 import { CreatePedagogicalDocumentDto } from './dto/create-pedagogical-document.dto';
 import { PedagogicalDocumentFilterDto } from './dto/pedagogical-document-filter.dto';
+import { existsSync, unlinkSync } from 'fs';
+import { join } from 'path';
 
 @Injectable()
 export class PedagogicalDocsService {
@@ -39,6 +41,25 @@ export class PedagogicalDocsService {
       where,
       order: { createdAt: 'DESC' },
     });
+  }
+
+  async delete(ownerId: number, documentId: number): Promise<void> {
+    const document = await this.repo.findOne({
+      where: { id: documentId, ownerId },
+    });
+
+    if (!document) {
+      throw new NotFoundException('الوثيقة البيداغوجية غير موجودة أو ليس لديك صلاحية حذفها.');
+    }
+
+    // Delete the physical file from disk
+    const filePath = join(__dirname, '..', '..', document.fileUrl);
+    if (existsSync(filePath)) {
+      unlinkSync(filePath);
+    }
+
+    // Delete the database record
+    await this.repo.remove(document);
   }
 }
 

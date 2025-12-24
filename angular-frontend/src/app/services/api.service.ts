@@ -119,4 +119,13 @@ export class ApiService {
       headers: this.getHeaders()
     });
   }
+
+  /**
+   * Delete pedagogical document
+   */
+  deletePedagogicalDocument(documentId: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/pedagogical-docs/${documentId}`, {
+      headers: this.getHeaders()
+    });
+  }
 }
