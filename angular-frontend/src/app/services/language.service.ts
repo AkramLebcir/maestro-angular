@@ -7906,6 +7906,15 @@ export class LanguageService {
         'DE': 'Computerlabor-Möbel',
         'TR': 'Bilgisayar laboratuvarı mobilyaları'
       },
+      'labs.inventoryNumber': {
+        'AR': 'رقم الجرد',
+        'FR': 'Numéro d\'inventaire',
+        'EN': 'Inventory number',
+        'ES': 'Número de inventario',
+        'IT': 'Numero di inventario',
+        'DE': 'Inventarnummer',
+        'TR': 'Envanter numarası'
+      },
       'labs.inventoryNumbers': {
         'AR': 'أرقام الجرد',
         'FR': 'Numéros d\'inventaire',
