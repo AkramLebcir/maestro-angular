@@ -276,6 +276,10 @@ export class GradebookComponent implements OnInit, AfterViewInit {
   editingCouncilRecord: { [key: string]: boolean } = {};
   editingFinalDecision: { [key: string]: boolean } = {};
 
+  // Search variables for council
+  councilStudentSearch: string = '';
+  finalDecisionStudentSearch: string = '';
+
   // Hover card variables
   hoveredStudent: (Student & { councilRecord?: CouncilSemesterRecord }) | null = null;
   hoverCardPosition: { top: number; left: number } | null = null;
@@ -6728,6 +6732,34 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         this.studentBehaviorSummary = { rating: 3, events: [] };
       }
     });
+  }
+
+  // =================== Search Getters ===================
+
+  get filteredCouncilStudents(): (Student & { councilRecord?: CouncilSemesterRecord })[] {
+    if (!this.councilStudentSearch.trim()) {
+      return this.councilStudentsWithRecords;
+    }
+
+    const searchTerm = this.councilStudentSearch.toLowerCase();
+    return this.councilStudentsWithRecords.filter(student =>
+      student.firstName?.toLowerCase().includes(searchTerm) ||
+      student.lastName?.toLowerCase().includes(searchTerm) ||
+      student.idNumber?.toLowerCase().includes(searchTerm)
+    );
+  }
+
+  get filteredFinalStudents(): (Student & { finalDecision?: FinalCouncilDecision })[] {
+    if (!this.finalDecisionStudentSearch.trim()) {
+      return this.finalStudentsWithDecisions;
+    }
+
+    const searchTerm = this.finalDecisionStudentSearch.toLowerCase();
+    return this.finalStudentsWithDecisions.filter(student =>
+      student.firstName?.toLowerCase().includes(searchTerm) ||
+      student.lastName?.toLowerCase().includes(searchTerm) ||
+      student.idNumber?.toLowerCase().includes(searchTerm)
+    );
   }
 }
 

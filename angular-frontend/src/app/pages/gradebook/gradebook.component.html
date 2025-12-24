@@ -1952,12 +1952,12 @@
         {{ translate('gradebook.councilTitle', { className: councilSelectedClass.name, term: councilSelectedTerm ? councilSelectedTerm.toString() : '' }) }}
       </h2>
       <div class="flex gap-2">
-        <button 
+        <button
           (click)="bulkSaveCouncilRecords()"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
           {{ translate('gradebook.saveAll') }}
         </button>
-        <button 
+        <button
           (click)="exportCouncilSemesterPDF()"
           class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1965,6 +1965,23 @@
           </svg>
           {{ translate('gradebook.exportPDF') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mb-4">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="councilStudentSearch"
+          placeholder="{{ translate('gradebook.searchStudent') }}"
+          class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+        />
       </div>
     </div>
 
@@ -1990,7 +2007,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let student of councilStudentsWithRecords; let i = index" 
+          <tr *ngFor="let student of filteredCouncilStudents; let i = index" 
               class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
             <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">{{ i + 1 }}</td>
             <td class="border border-gray-300 dark:border-gray-600 p-2 text-center relative">
@@ -2153,10 +2170,10 @@
                 <span class="text-sm font-medium text-purple-800 dark:text-purple-200">{{ translate('gradebook.marks') }}</span>
               </div>
               <p class="text-sm text-purple-700 dark:text-purple-300">
-                {{ translate('gradebook.teacherAverage') }}: {{ (hoveredStudent.councilRecord.teacherAverage ?? 0).toFixed(2) }}/20
+                {{ translate('gradebook.teacherAverage') }}: {{ (hoveredStudent.councilRecord?.teacherAverage ?? 0).toFixed(2) }}/20
               </p>
               <p class="text-sm text-purple-700 dark:text-purple-300">
-                {{ translate('gradebook.semesterAverage') }}: {{ (hoveredStudent.councilRecord.semesterAverage ?? 0).toFixed(2) }}/20
+                {{ translate('gradebook.semesterAverage') }}: {{ (hoveredStudent.councilRecord?.semesterAverage ?? 0).toFixed(2) }}/20
               </p>
             </div>
           </div>
@@ -2172,12 +2189,12 @@
         {{ translate('gradebook.finalDecisionTitle', { className: councilSelectedClass.name }) }}
       </h2>
       <div class="flex gap-2">
-        <button 
+        <button
           (click)="bulkSaveFinalDecisions()"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
           {{ translate('gradebook.saveAll') }}
         </button>
-        <button 
+        <button
           (click)="exportFinalDecisionPDF()"
           class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2185,6 +2202,23 @@
           </svg>
           {{ translate('gradebook.exportPDF') }}
         </button>
+      </div>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mb-4">
+      <div class="relative">
+        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </div>
+        <input
+          type="text"
+          [(ngModel)]="finalDecisionStudentSearch"
+          placeholder="{{ translate('gradebook.searchStudent') }}"
+          class="block w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md leading-5 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+        />
       </div>
     </div>
 
@@ -2207,7 +2241,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let student of finalStudentsWithDecisions; let i = index" 
+          <tr *ngFor="let student of filteredFinalStudents; let i = index" 
               class="hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
               [ngClass]="(student.finalDecision?.annualAverage || 0) < 10 ? 'bg-red-50 dark:bg-red-900/20' : ''">
             <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">{{ i + 1 }}</td>

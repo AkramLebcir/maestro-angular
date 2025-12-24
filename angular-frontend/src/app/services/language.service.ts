@@ -2884,6 +2884,15 @@ export class LanguageService {
         'DE': 'Endgültige Entscheidung - {{className}}',
         'TR': 'Nihai karar - {{className}}'
       },
+      'gradebook.searchStudent': {
+        'AR': 'البحث عن التلميذ...',
+        'FR': 'Rechercher un élève...',
+        'EN': 'Search student...',
+        'ES': 'Buscar estudiante...',
+        'IT': 'Cerca studente...',
+        'DE': 'Schüler suchen...',
+        'TR': 'Öğrenci ara...'
+      },
       'gradebook.saveAll': {
         'AR': 'حفظ الكل',
         'FR': 'Tout enregistrer',
