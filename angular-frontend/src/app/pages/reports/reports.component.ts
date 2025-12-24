@@ -332,7 +332,7 @@ export class ReportsComponent {
     this.router.navigate(['/teacher-card']);
   }
 
-  navigateToTrainingReport(report: 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical'): void {
+  navigateToTrainingReport(report: 'training' | 'inspection' | 'daily' | 'seminars' | 'pedagogical' | 'coordination'): void {
     this.router.navigate(['/training-inspection'], {
       queryParams: { report },
     });

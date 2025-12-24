@@ -1755,6 +1755,204 @@ export class LanguageService {
         'DE': 'Noch keine pädagogischen Besuche aufgezeichnet.',
         'TR': 'Henüz pedagojik ziyaret kaydı yok.'
       },
+      'trainingInspection.coordinationSessions': {
+        'AR': 'جلسات التنسيق',
+        'FR': 'Sessions de coordination',
+        'EN': 'Coordination sessions',
+        'ES': 'Sesiones de coordinación',
+        'IT': 'Sessioni di coordinamento',
+        'DE': 'Koordinationssitzungen',
+        'TR': 'Koordinasyon oturumları'
+      },
+      'trainingInspection.sessionDate': {
+        'AR': 'تاريخ الجلسة:',
+        'FR': 'Date de la session:',
+        'EN': 'Session date:',
+        'ES': 'Fecha de la sesión:',
+        'IT': 'Data della sessione:',
+        'DE': 'Sitzungsdatum:',
+        'TR': 'Oturum tarihi:'
+      },
+      'trainingInspection.attendees': {
+        'AR': 'الحاضرون:',
+        'FR': 'Présents:',
+        'EN': 'Attendees:',
+        'ES': 'Asistentes:',
+        'IT': 'Partecipanti:',
+        'DE': 'Teilnehmer:',
+        'TR': 'Katılımcılar:'
+      },
+      'trainingInspection.attendeeName': {
+        'AR': 'اسم الحاضر',
+        'FR': 'Nom du participant',
+        'EN': 'Attendee name',
+        'ES': 'Nombre del asistente',
+        'IT': 'Nome del partecipante',
+        'DE': 'Name des Teilnehmers',
+        'TR': 'Katılımcı adı'
+      },
+      'trainingInspection.addAttendee': {
+        'AR': 'إضافة حاضر',
+        'FR': 'Ajouter un participant',
+        'EN': 'Add attendee',
+        'ES': 'Agregar asistente',
+        'IT': 'Aggiungi partecipante',
+        'DE': 'Teilnehmer hinzufügen',
+        'TR': 'Katılımcı ekle'
+      },
+      'trainingInspection.agenda': {
+        'AR': 'جدول الأعمال:',
+        'FR': 'Ordre du jour:',
+        'EN': 'Agenda:',
+        'ES': 'Orden del día:',
+        'IT': 'Ordine del giorno:',
+        'DE': 'Tagesordnung:',
+        'TR': 'Gündem:'
+      },
+      'trainingInspection.agendaItem': {
+        'AR': 'نقطة جدول الأعمال',
+        'FR': 'Point de l\'ordre du jour',
+        'EN': 'Agenda item',
+        'ES': 'Punto del orden del día',
+        'IT': 'Punto dell\'ordine del giorno',
+        'DE': 'Tagesordnungspunkt',
+        'TR': 'Gündem maddesi'
+      },
+      'trainingInspection.addAgendaItem': {
+        'AR': 'إضافة نقطة',
+        'FR': 'Ajouter un point',
+        'EN': 'Add item',
+        'ES': 'Agregar punto',
+        'IT': 'Aggiungi punto',
+        'DE': 'Punkt hinzufügen',
+        'TR': 'Madde ekle'
+      },
+      'trainingInspection.decisions': {
+        'AR': 'القرارات المتخذة:',
+        'FR': 'Décisions prises:',
+        'EN': 'Decisions made:',
+        'ES': 'Decisiones tomadas:',
+        'IT': 'Decisioni prese:',
+        'DE': 'Getroffene Entscheidungen:',
+        'TR': 'Alınan kararlar:'
+      },
+      'trainingInspection.decision': {
+        'AR': 'قرار',
+        'FR': 'Décision',
+        'EN': 'Decision',
+        'ES': 'Decisión',
+        'IT': 'Decisione',
+        'DE': 'Entscheidung',
+        'TR': 'Karar'
+      },
+      'trainingInspection.addDecision': {
+        'AR': 'إضافة قرار',
+        'FR': 'Ajouter une décision',
+        'EN': 'Add decision',
+        'ES': 'Agregar decisión',
+        'IT': 'Aggiungi decisione',
+        'DE': 'Entscheidung hinzufügen',
+        'TR': 'Karar ekle'
+      },
+      'trainingInspection.progressPercentage': {
+        'AR': 'نسبة التقدم الجماعية (%):',
+        'FR': 'Pourcentage de progrès collectif (%):',
+        'EN': 'Collective progress percentage (%):',
+        'ES': 'Porcentaje de progreso colectivo (%):',
+        'IT': 'Percentuale di progresso collettivo (%):',
+        'DE': 'Kollektiver Fortschrittsprozentsatz (%):',
+        'TR': 'Toplu ilerleme yüzdesi (%):'
+      },
+      'trainingInspection.saveSession': {
+        'AR': 'حفظ الجلسة',
+        'FR': 'Enregistrer la session',
+        'EN': 'Save session',
+        'ES': 'Guardar sesión',
+        'IT': 'Salva sessione',
+        'DE': 'Sitzung speichern',
+        'TR': 'Oturumu kaydet'
+      },
+      'trainingInspection.coordinationMinutes': {
+        'AR': 'محضر التنسيق',
+        'FR': 'Procès-verbal de coordination',
+        'EN': 'Coordination minutes',
+        'ES': 'Acta de coordinación',
+        'IT': 'Verbale di coordinamento',
+        'DE': 'Koordinationsprotokoll',
+        'TR': 'Koordinasyon tutanağı'
+      },
+      'trainingInspection.coordinationReport': {
+        'AR': 'تقرير جلسات التنسيق',
+        'FR': 'Rapport des sessions de coordination',
+        'EN': 'Coordination sessions report',
+        'ES': 'Informe de sesiones de coordinación',
+        'IT': 'Rapporto sessioni di coordinamento',
+        'DE': 'Koordinationssitzungsbericht',
+        'TR': 'Koordinasyon oturumları raporu'
+      },
+      'trainingInspection.noCoordinationSessions': {
+        'AR': 'لا توجد جلسات تنسيق مسجلة بعد.',
+        'FR': 'Aucune session de coordination enregistrée pour le moment.',
+        'EN': 'No coordination sessions recorded yet.',
+        'ES': 'No hay sesiones de coordinación registradas todavía.',
+        'IT': 'Nessuna sessione di coordinamento registrata finora.',
+        'DE': 'Noch keine Koordinationssitzungen aufgezeichnet.',
+        'TR': 'Henüz koordinasyon oturumu kaydı yok.'
+      },
+      'trainingInspection.minutesTitle': {
+        'AR': 'محضر جلسة التنسيق',
+        'FR': 'Procès-verbal de la session de coordination',
+        'EN': 'Coordination session minutes',
+        'ES': 'Acta de la sesión de coordinación',
+        'IT': 'Verbale della sessione di coordinamento',
+        'DE': 'Koordinationssitzungsprotokoll',
+        'TR': 'Koordinasyon oturumu tutanağı'
+      },
+      'trainingInspection.present': {
+        'AR': 'الحاضرون',
+        'FR': 'Présents',
+        'EN': 'Present',
+        'ES': 'Presentes',
+        'IT': 'Presenti',
+        'DE': 'Anwesend',
+        'TR': 'Mevcut'
+      },
+      'trainingInspection.agendaItems': {
+        'AR': 'نقاط جدول الأعمال',
+        'FR': 'Points de l\'ordre du jour',
+        'EN': 'Agenda items',
+        'ES': 'Puntos del orden del día',
+        'IT': 'Punti dell\'ordine del giorno',
+        'DE': 'Tagesordnungspunkte',
+        'TR': 'Gündem maddeleri'
+      },
+      'trainingInspection.decisionsMade': {
+        'AR': 'القرارات المتخذة',
+        'FR': 'Décisions prises',
+        'EN': 'Decisions made',
+        'ES': 'Decisiones tomadas',
+        'IT': 'Decisioni prese',
+        'DE': 'Getroffene Entscheidungen',
+        'TR': 'Alınan kararlar'
+      },
+      'trainingInspection.collectiveProgress': {
+        'AR': 'نسبة التقدم الجماعية',
+        'FR': 'Pourcentage de progrès collectif',
+        'EN': 'Collective progress percentage',
+        'ES': 'Porcentaje de progreso colectivo',
+        'IT': 'Percentuale di progresso collettivo',
+        'DE': 'Kollektiver Fortschrittsprozentsatz',
+        'TR': 'Toplu ilerleme yüzdesi'
+      },
+      'trainingInspection.coordinator': {
+        'AR': 'منسق الجلسة',
+        'FR': 'Coordinateur de la session',
+        'EN': 'Session coordinator',
+        'ES': 'Coordinador de la sesión',
+        'IT': 'Coordinatore della sessione',
+        'DE': 'Sitzungskoordinator',
+        'TR': 'Oturum koordinatörü'
+      },
 
       // Header
       'header.teacherPhoto': {
@@ -3930,6 +4128,33 @@ export class LanguageService {
         'DE': 'Täglicher Notizbericht öffnen',
         'TR': 'Günlük notlar raporunu aç'
       },
+      'reports.coordinationSessions': {
+        'AR': 'تقرير جلسات التنسيق',
+        'FR': 'Rapport des sessions de coordination',
+        'EN': 'Coordination sessions report',
+        'ES': 'Informe de sesiones de coordinación',
+        'IT': 'Rapporto sessioni di coordinamento',
+        'DE': 'Koordinationssitzungsbericht',
+        'TR': 'Koordinasyon oturumları raporu'
+      },
+      'reports.coordinationSessionsDesc': {
+        'AR': 'عرض وتصدير محاضر جلسات التنسيق بصيغة PDF.',
+        'FR': 'Afficher et exporter les procès-verbaux des sessions de coordination en PDF.',
+        'EN': 'View and export coordination session minutes in PDF format.',
+        'ES': 'Ver y exportar actas de sesiones de coordinación en formato PDF.',
+        'IT': 'Visualizza ed esporta i verbali delle sessioni di coordinamento in formato PDF.',
+        'DE': 'Anzeigen und Exportieren von Koordinationssitzungsprotokollen im PDF-Format.',
+        'TR': 'Koordinasyon oturumu tutanaklarını PDF formatında görüntüleyin ve dışa aktarın.'
+      },
+      'reports.openCoordinationSessions': {
+        'AR': 'فتح تقرير جلسات التنسيق',
+        'FR': 'Ouvrir le rapport des sessions de coordination',
+        'EN': 'Open coordination sessions report',
+        'ES': 'Abrir informe de sesiones de coordinación',
+        'IT': 'Apri rapporto sessioni di coordinamento',
+        'DE': 'Koordinationssitzungsbericht öffnen',
+        'TR': 'Koordinasyon oturumları raporunu aç'
+      },
 
       // Pedagogical Docs
       'pedagogicalDocs.title': {
@@ -6000,6 +6225,123 @@ export class LanguageService {
         'IT': 'Presenze della classe',
         'DE': 'Klassenanwesenheit',
         'TR': 'Sınıf yoklaması'
+      },
+      'attendance.departmentTab': {
+        'AR': 'تقرير القسم',
+        'FR': 'Rapport de classe',
+        'EN': 'Department report',
+        'ES': 'Informe de departamento',
+        'IT': 'Rapporto dipartimento',
+        'DE': 'Abteilungsbericht',
+        'TR': 'Bölüm raporu'
+      },
+      'attendance.departmentReport': {
+        'AR': 'تقرير القسم',
+        'FR': 'Rapport de classe',
+        'EN': 'Department report',
+        'ES': 'Informe de departamento',
+        'IT': 'Rapporto dipartimento',
+        'DE': 'Abteilungsbericht',
+        'TR': 'Bölüm raporu'
+      },
+      'attendance.dailyPresent': {
+        'AR': 'حضور يومي',
+        'FR': 'Présence quotidienne',
+        'EN': 'Daily present',
+        'ES': 'Presente diario',
+        'IT': 'Presenza giornaliera',
+        'DE': 'Tägliche Anwesenheit',
+        'TR': 'Günlük devam'
+      },
+      'attendance.dailyAbsent': {
+        'AR': 'غياب يومي',
+        'FR': 'Absence quotidienne',
+        'EN': 'Daily absent',
+        'ES': 'Ausente diario',
+        'IT': 'Assenza giornaliera',
+        'DE': 'Tägliche Abwesenheit',
+        'TR': 'Günlük devamsızlık'
+      },
+      'attendance.weeklyPresent': {
+        'AR': 'حضور أسبوعي',
+        'FR': 'Présence hebdomadaire',
+        'EN': 'Weekly present',
+        'ES': 'Presente semanal',
+        'IT': 'Presenza settimanale',
+        'DE': 'Wöchentliche Anwesenheit',
+        'TR': 'Haftalık devam'
+      },
+      'attendance.weeklyAbsent': {
+        'AR': 'غياب أسبوعي',
+        'FR': 'Absence hebdomadaire',
+        'EN': 'Weekly absent',
+        'ES': 'Ausente semanal',
+        'IT': 'Assenza settimanale',
+        'DE': 'Wöchentliche Abwesenheit',
+        'TR': 'Haftalık devamsızlık'
+      },
+      'attendance.monthlyPresent': {
+        'AR': 'حضور شهري',
+        'FR': 'Présence mensuelle',
+        'EN': 'Monthly present',
+        'ES': 'Presente mensual',
+        'IT': 'Presenza mensile',
+        'DE': 'Monatliche Anwesenheit',
+        'TR': 'Aylık devam'
+      },
+      'attendance.monthlyAbsent': {
+        'AR': 'غياب شهري',
+        'FR': 'Absence mensuelle',
+        'EN': 'Monthly absent',
+        'ES': 'Ausente mensual',
+        'IT': 'Assenza mensile',
+        'DE': 'Monatliche Abwesenheit',
+        'TR': 'Aylık devamsızlık'
+      },
+      'attendance.statusExcellent': {
+        'AR': 'ممتاز',
+        'FR': 'Excellent',
+        'EN': 'Excellent',
+        'ES': 'Excelente',
+        'IT': 'Eccellente',
+        'DE': 'Ausgezeichnet',
+        'TR': 'Mükemmel'
+      },
+      'attendance.statusGood': {
+        'AR': 'جيد',
+        'FR': 'Bon',
+        'EN': 'Good',
+        'ES': 'Bueno',
+        'IT': 'Buono',
+        'DE': 'Gut',
+        'TR': 'İyi'
+      },
+      'attendance.statusNeedsAttention': {
+        'AR': 'يحتاج متابعة',
+        'FR': 'Nécessite une attention',
+        'EN': 'Needs attention',
+        'ES': 'Necesita atención',
+        'IT': 'Richiede attenzione',
+        'DE': 'Benötigt Aufmerksamkeit',
+        'TR': 'Dikkat gerektirir'
+      },
+      'attendance.selectClassFirst': {
+        'AR': 'يرجى اختيار قسم أولاً',
+        'FR': 'Veuillez d\'abord sélectionner une classe',
+        'EN': 'Please select a class first',
+        'ES': 'Por favor seleccione una clase primero',
+        'IT': 'Seleziona prima una classe',
+        'DE': 'Bitte wählen Sie zuerst eine Klasse aus',
+        'TR': 'Lütfen önce bir sınıf seçin'
+      },
+      'attendance.noDataToExport': {
+        'AR': 'لا توجد بيانات للتصدير',
+        'FR': 'Aucune donnée à exporter',
+        'EN': 'No data to export',
+        'ES': 'No hay datos para exportar',
+        'IT': 'Nessun dato da esportare',
+        'DE': 'Keine Daten zum Exportieren',
+        'TR': 'Dışa aktarılacak veri yok'
       },
       'attendance.presentDays': {
         'AR': 'أيام الحضور',

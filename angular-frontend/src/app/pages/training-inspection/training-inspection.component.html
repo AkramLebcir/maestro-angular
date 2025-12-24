@@ -48,6 +48,13 @@
           : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
         {{ translate('trainingInspection.pedagogicalVisits') }}
       </button>
+      <button
+        (click)="setTab('coordination')"
+        [class]="activeTab === 'coordination'
+          ? 'px-4 py-2 text-sm font-medium border-b-2 border-blue-600 text-blue-600'
+          : 'px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-blue-600'">
+        {{ translate('trainingInspection.coordinationSessions') }}
+      </button>
     </div>
 
     <!-- Tab: سجل التكوين -->
@@ -548,6 +555,204 @@
               </div>
               <div class="text-gray-700 dark:text-gray-300 whitespace-pre-line" *ngIf="v.followUp">
                 {{ translate('trainingInspection.pedagogicalFollowUp') }} {{ v.followUp }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: جلسات التنسيق -->
+    <div *ngIf="activeTab === 'coordination'" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.sessionDate') }}</label>
+            <input
+              class="col-span-2 input-field"
+              type="date"
+              [(ngModel)]="newCoordinationSession.date" />
+          </div>
+          
+          <!-- Attendees -->
+          <div>
+            <label class="text-sm text-gray-700 dark:text-gray-300 mb-2 block">{{ translate('trainingInspection.attendees') }}</label>
+            <div class="flex gap-2 mb-2">
+              <input
+                class="flex-1 input-field"
+                type="text"
+                [placeholder]="translate('trainingInspection.attendeeName')"
+                [(ngModel)]="newAttendeeName"
+                (keyup.enter)="addAttendee()" />
+              <button
+                (click)="addAttendee()"
+                class="px-3 py-2 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition">
+                {{ translate('trainingInspection.addAttendee') }}
+              </button>
+            </div>
+            <div class="space-y-1 max-h-32 overflow-y-auto">
+              <div
+                *ngFor="let attendee of newCoordinationSession.attendees; let i = index"
+                class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm">
+                <span>{{ attendee }}</span>
+                <button
+                  (click)="removeAttendee(i)"
+                  class="text-red-500 hover:text-red-700 text-xs">
+                  {{ translate('common.delete') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Progress Percentage -->
+          <div class="grid grid-cols-3 items-center gap-2">
+            <label class="col-span-1 text-sm text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.progressPercentage') }}</label>
+            <input
+              class="col-span-2 input-field"
+              type="number"
+              min="0"
+              max="100"
+              [(ngModel)]="newCoordinationSession.progressPercentage"
+              placeholder="0-100" />
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <!-- Agenda -->
+          <div>
+            <label class="text-sm text-gray-700 dark:text-gray-300 mb-2 block">{{ translate('trainingInspection.agenda') }}</label>
+            <div class="flex gap-2 mb-2">
+              <input
+                class="flex-1 input-field"
+                type="text"
+                [placeholder]="translate('trainingInspection.agendaItem')"
+                [(ngModel)]="newAgendaItem"
+                (keyup.enter)="addAgendaItem()" />
+              <button
+                (click)="addAgendaItem()"
+                class="px-3 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+                {{ translate('trainingInspection.addAgendaItem') }}
+              </button>
+            </div>
+            <div class="space-y-1 max-h-32 overflow-y-auto">
+              <div
+                *ngFor="let item of newCoordinationSession.agenda; let i = index"
+                class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm">
+                <span>{{ i + 1 }}. {{ item }}</span>
+                <button
+                  (click)="removeAgendaItem(i)"
+                  class="text-red-500 hover:text-red-700 text-xs">
+                  {{ translate('common.delete') }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Decisions -->
+          <div>
+            <label class="text-sm text-gray-700 dark:text-gray-300 mb-2 block">{{ translate('trainingInspection.decisions') }}</label>
+            <div class="flex gap-2 mb-2">
+              <input
+                class="flex-1 input-field"
+                type="text"
+                [placeholder]="translate('trainingInspection.decision')"
+                [(ngModel)]="newDecision"
+                (keyup.enter)="addDecision()" />
+              <button
+                (click)="addDecision()"
+                class="px-3 py-2 rounded-lg bg-purple-600 text-white text-sm font-medium hover:bg-purple-700 transition">
+                {{ translate('trainingInspection.addDecision') }}
+              </button>
+            </div>
+            <div class="space-y-1 max-h-32 overflow-y-auto">
+              <div
+                *ngFor="let decision of newCoordinationSession.decisions; let i = index"
+                class="flex items-center justify-between bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded text-sm">
+                <span>{{ i + 1 }}. {{ decision }}</span>
+                <button
+                  (click)="removeDecision(i)"
+                  class="text-red-500 hover:text-red-700 text-xs">
+                  {{ translate('common.delete') }}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end">
+        <button
+          (click)="addCoordinationSession()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition">
+          {{ translate('trainingInspection.saveSession') }}
+        </button>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ translate('trainingInspection.coordinationReport') }}</h2>
+          <button
+            (click)="exportCoordinationSessionPdf(-1)"
+            class="btn-export-pdf px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-medium hover:bg-red-700 transition">
+            {{ translate('common.exportPdf') }}
+          </button>
+        </div>
+        <div #coordinationSessionPrint>
+          <div class="text-center font-semibold text-gray-800 dark:text-gray-200 mb-3">
+            {{ translate('trainingInspection.coordinationReport') }}
+          </div>
+          <div *ngIf="coordinationSessions.length === 0" class="text-xs text-gray-500 dark:text-gray-400">
+            {{ translate('trainingInspection.noCoordinationSessions') }}
+          </div>
+          <div class="space-y-4">
+            <div
+              *ngFor="let session of coordinationSessions; let i = index"
+              class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 text-sm bg-gray-50 dark:bg-gray-900 flex flex-col gap-3">
+              <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800 dark:text-gray-200">
+                  {{ translate('trainingInspection.coordinationMinutes') }} - {{ session.date | date:'yyyy/MM/dd' }}
+                </div>
+                <div class="flex gap-2">
+                  <button
+                    (click)="exportCoordinationSessionPdf(i)"
+                    class="text-xs text-blue-500 hover:underline">
+                    {{ translate('common.exportPdf') }}
+                  </button>
+                  <button
+                    (click)="deleteCoordinationSession(i)"
+                    class="text-xs text-red-500 hover:underline">
+                    {{ translate('common.delete') }}
+                  </button>
+                </div>
+              </div>
+              
+              <div>
+                <div class="font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('trainingInspection.present') }}:</div>
+                <div class="text-gray-600 dark:text-gray-400">
+                  <span *ngFor="let attendee of session.attendees; let last = last">
+                    {{ attendee }}<span *ngIf="!last">، </span>
+                  </span>
+                  <span *ngIf="session.attendees.length === 0">{{ translate('trainingInspection.unspecified') }}</span>
+                </div>
+              </div>
+
+              <div>
+                <div class="font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('trainingInspection.agendaItems') }}:</div>
+                <ul class="list-decimal list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                  <li *ngFor="let item of session.agenda">{{ item }}</li>
+                  <li *ngIf="session.agenda.length === 0" class="text-gray-500">{{ translate('trainingInspection.unspecified') }}</li>
+                </ul>
+              </div>
+
+              <div>
+                <div class="font-medium text-gray-700 dark:text-gray-300 mb-1">{{ translate('trainingInspection.decisionsMade') }}:</div>
+                <ul class="list-decimal list-inside text-gray-600 dark:text-gray-400 space-y-1">
+                  <li *ngFor="let decision of session.decisions">{{ decision }}</li>
+                  <li *ngIf="session.decisions.length === 0" class="text-gray-500">{{ translate('trainingInspection.unspecified') }}</li>
+                </ul>
+              </div>
+
+              <div *ngIf="session.progressPercentage !== undefined && session.progressPercentage !== null">
+                <div class="font-medium text-gray-700 dark:text-gray-300">{{ translate('trainingInspection.collectiveProgress') }}: {{ session.progressPercentage }}%</div>
               </div>
             </div>
           </div>

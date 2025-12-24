@@ -95,6 +95,19 @@ export interface AttendanceStatistics {
   attendanceRate: number;
 }
 
+export interface DepartmentAttendanceReport {
+  studentId: number;
+  studentName: string;
+  dailyPresent: number;
+  dailyAbsent: number;
+  weeklyPresent: number;
+  weeklyAbsent: number;
+  monthlyPresent: number;
+  monthlyAbsent: number;
+  attendanceRate: number;
+  status: 'excellent' | 'good' | 'needs_attention';
+}
+
 @Component({
   selector: 'app-attendance',
   templateUrl: './attendance.component.html',
@@ -110,7 +123,7 @@ export class AttendanceComponent implements OnInit {
   attendanceRecords: AttendanceRecord[] = [];
   showReportModal = false;
   showStatisticsModal = false;
-  reportType: 'absences' | 'statistics' | 'class' = 'absences';
+  reportType: 'absences' | 'statistics' | 'class' | 'department' = 'absences';
   
   // Attendance statuses
   attendanceStatuses = [
@@ -756,11 +769,11 @@ export class AttendanceComponent implements OnInit {
   }
 
   // Reports
-  openReportModal(type: 'absences' | 'statistics' | 'class'): void {
+  openReportModal(type: 'absences' | 'statistics' | 'class' | 'department'): void {
     this.reportType = type;
     this.showReportModal = true;
-    // Load all attendance records for statistics
-    if (type === 'statistics') {
+    // Load all attendance records for statistics and department report
+    if (type === 'statistics' || type === 'department') {
       this.loadAllAttendanceRecords();
     }
   }
@@ -1255,6 +1268,246 @@ export class AttendanceComponent implements OnInit {
     if (learningCase) return '⭐';
     
     return null;
+  }
+
+  getDepartmentAttendanceReport(): DepartmentAttendanceReport[] {
+    if (!this.selectedClass) return [];
+    
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    // Calculate start of week (Monday)
+    const startOfWeek = new Date(today);
+    const dayOfWeek = today.getDay();
+    startOfWeek.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    startOfMonth.setHours(0, 0, 0, 0);
+    
+    return this.students.map(student => {
+      const studentRecords = this.attendanceRecords.filter(r => 
+        r.studentId === student.id && 
+        r.classId === this.selectedClass!.id
+      );
+      
+      // Daily statistics (today only)
+      const todayStr = this.formatDateForAPI(today);
+      const dailyRecords = studentRecords.filter(r => r.date === todayStr);
+      const dailyPresent = dailyRecords.filter(r => r.status === 'present').length;
+      const dailyAbsent = dailyRecords.filter(r => r.status === 'absent').length;
+      
+      // Weekly statistics (current week)
+      const weeklyRecords = studentRecords.filter(r => {
+        const recordDate = new Date(r.date);
+        return recordDate >= startOfWeek && recordDate <= today;
+      });
+      const weeklyPresent = weeklyRecords.filter(r => r.status === 'present').length;
+      const weeklyAbsent = weeklyRecords.filter(r => r.status === 'absent').length;
+      
+      // Monthly statistics (current month)
+      const monthlyRecords = studentRecords.filter(r => {
+        const recordDate = new Date(r.date);
+        return recordDate >= startOfMonth && recordDate <= today;
+      });
+      const monthlyPresent = monthlyRecords.filter(r => r.status === 'present').length;
+      const monthlyAbsent = monthlyRecords.filter(r => r.status === 'absent').length;
+      
+      // Calculate overall attendance rate
+      const totalRecords = monthlyRecords.length || 1;
+      const attendanceRate = (monthlyPresent / totalRecords) * 100;
+      
+      // Determine status
+      let status: 'excellent' | 'good' | 'needs_attention' = 'good';
+      if (attendanceRate >= 90) {
+        status = 'excellent';
+      } else if (attendanceRate < 70) {
+        status = 'needs_attention';
+      }
+      
+      return {
+        studentId: student.id,
+        studentName: `${student.lastName} ${student.firstName}`,
+        dailyPresent,
+        dailyAbsent,
+        weeklyPresent,
+        weeklyAbsent,
+        monthlyPresent,
+        monthlyAbsent,
+        attendanceRate,
+        status
+      };
+    }).sort((a, b) => {
+      // Sort by attendance rate (lowest first) to highlight students needing attention
+      return a.attendanceRate - b.attendanceRate;
+    });
+  }
+
+  getStatusLabelForReport(status: 'excellent' | 'good' | 'needs_attention'): string {
+    switch (status) {
+      case 'excellent':
+        return this.translate('attendance.statusExcellent');
+      case 'good':
+        return this.translate('attendance.statusGood');
+      case 'needs_attention':
+        return this.translate('attendance.statusNeedsAttention');
+      default:
+        return '-';
+    }
+  }
+
+  exportDepartmentReportToPDF(): void {
+    if (!this.selectedClass) {
+      alert(this.translate('attendance.selectClassFirst'));
+      return;
+    }
+
+    const reportData = this.getDepartmentAttendanceReport();
+    if (reportData.length === 0) {
+      alert(this.translate('attendance.noDataToExport'));
+      return;
+    }
+
+    // Find the department report table
+    const reportTable = document.querySelector('#department-report-table') as HTMLElement;
+    
+    if (!reportTable) {
+      alert(this.translate('attendance.reportTableNotFound'));
+      return;
+    }
+
+    // Create a container for export
+    const exportContainer = document.createElement('div');
+    exportContainer.style.position = 'absolute';
+    exportContainer.style.left = '-9999px';
+    exportContainer.style.top = '0';
+    exportContainer.style.width = '800px';
+    exportContainer.style.backgroundColor = '#ffffff';
+    exportContainer.style.padding = '20px';
+    exportContainer.style.fontFamily = 'Arial, sans-serif';
+    
+    // Clone the table
+    const clonedTable = reportTable.cloneNode(true) as HTMLElement;
+    
+    // Style the cloned table for better PDF rendering
+    clonedTable.style.width = '100%';
+    clonedTable.style.borderCollapse = 'collapse';
+    clonedTable.style.fontSize = '12px';
+    
+    // Style all cells
+    const allCells = clonedTable.querySelectorAll('td, th');
+    allCells.forEach((cell: Element) => {
+      const htmlCell = cell as HTMLElement;
+      htmlCell.style.border = '1px solid #e5e7eb';
+      htmlCell.style.padding = '8px';
+      htmlCell.style.textAlign = 'right';
+    });
+    
+    // Style header cells
+    const headerCells = clonedTable.querySelectorAll('th');
+    headerCells.forEach((cell: Element) => {
+      const htmlCell = cell as HTMLElement;
+      htmlCell.style.backgroundColor = '#f3f4f6';
+      htmlCell.style.fontWeight = 'bold';
+      htmlCell.style.color = '#374151';
+    });
+    
+    // Add title
+    const title = document.createElement('h2');
+    title.textContent = this.translate('attendance.departmentReport');
+    title.style.textAlign = 'right';
+    title.style.fontSize = '18px';
+    title.style.fontWeight = 'bold';
+    title.style.marginBottom = '15px';
+    title.style.color = '#111827';
+    
+    // Add class name and date if available
+    const info = document.createElement('div');
+    info.style.textAlign = 'right';
+    info.style.marginBottom = '15px';
+    info.style.fontSize = '12px';
+    info.style.color = '#6b7280';
+    
+    const classLabel = this.translate('students.class');
+    const dateLabel = this.translate('attendance.date');
+    const classInfo = this.selectedClass ? `${classLabel} ${this.selectedClass.name}` : '';
+    const dateInfo = `${dateLabel} ${new Date().toLocaleDateString(this.getLocale())}`;
+    info.innerHTML = `${classInfo}<br>${dateInfo}`;
+    
+    exportContainer.appendChild(title);
+    exportContainer.appendChild(info);
+    exportContainer.appendChild(clonedTable);
+    
+    document.body.appendChild(exportContainer);
+    
+    // Use html2canvas to capture the table
+    html2canvas(exportContainer, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      backgroundColor: '#ffffff',
+      width: exportContainer.offsetWidth,
+      height: exportContainer.offsetHeight
+    }).then((canvas) => {
+      // Clean up
+      document.body.removeChild(exportContainer);
+      
+      // Calculate PDF dimensions (landscape A4)
+      const imgWidth = 297; // A4 width in mm (landscape)
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const pdf = new jsPDF('l', 'mm', 'a4');
+      
+      // Calculate scale to fit on page(s)
+      const pageHeight = 210; // A4 height in mm (landscape)
+      const pageWidth = 297; // A4 width in mm (landscape)
+      const margin = 10; // Margin on all sides
+      const availableHeight = pageHeight - (2 * margin);
+      const availableWidth = pageWidth - (2 * margin);
+      
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+      
+      // Scale down if content is too large
+      if (imgHeight > availableHeight) {
+        const scale = availableHeight / imgHeight;
+        finalHeight = availableHeight;
+        finalWidth = imgWidth * scale;
+      }
+      
+      if (finalWidth > availableWidth) {
+        const scale = availableWidth / finalWidth;
+        finalWidth = availableWidth;
+        finalHeight = finalHeight * scale;
+      }
+      
+      // Position content from top
+      const xOffset = (pageWidth - finalWidth) / 2; // Center horizontally
+      const yOffset = margin; // Start from top with margin
+      
+      // Add to PDF
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      // Add additional pages if needed
+      let heightLeft = imgHeight - availableHeight;
+      let position = -availableHeight;
+      
+      while (heightLeft > 0) {
+        position = position - availableHeight;
+        pdf.addPage();
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, position, finalWidth, finalHeight);
+        heightLeft -= availableHeight;
+      }
+      
+      // Save PDF
+      const baseName = this.translate('attendance.departmentReport').replace(/\s+/g, '_');
+      const className = this.selectedClass?.name || 'class';
+      const fileName = `${baseName}_${className}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    }).catch((error) => {
+      console.error('Error generating PDF:', error);
+      alert(this.translate('attendance.errorExportPdf'));
+      document.body.removeChild(exportContainer);
+    });
   }
 }
 
