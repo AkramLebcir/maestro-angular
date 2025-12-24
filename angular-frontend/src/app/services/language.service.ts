@@ -1777,6 +1777,24 @@ export class LanguageService {
         'DE': 'Notenbuch',
         'TR': 'Not Defteri'
       },
+      'gradebook.voiceGrading': {
+        'AR': 'إملاء صوتي',
+        'FR': 'Dictée vocale',
+        'EN': 'Voice grading',
+        'ES': 'Dictado de voz',
+        'IT': 'Dettatura vocale',
+        'DE': 'Sprachdiktat',
+        'TR': 'Sesli dikte'
+      },
+      'gradebook.listening': {
+        'AR': 'جاري الاستماع...',
+        'FR': 'Écoute en cours...',
+        'EN': 'Listening...',
+        'ES': 'Escuchando...',
+        'IT': 'Ascolto...',
+        'DE': 'Zuhören...',
+        'TR': 'Dinliyor...'
+      },
       'gradebook.class': {
         'AR': 'القسم',
         'FR': 'Classe',

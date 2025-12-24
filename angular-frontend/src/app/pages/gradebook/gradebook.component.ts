@@ -1,17 +1,9 @@
-import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
-import {
-  GradingSettingsService,
-  GradingSettings,
-  CustomAssessmentColumn,
-  BaseColumnConfig,
-  BaseColumnKey,
-  DEFAULT_BASE_COLUMN_SETTINGS,
-  RatingRangeConfig,
-  GuidanceRangeConfig,
-} from '../../services/grading-settings.service';
+import { GradingSettingsService, GradingSettings, CustomAssessmentColumn, BaseColumnConfig, BaseColumnKey, DEFAULT_BASE_COLUMN_SETTINGS, RatingRangeConfig, GuidanceRangeConfig } from '../../services/grading-settings.service';
+import { VoiceGradingService } from '../../services/voice-grading.service';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
@@ -190,7 +182,7 @@ export interface FinalCouncilDecision {
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
 })
-export class GradebookComponent implements OnInit, AfterViewInit {
+export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   students: Student[] = [];
   classes: Class[] = [];
   assessments: Assessment[] = [];
@@ -431,12 +423,16 @@ export class GradebookComponent implements OnInit, AfterViewInit {
     }]
   };
 
+  // Voice Grading
+  isVoiceGradingActive = false;
+
   constructor(
     private apiService: ApiService,
     private gradingSettingsService: GradingSettingsService,
     private cdr: ChangeDetectorRef,
     private route: ActivatedRoute,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private voiceGradingService: VoiceGradingService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -465,6 +461,80 @@ export class GradebookComponent implements OnInit, AfterViewInit {
         this.councilActiveTab = councilTab;
       }
     });
+
+    // Subscribe to voice grading
+    this.voiceGradingService.listening$.subscribe(isListening => {
+      this.isVoiceGradingActive = isListening;
+      this.cdr.detectChanges();
+    });
+
+    this.voiceGradingService.transcript$.subscribe(transcript => {
+      this.handleVoiceInput(transcript);
+    });
+  }
+
+  toggleVoiceGrading() {
+    this.voiceGradingService.toggle();
+  }
+
+  handleVoiceInput(transcript: string) {
+    if (!this.isVoiceGradingActive) return;
+    
+    // Parse number from transcript (handle Arabic and English numerals)
+    const number = this.parseNumberFromSpeech(transcript);
+    
+    if (number !== null && !isNaN(number)) {
+      const activeElement = document.activeElement as HTMLInputElement;
+      if (activeElement && activeElement.tagName === 'INPUT' && activeElement.type === 'number') {
+        activeElement.value = number.toString();
+        activeElement.dispatchEvent(new Event('input'));
+        activeElement.dispatchEvent(new Event('change'));
+        
+        // Optional: Trigger blur to save if needed, or wait for user to move
+        // activeElement.dispatchEvent(new Event('blur')); 
+        // Better to let user say "Next" or manually move, or auto-move?
+        // Let's stick to filling the value for now. 
+        // Triggering blur might save immediately which is good.
+        activeElement.blur(); 
+        activeElement.focus(); // Focus back? No, blur triggers save.
+        
+        // Maybe move to next input?
+        // For now just fill and trigger change.
+      }
+    }
+  }
+
+  parseNumberFromSpeech(text: string): number | null {
+    // 1. Normalize Arabic numerals to English
+    const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    let normalized = text;
+    
+    arabicNumerals.forEach((num, index) => {
+      normalized = normalized.replace(new RegExp(num, 'g'), index.toString());
+    });
+
+    // 2. Handle Decimal Separators
+    // Arabic 'فاصلة', comma, etc. -> '.'
+    normalized = normalized.replace(/فاصلة/g, '.')
+                           .replace(/,/g, '.')
+                           .replace(/،/g, '.'); // Arabic comma
+
+    // 3. Cleanup: Remove non-numeric characters except '.' and '-'
+    // Note: This might remove words, so we rely on the speech engine to give digits or we do more advanced parsing.
+    // For now, let's just extract the first valid number pattern found.
+    
+    // Check if the string contains digits
+    const match = normalized.match(/-?[\d]+(\.[\d]+)?/);
+    if (match) {
+        const parsed = parseFloat(match[0]);
+        return isNaN(parsed) ? null : parsed;
+    }
+
+    return null;
+  }
+
+  ngOnDestroy() {
+    this.voiceGradingService.stop();
   }
 
   loadClasses(): void {
