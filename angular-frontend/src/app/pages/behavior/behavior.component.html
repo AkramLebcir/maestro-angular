@@ -2,15 +2,35 @@
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg dark:shadow-gray-900/50 p-6">
     <div class="flex justify-between items-center mb-6">
       <h1 class="text-3xl font-bold text-gray-800 dark:text-gray-200">{{ translate('behavior.title') }}</h1>
-      <div class="flex gap-3">
-        <button 
-          (click)="openClassReport()"
-          class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <span>{{ translate('behavior.classReport') }}</span>
-        </button>
+      <div class="flex flex-col gap-3 w-full">
+        <div class="flex gap-3 items-start justify-end w-full">
+          <button 
+            (click)="pickRandomStudent()"
+            class="random-picker-btn bg-[var(--primary-600)] text-white px-4 py-2 rounded-lg text-sm hover:bg-[var(--primary-700)] transition max-w-fit text-center flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 10V6a2 2 0 00-2-2H6a2 2 0 00-2 2v10a2 2 0 002 2h4M16 18l2 2 4-4M18 18h.01" />
+            </svg>
+            <span>{{ translate('randomPick') }}</span>
+          </button>
+          <div class="flex-shrink-0 flex-grow-0">
+            <button 
+              (click)="openClassReport()"
+              class="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <span>{{ translate('behavior.classReport') }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="w-1/5 mx-auto">
+          <app-random-picker 
+            [students]="students"
+            [selectedStudent]="randomPickedStudent"
+            (clearSelected)="clearRandomPickedStudent()"
+            class="w-full">
+          </app-random-picker>
+        </div>
       </div>
     </div>
 
@@ -102,10 +122,27 @@
   <div 
     class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-4xl my-8"
     (click)="$event.stopPropagation()">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
-        {{ translate('behavior.recordBehaviorTitle') }} - {{ selectedStudent.firstName }} {{ selectedStudent.lastName }}
-      </h3>
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-3">
+        <!-- Student Photo -->
+        <div class="relative">
+          <img 
+            *ngIf="hasPhoto(selectedStudent!)"
+            [src]="getStudentPhoto(selectedStudent!)"
+            [alt]="selectedStudent!.firstName + ' ' + selectedStudent!.lastName"
+            class="w-12 h-12 rounded-full object-cover border-2 border-gray-200 dark:border-gray-700">
+          <div 
+            *ngIf="!hasPhoto(selectedStudent!)" 
+            class="w-12 h-12 rounded-full border-2 border-gray-200 dark:border-gray-700 flex items-center justify-center text-xl bg-gray-100 dark:bg-gray-800"
+            [class.bg-green-50]="selectedStudent!.gender === 'male'" 
+            [class.bg-pink-50]="selectedStudent!.gender === 'female'">
+            {{ getDefaultIcon(selectedStudent!) }}
+          </div>
+        </div>
+        <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+          {{ translate('behavior.recordBehaviorTitle') }} - {{ selectedStudent!.firstName }} {{ selectedStudent!.lastName }}
+        </h3>
+      </div>
       <button 
         (click)="closeBehaviorModal()"
         class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">

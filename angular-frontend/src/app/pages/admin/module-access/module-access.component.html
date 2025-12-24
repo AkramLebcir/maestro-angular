@@ -48,7 +48,7 @@
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">
           {{ translate('moduleAccess.permissionsFor') }}:
-          {{ (selectedUser.firstName || '') + ' ' + (selectedUser.lastName || '') || selectedUser.email }}
+          {{ (selectedUser!.firstName || '') + ' ' + (selectedUser!.lastName || '') || selectedUser!.email }}
         </h3>
         <div class="space-x-2 space-x-reverse">
           <button

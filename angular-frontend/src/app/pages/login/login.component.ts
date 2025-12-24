@@ -15,9 +15,9 @@ export class LoginComponent implements OnInit, OnDestroy {
   password: string = '';
   isLoading: boolean = false;
   errorMessage: string = '';
+  private loginSubscription?: Subscription;
   recaptchaSiteKey: string = environment.recaptchaSiteKey;
   captchaToken: string = '';
-  private loginSubscription?: Subscription;
 
   constructor(
     private authService: AuthService,
@@ -36,18 +36,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  onCaptchaResolved(token: string): void {
-    this.captchaToken = token;
-  }
-
-  onCaptchaExpired(): void {
-    this.captchaToken = '';
-  }
-
-  onCaptchaError(): void {
-    this.captchaToken = '';
-    this.errorMessage = this.translate('login.captchaError') || 'حدث خطأ في التحقق من reCAPTCHA';
-  }
 
   onSubmit(): void {
     if (!this.identifier || !this.password) {
@@ -55,10 +43,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.captchaToken) {
-      this.errorMessage = this.translate('login.captchaRequired') || 'يرجى إكمال التحقق من reCAPTCHA';
-      return;
-    }
 
     this.isLoading = true;
     this.errorMessage = '';
@@ -71,8 +55,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.loginSubscription = this.authService.login(this.identifier, this.password, this.captchaToken).subscribe({
       next: (response) => {
         this.isLoading = false;
-        // Reset captcha token to prevent issues during navigation
-        this.captchaToken = '';
         // Redirect based on role
         if (response.user.role === 'admin') {
           this.router.navigate(['/admin']);
@@ -82,10 +64,21 @@ export class LoginComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         this.isLoading = false;
-        this.captchaToken = '';
         this.errorMessage = error?.error?.message || this.translate('login.error');
       }
     });
+  }
+
+  onCaptchaResolved(captchaToken: string): void {
+    this.captchaToken = captchaToken;
+  }
+
+  onCaptchaExpired(): void {
+    this.captchaToken = '';
+  }
+
+  onCaptchaError(): void {
+    this.captchaToken = '';
   }
 
   ngOnDestroy(): void {
@@ -94,8 +87,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.loginSubscription.unsubscribe();
     }
 
-    // Reset captcha token to help with cleanup
-    this.captchaToken = '';
   }
 }
 

@@ -1,5 +1,7 @@
 import { NgModule, ErrorHandler } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -42,6 +44,7 @@ import { ReportGeneratorComponent } from './pages/report-generator/report-genera
 import { ClubsComponent } from './pages/clubs/clubs.component';
 import { AuthInterceptor } from './services/auth-interceptor.service';
 import { GlobalErrorHandler } from './services/global-error-handler.service';
+import { RandomPickerComponent } from './components/random-picker/random-picker.component';
 
 @NgModule({
   declarations: [
@@ -51,6 +54,7 @@ import { GlobalErrorHandler } from './services/global-error-handler.service';
     ClassesComponent,
     LabsComponent,
     StudentsComponent,
+    RandomPickerComponent,
     TimetableComponent,
     TopicsComponent,
     NotebooksComponent,
@@ -82,6 +86,8 @@ import { GlobalErrorHandler } from './services/global-error-handler.service';
   ],
   imports: [
     BrowserModule,
+    CommonModule,
+    RouterModule,
     HttpClientModule,
     FormsModule,
     DragDropModule,

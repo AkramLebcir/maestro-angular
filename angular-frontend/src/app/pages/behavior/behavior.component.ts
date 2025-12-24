@@ -91,6 +91,7 @@ export class BehaviorComponent implements OnInit {
   behaviorEvents: BehaviorEvent[] = [];
   selectedClass: Class | null = null;
   selectedStudent: Student | null = null;
+  randomPickedStudent: Student | null = null;
   showBehaviorModal = false;
   showReportModal = false;
   showStudentReportModal = false;
@@ -286,6 +287,17 @@ export class BehaviorComponent implements OnInit {
   closeBehaviorModal(): void {
     this.showBehaviorModal = false;
     this.selectedStudent = null;
+  }
+
+  pickRandomStudent(): void {
+    if (this.filteredStudents.length > 0) {
+      const randomIndex = Math.floor(Math.random() * this.filteredStudents.length);
+      this.randomPickedStudent = this.filteredStudents[randomIndex];
+    }
+  }
+
+  clearRandomPickedStudent(): void {
+    this.randomPickedStudent = null;
   }
 
   saveBehaviorEvent(): void {

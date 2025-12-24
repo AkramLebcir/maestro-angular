@@ -6246,6 +6246,24 @@ export class LanguageService {
         'DE': 'Verhaltensverwaltung',
         'TR': 'Davranış Yönetimi'
       },
+      'randomPick': {
+        'AR': 'اختيار عشوائي',
+        'FR': 'Sélection aléatoire',
+        'EN': 'Random Pick',
+        'ES': 'Selección aleatoria',
+        'IT': 'Selezione casuale',
+        'DE': 'Zufällige Auswahl',
+        'TR': 'Rastgele Seçim'
+      },
+      'pickedStudent': {
+        'AR': 'الطالب المختار',
+        'FR': 'Étudiant sélectionné',
+        'EN': 'Picked Student',
+        'ES': 'Estudiante seleccionado',
+        'IT': 'Studente selezionato',
+        'DE': 'Ausgewählter Student',
+        'TR': 'Seçilen Öğrenci'
+      },
       'behavior.classReport': {
         'AR': 'تقرير القسم',
         'FR': 'Rapport de classe',

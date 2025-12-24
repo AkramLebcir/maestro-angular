@@ -1,0 +1,4 @@
+.random-picker-btn {
+  /* Removed fixed positioning and size, now handled by Tailwind classes in HTML */
+  /* Example: flex items-center justify-center gap-2 */
+}
