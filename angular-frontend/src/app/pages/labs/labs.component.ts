@@ -1,6 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
+import { AuthService } from '../../services/auth.service';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { ActivatedRoute } from '@angular/router';
@@ -11,6 +14,7 @@ export interface Lab {
   description?: string;
   location?: string;
   isAvailable: boolean;
+  images?: string[];
   createdAt: Date;
   updatedAt: Date;
 }
@@ -121,6 +125,11 @@ export class LabsComponent implements OnInit {
     isAvailable: true
   };
 
+  // Image management
+  showImageModal = false;
+  selectedLabForImages: Lab | null = null;
+  uploadingImage = false;
+
   // Tabs
   activeTab:
     | 'labs'
@@ -209,6 +218,8 @@ export class LabsComponent implements OnInit {
     private apiService: ApiService,
     private route: ActivatedRoute,
     public languageService: LanguageService,
+    private authService: AuthService,
+    private http: HttpClient,
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -986,6 +997,100 @@ export class LabsComponent implements OnInit {
       });
     }
   }
-}
 
+  openImageModal(lab: Lab): void {
+    this.selectedLabForImages = lab;
+    this.showImageModal = true;
+  }
+
+  closeImageModal(): void {
+    this.showImageModal = false;
+    this.selectedLabForImages = null;
+  }
+
+  onImageFileSelected(event: Event, labId: number): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    
+    // Check file size (100MB)
+    const maxSize = 100 * 1024 * 1024; // 100MB in bytes
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى هو 100 ميجابايت.');
+      input.value = '';
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      alert('نوع الملف غير مسموح. يُسمح فقط بصور PNG, JPEG, JPG, GIF, WEBP.');
+      input.value = '';
+      return;
+    }
+
+    this.uploadingImage = true;
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    this.http.post<Lab>(`${environment.apiUrl}/labs/${labId}/upload-image`, formData, {
+      headers
+    }).subscribe({
+      next: (updatedLab: Lab) => {
+        this.uploadingImage = false;
+        input.value = '';
+        // Update the lab in the list
+        const index = this.labs.findIndex(l => l.id === labId);
+        if (index !== -1) {
+          this.labs[index] = updatedLab;
+          if (this.selectedLabForImages && this.selectedLabForImages.id === labId) {
+            this.selectedLabForImages = updatedLab;
+          }
+        }
+      },
+      error: (error) => {
+        this.uploadingImage = false;
+        input.value = '';
+        console.error('Error uploading image:', error);
+        const errorMessage = error?.error?.message || 'حدث خطأ أثناء رفع الصورة';
+        alert(errorMessage);
+      }
+    });
+  }
+
+  deleteImage(labId: number, imageIndex: number): void {
+    if (!confirm('هل أنت متأكد من حذف هذه الصورة؟')) return;
+
+    this.apiService.delete<Lab>(`/labs/${labId}/images/${imageIndex}`).subscribe({
+      next: (updatedLab: Lab) => {
+        // Update the lab in the list
+        const index = this.labs.findIndex(l => l.id === labId);
+        if (index !== -1) {
+          this.labs[index] = updatedLab;
+          if (this.selectedLabForImages && this.selectedLabForImages.id === labId) {
+            this.selectedLabForImages = updatedLab;
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error deleting image:', error);
+        alert('حدث خطأ أثناء حذف الصورة');
+      }
+    });
+  }
+
+  getImageUrl(imagePath: string): string {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `${environment.apiUrl}${imagePath}`;
+  }
+}
 

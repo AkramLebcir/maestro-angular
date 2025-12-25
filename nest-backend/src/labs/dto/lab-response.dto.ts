@@ -4,6 +4,7 @@ export class LabResponseDto {
   description?: string;
   location?: string;
   isAvailable: boolean;
+  images?: string[];
   createdAt: Date;
   updatedAt: Date;
 }

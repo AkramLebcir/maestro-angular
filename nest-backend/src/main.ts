@@ -19,9 +19,9 @@ async function bootstrap() {
       bodyParser: false, // Disable default body parser to configure our own
     });
     
-    // Increase body size limit to 50MB for image uploads (base64 encoded images can be large)
-    app.use(express.json({ limit: '50mb' }));
-    app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+    // Increase body size limit to 100MB for image uploads (base64 encoded images can be large)
+    app.use(express.json({ limit: '100mb' }));
+    app.use(express.urlencoded({ extended: true, limit: '100mb' }));
     app.use(cookieParser());
 
     // Serve uploaded files (e.g., pedagogical documents)

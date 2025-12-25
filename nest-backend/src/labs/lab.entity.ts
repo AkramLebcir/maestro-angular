@@ -19,6 +19,9 @@ export class Lab extends TenantOwnedEntity {
   @Column({ default: true })
   isAvailable: boolean;
 
+  @Column('simple-array', { nullable: true })
+  images?: string[];
+
   @OneToMany(() => Class, (classEntity) => classEntity.lab)
   classes: Class[];
 

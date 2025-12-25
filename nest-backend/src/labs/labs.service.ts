@@ -45,6 +45,34 @@ export class LabsService {
     await this.labRepository.remove(lab);
   }
 
+  async addImage(ownerId: number, id: number, imageUrl: string): Promise<LabResponseDto> {
+    const lab = await this.findOwnedLab(ownerId, id);
+    
+    if (!lab.images) {
+      lab.images = [];
+    }
+    
+    lab.images.push(imageUrl);
+    await this.labRepository.save(lab);
+    return this.mapToResponseDto(lab);
+  }
+
+  async removeImage(ownerId: number, id: number, imageIndex: number): Promise<LabResponseDto> {
+    const lab = await this.findOwnedLab(ownerId, id);
+    
+    if (!lab.images || lab.images.length === 0) {
+      throw new NotFoundException('لا توجد صور للمخبر');
+    }
+    
+    if (imageIndex < 0 || imageIndex >= lab.images.length) {
+      throw new NotFoundException('فهرس الصورة غير صحيح');
+    }
+    
+    lab.images.splice(imageIndex, 1);
+    await this.labRepository.save(lab);
+    return this.mapToResponseDto(lab);
+  }
+
   private mapToResponseDto(lab: Lab): LabResponseDto {
     return {
       id: lab.id,
@@ -52,6 +80,7 @@ export class LabsService {
       description: lab.description,
       location: lab.location,
       isAvailable: lab.isAvailable,
+      images: lab.images || [],
       createdAt: lab.createdAt,
       updatedAt: lab.updatedAt,
     };

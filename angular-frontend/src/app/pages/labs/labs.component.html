@@ -112,6 +112,15 @@
               <td class="py-3 px-4">
                 <div class="flex items-center gap-2">
                   <button 
+                    (click)="openImageModal(lab)"
+                    class="p-2 text-green-600 hover:bg-green-50 dark:bg-green-900/20 rounded transition"
+                    [title]="translate('labs.manageImages')">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span *ngIf="lab.images && lab.images.length > 0" class="ml-1 text-xs">({{ lab.images.length }})</span>
+                  </button>
+                  <button 
                     (click)="openEditModal(lab)"
                     class="p-2 text-blue-600 hover:bg-blue-50 dark:bg-blue-900/20 rounded transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -940,6 +949,77 @@
         </button>
       </div>
     </form>
+  </div>
+</div>
+
+<!-- Image Management Modal -->
+<div 
+  *ngIf="showImageModal && selectedLabForImages"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
+  (click)="closeImageModal()">
+  <div 
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+        {{ translate('labs.manageImages') }} - {{ selectedLabForImages.name }}
+      </h3>
+      <button 
+        (click)="closeImageModal()"
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Upload Section -->
+    <div class="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+      <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+        {{ translate('labs.uploadImage') }} (حد أقصى 100 ميجابايت)
+      </label>
+      <input 
+        type="file"
+        accept="image/png,image/jpeg,image/jpg,image/gif,image/webp"
+        (change)="onImageFileSelected($event, selectedLabForImages.id)"
+        [disabled]="uploadingImage"
+        class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+        id="labImageInput">
+      <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+        {{ translate('labs.allowedImageTypes') }}: PNG, JPEG, JPG, GIF, WEBP
+      </p>
+      <div *ngIf="uploadingImage" class="mt-2 text-sm text-blue-600 dark:text-blue-400">
+        {{ translate('labs.uploading') }}...
+      </div>
+    </div>
+
+    <!-- Images Grid -->
+    <div *ngIf="selectedLabForImages.images && selectedLabForImages.images.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div *ngFor="let image of selectedLabForImages.images; let i = index" class="relative group">
+        <img 
+          [src]="getImageUrl(image)" 
+          [alt]="selectedLabForImages.name + ' - ' + (i + 1)"
+          class="w-full h-48 object-cover rounded-lg border border-gray-300 dark:border-gray-600">
+        <button 
+          (click)="deleteImage(selectedLabForImages.id, i)"
+          class="absolute top-2 right-2 bg-red-600 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-700">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div *ngIf="!selectedLabForImages.images || selectedLabForImages.images.length === 0" class="text-center py-8 text-gray-500 dark:text-gray-400">
+      {{ translate('labs.noImages') }}
+    </div>
+
+    <div class="mt-6 flex justify-end">
+      <button 
+        (click)="closeImageModal()"
+        class="bg-gray-200 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg hover:bg-gray-300 transition">
+        {{ translate('labs.close') }}
+      </button>
+    </div>
   </div>
 </div>
 
