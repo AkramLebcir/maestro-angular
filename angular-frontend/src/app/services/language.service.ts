@@ -4173,6 +4173,33 @@ export class LanguageService {
         'DE': 'Koordinationssitzungsbericht öffnen',
         'TR': 'Koordinasyon oturumları raporunu aç'
       },
+      'reports.excelAnalysis': {
+        'AR': 'تقرير تحليل بيانات Excel الإجمالي',
+        'FR': 'Rapport d\'analyse globale des données Excel',
+        'EN': 'Total Excel data analysis report',
+        'ES': 'Informe de análisis total de datos Excel',
+        'IT': 'Rapporto di analisi totale dei dati Excel',
+        'DE': 'Gesamtbericht zur Excel-Datenanalyse',
+        'TR': 'Toplam Excel veri analizi raporu'
+      },
+      'reports.excelAnalysisDesc': {
+        'AR': 'تحليل شامل وإجمالي لبيانات Excel المستوردة مع إحصائيات ورسوم بيانية تفصيلية.',
+        'FR': 'Analyse complète et globale des données Excel importées avec statistiques et graphiques détaillés.',
+        'EN': 'Comprehensive and total analysis of imported Excel data with detailed statistics and charts.',
+        'ES': 'Análisis completo y total de los datos de Excel importados con estadísticas y gráficos detallados.',
+        'IT': 'Analisi completa e totale dei dati Excel importati con statistiche e grafici dettagliati.',
+        'DE': 'Umfassende und vollständige Analyse der importierten Excel-Daten mit detaillierten Statistiken und Diagrammen.',
+        'TR': 'İstatistikler ve detaylı grafiklerle içe aktarılan Excel verilerinin kapsamlı ve toplam analizi.'
+      },
+      'reports.openExcelAnalysis': {
+        'AR': 'فتح تحليل Excel',
+        'FR': 'Ouvrir l\'analyse Excel',
+        'EN': 'Open Excel analysis',
+        'ES': 'Abrir análisis Excel',
+        'IT': 'Apri analisi Excel',
+        'DE': 'Excel-Analyse öffnen',
+        'TR': 'Excel analizini aç'
+      },
 
       // Pedagogical Docs
       'pedagogicalDocs.title': {

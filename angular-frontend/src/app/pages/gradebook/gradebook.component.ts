@@ -258,7 +258,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   ];
 
   // View mode
-  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'settings' | 'council' | 'finalDecision' = 'entry';
+  viewMode: 'entry' | 'grades' | 'reports' | 'analysis' | 'excelImport' | 'excelAnalysis' | 'totalExcelAnalysis' | 'settings' | 'council' | 'finalDecision' = 'entry';
   
   // Council variables
   councilRecords: CouncilSemesterRecord[] = [];
@@ -267,6 +267,9 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   councilSelectedTerm: number = 1;
   councilActiveTab: 'semester' | 'final' = 'semester';
   councilStudentsWithRecords: (Student & { councilRecord?: CouncilSemesterRecord })[] = [];
+  
+  // Total Excel Analysis variables
+  totalAnalysisActiveTab: 'results' | 'count' | 'classification' | 'monitoring' = 'results';
   finalStudentsWithDecisions: (Student & { finalDecision?: FinalCouncilDecision })[] = [];
   editingCouncilRecord: { [key: string]: boolean } = {};
   editingFinalDecision: { [key: string]: boolean } = {};
@@ -451,6 +454,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       const openGradeMonitoring = params['openGradeMonitoring'] === '1';
       const openCouncil = params['openCouncil'] === '1';
       const councilTab = params['councilTab'] === 'final' ? 'final' : 'semester';
+      const view = params['view'];
 
       if (openGradeMonitoring) {
         // انتظر قليلاً لتحميل البيانات ثم افتح الـ modal
@@ -462,6 +466,16 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       if (openCouncil) {
         this.viewMode = 'council';
         this.councilActiveTab = councilTab;
+      }
+
+      if (view === 'totalExcelAnalysis') {
+        this.viewMode = 'totalExcelAnalysis';
+        this.totalAnalysisActiveTab = 'results';
+        // Update charts when switching to total analysis tab
+        setTimeout(() => {
+          this.updateTotalExcelAnalysisCharts();
+          this.cdr.detectChanges();
+        }, 500);
       }
     });
 
@@ -4548,6 +4562,29 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     }, 100);
   }
 
+  onTotalExcelAnalysisTabClick(): void {
+    this.viewMode = 'totalExcelAnalysis';
+    this.totalAnalysisActiveTab = 'results';
+    // Update charts when switching to total analysis tab
+    setTimeout(() => {
+      this.updateTotalExcelAnalysisCharts();
+      this.cdr.detectChanges();
+    }, 100);
+  }
+
+  onTotalAnalysisTabChange(tab: 'results' | 'count' | 'classification' | 'monitoring'): void {
+    this.totalAnalysisActiveTab = tab;
+    // Update charts when switching tabs
+    setTimeout(() => {
+      if (tab === 'results') {
+        this.updateTotalAverageDistributionChart();
+      } else if (tab === 'classification') {
+        this.updateTotalClassificationChart();
+      }
+      this.cdr.detectChanges();
+    }, 100);
+  }
+
   ngAfterViewInit(): void {
     // Charts will be initialized when needed
   }
@@ -7235,6 +7272,1085 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       student.lastName?.toLowerCase().includes(searchTerm) ||
       student.idNumber?.toLowerCase().includes(searchTerm)
     );
+  }
+
+  // Total Excel Analysis Functions
+  calculateTotalAverage(): number {
+    if (!this.processedSheetsData || this.processedSheetsData.length === 0) return 0;
+    let totalSum = 0;
+    let totalCount = 0;
+    this.processedSheetsData.forEach(sheetInfo => {
+      sheetInfo.data.forEach(row => {
+        if (row.average) {
+          totalSum += row.average;
+          totalCount++;
+        }
+      });
+    });
+    return totalCount > 0 ? totalSum / totalCount : 0;
+  }
+
+  getTotalStudentsAbove10(): number {
+    if (!this.processedSheetsData) return 0;
+    let count = 0;
+    this.processedSheetsData.forEach(sheetInfo => {
+      count += this.getStudentsAbove10Count(sheetInfo.data);
+    });
+    return count;
+  }
+
+  getTotalStudentsBelow10(): number {
+    if (!this.processedSheetsData) return 0;
+    let count = 0;
+    this.processedSheetsData.forEach(sheetInfo => {
+      count += this.getStudentsBelow10Count(sheetInfo.data);
+    });
+    return count;
+  }
+
+  getTotalStudentsCount(): number {
+    if (!this.processedSheetsData) return 0;
+    return this.processedSheetsData.reduce((sum, sheetInfo) => sum + sheetInfo.data.length, 0);
+  }
+
+  getTotalSectionsCount(): number {
+    return this.processedSheetsData ? this.processedSheetsData.length : 0;
+  }
+
+  getCountByRange(data: any[], min: number, max: number): number {
+    if (!data) return 0;
+    return data.filter(row => {
+      const avg = row.average || 0;
+      if (max === 21) return avg >= min;
+      return avg >= min && avg < max;
+    }).length;
+  }
+
+  getTotalCountByRange(min: number, max: number): number {
+    if (!this.processedSheetsData) return 0;
+    let count = 0;
+    this.processedSheetsData.forEach(sheetInfo => {
+      count += this.getCountByRange(sheetInfo.data, min, max);
+    });
+    return count;
+  }
+
+  getClassificationCount(data: any[], type: 'congratulations' | 'encouragement' | 'honorRoll' | 'none' | 'remarks'): number {
+    if (!data) return 0;
+    const dist = this.getGradeRangeDistributionForSheet(data);
+    switch (type) {
+      case 'congratulations': return dist.congratulations;
+      case 'encouragement': return dist.encouragement;
+      case 'honorRoll': return dist.honorRoll;
+      case 'none': return dist.none;
+      case 'remarks': return dist.remarks;
+      default: return 0;
+    }
+  }
+
+  getTotalClassificationCount(type: 'congratulations' | 'encouragement' | 'honorRoll' | 'none' | 'remarks'): number {
+    if (!this.processedSheetsData) return 0;
+    let count = 0;
+    this.processedSheetsData.forEach(sheetInfo => {
+      count += this.getClassificationCount(sheetInfo.data, type);
+    });
+    return count;
+  }
+
+  getStatusClass(data: any[]): string {
+    const successRate = (this.getStudentsAbove10Count(data) / data.length) * 100;
+    if (successRate >= 80) return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+    if (successRate >= 60) return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+    return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+  }
+
+  getStatusText(data: any[]): string {
+    const successRate = (this.getStudentsAbove10Count(data) / data.length) * 100;
+    if (successRate >= 80) return 'ممتاز';
+    if (successRate >= 60) return 'جيد';
+    return 'يحتاج تحسين';
+  }
+
+  updateTotalExcelAnalysisCharts(): void {
+    if (!this.processedSheetsData || this.processedSheetsData.length === 0) return;
+    
+    setTimeout(() => {
+      // Update average distribution chart
+      this.updateTotalAverageDistributionChart();
+      // Update classification chart
+      this.updateTotalClassificationChart();
+    }, 200);
+  }
+
+  updateTotalAverageDistributionChart(): void {
+    const ctx = document.getElementById('totalAverageDistributionChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    const stats = {
+      lessThan4: this.getTotalCountByRange(0, 4),
+      between4and6: this.getTotalCountByRange(4, 6),
+      between6and8: this.getTotalCountByRange(6, 8),
+      between8and10: this.getTotalCountByRange(8, 10),
+      between10and12: this.getTotalCountByRange(10, 12),
+      between12and14: this.getTotalCountByRange(12, 14),
+      between14and16: this.getTotalCountByRange(14, 16),
+      greaterThan16: this.getTotalCountByRange(16, 21)
+    };
+
+    const chartData = {
+      labels: ['< 4', '4 - 6', '6 - 8', '8 - 10', '10 - 12', '12 - 14', '14 - 16', '≥ 16'],
+      datasets: [{
+        label: 'عدد التلاميذ',
+        data: [
+          stats.lessThan4,
+          stats.between4and6,
+          stats.between6and8,
+          stats.between8and10,
+          stats.between10and12,
+          stats.between12and14,
+          stats.between14and16,
+          stats.greaterThan16
+        ],
+        backgroundColor: [
+          'rgba(239, 68, 68, 0.7)',
+          'rgba(245, 101, 101, 0.7)',
+          'rgba(251, 146, 60, 0.7)',
+          'rgba(251, 191, 36, 0.7)',
+          'rgba(34, 197, 94, 0.7)',
+          'rgba(59, 130, 246, 0.7)',
+          'rgba(139, 92, 246, 0.7)',
+          'rgba(168, 85, 247, 0.7)'
+        ],
+        borderColor: [
+          'rgba(239, 68, 68, 1)',
+          'rgba(245, 101, 101, 1)',
+          'rgba(251, 146, 60, 1)',
+          'rgba(251, 191, 36, 1)',
+          'rgba(34, 197, 94, 1)',
+          'rgba(59, 130, 246, 1)',
+          'rgba(139, 92, 246, 1)',
+          'rgba(168, 85, 247, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top' as const
+        },
+        title: {
+          display: true,
+          text: 'توزيع المعدلات الإجمالي'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    };
+
+    // Destroy existing chart if it exists
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+  }
+
+  updateTotalClassificationChart(): void {
+    const ctx = document.getElementById('totalClassificationChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    const classificationData = {
+      congratulations: this.getTotalClassificationCount('congratulations'),
+      encouragement: this.getTotalClassificationCount('encouragement'),
+      honorRoll: this.getTotalClassificationCount('honorRoll'),
+      none: this.getTotalClassificationCount('none'),
+      remarks: this.getTotalClassificationCount('remarks')
+    };
+
+    const chartData = {
+      labels: ['تهاني (≥ 16)', 'تشجيع (14-16)', 'شرف (12-14)', 'عادي (10-12)', 'ملاحظات (< 10)'],
+      datasets: [{
+        label: 'عدد التلاميذ',
+        data: [
+          classificationData.congratulations,
+          classificationData.encouragement,
+          classificationData.honorRoll,
+          classificationData.none,
+          classificationData.remarks
+        ],
+        backgroundColor: [
+          'rgba(168, 85, 247, 0.7)',
+          'rgba(59, 130, 246, 0.7)',
+          'rgba(34, 197, 94, 0.7)',
+          'rgba(251, 191, 36, 0.7)',
+          'rgba(239, 68, 68, 0.7)'
+        ],
+        borderColor: [
+          'rgba(168, 85, 247, 1)',
+          'rgba(59, 130, 246, 1)',
+          'rgba(34, 197, 94, 1)',
+          'rgba(251, 191, 36, 1)',
+          'rgba(239, 68, 68, 1)'
+        ],
+        borderWidth: 1
+      }]
+    };
+
+    const chartOptions = {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top' as const
+        },
+        title: {
+          display: true,
+          text: 'تصنيف التلاميذ حسب المعدل'
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1
+          }
+        }
+      }
+    };
+
+    // Destroy existing chart if it exists
+    const existingChart = Chart.getChart(ctx);
+    if (existingChart) {
+      existingChart.destroy();
+    }
+
+    new Chart(ctx, {
+      type: 'bar',
+      data: chartData,
+      options: chartOptions
+    });
+  }
+
+  async exportTotalExcelAnalysisToPDF(): Promise<void> {
+    if (!this.processedSheetsData || this.processedSheetsData.length === 0) {
+      alert('لا توجد بيانات للتصدير');
+      return;
+    }
+
+    try {
+      // Create a temporary container for export
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm'; // A4 width
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير تحليل بيانات Excel الإجمالي';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '28px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.fontSize = '12px';
+      dateInfo.style.color = '#6b7280';
+      dateInfo.style.marginBottom = '30px';
+      exportContainer.appendChild(dateInfo);
+
+      // Overall Statistics Section
+      const statsSection = document.createElement('div');
+      statsSection.style.marginBottom = '30px';
+      
+      const statsTitle = document.createElement('h2');
+      statsTitle.textContent = 'الإحصائيات الإجمالية';
+      statsTitle.style.fontSize = '22px';
+      statsTitle.style.fontWeight = 'bold';
+      statsTitle.style.marginBottom = '20px';
+      statsTitle.style.color = '#1f2937';
+      statsTitle.style.borderBottom = '2px solid #3b82f6';
+      statsTitle.style.paddingBottom = '10px';
+      statsSection.appendChild(statsTitle);
+
+      const statsGrid = document.createElement('div');
+      statsGrid.style.display = 'grid';
+      statsGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      statsGrid.style.gap = '15px';
+      statsGrid.style.marginBottom = '20px';
+
+      const totalAvg = this.calculateTotalAverage();
+      const totalAbove10 = this.getTotalStudentsAbove10();
+      const totalBelow10 = this.getTotalStudentsBelow10();
+      const totalStudents = this.getTotalStudentsCount();
+
+      const stats = [
+        { label: 'المعدل الإجمالي', value: totalAvg.toFixed(2), color: '#3b82f6' },
+        { label: 'عدد التلاميذ بمعدل ≥ 10', value: totalAbove10.toString(), color: '#10b981' },
+        { label: 'عدد التلاميذ بمعدل < 10', value: totalBelow10.toString(), color: '#ef4444' },
+        { label: 'إجمالي التلاميذ', value: totalStudents.toString(), color: '#8b5cf6' }
+      ];
+
+      stats.forEach(stat => {
+        const statCard = document.createElement('div');
+        statCard.style.backgroundColor = '#f3f4f6';
+        statCard.style.padding = '15px';
+        statCard.style.borderRadius = '8px';
+        statCard.style.textAlign = 'center';
+        statCard.style.border = `2px solid ${stat.color}`;
+        
+        const value = document.createElement('div');
+        value.textContent = stat.value;
+        value.style.fontSize = '24px';
+        value.style.fontWeight = 'bold';
+        value.style.color = stat.color;
+        value.style.marginBottom = '5px';
+        
+        const label = document.createElement('div');
+        label.textContent = stat.label;
+        label.style.fontSize = '12px';
+        label.style.color = '#6b7280';
+        
+        statCard.appendChild(value);
+        statCard.appendChild(label);
+        statsGrid.appendChild(statCard);
+      });
+
+      statsSection.appendChild(statsGrid);
+      exportContainer.appendChild(statsSection);
+
+      // Results Analysis by Average Section
+      const resultsSection = document.createElement('div');
+      resultsSection.style.marginBottom = '30px';
+      resultsSection.style.pageBreakInside = 'avoid';
+
+      const resultsTitle = document.createElement('h2');
+      resultsTitle.textContent = 'تحليل النتائج حسب المعدل';
+      resultsTitle.style.fontSize = '22px';
+      resultsTitle.style.fontWeight = 'bold';
+      resultsTitle.style.marginBottom = '20px';
+      resultsTitle.style.color = '#1f2937';
+      resultsTitle.style.borderBottom = '2px solid #3b82f6';
+      resultsTitle.style.paddingBottom = '10px';
+      resultsSection.appendChild(resultsTitle);
+
+      // Results Table
+      const resultsTable = document.createElement('table');
+      resultsTable.style.width = '100%';
+      resultsTable.style.borderCollapse = 'collapse';
+      resultsTable.style.fontSize = '11px';
+      resultsTable.style.marginBottom = '20px';
+      resultsTable.style.border = '1px solid #d1d5db';
+
+      const resultsThead = document.createElement('thead');
+      const resultsHeaderRow = document.createElement('tr');
+      resultsHeaderRow.style.backgroundColor = '#3b82f6';
+      resultsHeaderRow.style.color = '#ffffff';
+      
+      ['القسم', 'المعدل', 'عدد التلاميذ', '≥ 10', '< 10', 'النسبة المئوية ≥ 10'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #2563eb';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        resultsHeaderRow.appendChild(th);
+      });
+      resultsThead.appendChild(resultsHeaderRow);
+      resultsTable.appendChild(resultsThead);
+
+      const resultsTbody = document.createElement('tbody');
+      this.processedSheetsData.forEach(sheetInfo => {
+        const row = document.createElement('tr');
+        const avg = this.calculateSheetAverage(sheetInfo.data);
+        const above10 = this.getStudentsAbove10Count(sheetInfo.data);
+        const below10 = this.getStudentsBelow10Count(sheetInfo.data);
+        const percentage = sheetInfo.data.length > 0 ? ((above10 / sheetInfo.data.length) * 100).toFixed(2) : '0.00';
+        
+        [sheetInfo.sheetName, avg.toFixed(2), sheetInfo.data.length.toString(), above10.toString(), below10.toString(), `${percentage}%`].forEach((cellText, index) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '8px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          if (index === 3) td.style.color = '#10b981';
+          if (index === 4) td.style.color = '#ef4444';
+          row.appendChild(td);
+        });
+        resultsTbody.appendChild(row);
+      });
+      resultsTable.appendChild(resultsTbody);
+      resultsSection.appendChild(resultsTable);
+
+      // Add chart for Results Analysis
+      const totalAverageChartCanvas = document.getElementById('totalAverageDistributionChart') as HTMLCanvasElement;
+      if (totalAverageChartCanvas) {
+        const chartDiv = document.createElement('div');
+        chartDiv.style.marginTop = '20px';
+        chartDiv.style.marginBottom = '20px';
+        
+        const chartTitle = document.createElement('h3');
+        chartTitle.textContent = 'مخطط توزيع المعدلات الإجمالي';
+        chartTitle.style.fontSize = '18px';
+        chartTitle.style.fontWeight = 'bold';
+        chartTitle.style.marginBottom = '15px';
+        chartTitle.style.color = '#1f2937';
+        chartDiv.appendChild(chartTitle);
+
+        const chartImg = document.createElement('img');
+        chartImg.src = totalAverageChartCanvas.toDataURL('image/png');
+        chartImg.style.width = '100%';
+        chartImg.style.height = 'auto';
+        chartImg.style.border = '1px solid #e5e7eb';
+        chartImg.style.borderRadius = '8px';
+        chartDiv.appendChild(chartImg);
+        resultsSection.appendChild(chartDiv);
+      }
+
+      exportContainer.appendChild(resultsSection);
+
+      // Count by Range Section
+      const countSection = document.createElement('div');
+      countSection.style.marginBottom = '30px';
+      countSection.style.pageBreakInside = 'avoid';
+
+      const countTitle = document.createElement('h2');
+      countTitle.textContent = 'حصر التلاميذ حسب المعدل لجميع الأقسام';
+      countTitle.style.fontSize = '22px';
+      countTitle.style.fontWeight = 'bold';
+      countTitle.style.marginBottom = '20px';
+      countTitle.style.color = '#1f2937';
+      countTitle.style.borderBottom = '2px solid #3b82f6';
+      countTitle.style.paddingBottom = '10px';
+      countSection.appendChild(countTitle);
+
+      // Count Table
+      const countTable = document.createElement('table');
+      countTable.style.width = '100%';
+      countTable.style.borderCollapse = 'collapse';
+      countTable.style.fontSize = '10px';
+      countTable.style.marginBottom = '20px';
+      countTable.style.border = '1px solid #d1d5db';
+
+      const countThead = document.createElement('thead');
+      const countHeaderRow = document.createElement('tr');
+      countHeaderRow.style.backgroundColor = '#3b82f6';
+      countHeaderRow.style.color = '#ffffff';
+      
+      ['القسم', '< 4', '4 - 6', '6 - 8', '8 - 10', '10 - 12', '12 - 14', '14 - 16', '≥ 16', 'الإجمالي'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '6px';
+        th.style.border = '1px solid #2563eb';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        countHeaderRow.appendChild(th);
+      });
+      countThead.appendChild(countHeaderRow);
+      countTable.appendChild(countThead);
+
+      const countTbody = document.createElement('tbody');
+      this.processedSheetsData.forEach(sheetInfo => {
+        const row = document.createElement('tr');
+        const cells = [
+          sheetInfo.sheetName,
+          this.getCountByRange(sheetInfo.data, 0, 4).toString(),
+          this.getCountByRange(sheetInfo.data, 4, 6).toString(),
+          this.getCountByRange(sheetInfo.data, 6, 8).toString(),
+          this.getCountByRange(sheetInfo.data, 8, 10).toString(),
+          this.getCountByRange(sheetInfo.data, 10, 12).toString(),
+          this.getCountByRange(sheetInfo.data, 12, 14).toString(),
+          this.getCountByRange(sheetInfo.data, 14, 16).toString(),
+          this.getCountByRange(sheetInfo.data, 16, 21).toString(),
+          sheetInfo.data.length.toString()
+        ];
+        
+        cells.forEach((cellText, index) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '6px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          if (index === 0) td.style.fontWeight = 'bold';
+          if (index === cells.length - 1) td.style.fontWeight = 'bold';
+          row.appendChild(td);
+        });
+        countTbody.appendChild(row);
+      });
+
+      // Add total row
+      const totalRow = document.createElement('tr');
+      totalRow.style.backgroundColor = '#f3f4f6';
+      totalRow.style.fontWeight = 'bold';
+      const totalCells = [
+        'الإجمالي',
+        this.getTotalCountByRange(0, 4).toString(),
+        this.getTotalCountByRange(4, 6).toString(),
+        this.getTotalCountByRange(6, 8).toString(),
+        this.getTotalCountByRange(8, 10).toString(),
+        this.getTotalCountByRange(10, 12).toString(),
+        this.getTotalCountByRange(12, 14).toString(),
+        this.getTotalCountByRange(14, 16).toString(),
+        this.getTotalCountByRange(16, 21).toString(),
+        this.getTotalStudentsCount().toString()
+      ];
+      
+      totalCells.forEach(cellText => {
+        const td = document.createElement('td');
+        td.textContent = cellText;
+        td.style.padding = '6px';
+        td.style.border = '1px solid #d1d5db';
+        td.style.textAlign = 'right';
+        countTbody.appendChild(td);
+      });
+      countTbody.appendChild(totalRow);
+
+      countTable.appendChild(countTbody);
+      countSection.appendChild(countTable);
+      exportContainer.appendChild(countSection);
+
+      // Classification Section
+      const classificationSection = document.createElement('div');
+      classificationSection.style.marginBottom = '30px';
+      classificationSection.style.pageBreakInside = 'avoid';
+
+      const classificationTitle = document.createElement('h2');
+      classificationTitle.textContent = 'تصنيف التلاميذ حسب المعدل لجميع الأقسام';
+      classificationTitle.style.fontSize = '22px';
+      classificationTitle.style.fontWeight = 'bold';
+      classificationTitle.style.marginBottom = '20px';
+      classificationTitle.style.color = '#1f2937';
+      classificationTitle.style.borderBottom = '2px solid #3b82f6';
+      classificationTitle.style.paddingBottom = '10px';
+      classificationSection.appendChild(classificationTitle);
+
+      // Classification Table
+      const classificationTable = document.createElement('table');
+      classificationTable.style.width = '100%';
+      classificationTable.style.borderCollapse = 'collapse';
+      classificationTable.style.fontSize = '11px';
+      classificationTable.style.marginBottom = '20px';
+      classificationTable.style.border = '1px solid #d1d5db';
+
+      const classificationThead = document.createElement('thead');
+      const classificationHeaderRow = document.createElement('tr');
+      classificationHeaderRow.style.backgroundColor = '#3b82f6';
+      classificationHeaderRow.style.color = '#ffffff';
+      
+      ['القسم', 'تهاني (≥ 16)', 'تشجيع (14 - 16)', 'شرف (12 - 14)', 'عادي (10 - 12)', 'ملاحظات (< 10)', 'الإجمالي'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #2563eb';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        classificationHeaderRow.appendChild(th);
+      });
+      classificationThead.appendChild(classificationHeaderRow);
+      classificationTable.appendChild(classificationThead);
+
+      const classificationTbody = document.createElement('tbody');
+      this.processedSheetsData.forEach(sheetInfo => {
+        const row = document.createElement('tr');
+        const cells = [
+          sheetInfo.sheetName,
+          this.getClassificationCount(sheetInfo.data, 'congratulations').toString(),
+          this.getClassificationCount(sheetInfo.data, 'encouragement').toString(),
+          this.getClassificationCount(sheetInfo.data, 'honorRoll').toString(),
+          this.getClassificationCount(sheetInfo.data, 'none').toString(),
+          this.getClassificationCount(sheetInfo.data, 'remarks').toString(),
+          sheetInfo.data.length.toString()
+        ];
+        
+        cells.forEach((cellText, index) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '8px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          if (index === 0) td.style.fontWeight = 'bold';
+          if (index === 1) td.style.color = '#9333ea';
+          if (index === 2) td.style.color = '#2563eb';
+          if (index === 3) td.style.color = '#16a34a';
+          if (index === 4) td.style.color = '#ca8a04';
+          if (index === 5) td.style.color = '#dc2626';
+          if (index === cells.length - 1) td.style.fontWeight = 'bold';
+          row.appendChild(td);
+        });
+        classificationTbody.appendChild(row);
+      });
+
+      // Add total row
+      const classificationTotalRow = document.createElement('tr');
+      classificationTotalRow.style.backgroundColor = '#f3f4f6';
+      classificationTotalRow.style.fontWeight = 'bold';
+      const classificationTotalCells = [
+        'الإجمالي',
+        this.getTotalClassificationCount('congratulations').toString(),
+        this.getTotalClassificationCount('encouragement').toString(),
+        this.getTotalClassificationCount('honorRoll').toString(),
+        this.getTotalClassificationCount('none').toString(),
+        this.getTotalClassificationCount('remarks').toString(),
+        this.getTotalStudentsCount().toString()
+      ];
+      
+      classificationTotalCells.forEach(cellText => {
+        const td = document.createElement('td');
+        td.textContent = cellText;
+        td.style.padding = '8px';
+        td.style.border = '1px solid #d1d5db';
+        td.style.textAlign = 'right';
+        classificationTbody.appendChild(td);
+      });
+      classificationTbody.appendChild(classificationTotalRow);
+
+      classificationTable.appendChild(classificationTbody);
+      classificationSection.appendChild(classificationTable);
+
+      // Add chart for Classification
+      const classificationChartCanvas = document.getElementById('totalClassificationChart') as HTMLCanvasElement;
+      if (classificationChartCanvas) {
+        const chartDiv = document.createElement('div');
+        chartDiv.style.marginTop = '20px';
+        chartDiv.style.marginBottom = '20px';
+        
+        const chartTitle = document.createElement('h3');
+        chartTitle.textContent = 'مخطط التصنيف الإجمالي';
+        chartTitle.style.fontSize = '18px';
+        chartTitle.style.fontWeight = 'bold';
+        chartTitle.style.marginBottom = '15px';
+        chartTitle.style.color = '#1f2937';
+        chartDiv.appendChild(chartTitle);
+
+        const chartImg = document.createElement('img');
+        chartImg.src = classificationChartCanvas.toDataURL('image/png');
+        chartImg.style.width = '100%';
+        chartImg.style.height = 'auto';
+        chartImg.style.border = '1px solid #e5e7eb';
+        chartImg.style.borderRadius = '8px';
+        chartDiv.appendChild(chartImg);
+        classificationSection.appendChild(chartDiv);
+      }
+
+      exportContainer.appendChild(classificationSection);
+
+      // Detailed Student Classification by Section
+      const detailedClassificationSection = document.createElement('div');
+      detailedClassificationSection.style.marginBottom = '30px';
+      detailedClassificationSection.style.pageBreakInside = 'avoid';
+
+      const detailedTitle = document.createElement('h2');
+      detailedTitle.textContent = 'تصنيف التلاميذ حسب المعدل - تفاصيل لكل قسم';
+      detailedTitle.style.fontSize = '22px';
+      detailedTitle.style.fontWeight = 'bold';
+      detailedTitle.style.marginBottom = '20px';
+      detailedTitle.style.color = '#1f2937';
+      detailedTitle.style.borderBottom = '2px solid #3b82f6';
+      detailedTitle.style.paddingBottom = '10px';
+      detailedClassificationSection.appendChild(detailedTitle);
+
+      // Process each section
+      this.processedSheetsData.forEach(sheetInfo => {
+        const sectionDiv = document.createElement('div');
+        sectionDiv.style.marginBottom = '25px';
+        sectionDiv.style.pageBreakInside = 'avoid';
+
+        const sectionTitle = document.createElement('h3');
+        sectionTitle.textContent = `القسم: ${sheetInfo.sheetName}`;
+        sectionTitle.style.fontSize = '18px';
+        sectionTitle.style.fontWeight = 'bold';
+        sectionTitle.style.marginBottom = '15px';
+        sectionTitle.style.color = '#3b82f6';
+        sectionTitle.style.paddingBottom = '8px';
+        sectionTitle.style.borderBottom = '1px solid #d1d5db';
+        sectionDiv.appendChild(sectionTitle);
+
+        // Sort students by average descending
+        const sortedStudents = [...sheetInfo.data].sort((a, b) => (b.average || 0) - (a.average || 0));
+
+        // Create table for this section
+        const sectionTable = document.createElement('table');
+        sectionTable.style.width = '100%';
+        sectionTable.style.borderCollapse = 'collapse';
+        sectionTable.style.fontSize = '10px';
+        sectionTable.style.marginBottom = '20px';
+        sectionTable.style.border = '1px solid #d1d5db';
+
+        const sectionThead = document.createElement('thead');
+        const sectionHeaderRow = document.createElement('tr');
+        sectionHeaderRow.style.backgroundColor = '#3b82f6';
+        sectionHeaderRow.style.color = '#ffffff';
+        
+        ['الترتيب', 'الاسم', 'اللقب', 'المعدل', 'التصنيف'].forEach(headerText => {
+          const th = document.createElement('th');
+          th.textContent = headerText;
+          th.style.padding = '6px';
+          th.style.border = '1px solid #2563eb';
+          th.style.textAlign = 'right';
+          th.style.fontWeight = 'bold';
+          sectionHeaderRow.appendChild(th);
+        });
+        sectionThead.appendChild(sectionHeaderRow);
+        sectionTable.appendChild(sectionThead);
+
+        const sectionTbody = document.createElement('tbody');
+        sortedStudents.forEach((student, index) => {
+          const row = document.createElement('tr');
+          const avg = student.average || 0;
+          let classification = '';
+          let classificationColor = '';
+          
+          if (avg >= 16) {
+            classification = 'تهاني';
+            classificationColor = '#9333ea';
+          } else if (avg >= 14) {
+            classification = 'تشجيع';
+            classificationColor = '#2563eb';
+          } else if (avg >= 12) {
+            classification = 'شرف';
+            classificationColor = '#16a34a';
+          } else if (avg >= 10) {
+            classification = 'عادي';
+            classificationColor = '#ca8a04';
+          } else {
+            classification = 'ملاحظات';
+            classificationColor = '#dc2626';
+          }
+
+          const cells = [
+            (index + 1).toString(),
+            student.firstName || '-',
+            student.lastName || '-',
+            avg.toFixed(2),
+            classification
+          ];
+          
+          cells.forEach((cellText, cellIndex) => {
+            const td = document.createElement('td');
+            td.textContent = cellText;
+            td.style.padding = '6px';
+            td.style.border = '1px solid #d1d5db';
+            td.style.textAlign = 'right';
+            
+            if (cellIndex === 3) { // Average column
+              if (avg >= 10) td.style.color = '#10b981';
+              else td.style.color = '#ef4444';
+              td.style.fontWeight = 'bold';
+            }
+            if (cellIndex === 4) { // Classification column
+              td.style.color = classificationColor;
+              td.style.fontWeight = 'bold';
+            }
+            
+            row.appendChild(td);
+          });
+          sectionTbody.appendChild(row);
+        });
+        sectionTable.appendChild(sectionTbody);
+        sectionDiv.appendChild(sectionTable);
+        detailedClassificationSection.appendChild(sectionDiv);
+      });
+
+      exportContainer.appendChild(detailedClassificationSection);
+
+      // Monitoring Document Section
+      const monitoringSection = document.createElement('div');
+      monitoringSection.style.marginBottom = '30px';
+      monitoringSection.style.pageBreakInside = 'avoid';
+
+      const monitoringTitle = document.createElement('h2');
+      monitoringTitle.textContent = 'وثيقة المراقبة';
+      monitoringTitle.style.fontSize = '22px';
+      monitoringTitle.style.fontWeight = 'bold';
+      monitoringTitle.style.marginBottom = '20px';
+      monitoringTitle.style.color = '#1f2937';
+      monitoringTitle.style.borderBottom = '2px solid #3b82f6';
+      monitoringTitle.style.paddingBottom = '10px';
+      monitoringSection.appendChild(monitoringTitle);
+
+      // Monitoring Summary
+      const monitoringSummary = document.createElement('div');
+      monitoringSummary.style.display = 'grid';
+      monitoringSummary.style.gridTemplateColumns = 'repeat(3, 1fr)';
+      monitoringSummary.style.gap = '15px';
+      monitoringSummary.style.marginBottom = '20px';
+
+      const sectionsCount = this.getTotalSectionsCount();
+      const successRate = totalStudents > 0 ? ((totalAbove10 / totalStudents) * 100).toFixed(2) : '0.00';
+
+      const monitoringStats = [
+        { label: 'عدد الأقسام', value: sectionsCount.toString(), color: '#eab308' },
+        { label: 'إجمالي التلاميذ', value: totalStudents.toString(), color: '#3b82f6' },
+        { label: 'نسبة النجاح', value: `${successRate}%`, color: '#10b981' }
+      ];
+
+      monitoringStats.forEach(stat => {
+        const statCard = document.createElement('div');
+        statCard.style.backgroundColor = '#f3f4f6';
+        statCard.style.padding = '15px';
+        statCard.style.borderRadius = '8px';
+        statCard.style.textAlign = 'center';
+        statCard.style.border = `2px solid ${stat.color}`;
+        
+        const value = document.createElement('div');
+        value.textContent = stat.value;
+        value.style.fontSize = '20px';
+        value.style.fontWeight = 'bold';
+        value.style.color = stat.color;
+        value.style.marginBottom = '5px';
+        
+        const label = document.createElement('div');
+        label.textContent = stat.label;
+        label.style.fontSize = '12px';
+        label.style.color = '#6b7280';
+        
+        statCard.appendChild(value);
+        statCard.appendChild(label);
+        monitoringSummary.appendChild(statCard);
+      });
+
+      monitoringSection.appendChild(monitoringSummary);
+
+      // Monitoring Table
+      const monitoringTable = document.createElement('table');
+      monitoringTable.style.width = '100%';
+      monitoringTable.style.borderCollapse = 'collapse';
+      monitoringTable.style.fontSize = '11px';
+      monitoringTable.style.marginBottom = '20px';
+      monitoringTable.style.border = '1px solid #d1d5db';
+
+      const monitoringThead = document.createElement('thead');
+      const monitoringHeaderRow = document.createElement('tr');
+      monitoringHeaderRow.style.backgroundColor = '#3b82f6';
+      monitoringHeaderRow.style.color = '#ffffff';
+      
+      ['القسم', 'المعدل', 'عدد التلاميذ', '≥ 10', '< 10', 'نسبة النجاح', 'الحالة'].forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #2563eb';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        monitoringHeaderRow.appendChild(th);
+      });
+      monitoringThead.appendChild(monitoringHeaderRow);
+      monitoringTable.appendChild(monitoringThead);
+
+      const monitoringTbody = document.createElement('tbody');
+      this.processedSheetsData.forEach(sheetInfo => {
+        const row = document.createElement('tr');
+        const avg = this.calculateSheetAverage(sheetInfo.data);
+        const above10 = this.getStudentsAbove10Count(sheetInfo.data);
+        const below10 = this.getStudentsBelow10Count(sheetInfo.data);
+        const successRate = sheetInfo.data.length > 0 ? ((above10 / sheetInfo.data.length) * 100).toFixed(2) : '0.00';
+        const statusClass = this.getStatusClass(sheetInfo.data);
+        let statusText = '';
+        if (statusClass.includes('green')) statusText = 'ممتاز';
+        else if (statusClass.includes('yellow')) statusText = 'جيد';
+        else statusText = 'يحتاج تحسين';
+        
+        [sheetInfo.sheetName, avg.toFixed(2), sheetInfo.data.length.toString(), above10.toString(), below10.toString(), `${successRate}%`, statusText].forEach((cellText, index) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '8px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          if (index === 3) td.style.color = '#10b981';
+          if (index === 4) td.style.color = '#ef4444';
+          if (index === 6) {
+            if (statusText === 'ممتاز') td.style.color = '#10b981';
+            else if (statusText === 'جيد') td.style.color = '#eab308';
+            else td.style.color = '#ef4444';
+            td.style.fontWeight = 'bold';
+          }
+          row.appendChild(td);
+        });
+        monitoringTbody.appendChild(row);
+      });
+      monitoringTable.appendChild(monitoringTbody);
+      monitoringSection.appendChild(monitoringTable);
+
+      // Add all charts to Monitoring Document section
+      const monitoringChartsDiv = document.createElement('div');
+      monitoringChartsDiv.style.marginTop = '30px';
+      
+      const chartsTitle = document.createElement('h3');
+      chartsTitle.textContent = 'المخططات الإجمالية';
+      chartsTitle.style.fontSize = '18px';
+      chartsTitle.style.fontWeight = 'bold';
+      chartsTitle.style.marginBottom = '20px';
+      chartsTitle.style.color = '#1f2937';
+      chartsTitle.style.borderBottom = '2px solid #3b82f6';
+      chartsTitle.style.paddingBottom = '10px';
+      monitoringChartsDiv.appendChild(chartsTitle);
+
+      const chartsGrid = document.createElement('div');
+      chartsGrid.style.display = 'grid';
+      chartsGrid.style.gridTemplateColumns = 'repeat(2, 1fr)';
+      chartsGrid.style.gap = '20px';
+
+      // Add Average Distribution Chart - try to get from DOM
+      const totalAverageChartCanvas2 = document.getElementById('totalAverageDistributionChart') as HTMLCanvasElement;
+      if (totalAverageChartCanvas2) {
+        try {
+          const chartCard = document.createElement('div');
+          chartCard.style.border = '1px solid #e5e7eb';
+          chartCard.style.borderRadius = '8px';
+          chartCard.style.padding = '15px';
+          chartCard.style.backgroundColor = '#f9fafb';
+          
+          const chartTitle = document.createElement('h4');
+          chartTitle.textContent = 'توزيع المعدلات الإجمالي';
+          chartTitle.style.fontSize = '16px';
+          chartTitle.style.fontWeight = 'bold';
+          chartTitle.style.marginBottom = '10px';
+          chartTitle.style.color = '#1f2937';
+          chartCard.appendChild(chartTitle);
+
+          const chartImg = document.createElement('img');
+          chartImg.src = totalAverageChartCanvas2.toDataURL('image/png');
+          chartImg.style.width = '100%';
+          chartImg.style.height = 'auto';
+          chartImg.style.maxHeight = '300px';
+          chartImg.style.objectFit = 'contain';
+          chartCard.appendChild(chartImg);
+          chartsGrid.appendChild(chartCard);
+        } catch (e) {
+          console.warn('Could not capture average distribution chart:', e);
+        }
+      }
+
+      // Add Classification Chart - try to get from DOM
+      const classificationChartCanvas2 = document.getElementById('totalClassificationChart') as HTMLCanvasElement;
+      if (classificationChartCanvas2) {
+        try {
+          const chartCard = document.createElement('div');
+          chartCard.style.border = '1px solid #e5e7eb';
+          chartCard.style.borderRadius = '8px';
+          chartCard.style.padding = '15px';
+          chartCard.style.backgroundColor = '#f9fafb';
+          
+          const chartTitle = document.createElement('h4');
+          chartTitle.textContent = 'مخطط التصنيف الإجمالي';
+          chartTitle.style.fontSize = '16px';
+          chartTitle.style.fontWeight = 'bold';
+          chartTitle.style.marginBottom = '10px';
+          chartTitle.style.color = '#1f2937';
+          chartCard.appendChild(chartTitle);
+
+          const chartImg = document.createElement('img');
+          chartImg.src = classificationChartCanvas2.toDataURL('image/png');
+          chartImg.style.width = '100%';
+          chartImg.style.height = 'auto';
+          chartImg.style.maxHeight = '300px';
+          chartImg.style.objectFit = 'contain';
+          chartCard.appendChild(chartImg);
+          chartsGrid.appendChild(chartCard);
+        } catch (e) {
+          console.warn('Could not capture classification chart:', e);
+        }
+      }
+
+      if (chartsGrid.children.length > 0) {
+        monitoringChartsDiv.appendChild(chartsGrid);
+        monitoringSection.appendChild(monitoringChartsDiv);
+      }
+
+      exportContainer.appendChild(monitoringSection);
+
+      document.body.appendChild(exportContainer);
+
+      // Wait for charts to render and ensure they're visible
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Force chart updates to ensure they're rendered
+      this.updateTotalExcelAnalysisCharts();
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.scrollHeight,
+        windowWidth: exportContainer.scrollWidth,
+        windowHeight: exportContainer.scrollHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Create PDF with proper page breaks
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const availableWidth = pageWidth - 2 * margin;
+      const availableHeight = pageHeight - 2 * margin;
+
+      const imgWidth = availableWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      const imgData = canvas.toDataURL('image/png');
+
+      // Calculate number of pages needed
+      const totalPages = Math.ceil(imgHeight / availableHeight);
+
+      // Add pages as needed - properly crop each page using negative yOffset
+      for (let page = 0; page < totalPages; page++) {
+        if (page > 0) {
+          pdf.addPage();
+        }
+
+        // Calculate the yOffset for this page (negative to show different portion)
+        const yOffset = margin - (page * availableHeight);
+
+        // Add the full image with adjusted yOffset to show the correct portion
+        pdf.addImage(
+          imgData,
+          'PNG',
+          margin,
+          yOffset,
+          imgWidth,
+          imgHeight
+        );
+      }
+
+      const fileName = `تقرير_تحليل_Excel_الإجمالي_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error exporting to PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+    }
   }
 
   get filteredFinalStudents(): (Student & { finalDecision?: FinalCouncilDecision })[] {

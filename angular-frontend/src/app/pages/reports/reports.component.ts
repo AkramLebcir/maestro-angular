@@ -330,6 +330,12 @@ export class ReportsComponent {
     this.router.navigate(['/progress-tracking']);
   }
 
+  navigateToExcelAnalysis(): void {
+    this.router.navigate(['/gradebook'], {
+      queryParams: { view: 'totalExcelAnalysis' }
+    });
+  }
+
   navigateToClubs(): void {
     this.router.navigate(['/clubs']);
   }

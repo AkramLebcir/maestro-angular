@@ -92,6 +92,12 @@
         {{ translate('gradebook.excelAnalysis') }}
       </button>
       <button 
+        (click)="onTotalExcelAnalysisTabClick()"
+        [class]="viewMode === 'totalExcelAnalysis' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+        class="px-4 py-2 font-semibold">
+        تحليل بيانات excel اجمالي
+      </button>
+      <button 
         (click)="viewMode = 'settings'"
         [class]="viewMode === 'settings' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
         class="px-4 py-2 font-semibold">
@@ -800,6 +806,289 @@
                   <canvas [attr.id]="'gradeRangeChart_' + sheetIndex"></canvas>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div *ngIf="!processedSheetsData || processedSheetsData.length === 0" class="text-center text-gray-500 dark:text-gray-400 py-12">
+        <p class="mb-4">{{ translate('gradebook.noProcessedData') }}</p>
+        <button 
+          (click)="viewMode = 'excelImport'"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
+          {{ translate('gradebook.importExcelFirst') }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Total Excel Analysis View -->
+    <div *ngIf="viewMode === 'totalExcelAnalysis'">
+      <div class="mb-6">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">تحليل بيانات excel اجمالي</h2>
+            <p class="text-gray-600 dark:text-gray-400">تحليل شامل لجميع الأقسام</p>
+          </div>
+          <button 
+            *ngIf="processedSheetsData && processedSheetsData.length > 0"
+            (click)="exportTotalExcelAnalysisToPDF()"
+            class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <span>تصدير PDF</span>
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="processedSheetsData && processedSheetsData.length > 0">
+        <!-- Tabs for different analysis views -->
+        <div class="flex gap-2 mb-6 border-b border-gray-200 dark:border-gray-700">
+          <button 
+            (click)="onTotalAnalysisTabChange('results')"
+            [class]="totalAnalysisActiveTab === 'results' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+            class="px-4 py-2 font-semibold">
+            تحليل النتائج حسب المعدل
+          </button>
+          <button 
+            (click)="onTotalAnalysisTabChange('count')"
+            [class]="totalAnalysisActiveTab === 'count' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+            class="px-4 py-2 font-semibold">
+            حصر التلاميذ حسب المعدل لجميع الاقسام
+          </button>
+          <button 
+            (click)="onTotalAnalysisTabChange('classification')"
+            [class]="totalAnalysisActiveTab === 'classification' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+            class="px-4 py-2 font-semibold">
+            تصنيف التلاميذ حسب المعدل لجميع الاقسام
+          </button>
+          <button 
+            (click)="onTotalAnalysisTabChange('monitoring')"
+            [class]="totalAnalysisActiveTab === 'monitoring' ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600 dark:text-gray-400'"
+            class="px-4 py-2 font-semibold">
+            وثيقة المراقبة
+          </button>
+        </div>
+
+        <!-- Results Analysis by Average Tab -->
+        <div *ngIf="totalAnalysisActiveTab === 'results'" class="space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">تحليل النتائج حسب المعدل</h3>
+            
+            <!-- Overall Statistics -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200">
+                <div class="text-2xl font-bold text-blue-700 mb-1">{{ calculateTotalAverage().toFixed(2) }}</div>
+                <div class="text-sm text-blue-600">المعدل الإجمالي</div>
+              </div>
+              <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200">
+                <div class="text-2xl font-bold text-green-700 mb-1">{{ getTotalStudentsAbove10() }}</div>
+                <div class="text-sm text-green-600">عدد التلاميذ بمعدل ≥ 10</div>
+              </div>
+              <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200">
+                <div class="text-2xl font-bold text-red-700 mb-1">{{ getTotalStudentsBelow10() }}</div>
+                <div class="text-sm text-red-600">عدد التلاميذ بمعدل &lt; 10</div>
+              </div>
+              <div class="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg border border-purple-200">
+                <div class="text-2xl font-bold text-purple-700 mb-1">{{ getTotalStudentsCount() }}</div>
+                <div class="text-sm text-purple-600">إجمالي التلاميذ</div>
+              </div>
+            </div>
+
+            <!-- Average Distribution Chart -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-6">
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">توزيع المعدلات الإجمالي</h4>
+              <div class="h-80">
+                <canvas id="totalAverageDistributionChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Statistics by Section -->
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+                <thead>
+                  <tr class="bg-blue-600 text-white">
+                    <th class="border border-blue-700 p-2 text-right font-semibold">القسم</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">عدد التلاميذ</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">≥ 10</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">&lt; 10</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">النسبة المئوية ≥ 10</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sheetInfo of processedSheetsData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ sheetInfo.sheetName }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ calculateSheetAverage(sheetInfo.data).toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ sheetInfo.data.length }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-green-600 font-semibold">{{ getStudentsAbove10Count(sheetInfo.data) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-red-600 font-semibold">{{ getStudentsBelow10Count(sheetInfo.data) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ ((getStudentsAbove10Count(sheetInfo.data) / sheetInfo.data.length) * 100).toFixed(2) }}%</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Count by Average Tab -->
+        <div *ngIf="totalAnalysisActiveTab === 'count'" class="space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">حصر التلاميذ حسب المعدل لجميع الاقسام</h3>
+            
+            <!-- Count by Range Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+                <thead>
+                  <tr class="bg-blue-600 text-white">
+                    <th class="border border-blue-700 p-2 text-right font-semibold">القسم</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">&lt; 4</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">4 - 6</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">6 - 8</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">8 - 10</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">10 - 12</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">12 - 14</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">14 - 16</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">≥ 16</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">الإجمالي</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sheetInfo of processedSheetsData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right font-semibold">{{ sheetInfo.sheetName }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 0, 4) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 4, 6) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 6, 8) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 8, 10) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 10, 12) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 12, 14) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 14, 16) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getCountByRange(sheetInfo.data, 16, 21) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right font-semibold">{{ sheetInfo.data.length }}</td>
+                  </tr>
+                  <!-- Total Row -->
+                  <tr class="bg-gray-100 dark:bg-gray-700 font-bold">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">الإجمالي</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(0, 4) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(4, 6) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(6, 8) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(8, 10) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(10, 12) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(12, 14) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(14, 16) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalCountByRange(16, 21) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalStudentsCount() }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Student Classification Tab -->
+        <div *ngIf="totalAnalysisActiveTab === 'classification'" class="space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">تصنيف التلاميذ حسب المعدل لجميع الاقسام</h3>
+            
+            <!-- Classification Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+                <thead>
+                  <tr class="bg-blue-600 text-white">
+                    <th class="border border-blue-700 p-2 text-right font-semibold">القسم</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">تهاني (≥ 16)</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">تشجيع (14 - 16)</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">شرف (12 - 14)</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">عادي (10 - 12)</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">ملاحظات (&lt; 10)</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">الإجمالي</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sheetInfo of processedSheetsData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right font-semibold">{{ sheetInfo.sheetName }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-purple-600 font-semibold">{{ getClassificationCount(sheetInfo.data, 'congratulations') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-blue-600 font-semibold">{{ getClassificationCount(sheetInfo.data, 'encouragement') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-green-600 font-semibold">{{ getClassificationCount(sheetInfo.data, 'honorRoll') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-yellow-600 font-semibold">{{ getClassificationCount(sheetInfo.data, 'none') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-red-600 font-semibold">{{ getClassificationCount(sheetInfo.data, 'remarks') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right font-semibold">{{ sheetInfo.data.length }}</td>
+                  </tr>
+                  <!-- Total Row -->
+                  <tr class="bg-gray-100 dark:bg-gray-700 font-bold">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">الإجمالي</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalClassificationCount('congratulations') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalClassificationCount('encouragement') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalClassificationCount('honorRoll') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalClassificationCount('none') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalClassificationCount('remarks') }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ getTotalStudentsCount() }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Classification Chart -->
+            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mt-6">
+              <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-3">مخطط التصنيف الإجمالي</h4>
+              <div class="h-80">
+                <canvas id="totalClassificationChart"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Monitoring Document Tab -->
+        <div *ngIf="totalAnalysisActiveTab === 'monitoring'" class="space-y-6">
+          <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md dark:shadow-gray-900/50">
+            <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">وثيقة المراقبة</h3>
+            
+            <!-- Monitoring Summary -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-yellow-200">
+                <div class="text-2xl font-bold text-yellow-700 mb-1">{{ getTotalSectionsCount() }}</div>
+                <div class="text-sm text-yellow-600">عدد الأقسام</div>
+              </div>
+              <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200">
+                <div class="text-2xl font-bold text-blue-700 mb-1">{{ getTotalStudentsCount() }}</div>
+                <div class="text-sm text-blue-600">إجمالي التلاميذ</div>
+              </div>
+              <div class="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg border border-green-200">
+                <div class="text-2xl font-bold text-green-700 mb-1">{{ ((getTotalStudentsAbove10() / getTotalStudentsCount()) * 100).toFixed(2) }}%</div>
+                <div class="text-sm text-green-600">نسبة النجاح</div>
+              </div>
+            </div>
+
+            <!-- Detailed Monitoring Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+                <thead>
+                  <tr class="bg-blue-600 text-white">
+                    <th class="border border-blue-700 p-2 text-right font-semibold">القسم</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">المعدل</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">عدد التلاميذ</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">≥ 10</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">&lt; 10</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">نسبة النجاح</th>
+                    <th class="border border-blue-700 p-2 text-right font-semibold">الحالة</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let sheetInfo of processedSheetsData" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right font-semibold">{{ sheetInfo.sheetName }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ calculateSheetAverage(sheetInfo.data).toFixed(2) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ sheetInfo.data.length }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-green-600 font-semibold">{{ getStudentsAbove10Count(sheetInfo.data) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right text-red-600 font-semibold">{{ getStudentsBelow10Count(sheetInfo.data) }}</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">{{ ((getStudentsAbove10Count(sheetInfo.data) / sheetInfo.data.length) * 100).toFixed(2) }}%</td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-right">
+                      <span [class]="getStatusClass(sheetInfo.data)" class="px-2 py-1 rounded text-xs font-semibold">
+                        {{ getStatusText(sheetInfo.data) }}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
