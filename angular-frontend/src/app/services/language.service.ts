@@ -60,13 +60,13 @@ export class LanguageService {
     this.translations = {
       // Header
       'app.title': {
-        'AR': 'Maestro',
-        'FR': 'Maestro',
-        'EN': 'Maestro',
-        'ES': 'Maestro',
-        'IT': 'Maestro',
-        'DE': 'Maestro',
-        'TR': 'Maestro'
+        'AR': 'assatida',
+        'FR': 'assatida',
+        'EN': 'assatida',
+        'ES': 'assatida',
+        'IT': 'assatida',
+        'DE': 'assatida',
+        'TR': 'assatida'
       },
       'header.teacher': {
         'AR': 'الأستاذ',
@@ -12758,13 +12758,13 @@ export class LanguageService {
 
       // Login
       'login.title': {
-        'AR': 'المايسترو',
-        'FR': 'Maestro',
-        'EN': 'Maestro',
-        'ES': 'Maestro',
-        'IT': 'Maestro',
-        'DE': 'Maestro',
-        'TR': 'Maestro'
+        'AR': 'assatida',
+        'FR': 'assatida',
+        'EN': 'assatida',
+        'ES': 'assatida',
+        'IT': 'assatida',
+        'DE': 'assatida',
+        'TR': 'assatida'
       },
       'login.subtitle': {
         'AR': 'تسجيل الدخول إلى حسابك',
@@ -12830,13 +12830,13 @@ export class LanguageService {
         'TR': 'Giriş yapılıyor...'
       },
       'login.footer': {
-        'AR': '© 2024 المايسترو. جميع الحقوق محفوظة.',
-        'FR': '© 2024 Maestro. Tous droits réservés.',
-        'EN': '© 2024 Maestro. All rights reserved.',
-        'ES': '© 2024 Maestro. Todos los derechos reservados.',
-        'IT': '© 2024 Maestro. Tutti i diritti riservati.',
-        'DE': '© 2024 Maestro. Alle Rechte vorbehalten.',
-        'TR': '© 2024 Maestro. Tüm hakları saklıdır.'
+        'AR': '© 2024 assatida. جميع الحقوق محفوظة.',
+        'FR': '© 2024 assatida. Tous droits réservés.',
+        'EN': '© 2024 assatida. All rights reserved.',
+        'ES': '© 2024 assatida. Todos los derechos reservados.',
+        'IT': '© 2024 assatida. Tutti i diritti riservati.',
+        'DE': '© 2024 assatida. Alle Rechte vorbehalten.',
+        'TR': '© 2024 assatida. Tüm hakları saklıdır.'
       },
       'login.error': {
         'AR': 'خطأ في تسجيل الدخول. الرجاء التحقق من البيانات المدخلة.',

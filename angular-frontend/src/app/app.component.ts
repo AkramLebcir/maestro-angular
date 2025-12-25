@@ -13,7 +13,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'TeacherKit Plus Informatique';
+  title = 'assatida';
   isSidebarOpen = false;
   currentLanguage: LanguageCode = 'AR';
   showLayout = true; // Show header/sidebar by default
