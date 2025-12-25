@@ -179,10 +179,15 @@ export class AttendanceComponent implements OnInit {
      // دعم الفتح من صفحة التقارير مع تفعيل تبويب التقارير والتصدير عند الحاجة
      this.route.queryParams.subscribe((params) => {
        const autoExport = params['autoExport'] === '1';
+       const openDepartmentReport = params['openDepartmentReport'] === '1';
+       
        if (autoExport) {
          // افتح نافذة التقارير على تقرير الغيابات ثم صدّر PDF
          this.openReportModal('absences');
          setTimeout(() => this.exportReportToPDF(), 400);
+       } else if (openDepartmentReport) {
+         // افتح نافذة التقارير على تقرير القسم
+         this.openReportModal('department');
        }
      });
   }
@@ -1343,6 +1348,127 @@ export class AttendanceComponent implements OnInit {
     });
   }
 
+  getCurrentWeekDays(): Date[] {
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - dayOfWeek + (dayOfWeek === 0 ? -6 : 1)); // Monday
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const weekDays: Date[] = [];
+    for (let i = 0; i < 7; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      weekDays.push(date);
+    }
+    return weekDays;
+  }
+
+  getAttendanceStatusForDay(studentId: number, date: Date): AttendanceStatus {
+    if (!this.selectedClass) return 'unrecorded';
+    const dateStr = this.formatDateForAPI(date);
+    const record = this.attendanceRecords.find(r => 
+      r.studentId === studentId && 
+      r.date === dateStr &&
+      r.classId === this.selectedClass!.id
+    );
+    return record ? record.status : 'unrecorded';
+  }
+
+  getAttendanceCode(status: AttendanceStatus): string {
+    switch (status) {
+      case 'present':
+        return 'P';
+      case 'absent':
+        return 'A';
+      case 'late':
+        return 'L';
+      case 'excused':
+        return 'E';
+      case 'left_early':
+        return 'LE';
+      default:
+        return '-';
+    }
+  }
+
+  getAttendanceCodeColor(status: AttendanceStatus): string {
+    switch (status) {
+      case 'present':
+        return 'bg-green-500 text-white';
+      case 'absent':
+        return 'bg-red-500 text-white';
+      case 'late':
+        return 'bg-yellow-500 text-white';
+      case 'excused':
+        return 'bg-purple-500 text-white';
+      case 'left_early':
+        return 'bg-orange-500 text-white';
+      default:
+        return 'bg-gray-300 text-gray-600';
+    }
+  }
+
+  getWeeklyLateCount(studentId: number): number {
+    if (!this.selectedClass) return 0;
+    const weekDays = this.getCurrentWeekDays();
+    let lateCount = 0;
+    weekDays.forEach(day => {
+      const status = this.getAttendanceStatusForDay(studentId, day);
+      if (status === 'late') lateCount++;
+    });
+    return lateCount;
+  }
+
+  getDepartmentReportSummary(): {
+    totalPresent: number;
+    totalAbsent: number;
+    totalLate: number;
+    totalExcused: number;
+    totalLeftEarly: number;
+    totalRecords: number;
+    presentPercentage: number;
+    absentPercentage: number;
+    latePercentage: number;
+  } {
+    const report = this.getDepartmentAttendanceReport();
+    const weekDays = this.getCurrentWeekDays();
+    
+    let totalPresent = 0;
+    let totalAbsent = 0;
+    let totalLate = 0;
+    let totalExcused = 0;
+    let totalLeftEarly = 0;
+    let totalRecords = 0;
+
+    this.students.forEach(student => {
+      weekDays.forEach(day => {
+        const status = this.getAttendanceStatusForDay(student.id, day);
+        if (status !== 'unrecorded') {
+          totalRecords++;
+          if (status === 'present') totalPresent++;
+          else if (status === 'absent') totalAbsent++;
+          else if (status === 'late') totalLate++;
+          else if (status === 'excused') totalExcused++;
+          else if (status === 'left_early') totalLeftEarly++;
+        }
+      });
+    });
+
+    const total = totalRecords || 1;
+    return {
+      totalPresent,
+      totalAbsent,
+      totalLate,
+      totalExcused,
+      totalLeftEarly,
+      totalRecords,
+      presentPercentage: (totalPresent / total) * 100,
+      absentPercentage: (totalAbsent / total) * 100,
+      latePercentage: (totalLate / total) * 100
+    };
+  }
+
   getStatusLabelForReport(status: 'excellent' | 'good' | 'needs_attention'): string {
     switch (status) {
       case 'excellent':
@@ -1508,6 +1634,47 @@ export class AttendanceComponent implements OnInit {
       alert(this.translate('attendance.errorExportPdf'));
       document.body.removeChild(exportContainer);
     });
+  }
+
+  // Helper methods for department attendance report template
+  getStudentWeeklyPresent(studentId: number): number {
+    const report = this.getDepartmentAttendanceReport();
+    const studentReport = report.find(r => r.studentId === studentId);
+    return studentReport?.weeklyPresent || 0;
+  }
+
+  getStudentWeeklyAbsent(studentId: number): number {
+    const report = this.getDepartmentAttendanceReport();
+    const studentReport = report.find(r => r.studentId === studentId);
+    return studentReport?.weeklyAbsent || 0;
+  }
+
+  getStudentWeeklyUnrecorded(studentId: number): number {
+    const weeklyPresent = this.getStudentWeeklyPresent(studentId);
+    const weeklyAbsent = this.getStudentWeeklyAbsent(studentId);
+    const weekDaysLength = this.getCurrentWeekDays().length;
+    return weeklyPresent ? (weekDaysLength - weeklyPresent - weeklyAbsent) : 0;
+  }
+
+  getStudentAttendanceRate(studentId: number): number {
+    const report = this.getDepartmentAttendanceReport();
+    const studentReport = report.find(r => r.studentId === studentId);
+    return studentReport?.attendanceRate || 0;
+  }
+
+  hasStudentReport(studentId: number): boolean {
+    const report = this.getDepartmentAttendanceReport();
+    return !!report.find(r => r.studentId === studentId);
+  }
+
+  getStudentStatus(studentId: number): 'excellent' | 'good' | 'needs_attention' {
+    const report = this.getDepartmentAttendanceReport();
+    const studentReport = report.find(r => r.studentId === studentId);
+    return studentReport?.status || 'good';
+  }
+
+  isStudentStatus(studentId: number, status: 'excellent' | 'good' | 'needs_attention'): boolean {
+    return this.getStudentStatus(studentId) === status;
   }
 }
 

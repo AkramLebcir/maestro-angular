@@ -45,6 +45,7 @@ import { ClubsComponent } from './pages/clubs/clubs.component';
 import { AuthInterceptor } from './services/auth-interceptor.service';
 import { GlobalErrorHandler } from './services/global-error-handler.service';
 import { RandomPickerComponent } from './components/random-picker/random-picker.component';
+import { BehaviorDictionaryComponent } from './components/behavior-dictionary/behavior-dictionary.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { RandomPickerComponent } from './components/random-picker/random-picker.
     LabsComponent,
     StudentsComponent,
     RandomPickerComponent,
+    BehaviorDictionaryComponent,
     TimetableComponent,
     TopicsComponent,
     NotebooksComponent,

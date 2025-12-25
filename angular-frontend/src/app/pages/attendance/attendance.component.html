@@ -70,11 +70,6 @@
           <button 
             (click)="openReportModal('department')"
             class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
-            {{ translate('attendance.departmentReport') }}
-          </button>
-          <button 
-            (click)="openReportModal('absences')"
-            class="bg-blue-700 hover:bg-blue-800 px-4 py-2 rounded transition">
             {{ translate('attendance.reports') }}
           </button>
         </div>
@@ -575,60 +570,131 @@
       </div>
 
       <!-- Department Attendance Report -->
-      <div *ngIf="reportType === 'department'" class="overflow-x-auto">
-        <table class="w-full border-collapse" id="department-report-table">
-          <thead>
-            <tr class="bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.studentName') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.dailyPresent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.dailyAbsent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.weeklyPresent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.weeklyAbsent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.monthlyPresent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.monthlyAbsent') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.attendanceRate') }}</th>
-              <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('attendance.status') }}</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              *ngFor="let report of getDepartmentAttendanceReport()" 
-              class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900"
-              [ngClass]="report.status === 'needs_attention' ? 'bg-red-50 dark:bg-red-900/20' : ''">
-              <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ report.studentName }}</td>
-              <td class="py-3 px-4 text-green-600 font-semibold">{{ report.dailyPresent }}</td>
-              <td class="py-3 px-4 text-red-600 font-semibold">{{ report.dailyAbsent }}</td>
-              <td class="py-3 px-4 text-green-600 font-semibold">{{ report.weeklyPresent }}</td>
-              <td class="py-3 px-4 text-red-600 font-semibold">{{ report.weeklyAbsent }}</td>
-              <td class="py-3 px-4 text-green-600 font-semibold">{{ report.monthlyPresent }}</td>
-              <td class="py-3 px-4 text-red-600 font-semibold">{{ report.monthlyAbsent }}</td>
-              <td class="py-3 px-4">
-                <div class="flex items-center gap-2">
-                  <div class="flex-1 bg-gray-200 rounded-full h-2">
-                    <div 
-                      class="bg-green-600 h-2 rounded-full"
-                      [style.width.%]="report.attendanceRate">
+      <div *ngIf="reportType === 'department'" class="space-y-6">
+        <!-- Summary Section -->
+        <div class="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
+          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('attendance.summary') }}</h4>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="text-center">
+              <div class="text-2xl font-bold text-green-600">{{ getDepartmentReportSummary().totalPresent }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ translate('attendance.present') }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ getDepartmentReportSummary().presentPercentage.toFixed(1) }}%</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-red-600">{{ getDepartmentReportSummary().totalAbsent }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ translate('attendance.absent') }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ getDepartmentReportSummary().absentPercentage.toFixed(1) }}%</div>
+            </div>
+            <div class="text-center">
+              <div class="text-2xl font-bold text-yellow-600">{{ getDepartmentReportSummary().totalLate }}</div>
+              <div class="text-sm text-gray-600 dark:text-gray-400">{{ translate('attendance.late') }}</div>
+              <div class="text-xs text-gray-500 dark:text-gray-500 mt-1">{{ getDepartmentReportSummary().latePercentage.toFixed(1) }}%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Daily Attendance Register -->
+        <div class="overflow-x-auto">
+          <h4 class="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-4">{{ translate('attendance.dailyRegister') }}</h4>
+          <div class="mb-4 flex gap-4 text-sm">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-green-500 text-white rounded text-xs font-semibold">P</span>
+              <span class="text-gray-600 dark:text-gray-400">{{ translate('attendance.present') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-red-500 text-white rounded text-xs font-semibold">A</span>
+              <span class="text-gray-600 dark:text-gray-400">{{ translate('attendance.absent') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-yellow-500 text-white rounded text-xs font-semibold">L</span>
+              <span class="text-gray-600 dark:text-gray-400">{{ translate('attendance.late') }}</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 bg-purple-500 text-white rounded text-xs font-semibold">E</span>
+              <span class="text-gray-600 dark:text-gray-400">{{ translate('attendance.excused') }}</span>
+            </div>
+          </div>
+          
+          <table class="w-full border-collapse border border-gray-300 dark:border-gray-600" id="department-report-table">
+            <thead>
+              <tr class="bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.studentName') }}</th>
+                <th *ngFor="let day of getCurrentWeekDays()" class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600 min-w-[80px]">
+                  <div>{{ getDayName(day) }}</div>
+                  <div class="text-xs font-normal text-gray-500 dark:text-gray-400">{{ formatDateShort(day) }}</div>
+                </th>
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.present') }}</th>
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.absent') }}</th>
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.late') }}</th>
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.attendanceRate') }}</th>
+                <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300 border border-gray-300 dark:border-gray-600">{{ translate('attendance.status') }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr 
+                *ngFor="let student of students" 
+                class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
+                <td class="py-3 px-4 text-gray-800 dark:text-gray-200 border border-gray-300 dark:border-gray-600">
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+                      <img 
+                        *ngIf="hasPhoto(student)"
+                        [src]="getStudentPhoto(student)"
+                        [alt]="student.firstName"
+                        class="w-full h-full object-cover">
+                      <span *ngIf="!hasPhoto(student)" class="text-lg">{{ getDefaultIcon(student) }}</span>
+                    </div>
+                    <div>
+                      <div class="font-semibold">{{ student.firstName }}</div>
+                      <div class="text-xs text-gray-600 dark:text-gray-400">{{ student.lastName }}</div>
                     </div>
                   </div>
-                  <span class="text-sm font-semibold">{{ report.attendanceRate.toFixed(1) }}%</span>
-                </div>
-              </td>
-              <td class="py-3 px-4">
-                <span 
-                  [ngClass]="{
-                    'px-2 py-1 bg-green-100 text-green-800 rounded text-sm font-semibold': report.status === 'excellent',
-                    'px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-semibold': report.status === 'good',
-                    'px-2 py-1 bg-red-100 text-red-800 rounded text-sm font-semibold': report.status === 'needs_attention'
-                  }">
-                  {{ getStatusLabelForReport(report.status) }}
-                </span>
-              </td>
-            </tr>
-            <tr *ngIf="getDepartmentAttendanceReport().length === 0">
-              <td colspan="9" class="py-8 text-center text-gray-500 dark:text-gray-400">{{ translate('attendance.noData') }}</td>
-            </tr>
-          </tbody>
-        </table>
+                </td>
+                <td *ngFor="let day of getCurrentWeekDays()" class="text-center py-3 px-2 border border-gray-300 dark:border-gray-600">
+                  <span 
+                    [class]="getAttendanceCodeColor(getAttendanceStatusForDay(student.id, day))"
+                    class="px-2 py-1 rounded text-xs font-semibold inline-block min-w-[30px]">
+                    {{ getAttendanceCode(getAttendanceStatusForDay(student.id, day)) }}
+                  </span>
+                </td>
+                <td class="text-center py-3 px-4 text-green-600 font-semibold border border-gray-300 dark:border-gray-600">
+                  {{ getStudentWeeklyPresent(student.id) }}
+                </td>
+                <td class="text-center py-3 px-4 text-red-600 font-semibold border border-gray-300 dark:border-gray-600">
+                  {{ getStudentWeeklyAbsent(student.id) }}
+                </td>
+                <td class="text-center py-3 px-4 text-yellow-600 font-semibold border border-gray-300 dark:border-gray-600">
+                  {{ getStudentWeeklyUnrecorded(student.id) }}
+                </td>
+                <td class="py-3 px-4 border border-gray-300 dark:border-gray-600">
+                  <div class="flex items-center gap-2">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2">
+                      <div 
+                        class="bg-green-600 h-2 rounded-full"
+                        [style.width.%]="getStudentAttendanceRate(student.id)">
+                      </div>
+                    </div>
+                    <span class="text-sm font-semibold min-w-[50px]">{{ getStudentAttendanceRate(student.id).toFixed(1) }}%</span>
+                  </div>
+                </td>
+                <td class="py-3 px-4 border border-gray-300 dark:border-gray-600">
+                  <span 
+                    *ngIf="hasStudentReport(student.id)"
+                    [ngClass]="{
+                      'px-2 py-1 bg-green-100 text-green-800 rounded text-xs font-semibold': isStudentStatus(student.id, 'excellent'),
+                      'px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-semibold': isStudentStatus(student.id, 'good'),
+                      'px-2 py-1 bg-red-100 text-red-800 rounded text-xs font-semibold': isStudentStatus(student.id, 'needs_attention')
+                    }">
+                    {{ getStatusLabelForReport(getStudentStatus(student.id)) }}
+                  </span>
+                </td>
+              </tr>
+              <tr *ngIf="students.length === 0">
+                <td [attr.colspan]="getCurrentWeekDays().length + 6" class="py-8 text-center text-gray-500 dark:text-gray-400">{{ translate('attendance.noData') }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>

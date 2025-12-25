@@ -12,6 +12,8 @@ export interface Behavior {
   icon?: string;
   color?: string;
   description?: string;
+  points?: number;
+  isDefault?: boolean;
 }
 
 export interface BehaviorEvent {
@@ -132,10 +134,17 @@ export class BehaviorComponent implements OnInit {
   viewMode: 'grid' | 'list' = 'grid';
   selectedBehaviorType: 'all' | 'positive' | 'negative' = 'all';
 
+  // Tab management
+  activeTab: 'management' | 'dictionary' = 'management';
+
   constructor(
     private apiService: ApiService,
     public languageService: LanguageService
   ) {}
+
+  setTab(tab: 'management' | 'dictionary'): void {
+    this.activeTab = tab;
+  }
 
   translate(key: string): string {
     return this.languageService.translate(key);

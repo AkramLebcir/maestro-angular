@@ -294,6 +294,12 @@ export class ReportsComponent {
     });
   }
 
+  navigateToDepartmentAttendanceReport(): void {
+    this.router.navigate(['/attendance'], {
+      queryParams: { openDepartmentReport: '1' },
+    });
+  }
+
   navigateToBehavior(): void {
     this.router.navigate(['/behavior']);
   }

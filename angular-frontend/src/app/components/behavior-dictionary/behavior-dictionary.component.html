@@ -1,0 +1,323 @@
+<div class="space-y-6">
+  <!-- Header with Reset Button -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200">
+      {{ translate('behavior.dictionaryTitle') }}
+    </h2>
+    <button
+      (click)="resetToDefaults()"
+      class="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 transition flex items-center gap-2">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+      </svg>
+      <span>{{ translate('behavior.resetDefaults') }}</span>
+    </button>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-8 text-gray-500">
+    {{ translate('behavior.loading') }}...
+  </div>
+
+  <div *ngIf="!loading" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <!-- Positive Behaviors -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-green-700 dark:text-green-400">
+          {{ translate('behavior.positive') }}
+        </h3>
+        <button
+          (click)="openAddModal('positive')"
+          class="bg-green-600 text-white px-3 py-1 rounded text-sm hover:bg-green-700 transition flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>{{ translate('behavior.add') }}</span>
+        </button>
+      </div>
+      
+      <div class="space-y-2">
+        <div
+          *ngFor="let behavior of positiveBehaviors"
+          class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center justify-between">
+          <div class="flex items-center gap-3 flex-1">
+            <span class="text-2xl">{{ behavior.icon || '✓' }}</span>
+            <div class="flex-1">
+              <div class="font-medium text-gray-800 dark:text-gray-200">
+                {{ getBehaviorName(behavior) }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                {{ translate('behavior.points') }}: {{ behavior.points > 0 ? '+' : '' }}{{ formatPoints(behavior.points) }}
+              </div>
+            </div>
+            <span
+              *ngIf="behavior.isDefault"
+              class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
+              {{ translate('behavior.default') }}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              (click)="openEditModal(behavior)"
+              [disabled]="behavior.isDefault"
+              class="text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
+              (click)="deleteBehavior(behavior)"
+              [disabled]="behavior.isDefault"
+              class="text-red-600 hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="positiveBehaviors.length === 0" class="text-center text-gray-500 py-4">
+          {{ translate('behavior.noBehaviors') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Negative Behaviors -->
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-semibold text-red-700 dark:text-red-400">
+          {{ translate('behavior.negative') }}
+        </h3>
+        <button
+          (click)="openAddModal('negative')"
+          class="bg-red-600 text-white px-3 py-1 rounded text-sm hover:bg-red-700 transition flex items-center gap-1">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span>{{ translate('behavior.add') }}</span>
+        </button>
+      </div>
+      
+      <div class="space-y-2">
+        <div
+          *ngFor="let behavior of negativeBehaviors"
+          class="border border-gray-200 dark:border-gray-700 rounded-lg p-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition flex items-center justify-between">
+          <div class="flex items-center gap-3 flex-1">
+            <span class="text-2xl">{{ behavior.icon || '✗' }}</span>
+            <div class="flex-1">
+              <div class="font-medium text-gray-800 dark:text-gray-200">
+                {{ getBehaviorName(behavior) }}
+              </div>
+              <div class="text-sm text-gray-500 dark:text-gray-400">
+                {{ translate('behavior.points') }}: {{ behavior.points > 0 ? '+' : '' }}{{ formatPoints(behavior.points) }}
+              </div>
+            </div>
+            <span
+              *ngIf="behavior.isDefault"
+              class="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400 text-xs rounded">
+              {{ translate('behavior.default') }}
+            </span>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              (click)="openEditModal(behavior)"
+              [disabled]="behavior.isDefault"
+              class="text-blue-600 hover:text-blue-800 disabled:text-gray-400 disabled:cursor-not-allowed">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+            </button>
+            <button
+              (click)="deleteBehavior(behavior)"
+              [disabled]="behavior.isDefault"
+              class="text-red-600 hover:text-red-800 disabled:text-gray-400 disabled:cursor-not-allowed">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div *ngIf="negativeBehaviors.length === 0" class="text-center text-gray-500 py-4">
+          {{ translate('behavior.noBehaviors') }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Behavior Modal -->
+<div
+  *ngIf="showAddModal"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
+  (click)="closeAddModal()">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+        {{ translate('behavior.addBehavior') }}
+      </h3>
+      <button
+        (click)="closeAddModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveBehavior()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.name') }} *
+        </label>
+        <input
+          *ngIf="languageService.getCurrentLanguage() === 'AR'"
+          type="text"
+          [(ngModel)]="formData.nameAr"
+          name="nameAr"
+          required
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+        <input
+          *ngIf="languageService.getCurrentLanguage() !== 'AR'"
+          type="text"
+          [(ngModel)]="formData.name"
+          name="name"
+          required
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.icon') }}
+        </label>
+        <select
+          [(ngModel)]="formData.icon"
+          name="icon"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700">
+          <option value="">{{ translate('behavior.selectIcon') }}</option>
+          <option *ngFor="let icon of availableIcons" [value]="icon">
+            {{ icon }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.points') }} *
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="formData.points"
+          name="points"
+          required
+          step="0.1"
+          [min]="formData.type === 'negative' ? -100 : 0"
+          [max]="formData.type === 'positive' ? 100 : 0"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button
+          type="submit"
+          class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+          {{ translate('behavior.save') }}
+        </button>
+        <button
+          type="button"
+          (click)="closeAddModal()"
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
+          {{ translate('common.cancel') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Behavior Modal -->
+<div
+  *ngIf="showEditModal"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50"
+  (click)="closeEditModal()">
+  <div
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">
+        {{ translate('behavior.editBehavior') }}
+      </h3>
+      <button
+        (click)="closeEditModal()"
+        class="text-gray-500 hover:text-gray-700">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <form (ngSubmit)="saveBehavior()" class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.name') }} *
+        </label>
+        <input
+          *ngIf="languageService.getCurrentLanguage() === 'AR'"
+          type="text"
+          [(ngModel)]="formData.nameAr"
+          name="nameAr"
+          required
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+        <input
+          *ngIf="languageService.getCurrentLanguage() !== 'AR'"
+          type="text"
+          [(ngModel)]="formData.name"
+          name="name"
+          required
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.icon') }}
+        </label>
+        <select
+          [(ngModel)]="formData.icon"
+          name="icon"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500 bg-white dark:bg-gray-700">
+          <option value="">{{ translate('behavior.selectIcon') }}</option>
+          <option *ngFor="let icon of availableIcons" [value]="icon">
+            {{ icon }}
+          </option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+          {{ translate('behavior.points') }} *
+        </label>
+        <input
+          type="number"
+          [(ngModel)]="formData.points"
+          name="points"
+          required
+          step="0.1"
+          [min]="formData.type === 'negative' ? -100 : 0"
+          [max]="formData.type === 'positive' ? 100 : 0"
+          class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-green-500">
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button
+          type="submit"
+          class="flex-1 bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition">
+          {{ translate('behavior.save') }}
+        </button>
+        <button
+          type="button"
+          (click)="closeEditModal()"
+          class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
+          {{ translate('common.cancel') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+

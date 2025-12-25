@@ -3705,6 +3705,24 @@ export class LanguageService {
         'DE': 'Anwesenheitsbericht nach Klasse mit PDF-Exportfunktion.',
         'TR': 'PDF dışa aktarma özelliği ile sınıfa göre yoklama raporu.'
       },
+      'reports.departmentAttendanceReport': {
+        'AR': 'تقرير الحضور على مستوى القسم',
+        'FR': 'Rapport de présence au niveau du département',
+        'EN': 'Department attendance report',
+        'ES': 'Informe de asistencia del departamento',
+        'IT': 'Rapporto presenze del dipartimento',
+        'DE': 'Abteilungs-Anwesenheitsbericht',
+        'TR': 'Bölüm yoklama raporu'
+      },
+      'reports.departmentAttendanceReportDesc': {
+        'AR': 'تقرير شامل عن الحضور على مستوى القسم يتضمن الإحصائيات اليومية والأسبوعية والشهرية',
+        'FR': 'Rapport complet sur la présence au niveau du département incluant les statistiques quotidiennes, hebdomadaires et mensuelles',
+        'EN': 'Comprehensive report on department-level attendance including daily, weekly, and monthly statistics',
+        'ES': 'Informe completo sobre la asistencia a nivel de departamento que incluye estadísticas diarias, semanales y mensuales',
+        'IT': 'Rapporto completo sulla presenza a livello di dipartimento che include statistiche giornaliere, settimanali e mensili',
+        'DE': 'Umfassender Bericht über die Anwesenheit auf Abteilungsebene einschließlich täglicher, wöchentlicher und monatlicher Statistiken',
+        'TR': 'Günlük, haftalık ve aylık istatistikleri içeren bölüm düzeyinde yoklama hakkında kapsamlı rapor'
+      },
       'reports.behaviorReports': {
         'AR': 'تقارير السلوك',
         'FR': 'Rapports de comportement',
@@ -6343,6 +6361,24 @@ export class LanguageService {
         'DE': 'Keine Daten zum Exportieren',
         'TR': 'Dışa aktarılacak veri yok'
       },
+      'attendance.summary': {
+        'AR': 'ملخص الحضور',
+        'FR': 'Résumé de présence',
+        'EN': 'Attendance Summary',
+        'ES': 'Resumen de asistencia',
+        'IT': 'Riepilogo presenze',
+        'DE': 'Anwesenheitszusammenfassung',
+        'TR': 'Yoklama özeti'
+      },
+      'attendance.dailyRegister': {
+        'AR': 'سجل الحضور اليومي',
+        'FR': 'Registre de présence quotidien',
+        'EN': 'Daily Attendance Register',
+        'ES': 'Registro de asistencia diaria',
+        'IT': 'Registro presenze giornaliero',
+        'DE': 'Tägliches Anwesenheitsregister',
+        'TR': 'Günlük yoklama kaydı'
+      },
       'attendance.presentDays': {
         'AR': 'أيام الحضور',
         'FR': 'Jours de présence',
@@ -7019,6 +7055,204 @@ export class LanguageService {
         'IT': 'Salva',
         'DE': 'Speichern',
         'TR': 'Kaydet'
+      },
+      'behavior.tabManagement': {
+        'AR': 'إدارة السلوك',
+        'FR': 'Gestion du comportement',
+        'EN': 'Behavior Management',
+        'ES': 'Gestión de comportamiento',
+        'IT': 'Gestione comportamento',
+        'DE': 'Verhaltensverwaltung',
+        'TR': 'Davranış Yönetimi'
+      },
+      'behavior.tabDictionary': {
+        'AR': 'قواميس السلوك',
+        'FR': 'Dictionnaires de comportement',
+        'EN': 'Behavior Dictionaries',
+        'ES': 'Diccionarios de comportamiento',
+        'IT': 'Dizionari comportamento',
+        'DE': 'Verhaltenswörterbücher',
+        'TR': 'Davranış Sözlükleri'
+      },
+      'behavior.dictionaryTitle': {
+        'AR': 'إدارة قواميس السلوك',
+        'FR': 'Gestion des dictionnaires de comportement',
+        'EN': 'Behavior Dictionaries Management',
+        'ES': 'Gestión de diccionarios de comportamiento',
+        'IT': 'Gestione dizionari comportamento',
+        'DE': 'Verwaltung von Verhaltenswörterbüchern',
+        'TR': 'Davranış Sözlükleri Yönetimi'
+      },
+      'behavior.resetDefaults': {
+        'AR': 'استعادة الإعدادات الافتراضية',
+        'FR': 'Restaurer les paramètres par défaut',
+        'EN': 'Reset to Defaults',
+        'ES': 'Restablecer valores predeterminados',
+        'IT': 'Ripristina predefiniti',
+        'DE': 'Auf Standard zurücksetzen',
+        'TR': 'Varsayılanlara Sıfırla'
+      },
+      'behavior.add': {
+        'AR': 'إضافة',
+        'FR': 'Ajouter',
+        'EN': 'Add',
+        'ES': 'Agregar',
+        'IT': 'Aggiungi',
+        'DE': 'Hinzufügen',
+        'TR': 'Ekle'
+      },
+      'behavior.editBehavior': {
+        'AR': 'تعديل السلوك',
+        'FR': 'Modifier le comportement',
+        'EN': 'Edit Behavior',
+        'ES': 'Editar comportamiento',
+        'IT': 'Modifica comportamento',
+        'DE': 'Verhalten bearbeiten',
+        'TR': 'Davranışı Düzenle'
+      },
+      'behavior.name': {
+        'AR': 'الاسم',
+        'FR': 'Nom',
+        'EN': 'Name',
+        'ES': 'Nombre',
+        'IT': 'Nome',
+        'DE': 'Name',
+        'TR': 'İsim'
+      },
+      'behavior.icon': {
+        'AR': 'الأيقونة',
+        'FR': 'Icône',
+        'EN': 'Icon',
+        'ES': 'Icono',
+        'IT': 'Icona',
+        'DE': 'Symbol',
+        'TR': 'İkon'
+      },
+      'behavior.selectIcon': {
+        'AR': 'اختر الأيقونة',
+        'FR': 'Sélectionner une icône',
+        'EN': 'Select Icon',
+        'ES': 'Seleccionar icono',
+        'IT': 'Seleziona icona',
+        'DE': 'Symbol auswählen',
+        'TR': 'İkon seç'
+      },
+      'behavior.points': {
+        'AR': 'النقاط',
+        'FR': 'Points',
+        'EN': 'Points',
+        'ES': 'Puntos',
+        'IT': 'Punti',
+        'DE': 'Punkte',
+        'TR': 'Puanlar'
+      },
+      'behavior.default': {
+        'AR': 'افتراضي',
+        'FR': 'Par défaut',
+        'EN': 'Default',
+        'ES': 'Predeterminado',
+        'IT': 'Predefinito',
+        'DE': 'Standard',
+        'TR': 'Varsayılan'
+      },
+      'behavior.noBehaviors': {
+        'AR': 'لا توجد سلوكات',
+        'FR': 'Aucun comportement',
+        'EN': 'No behaviors',
+        'ES': 'Sin comportamientos',
+        'IT': 'Nessun comportamento',
+        'DE': 'Keine Verhaltensweisen',
+        'TR': 'Davranış yok'
+      },
+      'behavior.cannotEditDefault': {
+        'AR': 'لا يمكن تعديل السلوكات الافتراضية',
+        'FR': 'Impossible de modifier les comportements par défaut',
+        'EN': 'Cannot edit default behaviors',
+        'ES': 'No se pueden editar los comportamientos predeterminados',
+        'IT': 'Impossibile modificare i comportamenti predefiniti',
+        'DE': 'Standardverhalten können nicht bearbeitet werden',
+        'TR': 'Varsayılan davranışlar düzenlenemez'
+      },
+      'behavior.cannotDeleteDefault': {
+        'AR': 'لا يمكن حذف السلوكات الافتراضية',
+        'FR': 'Impossible de supprimer les comportements par défaut',
+        'EN': 'Cannot delete default behaviors',
+        'ES': 'No se pueden eliminar los comportamientos predeterminados',
+        'IT': 'Impossibile eliminare i comportamenti predefiniti',
+        'DE': 'Standardverhalten können nicht gelöscht werden',
+        'TR': 'Varsayılan davranışlar silinemez'
+      },
+      'behavior.fillRequiredFields': {
+        'AR': 'يرجى ملء جميع الحقول المطلوبة',
+        'FR': 'Veuillez remplir tous les champs requis',
+        'EN': 'Please fill all required fields',
+        'ES': 'Por favor complete todos los campos requeridos',
+        'IT': 'Si prega di compilare tutti i campi obbligatori',
+        'DE': 'Bitte füllen Sie alle erforderlichen Felder aus',
+        'TR': 'Lütfen tüm gerekli alanları doldurun'
+      },
+      'behavior.confirmDeleteBehavior': {
+        'AR': 'هل أنت متأكد من حذف هذا السلوك؟',
+        'FR': 'Êtes-vous sûr de vouloir supprimer ce comportement ?',
+        'EN': 'Are you sure you want to delete this behavior?',
+        'ES': '¿Está seguro de que desea eliminar este comportamiento?',
+        'IT': 'Sei sicuro di voler eliminare questo comportamento?',
+        'DE': 'Sind Sie sicher, dass Sie dieses Verhalten löschen möchten?',
+        'TR': 'Bu davranışı silmek istediğinizden emin misiniz?'
+      },
+      'behavior.confirmResetDefaults': {
+        'AR': 'هل أنت متأكد من استعادة الإعدادات الافتراضية؟ سيتم حذف جميع السلوكات المخصصة.',
+        'FR': 'Êtes-vous sûr de vouloir restaurer les paramètres par défaut ? Tous les comportements personnalisés seront supprimés.',
+        'EN': 'Are you sure you want to reset to defaults? All custom behaviors will be deleted.',
+        'ES': '¿Está seguro de que desea restablecer los valores predeterminados? Se eliminarán todos los comportamientos personalizados.',
+        'IT': 'Sei sicuro di voler ripristinare i predefiniti? Tutti i comportamenti personalizzati verranno eliminati.',
+        'DE': 'Sind Sie sicher, dass Sie auf die Standardeinstellungen zurücksetzen möchten? Alle benutzerdefinierten Verhaltensweisen werden gelöscht.',
+        'TR': 'Varsayılanlara sıfırlamak istediğinizden emin misiniz? Tüm özel davranışlar silinecek.'
+      },
+      'behavior.resetSuccess': {
+        'AR': 'تم استعادة الإعدادات الافتراضية بنجاح',
+        'FR': 'Paramètres par défaut restaurés avec succès',
+        'EN': 'Defaults reset successfully',
+        'ES': 'Valores predeterminados restablecidos correctamente',
+        'IT': 'Predefiniti ripristinati con successo',
+        'DE': 'Standardeinstellungen erfolgreich zurückgesetzt',
+        'TR': 'Varsayılanlar başarıyla sıfırlandı'
+      },
+      'behavior.errorReset': {
+        'AR': 'حدث خطأ أثناء استعادة الإعدادات الافتراضية',
+        'FR': 'Une erreur s\'est produite lors de la restauration des paramètres par défaut',
+        'EN': 'Error resetting defaults',
+        'ES': 'Error al restablecer los valores predeterminados',
+        'IT': 'Errore nel ripristino dei predefiniti',
+        'DE': 'Fehler beim Zurücksetzen der Standardeinstellungen',
+        'TR': 'Varsayılanları sıfırlarken hata oluştu'
+      },
+      'behavior.errorCreate': {
+        'AR': 'حدث خطأ أثناء إنشاء السلوك',
+        'FR': 'Une erreur s\'est produite lors de la création du comportement',
+        'EN': 'Error creating behavior',
+        'ES': 'Error al crear el comportamiento',
+        'IT': 'Errore nella creazione del comportamento',
+        'DE': 'Fehler beim Erstellen des Verhaltens',
+        'TR': 'Davranış oluşturulurken hata oluştu'
+      },
+      'behavior.errorUpdate': {
+        'AR': 'حدث خطأ أثناء تحديث السلوك',
+        'FR': 'Une erreur s\'est produite lors de la mise à jour du comportement',
+        'EN': 'Error updating behavior',
+        'ES': 'Error al actualizar el comportamiento',
+        'IT': 'Errore nell\'aggiornamento del comportamento',
+        'DE': 'Fehler beim Aktualisieren des Verhaltens',
+        'TR': 'Davranış güncellenirken hata oluştu'
+      },
+      'behavior.loading': {
+        'AR': 'جاري التحميل',
+        'FR': 'Chargement',
+        'EN': 'Loading',
+        'ES': 'Cargando',
+        'IT': 'Caricamento',
+        'DE': 'Laden',
+        'TR': 'Yükleniyor'
       },
 
       // Seating Chart
