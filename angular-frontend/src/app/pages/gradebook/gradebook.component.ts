@@ -3536,7 +3536,10 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
         guidance = ''; // Leave guidance empty
       } else {
-        // Read from Excel file if columns exist
+        // Read from Excel file if columns exist, otherwise generate automatically
+        let observationRead = false;
+        let guidanceRead = false;
+        
         if (observationColIndex !== -1) {
           const obsValue = row[observationColIndex];
           // Check if value exists and is not empty
@@ -3544,18 +3547,19 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             const obsStr = String(obsValue).trim();
             if (obsStr !== '' && obsStr !== '-' && obsStr.toLowerCase() !== 'null' && obsStr.toLowerCase() !== 'undefined') {
               observation = obsStr;
+              observationRead = true;
               // Debug log for first row
               if (processedData.length === 0) {
                 console.log('✓ Reading observation from Excel:', observation, 'from column index:', observationColIndex, 'Raw value:', obsValue);
               }
             } else if (processedData.length === 0) {
-              console.log('✗ Observation column found but value is empty. Column index:', observationColIndex, 'Raw value:', obsValue);
+              console.log('✗ Observation column found but value is empty. Will generate automatically.');
             }
           } else if (processedData.length === 0) {
-            console.log('✗ Observation column found but value is null/undefined. Column index:', observationColIndex);
+            console.log('✗ Observation column found but value is null/undefined. Will generate automatically.');
           }
         } else if (processedData.length === 0) {
-          console.log('✗ Observation column not found in Excel file');
+          console.log('✗ Observation column not found in Excel file. Will generate automatically.');
         }
         
         if (guidanceColIndex !== -1) {
@@ -3565,18 +3569,27 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             const consStr = String(consValue).trim();
             if (consStr !== '' && consStr !== '-' && consStr.toLowerCase() !== 'null' && consStr.toLowerCase() !== 'undefined') {
               guidance = consStr;
+              guidanceRead = true;
               // Debug log for first row
               if (processedData.length === 0) {
                 console.log('✓ Reading guidance from Excel:', guidance, 'from column index:', guidanceColIndex, 'Raw value:', consValue);
               }
             } else if (processedData.length === 0) {
-              console.log('✗ Guidance column found but value is empty. Column index:', guidanceColIndex, 'Raw value:', consValue);
+              console.log('✗ Guidance column found but value is empty. Will generate automatically.');
             }
           } else if (processedData.length === 0) {
-            console.log('✗ Guidance column found but value is null/undefined. Column index:', guidanceColIndex);
+            console.log('✗ Guidance column found but value is null/undefined. Will generate automatically.');
           }
         } else if (processedData.length === 0) {
-          console.log('✗ Guidance column not found in Excel file');
+          console.log('✗ Guidance column not found in Excel file. Will generate automatically.');
+        }
+        
+        // إذا لم نتمكن من قراءة البيانات من الملف (لأنها فارغة أو غير موجودة)، نولدها تلقائياً
+        if (!observationRead) {
+          observation = this.generateObservation(average, this.selectedLevel, this.selectedLanguage);
+        }
+        if (!guidanceRead) {
+          guidance = this.generateGuidance(average, this.selectedLevel, this.selectedLanguage);
         }
       }
 
@@ -4170,63 +4183,174 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         continue;
       }
 
-      // البحث عن صف الرؤوس - يمكن أن يكون في السطر 8 أو 9 أو 10 أو قبل ذلك
-      let headerRow = 0;
-      // البحث في أول 15 سطر للسماح بوجود رؤوس في السطر 8 أو 9 أو 10
-      for (let i = 0; i < Math.min(15, sheetData.length); i++) {
-        const row = sheetData[i];
-        if (Array.isArray(row) && row.some((cell: any) => {
-          const cellStr = String(cell || '').toLowerCase();
-          return cellStr.includes('name') || 
-                 cellStr.includes('اسم') || 
-                 cellStr.includes('nom') ||
-                 cellStr.includes('score') ||
-                 cellStr.includes('درجة') ||
-                 cellStr.includes('obs') ||
-                 cellStr.includes('ملاحظات') ||
-                 cellStr.includes('cons') ||
-                 cellStr.includes('إرشادات') ||
-                 cellStr.includes('observation') ||
-                 cellStr.includes('guidance');
-        })) {
-          headerRow = i;
-          break;
+      // البحث عن صف الرؤوس - يمكن أن يكون في السطر 7 أو 8 أو 9 أو قبل ذلك
+      let headerRow = -1;
+      // البحث أولاً في السطور 7-9 (index 6-8) كما طلب المستخدم
+      const priorityRows = [6, 7, 8]; // السطور 7, 8, 9 (index 6, 7, 8)
+      for (const rowIndex of priorityRows) {
+        if (rowIndex < sheetData.length) {
+          const row = sheetData[rowIndex];
+          if (Array.isArray(row) && row.some((cell: any) => {
+            const cellStr = String(cell || '').toLowerCase();
+            return cellStr.includes('name') || 
+                   cellStr.includes('اسم') || 
+                   cellStr.includes('nom') ||
+                   cellStr.includes('score') ||
+                   cellStr.includes('درجة') ||
+                   cellStr.includes('obs') ||
+                   cellStr.includes('ملاحظات') ||
+                   cellStr.includes('cons') ||
+                   cellStr.includes('إرشادات') ||
+                   cellStr.includes('observation') ||
+                   cellStr.includes('guidance') ||
+                   cellStr.includes('ratings') ||
+                   cellStr.includes('تقديرات') ||
+                   cellStr.includes('appréciation') ||
+                   cellStr.includes('appreciation');
+          })) {
+            headerRow = rowIndex;
+            break;
+          }
         }
+      }
+      
+      // إذا لم نجد في السطور 7-9، نبحث في السطور الأخرى (0-6 و 9-15)
+      if (headerRow === -1) {
+        for (let i = 0; i < Math.min(15, sheetData.length); i++) {
+          // تخطي السطور 7-9 لأننا بحثنا فيها بالفعل
+          if (priorityRows.includes(i)) continue;
+          
+          const row = sheetData[i];
+          if (Array.isArray(row) && row.some((cell: any) => {
+            const cellStr = String(cell || '').toLowerCase();
+            return cellStr.includes('name') || 
+                   cellStr.includes('اسم') || 
+                   cellStr.includes('nom') ||
+                   cellStr.includes('score') ||
+                   cellStr.includes('درجة') ||
+                   cellStr.includes('obs') ||
+                   cellStr.includes('ملاحظات') ||
+                   cellStr.includes('cons') ||
+                   cellStr.includes('إرشادات') ||
+                   cellStr.includes('observation') ||
+                   cellStr.includes('guidance') ||
+                   cellStr.includes('ratings') ||
+                   cellStr.includes('تقديرات') ||
+                   cellStr.includes('appréciation') ||
+                   cellStr.includes('appreciation');
+          })) {
+            headerRow = i;
+            break;
+          }
+        }
+      }
+      
+      // إذا لم نجد صف رؤوس، نستخدم السطر الأول كافتراضي
+      if (headerRow === -1) {
+        headerRow = 0;
       }
 
       const headers = sheetData[headerRow] || [];
+      console.log(`[Download] Header row found at index ${headerRow}, headers:`, headers);
       
       // البحث عن أعمدة الملاحظات/التقديرات والإرشادات الموجودة في الملف الأصلي
+      // نبحث عن "obs" لعمود التقديرات و "cons" لعمود الإرشادات
       let notesColIndex = -1;
       let guidanceColIndex = -1;
       
       for (let colIndex = 0; colIndex < headers.length; colIndex++) {
         const header = String(headers[colIndex] || '').toLowerCase().trim();
-        if (notesColIndex === -1 && (
-          header.includes('obs') || 
-          header.includes('ملاحظات') || 
-          header.includes('observation') ||
-          header.includes('ملاحظة') ||
-          header.includes('ratings') ||
-          header.includes('تقديرات') ||
-          header.includes('rating') ||
-          header.includes('تقييم') ||
-          header.includes('appréciation') ||
-          header.includes('appreciation')
-        )) {
-          notesColIndex = colIndex;
+        
+        // البحث عن عمود التقديرات (ratings/obs) - الأولوية لـ "obs" و "ratings" و "تقديرات"
+        if (notesColIndex === -1) {
+          // البحث الدقيق أولاً عن "obs" أو "ratings" أو "تقديرات"
+          if (header === 'obs' || 
+              header === 'ratings' || 
+              header === 'تقديرات' ||
+              header === 'appréciation' ||
+              header === 'appreciation' ||
+              header.includes('obs') || 
+              header.includes('ratings') || 
+              header.includes('تقديرات') ||
+              header.includes('rating') ||
+              header.includes('تقييم') ||
+              header.includes('appréciation') ||
+              header.includes('appreciation') ||
+              header.includes('observation') ||
+              header.includes('ملاحظات') ||
+              header.includes('ملاحظة')) {
+            notesColIndex = colIndex;
+            console.log(`[Download] Found notes/ratings column at index ${colIndex}: "${headers[colIndex]}"`);
+          }
         }
-        if (guidanceColIndex === -1 && (
-          header.includes('cons') || 
-          header.includes('إرشادات') || 
-          header.includes('guidance') ||
-          header.includes('إرشاد') ||
-          header.includes('conseils') ||
-          header.includes('conseil')
-        )) {
-          guidanceColIndex = colIndex;
+        
+        // البحث عن عمود الإرشادات (guidance/cons) - الأولوية لـ "cons" و "guidance" و "إرشادات"
+        if (guidanceColIndex === -1) {
+          // البحث الدقيق أولاً عن "cons" أو "guidance" أو "إرشادات"
+          if (header === 'cons' || 
+              header === 'guidance' || 
+              header === 'إرشادات' ||
+              header === 'conseils' ||
+              header === 'conseil' ||
+              header.includes('cons') || 
+              header.includes('guidance') || 
+              header.includes('إرشادات') ||
+              header.includes('إرشاد') ||
+              header.includes('conseils') ||
+              header.includes('conseil')) {
+            guidanceColIndex = colIndex;
+            console.log(`[Download] Found guidance column at index ${colIndex}: "${headers[colIndex]}"`);
+          }
         }
       }
+      
+      if (notesColIndex === -1) {
+        console.warn(`[Download] Notes/ratings column not found in headers`);
+      }
+      if (guidanceColIndex === -1) {
+        console.warn(`[Download] Guidance column not found in headers`);
+      }
+
+      // إذا لم تكن الأعمدة موجودة، نضيفها
+      const lang = this.selectedLanguage || 'AR';
+      if (notesColIndex === -1) {
+        // إضافة عمود الملاحظات/التقديرات
+        notesColIndex = headers.length;
+        if (lang === 'FR') {
+          headers.push('Appréciation');
+        } else if (lang === 'EN') {
+          headers.push('Ratings');
+        } else {
+          headers.push('التقديرات');
+        }
+        // التأكد من أن جميع الصفوف تحتوي على عدد كافٍ من الأعمدة
+        for (let i = 0; i < sheetData.length; i++) {
+          while (sheetData[i].length <= notesColIndex) {
+            sheetData[i].push('');
+          }
+        }
+      }
+      
+      if (guidanceColIndex === -1) {
+        // إضافة عمود الإرشادات
+        guidanceColIndex = headers.length;
+        if (lang === 'FR') {
+          headers.push('Conseils');
+        } else if (lang === 'EN') {
+          headers.push('Guidance');
+        } else {
+          headers.push('الإرشادات');
+        }
+        // التأكد من أن جميع الصفوف تحتوي على عدد كافٍ من الأعمدة
+        for (let i = 0; i < sheetData.length; i++) {
+          while (sheetData[i].length <= guidanceColIndex) {
+            sheetData[i].push('');
+          }
+        }
+      }
+      
+      // تحديث صف الرؤوس في sheetData
+      sheetData[headerRow] = headers;
 
       // البحث عن البيانات المعالجة لهذه الصفحة
       const sheetProcessedData = this.processedSheetsData.find(s => s.sheetName === sheetName);
@@ -4235,7 +4359,8 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       // نستخدم عدة مفاتيح للمطابقة الأفضل
       const processedDataMap = new Map<string, { observation: string; guidance: string; rowIndex?: number }>();
       
-      if (sheetProcessedData) {
+      if (sheetProcessedData && sheetProcessedData.data) {
+        console.log(`[Download] Found ${sheetProcessedData.data.length} processed rows for sheet: ${sheetName}`);
         sheetProcessedData.data.forEach((row: any, index: number) => {
           // مفاتيح متعددة للمطابقة
           const key1 = `${row.firstName || ''}_${row.lastName || ''}_${row.id || ''}`.trim().toLowerCase();
@@ -4249,11 +4374,19 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             rowIndex: headerRow + 1 + index // تقدير موضع الصف في الملف الأصلي
           };
           
+          // Debug: Log first few rows
+          if (index < 3) {
+            console.log(`[Download] Processed row ${index}: firstName="${row.firstName}", lastName="${row.lastName}", id="${row.id}", observation="${data.observation}", guidance="${data.guidance}"`);
+          }
+          
           processedDataMap.set(key1, data);
           if (key2 !== key1) processedDataMap.set(key2, data);
           if (key3 !== key2 && key3 !== key1) processedDataMap.set(key3, data);
           if (key4 && key4 !== key1 && key4 !== key2 && key4 !== key3) processedDataMap.set(key4, data);
         });
+        console.log(`[Download] Created map with ${processedDataMap.size} keys`);
+      } else {
+        console.warn(`[Download] No processed data found for sheet: ${sheetName}`);
       }
 
       // إضافة البيانات إلى الصفوف
@@ -4266,14 +4399,46 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         let lastName = '';
         let id = '';
         
-        // البحث عن عمود الاسم
+        // البحث عن عمود الاسم - دعم prenom, nom, matricule
         for (let colIndex = 0; colIndex < headers.length; colIndex++) {
-          const header = String(headers[colIndex] || '').toLowerCase();
-          if (header.includes('firstname') || (header.includes('الاسم') && !header.includes('اللقب'))) {
+          const header = String(headers[colIndex] || '').toLowerCase().trim();
+          
+          // البحث عن الاسم الأول (prenom / firstname / الاسم)
+          if (!firstName && (
+            header === 'prenom' || 
+            header.includes('prenom') ||
+            header.includes('firstname') || 
+            header.includes('first name') ||
+            (header.includes('الاسم') && !header.includes('اللقب'))
+          )) {
             firstName = String(row[colIndex] || '').trim();
-          } else if (header.includes('lastname') || header.includes('اللقب') || (header.includes('nom') && !header.includes('prénom'))) {
+          }
+          
+          // البحث عن اللقب (nom / lastname / اللقب)
+          if (!lastName && (
+            header === 'nom' || 
+            header.includes('nom') && !header.includes('prenom') ||
+            header.includes('lastname') || 
+            header.includes('last name') ||
+            header.includes('اللقب')
+          )) {
             lastName = String(row[colIndex] || '').trim();
-          } else if (header.includes('name') && !header.includes('first') && !header.includes('last') && !firstName && !lastName) {
+          }
+          
+          // البحث عن رقم الهوية (matricule / id / رقم)
+          if (!id && (
+            header === 'matricule' ||
+            header.includes('matricule') ||
+            header.includes('id') || 
+            header.includes('رقم') || 
+            header.includes('code') ||
+            header.includes('رقم التعريف')
+          )) {
+            id = String(row[colIndex] || '').trim();
+          }
+          
+          // إذا لم نجد بعد، نبحث عن عمود name عام
+          if (!firstName && !lastName && header.includes('name') && !header.includes('first') && !header.includes('last')) {
             const fullName = String(row[colIndex] || '').trim();
             const nameParts = fullName.split(/\s+/);
             if (nameParts.length >= 2) {
@@ -4282,8 +4447,6 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             } else {
               firstName = fullName;
             }
-          } else if ((header.includes('id') || header.includes('رقم') || header.includes('code')) && !id) {
-            id = String(row[colIndex] || '').trim();
           }
         }
 
@@ -4310,21 +4473,41 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         }
 
-        // ملء أعمدة الملاحظات والإرشادات إذا كانت موجودة في الملف الأصلي
-        if (notesColIndex !== -1 && matchedData?.observation) {
+        // ملء أعمدة الملاحظات والإرشادات (تم إضافتها إذا لم تكن موجودة)
+        // كتابة الملاحظات (obs) في عمود التقديرات
+        if (notesColIndex !== -1) {
           // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
           while (row.length <= notesColIndex) {
             row.push('');
           }
-          row[notesColIndex] = matchedData.observation;
+          
+          if (matchedData) {
+            // كتابة الملاحظات (observation) في عمود التقديرات
+            row[notesColIndex] = matchedData.observation || '';
+            // Debug: Log first few matches
+            if (rowIndex <= headerRow + 3) {
+              console.log(`[Download] Row ${rowIndex}: Writing observation="${matchedData.observation}" to column ${notesColIndex}`);
+            }
+          } else if (rowIndex <= headerRow + 3) {
+            console.warn(`[Download] Row ${rowIndex}: No matched data found for firstName="${firstName}", lastName="${lastName}", id="${id}"`);
+          }
         }
 
-        if (guidanceColIndex !== -1 && matchedData?.guidance) {
+        // كتابة الإرشادات (cons) في عمود الإرشادات
+        if (guidanceColIndex !== -1) {
           // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
           while (row.length <= guidanceColIndex) {
             row.push('');
           }
-          row[guidanceColIndex] = matchedData.guidance;
+          
+          if (matchedData) {
+            // كتابة الإرشادات (guidance) في عمود الإرشادات
+            row[guidanceColIndex] = matchedData.guidance || '';
+            // Debug: Log first few matches
+            if (rowIndex <= headerRow + 3) {
+              console.log(`[Download] Row ${rowIndex}: Writing guidance="${matchedData.guidance}" to column ${guidanceColIndex}`);
+            }
+          }
         }
       }
 
