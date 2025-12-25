@@ -9373,6 +9373,51 @@ export class LanguageService {
         'DE': 'Abbrechen',
         'TR': 'İptal'
       },
+      'labs.manageImages': {
+        'AR': 'إدارة الصور',
+        'FR': 'Gérer les images',
+        'EN': 'Manage Images',
+        'ES': 'Gestionar imágenes',
+        'IT': 'Gestisci immagini',
+        'DE': 'Bilder verwalten',
+        'TR': 'Resimleri yönet'
+      },
+      'labs.uploadImage': {
+        'AR': 'رفع صورة',
+        'FR': 'Télécharger une image',
+        'EN': 'Upload Image',
+        'ES': 'Subir imagen',
+        'IT': 'Carica immagine',
+        'DE': 'Bild hochladen',
+        'TR': 'Resim yükle'
+      },
+      'labs.close': {
+        'AR': 'إغلاق',
+        'FR': 'Fermer',
+        'EN': 'Close',
+        'ES': 'Cerrar',
+        'IT': 'Chiudi',
+        'DE': 'Schließen',
+        'TR': 'Kapat'
+      },
+      'labs.allowedImageTypes': {
+        'AR': 'أنواع الصور المسموحة',
+        'FR': 'Types d\'images autorisés',
+        'EN': 'Allowed Image Types',
+        'ES': 'Tipos de imagen permitidos',
+        'IT': 'Tipi di immagine consentiti',
+        'DE': 'Erlaubte Bildtypen',
+        'TR': 'İzin verilen resim türleri'
+      },
+      'labs.noImages': {
+        'AR': 'لا توجد صور',
+        'FR': 'Aucune image',
+        'EN': 'No Images',
+        'ES': 'Sin imágenes',
+        'IT': 'Nessuna immagine',
+        'DE': 'Keine Bilder',
+        'TR': 'Resim yok'
+      },
 
       // Timetable
       'timetable.title': {
