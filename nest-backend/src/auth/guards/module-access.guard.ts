@@ -56,6 +56,8 @@ export class ModuleAccessGuard implements CanActivate {
         'notifications': 'الإشعارات',
         'labs': 'المخابر',
         'clubs': 'النوادي',
+        'large-storage': 'تخزين كبير',
+        'ai-memo-generation': 'توليد المذكرات بالذكاء الاصطناعي',
       };
       
       const moduleName = moduleNames[requiredModule] || requiredModule;

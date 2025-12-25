@@ -4,7 +4,7 @@
     "secure": false,
     "changeOrigin": true,
     "logLevel": "debug",
-    "timeout": 60000
+    "timeout": 150000
   }
 }
 

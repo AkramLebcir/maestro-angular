@@ -236,8 +236,10 @@ export class PedagogicalDocsComponent implements OnInit {
           errorMessage = 'خطأ في الخادم. تأكد من إعداد مفتاح Gemini API في ملف .env.';
         } else if (error?.status === 401) {
           errorMessage = 'غير مصرح لك بالوصول. يرجى تسجيل الدخول مرة أخرى.';
-        } else if (error?.status === 0 || error?.message?.includes('Network')) {
-          errorMessage = 'لا يمكن الاتصال بالخادم. تأكد من أن الخادم يعمل.';
+        } else if (error?.status === 0 || error?.message?.includes('Network') || error?.message?.includes('timeout')) {
+          errorMessage = 'لا يمكن الاتصال بالخادم أو انتهت مهلة الانتظار. تحقق من اتصالك بالإنترنت وأن الخادم يعمل.';
+        } else if (error?.name === 'TimeoutError' || error?.message?.includes('timeout')) {
+          errorMessage = 'تم تجاوز الوقت المسموح. يرجى المحاولة مرة أخرى. قد يكون الطلب معقداً جداً.';
         }
         
         this.errorMessage = errorMessage;

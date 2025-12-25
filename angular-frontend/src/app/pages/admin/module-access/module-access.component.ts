@@ -46,6 +46,8 @@ export class ModuleAccessComponent implements OnInit {
     { key: 'annual-planning', name: 'التخطيط السنوي', description: 'التخطيط السنوي للمنهاج' },
     { key: 'notifications', name: 'الإشعارات', description: 'إدارة الإشعارات' },
     { key: 'clubs', name: 'النوادي', description: 'إدارة النوادي المدرسية' },
+    { key: 'large-storage', name: 'تخزين كبير', description: 'تخزين ملفات أكبر من 100 ميجابايت' },
+    { key: 'ai-memo-generation', name: 'توليد المذكرات بالذكاء الاصطناعي', description: 'توليد المذكرات باستخدام الذكاء الاصطناعي' },
   ];
 
   constructor(

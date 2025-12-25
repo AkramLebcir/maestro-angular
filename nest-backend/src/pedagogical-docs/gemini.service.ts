@@ -26,24 +26,88 @@ export class GeminiService {
     // بناء prompt تفصيلي للذكاء الاصطناعي
     const prompt = this.buildPrompt(dto);
 
-    try {
-      const result = await model.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
+    // إعداد timeout (120 ثانية)
+    const timeoutMs = 120000;
 
+    // دالة لإجراء الطلب مع إعادة المحاولة و timeout
+    const makeRequest = async (retries = 2): Promise<string> => {
+      try {
+        // إنشاء timeout promise
+        const timeoutPromise = new Promise<never>((_, reject) => {
+          setTimeout(() => {
+            reject(new Error('TIMEOUT: تم تجاوز الوقت المسموح. يرجى المحاولة مرة أخرى.'));
+          }, timeoutMs);
+        });
+
+        // إجراء الطلب مع timeout
+        const apiCall = model.generateContent(prompt);
+        const result = await Promise.race([apiCall, timeoutPromise]);
+        const response = await result.response;
+        return response.text();
+      } catch (error: any) {
+        // التحقق من أخطاء الشبكة التي يمكن إعادة المحاولة عليها
+        const isNetworkError = 
+          error?.message?.includes('network') ||
+          error?.message?.includes('fetch') ||
+          error?.message?.includes('ECONNRESET') ||
+          error?.message?.includes('ETIMEDOUT') ||
+          error?.message?.includes('ENOTFOUND') ||
+          error?.message?.includes('ECONNREFUSED') ||
+          error?.code === 'ECONNRESET' ||
+          error?.code === 'ETIMEDOUT' ||
+          error?.code === 'ENOTFOUND' ||
+          error?.code === 'ECONNREFUSED';
+
+        if (isNetworkError && retries > 0) {
+          console.log(`Network error occurred, retrying... (${retries} attempts remaining)`);
+          // انتظار قبل إعادة المحاولة (exponential backoff)
+          await new Promise(resolve => setTimeout(resolve, 2000 * (3 - retries)));
+          return makeRequest(retries - 1);
+        }
+        throw error;
+      }
+    };
+
+    try {
+      const text = await makeRequest();
+      
       // Parse the JSON response from AI
       const lessonPlan = this.parseAIResponse(text, dto);
       return lessonPlan;
     } catch (error: any) {
       console.error('Error generating lesson plan:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        code: error?.code,
+        stack: error?.stack,
+      });
       
       // تحسين رسائل الخطأ
-      if (error?.message?.includes('API key')) {
-        throw new Error('مفتاح Gemini API غير صحيح. تحقق من إعدادات ملف .env');
-      } else if (error?.message?.includes('quota') || error?.message?.includes('quotaExceeded')) {
+      if (error?.message?.includes('TIMEOUT')) {
+        throw new Error('تم تجاوز الوقت المسموح للطلب. يرجى المحاولة مرة أخرى. قد يكون الطلب معقداً جداً أو الاتصال بالإنترنت بطيئاً.');
+      } else if (error?.message?.includes('API key') || error?.message?.includes('API_KEY')) {
+        throw new Error('مفتاح Gemini API غير صحيح أو غير موجود. تحقق من إعدادات ملف .env');
+      } else if (error?.message?.includes('quota') || error?.message?.includes('quotaExceeded') || error?.message?.includes('429')) {
         throw new Error('تم تجاوز الحد المسموح لاستخدام Gemini API. يرجى المحاولة لاحقاً');
-      } else if (error?.message?.includes('network') || error?.message?.includes('fetch')) {
-        throw new Error('خطأ في الاتصال بالإنترنت. تحقق من اتصالك بالشبكة');
+      } else if (
+        error?.message?.includes('network') || 
+        error?.message?.includes('fetch') ||
+        error?.message?.includes('ECONNRESET') ||
+        error?.message?.includes('ETIMEDOUT') ||
+        error?.message?.includes('ENOTFOUND') ||
+        error?.message?.includes('ECONNREFUSED') ||
+        error?.code === 'ECONNRESET' ||
+        error?.code === 'ETIMEDOUT' ||
+        error?.code === 'ENOTFOUND' ||
+        error?.code === 'ECONNREFUSED'
+      ) {
+        throw new Error('خطأ في الاتصال بالإنترنت. تحقق من اتصالك بالشبكة وحاول مرة أخرى. إذا استمرت المشكلة، تحقق من إعدادات الجدار الناري أو الوكيل.');
+      } else if (error?.message?.includes('400') || error?.status === 400) {
+        throw new Error('طلب غير صحيح. يرجى التحقق من البيانات المدخلة.');
+      } else if (error?.message?.includes('403') || error?.status === 403) {
+        throw new Error('غير مصرح بالوصول إلى Gemini API. تحقق من صلاحيات مفتاح API.');
+      } else if (error?.message?.includes('500') || error?.status === 500) {
+        throw new Error('خطأ في خادم Gemini API. يرجى المحاولة لاحقاً.');
       } else {
         const errorMsg = error?.message || 'فشل في توليد خطة الدرس';
         throw new Error(`فشل في توليد خطة الدرس: ${errorMsg}`);

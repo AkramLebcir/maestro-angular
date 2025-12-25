@@ -13302,6 +13302,42 @@ export class LanguageService {
         'DE': 'Schulclubs und ihre Aktivitäten verwalten',
         'TR': 'Okul kulüplerini ve faaliyetlerini yönet'
       },
+      'moduleAccess.module.large-storage.name': {
+        'AR': 'تخزين كبير',
+        'FR': 'Stockage volumineux',
+        'EN': 'Large Storage',
+        'ES': 'Almacenamiento grande',
+        'IT': 'Archiviazione grande',
+        'DE': 'Große Speicherung',
+        'TR': 'Büyük depolama'
+      },
+      'moduleAccess.module.large-storage.description': {
+        'AR': 'تخزين ملفات أكبر من 100 ميجابايت',
+        'FR': 'Stocker des fichiers de plus de 100 mégaoctets',
+        'EN': 'Store files larger than 100 megabytes',
+        'ES': 'Almacenar archivos mayores de 100 megabytes',
+        'IT': 'Archiviare file più grandi di 100 megabyte',
+        'DE': 'Dateien größer als 100 Megabyte speichern',
+        'TR': '100 megabayttan büyük dosyaları depola'
+      },
+      'moduleAccess.module.ai-memo-generation.name': {
+        'AR': 'توليد المذكرات بالذكاء الاصطناعي',
+        'FR': 'Génération de mémos par IA',
+        'EN': 'AI Memo Generation',
+        'ES': 'Generación de memorandos con IA',
+        'IT': 'Generazione memo con IA',
+        'DE': 'KI-Memo-Generierung',
+        'TR': 'Yapay zeka ile not oluşturma'
+      },
+      'moduleAccess.module.ai-memo-generation.description': {
+        'AR': 'توليد المذكرات باستخدام الذكاء الاصطناعي',
+        'FR': 'Générer des mémos en utilisant l\'intelligence artificielle',
+        'EN': 'Generate memos using artificial intelligence',
+        'ES': 'Generar memorandos usando inteligencia artificial',
+        'IT': 'Generare memo utilizzando l\'intelligenza artificiale',
+        'DE': 'Memos mit künstlicher Intelligenz generieren',
+        'TR': 'Yapay zeka kullanarak notlar oluştur'
+      },
       'header.priorityUrgent': {
         'AR': 'عاجل',
         'FR': 'Urgent',
