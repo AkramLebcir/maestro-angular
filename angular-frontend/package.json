@@ -23,7 +23,7 @@
     "html2canvas": "^1.4.1",
     "jspdf": "^3.0.4",
     "jspdf-autotable": "^5.0.2",
-    "ng-recaptcha": "^12.0.0",
+    "ng-recaptcha": "^13.2.1",
     "ng2-charts": "^5.0.0",
     "ngx-extended-pdf-viewer": "^22.0.0",
     "rxjs": "~7.8.0",
@@ -55,6 +55,10 @@
     "@angular/platform-browser": "^19.2.17",
     "@babel/runtime": "^7.26.10",
     "tmp": "^0.2.4",
-    "webpack-dev-server": "^5.2.1"
+    "webpack-dev-server": "^5.2.1",
+    "ng-recaptcha": {
+      "@angular/common": "^19.2.17",
+      "@angular/core": "^19.2.17"
+    }
   }
 }

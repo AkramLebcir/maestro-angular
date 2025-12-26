@@ -24,7 +24,7 @@ interface PedagogicalDocument {
   styleUrls: ['./pedagogical-docs.component.css'],
 })
 export class PedagogicalDocsComponent implements OnInit {
-  levels: string[] = [
+  classLevels: string[] = [
     '1AP',
     '2AP',
     '3AP',
@@ -74,7 +74,7 @@ export class PedagogicalDocsComponent implements OnInit {
   selectedDoc: PedagogicalDocument | null = null;
 
   // AI Lesson Plan Generator
-  activeTab: 'documents' | 'generator' = 'documents';
+  activeTab: 'documents' | 'generator' | 'create-memo' = 'documents';
   generatingLessonPlan = false;
   teachingSubject: string = '';
   lessonPlanForm: {
@@ -100,6 +100,94 @@ export class PedagogicalDocsComponent implements OnInit {
   generatedLessonPlan: any = null;
   classes: any[] = [];
 
+  // قائمة المستويات الثابتة للمذكرة
+  memoLevels: string[] = [
+    'ابتدائي',
+    'متوسط',
+    'ثانوي'
+  ];
+
+  // قائمة الشعب الثابتة
+  sections: string[] = [
+    'جذع مشترك آداب',
+    'جذع مشترك علوم وتكنولوجيا',
+    'شعبة العلوم التجريبية',
+    'شعبة الرياضيات',
+    'شعبة التقني رياضي',
+    'شعبة التسيير والاقتصاد',
+    'شعبة الآداب والفلسفة',
+    'شعبة اللغات الأجنبية'
+  ];
+
+  // Manual Memo Creation Form
+  memoForm: {
+    teacherName: string;
+    date: string;
+    level: string;
+    section: string;
+    selectedClassId?: number;
+    memoNumber: string;
+    conceptualField: string;
+    conceptualUnit: string;
+    objective: string;
+    recognizes: string;
+    currentActivity: string;
+    stages: Array<{
+      time: string;
+      stage: string;
+      methodologicalApproach: string;
+      strategy: string;
+      requiredResources: string;
+      notes: string;
+    }>;
+  } = {
+    teacherName: '',
+    date: new Date().toISOString().split('T')[0],
+    level: '',
+    section: '',
+    selectedClassId: undefined,
+    memoNumber: '',
+    conceptualField: '',
+    conceptualUnit: '',
+    objective: '',
+    recognizes: '',
+    currentActivity: '',
+    stages: [
+      {
+        time: '',
+        stage: '1) التزام',
+        methodologicalApproach: 'الوضعية المشكلة\n(بناء المعرفة المسبقة، والإثارة في الدرس)',
+        strategy: '',
+        requiredResources: '',
+        notes: '',
+      },
+      {
+        time: '',
+        stage: '2) تمثيل',
+        methodologicalApproach: 'طريقة القاء الدرس بالتفصيل (مقدمه إلى مفهوم الدرس) مع الاستراتيجيات المتبعة في كل عنصر',
+        strategy: '',
+        requiredResources: '',
+        notes: '',
+      },
+      {
+        time: '',
+        stage: '3) مشاركه',
+        methodologicalApproach: '(تفاعل التلاميذ مع الدرس)',
+        strategy: '',
+        requiredResources: '',
+        notes: '',
+      },
+      {
+        time: '',
+        stage: '4) التقييم',
+        methodologicalApproach: 'هل وصلت إلى هدفي كمدرس؟',
+        strategy: '',
+        requiredResources: '',
+        notes: '',
+      },
+    ],
+  };
+
   constructor(
     private api: ApiService,
     public languageService: LanguageService,
@@ -114,6 +202,7 @@ export class PedagogicalDocsComponent implements OnInit {
     this.loadDocs();
     this.loadClasses();
     this.loadTeachingSubject();
+    this.loadTeacherName();
   }
 
   loadTeachingSubject(): void {
@@ -133,6 +222,52 @@ export class PedagogicalDocsComponent implements OnInit {
       } catch (error) {
         console.error('Error parsing teacher card data:', error);
       }
+    }
+  }
+
+  loadTeacherName(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      return;
+    }
+
+    // محاولة جلب اسم الأستاذ من البطاقة الفنية
+    const storageKey = `teacherCard_${user.id}`;
+    const stored = localStorage.getItem(storageKey);
+    
+    if (stored) {
+      try {
+        const card = JSON.parse(stored);
+        const firstName = card.firstName || '';
+        const lastName = card.lastName || '';
+        this.memoForm.teacherName = `${firstName} ${lastName}`.trim();
+        
+        // إذا لم يكن هناك اسم في البطاقة الفنية، استخدم بيانات المستخدم كبديل
+        if (!this.memoForm.teacherName) {
+          const userFirstName = user.firstName || '';
+          const userLastName = user.lastName || '';
+          this.memoForm.teacherName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
+        }
+      } catch (error) {
+        console.error('Error parsing teacher card data:', error);
+        // في حالة الخطأ، استخدم بيانات المستخدم كبديل
+        const userFirstName = user.firstName || '';
+        const userLastName = user.lastName || '';
+        this.memoForm.teacherName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
+      }
+    } else {
+      // إذا لم تكن البطاقة الفنية موجودة، استخدم بيانات المستخدم
+      const userFirstName = user.firstName || '';
+      const userLastName = user.lastName || '';
+      this.memoForm.teacherName = `${userFirstName} ${userLastName}`.trim() || user.email || '';
+    }
+  }
+
+  onMemoClassSelected(classId: number): void {
+    const selectedClass = this.classes.find((c) => c.id === classId);
+    if (selectedClass) {
+      this.memoForm.selectedClassId = classId;
+      // لا نغير المستوى أو الشعبة تلقائياً - يختارها المستخدم من القوائم
     }
   }
 
@@ -165,7 +300,7 @@ export class PedagogicalDocsComponent implements OnInit {
     }
   }
 
-  switchTab(tab: 'documents' | 'generator'): void {
+  switchTab(tab: 'documents' | 'generator' | 'create-memo'): void {
     this.activeTab = tab;
     if (tab === 'generator') {
       this.loadTeachingSubject();
@@ -181,6 +316,9 @@ export class PedagogicalDocsComponent implements OnInit {
         classLevel: 'متوسط',
         sessionDuration: 60,
       };
+    } else if (tab === 'create-memo') {
+      // Reset memo form with default date
+      this.memoForm.date = new Date().toISOString().split('T')[0];
     }
   }
 
@@ -505,6 +643,128 @@ export class PedagogicalDocsComponent implements OnInit {
           }, 5000);
         },
       });
+    }
+  }
+
+  printMemo(): void {
+    window.print();
+  }
+
+  exportMemoToPDF(): void {
+    try {
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 15;
+      const contentWidth = pageWidth - 2 * margin;
+      let yPos = margin;
+
+      // العنوان الرئيسي
+      pdf.setFontSize(18);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('نموذج خطة الدرس', pageWidth / 2, yPos, { align: 'center' });
+      yPos += 10;
+
+      // معلومات عامة
+      pdf.setFontSize(11);
+      pdf.setFont('helvetica', 'normal');
+      const currentDate = this.memoForm.date || new Date().toISOString().split('T')[0];
+      const dateParts = currentDate.split('-');
+      const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : currentDate;
+      
+      pdf.text(`اسم الأستاذ: ${this.memoForm.teacherName || ''}`, margin, yPos);
+      pdf.text(`التاريخ : ${formattedDate}`, pageWidth - margin - 50, yPos);
+      yPos += 7;
+
+      pdf.text(`المستوى : ${this.memoForm.level || ''}`, margin, yPos);
+      pdf.text(`الشعبة : ${this.memoForm.section || ''}`, pageWidth - margin - 50, yPos);
+      yPos += 7;
+
+      pdf.text(`مذكرة رقم: ${this.memoForm.memoNumber || '___________'}`, margin, yPos);
+      yPos += 7;
+
+      pdf.text(`المجال المفاهمي (الميدان): ${this.memoForm.conceptualField || ''}`, margin, yPos);
+      yPos += 7;
+
+      pdf.text(`الوحدة المفاهمية (المقطع): ${this.memoForm.conceptualUnit || ''}`, margin, yPos);
+      yPos += 10;
+
+      // الهدف
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('الهدف: تحديد.', margin, yPos);
+      yPos += 7;
+      pdf.setFont('helvetica', 'normal');
+      const objectiveText = this.memoForm.objective || '';
+      const objectiveLines = pdf.splitTextToSize(`يتعرف على.. ${objectiveText}`, contentWidth);
+      pdf.text(objectiveLines, margin, yPos);
+      yPos += objectiveLines.length * 7 + 5;
+
+      // النشاط الحالي (إن وجد)
+      if (this.memoForm.currentActivity) {
+        pdf.setFont('helvetica', 'bold');
+        pdf.text('القيام الآن: نشاط مستقل يثير الاهتمام في الدرس:', margin, yPos);
+        yPos += 7;
+        pdf.setFont('helvetica', 'normal');
+        const activityLines = pdf.splitTextToSize(this.memoForm.currentActivity, contentWidth);
+        pdf.text(activityLines, margin, yPos);
+        yPos += activityLines.length * 7 + 10;
+      }
+
+      // الجدول - استخدام هيكل بسيط مشابه لـ exportLessonPlanToPDF
+      const tableHeaders = ['الوقت', 'مرحلة الدرس', 'السير المنهجي', 'الاستراتيجية', 'الموارد المطلوبة', 'ملاحظات'];
+      const tableData: any[] = [];
+
+      if (this.memoForm.stages && this.memoForm.stages.length > 0) {
+        this.memoForm.stages.forEach((stage: any) => {
+          // تحضير البيانات لكل صف
+          const row = [
+            (stage.time || '') + ' دقيقة',
+            stage.stage || '',
+            stage.methodologicalApproach || '',
+            stage.strategy || '',
+            stage.requiredResources || '',
+            stage.notes || '',
+          ];
+          tableData.push(row);
+        });
+      }
+
+      // إضافة الجدول باستخدام autoTable
+      (pdf as any).autoTable({
+        head: [tableHeaders],
+        body: tableData,
+        startY: yPos,
+        styles: {
+          font: 'helvetica',
+          fontSize: 8,
+          textColor: [0, 0, 0],
+          cellPadding: 2,
+          halign: 'right',
+        },
+        headStyles: {
+          fillColor: [0, 112, 192],
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'center',
+        },
+        columnStyles: {
+          0: { cellWidth: 18, halign: 'center', fillColor: [0, 112, 192], textColor: [255, 255, 255], fontStyle: 'bold' }, // الوقت بخلفية زرقاء
+          1: { cellWidth: 25, halign: 'right' }, // مرحلة الدرس
+          2: { cellWidth: 55, halign: 'right' }, // السير المنهجي
+          3: { cellWidth: 28, halign: 'right' }, // الاستراتيجية
+          4: { cellWidth: 35, halign: 'right' }, // الموارد
+          5: { cellWidth: 29, halign: 'right' }, // ملاحظات
+        },
+        margin: { left: margin, right: margin },
+        theme: 'grid',
+      });
+
+      // حفظ الملف
+      const fileName = `مذكرة_الدرس_${Date.now()}.pdf`;
+      pdf.save(fileName);
+    } catch (error) {
+      console.error('Error exporting memo to PDF:', error);
+      alert('حدث خطأ أثناء تصدير ملف PDF. يرجى المحاولة مرة أخرى.');
     }
   }
 }

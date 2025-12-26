@@ -33,6 +33,15 @@
       >
         ✨ مولد المذكرات الذكي
       </button>
+      <button
+        (click)="switchTab('create-memo')"
+        [class.border-blue-500]="activeTab === 'create-memo'"
+        [class.text-blue-600]="activeTab === 'create-memo'"
+        [class.text-gray-500]="activeTab !== 'create-memo'"
+        class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+      >
+        إنشاء مذكرة
+      </button>
     </nav>
   </div>
 
@@ -59,7 +68,7 @@
           class="border rounded px-2 py-1"
         >
           <option value="">{{ translate('pedagogicalDocs.selectLevel') }}</option>
-          <option *ngFor="let lvl of levels" [ngValue]="lvl">
+          <option *ngFor="let lvl of classLevels" [ngValue]="lvl">
             {{ lvl }}
           </option>
         </select>
@@ -121,7 +130,7 @@
         class="border rounded px-2 py-1"
       >
         <option [ngValue]="'all'">{{ translate('pedagogicalDocs.allLevels') }}</option>
-        <option *ngFor="let lvl of levels" [ngValue]="lvl">
+        <option *ngFor="let lvl of classLevels" [ngValue]="lvl">
           {{ lvl }}
         </option>
       </select>
@@ -481,6 +490,241 @@
             📄 تصدير PDF
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Memo Tab -->
+  <div *ngIf="activeTab === 'create-memo'" class="space-y-6">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 memo-form-container">
+      <!-- Title -->
+      <h1 class="text-2xl font-bold text-center mb-6" style="color: #2563eb;">نموذج خطة الدرس</h1>
+
+      <!-- Header Section -->
+      <div class="memo-header mb-6">
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">اسم الأستاذ:</label>
+            <input
+              type="text"
+              [(ngModel)]="memoForm.teacherName"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">التاريخ:</label>
+            <input
+              type="date"
+              [(ngModel)]="memoForm.date"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">القسم:</label>
+            <select
+              [(ngModel)]="memoForm.selectedClassId"
+              (change)="onMemoClassSelected(memoForm.selectedClassId!)"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+            >
+              <option [ngValue]="undefined">-- اختر القسم --</option>
+              <option *ngFor="let cls of classes" [ngValue]="cls.id">
+                {{ cls.name }}
+              </option>
+            </select>
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">المستوى:</label>
+            <select
+              [(ngModel)]="memoForm.level"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+            >
+              <option value="">-- اختر المستوى --</option>
+              <option *ngFor="let level of memoLevels" [value]="level">
+                {{ level }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">الشعبة:</label>
+            <select
+              [(ngModel)]="memoForm.section"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+            >
+              <option value="">-- اختر الشعبة --</option>
+              <option *ngFor="let sec of sections" [value]="sec">
+                {{ sec }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-4 mb-4">
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">مذكرة رقم</label>
+            <input
+              type="text"
+              [(ngModel)]="memoForm.memoNumber"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <label class="font-semibold" style="color: #2563eb;">المجال المفاهمي (الميدان):</label>
+            <input
+              type="text"
+              [(ngModel)]="memoForm.conceptualField"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+          <div class="flex items-center gap-2">
+            <label class="font-semibold" style="color: #2563eb;">الوحدة المفاهمية (المقطع):</label>
+            <input
+              type="text"
+              [(ngModel)]="memoForm.conceptualUnit"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500"
+              placeholder=""
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Objectives Section -->
+      <div class="mb-6">
+        <div class="mb-2">
+          <label class="font-semibold" style="color: #2563eb;">الهدف تحديد.</label>
+          <input
+            type="text"
+            [(ngModel)]="memoForm.objective"
+            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500"
+            placeholder=""
+          />
+        </div>
+        <div>
+          <label class="font-semibold" style="color: #2563eb;">يتعرف على.</label>
+          <input
+            type="text"
+            [(ngModel)]="memoForm.recognizes"
+            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500"
+            placeholder=""
+          />
+        </div>
+      </div>
+
+      <!-- Current Activity Section -->
+      <div class="mb-6">
+        <label class="font-semibold block mb-2" style="color: #2563eb;">القيام الآن: نشاط مستقل يثير الاهتمام في الدرس:</label>
+        <textarea
+          [(ngModel)]="memoForm.currentActivity"
+          rows="3"
+          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
+          placeholder=""
+        ></textarea>
+      </div>
+
+      <!-- Table Section -->
+      <div class="overflow-x-auto">
+        <table class="w-full border-collapse memo-table">
+          <thead>
+            <tr>
+              <th class="memo-table-header" rowspan="2" style="width: 60px;">الوقت</th>
+              <th class="memo-table-header" rowspan="2" style="width: 120px;">مرحله الدرس</th>
+              <th class="memo-table-header" colspan="3">السير المنهجي والاستراتيجيات المتبعة</th>
+              <th class="memo-table-header" rowspan="2" style="width: 80px;">ملاحظات</th>
+            </tr>
+            <tr>
+              <th class="memo-table-subheader"></th>
+              <th class="memo-table-subheader" style="width: 100px;">الاستراتيجية</th>
+              <th class="memo-table-subheader" style="width: 100px;">الموارد المطلوبة</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let stage of memoForm.stages; let i = index" class="memo-table-row">
+              <td class="memo-table-cell-time">
+                <input
+                  type="text"
+                  [(ngModel)]="stage.time"
+                  class="memo-input"
+                  placeholder=""
+                />
+                <div class="memo-time-label">دقيقة</div>
+              </td>
+              <td class="memo-table-cell-stage">
+                <textarea
+                  [(ngModel)]="stage.stage"
+                  rows="4"
+                  class="memo-textarea font-bold text-center"
+                  style="text-align: center;"
+                  placeholder=""
+                ></textarea>
+              </td>
+              <td class="memo-table-cell">
+                <textarea
+                  [(ngModel)]="stage.methodologicalApproach"
+                  rows="4"
+                  class="memo-textarea text-right"
+                  style="text-align: right;"
+                  placeholder=""
+                ></textarea>
+              </td>
+              <td class="memo-table-cell">
+                <input
+                  type="text"
+                  [(ngModel)]="stage.strategy"
+                  class="memo-input"
+                  placeholder=""
+                />
+              </td>
+              <td class="memo-table-cell">
+                <textarea
+                  *ngIf="i === 0"
+                  [(ngModel)]="stage.requiredResources"
+                  rows="4"
+                  class="memo-textarea text-center font-bold"
+                  style="text-align: center;"
+                  placeholder="ما الذي احتاجه لإكمال هذه الخطوة؟"
+                ></textarea>
+                <textarea
+                  *ngIf="i !== 0"
+                  [(ngModel)]="stage.requiredResources"
+                  rows="4"
+                  class="memo-textarea"
+                  placeholder=""
+                ></textarea>
+              </td>
+              <td class="memo-table-cell">
+                <textarea
+                  [(ngModel)]="stage.notes"
+                  rows="4"
+                  class="memo-textarea"
+                  placeholder=""
+                ></textarea>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
+        <button
+          (click)="printMemo()"
+          class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+        >
+          🖨️ طباعة
+        </button>
+        <button
+          (click)="exportMemoToPDF()"
+          class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+        >
+          📄 تصدير PDF
+        </button>
       </div>
     </div>
   </div>
