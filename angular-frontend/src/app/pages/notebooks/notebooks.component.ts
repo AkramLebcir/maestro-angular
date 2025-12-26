@@ -94,6 +94,7 @@ export interface Class {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-notebooks',
   templateUrl: './notebooks.component.html',
   styleUrls: ['./notebooks.component.css']

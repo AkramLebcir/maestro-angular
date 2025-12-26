@@ -10,6 +10,7 @@ export interface UserActivity extends User {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-monitoring',
   templateUrl: './monitoring.component.html',
   styleUrls: ['./monitoring.component.css']

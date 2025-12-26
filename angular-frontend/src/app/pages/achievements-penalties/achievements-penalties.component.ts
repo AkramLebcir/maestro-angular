@@ -46,6 +46,7 @@ interface CertificateHistory {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-achievements-penalties',
   templateUrl: './achievements-penalties.component.html',
   styleUrls: ['./achievements-penalties.component.css'],

@@ -79,6 +79,7 @@ export interface BehaviorReport {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-behavior',
   templateUrl: './behavior.component.html',
   styleUrls: ['./behavior.component.css']

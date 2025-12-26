@@ -73,6 +73,7 @@ interface TeacherCardForm {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-teacher-card',
   templateUrl: './teacher-card.component.html',
   styleUrls: ['./teacher-card.component.css']

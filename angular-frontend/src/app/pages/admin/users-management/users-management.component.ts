@@ -9,6 +9,7 @@ export interface UserListItem extends User {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-users-management',
   templateUrl: './users-management.component.html',
   styleUrls: ['./users-management.component.css']

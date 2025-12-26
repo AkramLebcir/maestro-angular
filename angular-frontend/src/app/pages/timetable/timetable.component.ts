@@ -54,6 +54,7 @@ export interface Lab {
 type ViewMode = 'weekly' | 'daily' | 'monthly';
 
 @Component({
+  standalone: false,
   selector: 'app-timetable',
   templateUrl: './timetable.component.html',
   styleUrls: ['./timetable.component.css']

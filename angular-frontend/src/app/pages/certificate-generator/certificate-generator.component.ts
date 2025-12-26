@@ -25,6 +25,7 @@ interface StudentOption {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-certificate-generator',
   templateUrl: './certificate-generator.component.html',
   styleUrls: ['./certificate-generator.component.css'],

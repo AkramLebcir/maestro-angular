@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { LanguageService } from '../../services/language.service';
 
 @Component({
+  standalone: false,
   selector: 'app-admin',
   templateUrl: './admin.component.html',
   styleUrls: ['./admin.component.css']

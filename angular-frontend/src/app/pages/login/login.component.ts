@@ -6,6 +6,7 @@ import { environment } from '../../../environments/environment';
 import { Subscription } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']

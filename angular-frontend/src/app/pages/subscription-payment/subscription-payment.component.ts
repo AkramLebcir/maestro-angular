@@ -15,6 +15,7 @@ export interface SubscriptionPlan {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-subscription-payment',
   templateUrl: './subscription-payment.component.html',
   styleUrls: ['./subscription-payment.component.css']

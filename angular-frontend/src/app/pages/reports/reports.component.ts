@@ -9,6 +9,7 @@ import html2canvas from 'html2canvas';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
+  standalone: false,
   selector: 'app-reports',
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.css'],

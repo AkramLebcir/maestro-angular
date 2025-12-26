@@ -56,6 +56,7 @@ interface CoordinationSession {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-training-inspection',
   templateUrl: './training-inspection.component.html',
   styleUrls: ['./training-inspection.component.css']

@@ -136,6 +136,7 @@ interface WorkstationPrintPage {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-seating-chart',
   templateUrl: './seating-chart.component.html',
   styleUrls: ['./seating-chart.component.css'],

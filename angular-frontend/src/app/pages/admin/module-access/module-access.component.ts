@@ -14,6 +14,7 @@ export interface UserWithModules extends User {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-module-access',
   templateUrl: './module-access.component.html',
   styleUrls: ['./module-access.component.css']

@@ -17,6 +17,7 @@ interface StudentOption {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-report-generator',
   templateUrl: './report-generator.component.html',
   styleUrls: ['./report-generator.component.css']

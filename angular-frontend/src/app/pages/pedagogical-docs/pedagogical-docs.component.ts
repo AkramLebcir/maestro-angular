@@ -18,6 +18,7 @@ interface PedagogicalDocument {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-pedagogical-docs',
   templateUrl: './pedagogical-docs.component.html',
   styleUrls: ['./pedagogical-docs.component.css'],

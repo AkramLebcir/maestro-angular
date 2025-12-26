@@ -10,6 +10,7 @@ interface StudentLike {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-random-picker',
   templateUrl: './random-picker.component.html',
   styleUrls: ['./random-picker.component.css']

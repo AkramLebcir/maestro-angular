@@ -54,6 +54,7 @@ export interface Student {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-clubs',
   templateUrl: './clubs.component.html',
   styleUrls: ['./clubs.component.css']

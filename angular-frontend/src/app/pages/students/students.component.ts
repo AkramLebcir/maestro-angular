@@ -65,6 +65,7 @@ export interface Class {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-students',
   templateUrl: './students.component.html',
   styleUrls: ['./students.component.css']

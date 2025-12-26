@@ -90,6 +90,7 @@ export interface Student {
 
 
 @Component({
+  standalone: false,
   selector: 'app-classes',
   templateUrl: './classes.component.html',
   styleUrls: ['./classes.component.css']

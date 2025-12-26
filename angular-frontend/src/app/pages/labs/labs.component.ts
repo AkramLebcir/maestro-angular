@@ -110,6 +110,7 @@ export type CleaningLevel = 'good' | 'bad';
 export type WiringStatus = 'complete' | 'incomplete';
 
 @Component({
+  standalone: false,
   selector: 'app-labs',
   templateUrl: './labs.component.html',
   styleUrls: ['./labs.component.css']

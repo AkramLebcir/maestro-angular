@@ -109,6 +109,7 @@ export interface DepartmentAttendanceReport {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-attendance',
   templateUrl: './attendance.component.html',
   styleUrls: ['./attendance.component.css']

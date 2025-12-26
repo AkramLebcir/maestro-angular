@@ -43,6 +43,7 @@ interface TimelineRow {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-annual-distribution',
   templateUrl: './annual-distribution.component.html',
   styleUrls: ['./annual-distribution.component.css'],

@@ -9,6 +9,7 @@ export interface SubscriptionData {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-subscription-status',
   templateUrl: './subscription-status.component.html',
   styleUrls: ['./subscription-status.component.css']

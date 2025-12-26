@@ -14,6 +14,7 @@ export interface StickyNote {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-teacher-notebook',
   templateUrl: './teacher-notebook.component.html',
   styleUrls: ['./teacher-notebook.component.css']

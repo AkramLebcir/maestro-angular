@@ -15,6 +15,7 @@ export interface Behavior {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-behavior-dictionary',
   templateUrl: './behavior-dictionary.component.html',
   styleUrls: ['./behavior-dictionary.component.css']

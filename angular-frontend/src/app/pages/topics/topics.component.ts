@@ -38,6 +38,7 @@ export interface CreateTopicElementDto {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-topics',
   templateUrl: './topics.component.html',
   styleUrls: ['./topics.component.css']

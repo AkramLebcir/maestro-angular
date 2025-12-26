@@ -41,6 +41,7 @@ interface GroupedRow {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-progress-tracking',
   templateUrl: './progress-tracking.component.html',
   styleUrls: ['./progress-tracking.component.css'],

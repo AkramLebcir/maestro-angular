@@ -178,6 +178,7 @@ export interface FinalCouncilDecision {
 }
 
 @Component({
+  standalone: false,
   selector: 'app-gradebook',
   templateUrl: './gradebook.component.html',
   styleUrls: ['./gradebook.component.css']
