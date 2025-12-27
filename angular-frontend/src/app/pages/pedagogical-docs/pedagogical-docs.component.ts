@@ -5,6 +5,7 @@ import { AuthService } from '../../services/auth.service';
 import { environment } from '../../../environments/environment';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import html2canvas from 'html2canvas';
 
 interface PedagogicalDocument {
   id: number;
@@ -203,6 +204,36 @@ export class PedagogicalDocsComponent implements OnInit {
     this.loadClasses();
     this.loadTeachingSubject();
     this.loadTeacherName();
+    
+    // إعداد توسيع textarea تلقائياً بعد تحميل الصفحة
+    setTimeout(() => {
+      this.setupAutoResizeTextareas();
+    }, 500);
+  }
+
+  setupAutoResizeTextareas(): void {
+    // دالة لتوسيع textarea تلقائياً حسب المحتوى
+    const autoResize = (textarea: HTMLTextAreaElement) => {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    };
+
+    // إضافة event listeners لجميع textareas في الجدول
+    const textareas = document.querySelectorAll('.memo-textarea');
+    textareas.forEach((textarea: any) => {
+      // توسيع عند التحميل
+      autoResize(textarea);
+      
+      // توسيع عند الكتابة
+      textarea.addEventListener('input', () => {
+        autoResize(textarea);
+      });
+      
+      // توسيع عند تغيير النموذج
+      textarea.addEventListener('change', () => {
+        autoResize(textarea);
+      });
+    });
   }
 
   loadTeachingSubject(): void {
@@ -319,6 +350,10 @@ export class PedagogicalDocsComponent implements OnInit {
     } else if (tab === 'create-memo') {
       // Reset memo form with default date
       this.memoForm.date = new Date().toISOString().split('T')[0];
+      // إعداد توسيع textarea بعد التبديل للتبويب
+      setTimeout(() => {
+        this.setupAutoResizeTextareas();
+      }, 300);
     }
   }
 
@@ -647,117 +682,194 @@ export class PedagogicalDocsComponent implements OnInit {
   }
 
   printMemo(): void {
-    window.print();
+    // إخفاء الأزرار قبل الطباعة
+    const buttons = document.querySelectorAll('.memo-form-container button');
+    buttons.forEach((btn: any) => {
+      btn.style.display = 'none';
+    });
+
+    // الانتظار قليلاً ثم الطباعة
+    setTimeout(() => {
+      window.print();
+      
+      // إعادة عرض الأزرار بعد الطباعة
+      setTimeout(() => {
+        buttons.forEach((btn: any) => {
+          btn.style.display = '';
+        });
+      }, 500);
+    }, 100);
   }
 
-  exportMemoToPDF(): void {
+  async exportMemoToPDF(): Promise<void> {
     try {
-      const pdf = new jsPDF('p', 'mm', 'a4');
+      const memoContainer = document.querySelector('.memo-form-container') as HTMLElement;
+      
+      if (!memoContainer) {
+        alert('لم يتم العثور على نموذج المذكرة. يرجى التأكد من أنك في تبويب "إنشاء مذكرة".');
+        return;
+      }
+
+      // حفظ الأنماط الأصلية
+      const originalStyles = {
+        padding: memoContainer.style.padding,
+        marginBottom: memoContainer.style.marginBottom,
+        overflow: memoContainer.style.overflow,
+      };
+
+      // تحسين التخطيط للتصدير (تقليل المسافات وإزالة overflow)
+      memoContainer.style.padding = '10px';
+      memoContainer.style.overflow = 'visible';
+      
+      // إزالة overflow من جميع العناصر الداخلية
+      const allElements = memoContainer.querySelectorAll('*');
+      const originalOverflows: string[] = [];
+      allElements.forEach((el: any) => {
+        originalOverflows.push(el.style.overflow);
+        el.style.overflow = 'visible';
+      });
+      
+      // توسيع جميع textareas وتأكد من عرض الأسطر بشكل صحيح
+      const textareas = memoContainer.querySelectorAll('.memo-textarea');
+      const originalHeights: string[] = [];
+      const originalDisplays: string[] = [];
+      const textareaReplacements: Array<{ textarea: HTMLElement; div: HTMLElement }> = [];
+      
+      textareas.forEach((textarea: any) => {
+        originalHeights.push(textarea.style.height);
+        originalDisplays.push(textarea.style.display);
+        
+        // التأكد من أن textarea تعرض الأسطر بشكل صحيح
+        textarea.style.whiteSpace = 'pre-wrap';
+        textarea.style.wordWrap = 'break-word';
+        textarea.style.overflow = 'visible';
+        
+        // توسيع textarea أولاً
+        textarea.style.height = 'auto';
+        const scrollHeight = textarea.scrollHeight;
+        textarea.style.height = scrollHeight + 'px';
+        
+        // إنشاء div مؤقت يحاكي textarea لعرض النص مع الأسطر
+        const div = document.createElement('div');
+        div.textContent = textarea.value || textarea.innerText || '';
+        
+        // نسخ جميع الأنماط من textarea
+        const computedStyle = window.getComputedStyle(textarea);
+        div.style.width = textarea.offsetWidth + 'px';
+        div.style.padding = computedStyle.padding;
+        div.style.margin = computedStyle.margin;
+        div.style.fontSize = computedStyle.fontSize;
+        div.style.fontFamily = computedStyle.fontFamily;
+        div.style.fontWeight = computedStyle.fontWeight;
+        div.style.lineHeight = computedStyle.lineHeight;
+        div.style.textAlign = computedStyle.textAlign;
+        div.style.color = computedStyle.color;
+        div.style.backgroundColor = computedStyle.backgroundColor;
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.wordWrap = 'break-word';
+        div.style.overflow = 'visible';
+        div.style.border = 'none';
+        div.style.outline = 'none';
+        div.style.boxSizing = 'border-box';
+        div.style.direction = computedStyle.direction;
+        div.style.verticalAlign = 'top';
+        div.style.display = 'block';
+        
+        // إدراج div مكان textarea
+        textarea.parentNode!.insertBefore(div, textarea);
+        
+        // حساب الارتفاع الفعلي بعد إدراج div في DOM
+        const actualHeight = div.scrollHeight;
+        div.style.height = actualHeight + 'px';
+        div.style.minHeight = actualHeight + 'px';
+        
+        textareaReplacements.push({ textarea, div });
+        
+        // إخفاء textarea
+        textarea.style.display = 'none';
+      });
+      
+      // إخفاء الأزرار قبل التصدير
+      const buttons = memoContainer.querySelectorAll('button');
+      const originalButtonDisplays: string[] = [];
+      buttons.forEach((btn) => {
+        originalButtonDisplays.push(btn.style.display);
+        btn.style.display = 'none';
+      });
+
+      // الانتظار قليلاً للتأكد من تحديث التخطيط
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // استخدام html2canvas لالتقاط المحتوى - استخدام scrollWidth و scrollHeight لالتقاط كل المحتوى
+      const canvas = await html2canvas(memoContainer, {
+        scale: 1.5, // تقليل scale لضمان أن كل شيء يظهر في صفحة واحدة
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: memoContainer.scrollWidth,
+        height: memoContainer.scrollHeight,
+        windowWidth: memoContainer.scrollWidth,
+        windowHeight: memoContainer.scrollHeight,
+        scrollX: 0,
+        scrollY: 0,
+        allowTaint: true,
+        removeContainer: false
+      });
+
+      // استعادة الأنماط الأصلية
+      memoContainer.style.padding = originalStyles.padding;
+      memoContainer.style.overflow = originalStyles.overflow;
+      
+      // استعادة overflow للعناصر
+      allElements.forEach((el: any, index) => {
+        el.style.overflow = originalOverflows[index] || '';
+      });
+      
+      // استعادة textareas وإزالة divs المؤقتة
+      textareaReplacements.forEach(({ textarea, div }, index) => {
+        // إعادة عرض textarea
+        textarea.style.display = originalDisplays[index] || '';
+        // إزالة div المؤقت
+        if (div.parentNode) {
+          div.parentNode.removeChild(div);
+        }
+        // استعادة ارتفاع textarea
+        if (originalHeights && originalHeights[index] !== undefined) {
+          textarea.style.height = originalHeights[index] || '';
+        }
+      });
+      
+      // إعادة عرض الأزرار
+      buttons.forEach((btn, index) => {
+        btn.style.display = originalButtonDisplays[index] || '';
+      });
+
+      // إنشاء PDF
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('l', 'mm', 'a4'); // Landscape orientation for better table display
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
-      const margin = 15;
-      const contentWidth = pageWidth - 2 * margin;
-      let yPos = margin;
-
-      // العنوان الرئيسي
-      pdf.setFontSize(18);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('نموذج خطة الدرس', pageWidth / 2, yPos, { align: 'center' });
-      yPos += 10;
-
-      // معلومات عامة
-      pdf.setFontSize(11);
-      pdf.setFont('helvetica', 'normal');
-      const currentDate = this.memoForm.date || new Date().toISOString().split('T')[0];
-      const dateParts = currentDate.split('-');
-      const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : currentDate;
       
-      pdf.text(`اسم الأستاذ: ${this.memoForm.teacherName || ''}`, margin, yPos);
-      pdf.text(`التاريخ : ${formattedDate}`, pageWidth - margin - 50, yPos);
-      yPos += 7;
-
-      pdf.text(`المستوى : ${this.memoForm.level || ''}`, margin, yPos);
-      pdf.text(`الشعبة : ${this.memoForm.section || ''}`, pageWidth - margin - 50, yPos);
-      yPos += 7;
-
-      pdf.text(`مذكرة رقم: ${this.memoForm.memoNumber || '___________'}`, margin, yPos);
-      yPos += 7;
-
-      pdf.text(`المجال المفاهمي (الميدان): ${this.memoForm.conceptualField || ''}`, margin, yPos);
-      yPos += 7;
-
-      pdf.text(`الوحدة المفاهمية (المقطع): ${this.memoForm.conceptualUnit || ''}`, margin, yPos);
-      yPos += 10;
-
-      // الهدف
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('الهدف: تحديد.', margin, yPos);
-      yPos += 7;
-      pdf.setFont('helvetica', 'normal');
-      const objectiveText = this.memoForm.objective || '';
-      const objectiveLines = pdf.splitTextToSize(`يتعرف على.. ${objectiveText}`, contentWidth);
-      pdf.text(objectiveLines, margin, yPos);
-      yPos += objectiveLines.length * 7 + 5;
-
-      // النشاط الحالي (إن وجد)
-      if (this.memoForm.currentActivity) {
-        pdf.setFont('helvetica', 'bold');
-        pdf.text('القيام الآن: نشاط مستقل يثير الاهتمام في الدرس:', margin, yPos);
-        yPos += 7;
-        pdf.setFont('helvetica', 'normal');
-        const activityLines = pdf.splitTextToSize(this.memoForm.currentActivity, contentWidth);
-        pdf.text(activityLines, margin, yPos);
-        yPos += activityLines.length * 7 + 10;
+      // حساب الأبعاد لضمان أن كل شيء يظهر في صفحة واحدة
+      const imgWidth = pageWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      
+      // إذا كان المحتوى أطول من الصفحة، نقوم بتقليصه ليتناسب مع صفحة واحدة
+      let finalImgHeight = imgHeight;
+      let finalImgWidth = imgWidth;
+      
+      if (imgHeight > pageHeight) {
+        // تقليص الحجم ليتناسب مع صفحة واحدة
+        const scale = pageHeight / imgHeight;
+        finalImgHeight = pageHeight;
+        finalImgWidth = imgWidth * scale;
+        const xOffset = (pageWidth - finalImgWidth) / 2; // توسيط الصورة
+        
+        pdf.addImage(imgData, 'PNG', xOffset, 0, finalImgWidth, finalImgHeight);
+      } else {
+        // المحتوى يتناسب مع صفحة واحدة
+        pdf.addImage(imgData, 'PNG', 0, 0, finalImgWidth, finalImgHeight);
       }
-
-      // الجدول - استخدام هيكل بسيط مشابه لـ exportLessonPlanToPDF
-      const tableHeaders = ['الوقت', 'مرحلة الدرس', 'السير المنهجي', 'الاستراتيجية', 'الموارد المطلوبة', 'ملاحظات'];
-      const tableData: any[] = [];
-
-      if (this.memoForm.stages && this.memoForm.stages.length > 0) {
-        this.memoForm.stages.forEach((stage: any) => {
-          // تحضير البيانات لكل صف
-          const row = [
-            (stage.time || '') + ' دقيقة',
-            stage.stage || '',
-            stage.methodologicalApproach || '',
-            stage.strategy || '',
-            stage.requiredResources || '',
-            stage.notes || '',
-          ];
-          tableData.push(row);
-        });
-      }
-
-      // إضافة الجدول باستخدام autoTable
-      (pdf as any).autoTable({
-        head: [tableHeaders],
-        body: tableData,
-        startY: yPos,
-        styles: {
-          font: 'helvetica',
-          fontSize: 8,
-          textColor: [0, 0, 0],
-          cellPadding: 2,
-          halign: 'right',
-        },
-        headStyles: {
-          fillColor: [0, 112, 192],
-          textColor: [255, 255, 255],
-          fontStyle: 'bold',
-          halign: 'center',
-        },
-        columnStyles: {
-          0: { cellWidth: 18, halign: 'center', fillColor: [0, 112, 192], textColor: [255, 255, 255], fontStyle: 'bold' }, // الوقت بخلفية زرقاء
-          1: { cellWidth: 25, halign: 'right' }, // مرحلة الدرس
-          2: { cellWidth: 55, halign: 'right' }, // السير المنهجي
-          3: { cellWidth: 28, halign: 'right' }, // الاستراتيجية
-          4: { cellWidth: 35, halign: 'right' }, // الموارد
-          5: { cellWidth: 29, halign: 'right' }, // ملاحظات
-        },
-        margin: { left: margin, right: margin },
-        theme: 'grid',
-      });
 
       // حفظ الملف
       const fileName = `مذكرة_الدرس_${Date.now()}.pdf`;

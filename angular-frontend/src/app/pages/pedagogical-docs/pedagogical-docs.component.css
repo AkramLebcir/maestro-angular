@@ -20,7 +20,16 @@
 }
 
 .memo-header label {
-  min-width: 150px;
+  min-width: 120px;
+  font-size: 14px;
+}
+
+.memo-header {
+  margin-bottom: 12px !important;
+}
+
+.memo-header > div {
+  margin-bottom: 8px !important;
 }
 
 .memo-table {
@@ -28,6 +37,17 @@
   border-collapse: collapse;
   width: 100%;
   margin-top: 20px;
+  table-layout: auto;
+  overflow: visible;
+}
+
+/* إزالة أي قيود على overflow */
+.memo-form-container {
+  overflow: visible !important;
+}
+
+.memo-form-container > div {
+  overflow: visible !important;
 }
 
 .memo-table-header {
@@ -62,6 +82,9 @@
   vertical-align: top;
   background-color: white;
   position: relative;
+  overflow: visible; /* إظهار كل المحتوى */
+  word-wrap: break-word; /* كسر الكلمات الطويلة */
+  height: auto; /* السماح بالتوسع التلقائي */
 }
 
 .memo-table-cell-time {
@@ -120,16 +143,21 @@
 
 .memo-textarea {
   width: 100%;
-  height: 100%;
-  min-height: 100px;
+  min-height: 60px;
+  height: auto; /* السماح بالتوسع التلقائي */
   border: none;
   background: transparent;
-  padding: 4px;
-  font-size: 13px;
+  padding: 3px;
+  font-size: 11px;
   outline: none;
-  resize: none;
+  resize: vertical; /* السماح بتغيير الحجم عمودياً فقط */
   font-family: inherit;
   color: black;
+  line-height: 1.3;
+  overflow: hidden; /* إخفاء scrollbar */
+  white-space: pre-wrap; /* الحفاظ على الأسطر */
+  word-wrap: break-word; /* كسر الكلمات الطويلة */
+  box-sizing: border-box;
 }
 
 .memo-textarea::placeholder {
@@ -138,6 +166,12 @@
 
 /* Print Styles */
 @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+
   body * {
     visibility: hidden;
   }
@@ -152,13 +186,64 @@
     left: 0;
     top: 0;
     width: 100%;
-    padding: 0;
-    background: white;
+    padding: 10px;
+    background: white !important;
     box-shadow: none;
+    margin: 0;
+    font-size: 12px;
+  }
+
+  .memo-header {
+    margin-bottom: 8px !important;
+  }
+
+  .memo-header > div {
+    margin-bottom: 4px !important;
+  }
+
+  .memo-header label {
+    min-width: 100px;
+    font-size: 12px;
+  }
+
+  .memo-form-container h1 {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .memo-table {
+    font-size: 11px !important;
+    margin-top: 10px !important;
+  }
+
+  .memo-textarea {
+    min-height: 60px !important;
+    font-size: 11px !important;
+  }
+
+  .memo-input {
+    font-size: 11px !important;
+  }
+
+  /* إخفاء جميع الأزرار */
+  button,
+  .memo-form-container button {
+    display: none !important;
+    visibility: hidden !important;
+  }
+
+  /* إخفاء التبويبات والعناصر الأخرى */
+  .border-b,
+  nav,
+  h1:not(.memo-form-container h1),
+  .space-y-6 > *:not(.memo-form-container) {
+    display: none !important;
+    visibility: hidden !important;
   }
 
   .memo-table {
     border: 2px solid black !important;
+    page-break-inside: avoid;
   }
 
   .memo-table-header,
@@ -166,8 +251,9 @@
   .memo-table-cell-time {
     background-color: #0070c0 !important;
     color: white !important;
-    -webkit-print-color-adjust: exact;
-    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
     border: 2px solid black !important;
   }
 
@@ -176,19 +262,43 @@
     border: 2px solid black !important;
     background-color: white !important;
     color: black !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
 
   .memo-input,
   .memo-textarea {
     border: none !important;
+    background: transparent !important;
+    -webkit-print-color-adjust: exact !important;
   }
 
-  button {
-    display: none !important;
+  /* منع تقسيم الصفوف بين الصفحات */
+  .memo-table-row {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* تقليل المسافات في الطباعة */
+  .memo-form-container > * {
+    margin-bottom: 4px !important;
+  }
+
+  .memo-form-container .mb-4,
+  .memo-form-container .mb-6 {
+    margin-bottom: 6px !important;
+  }
+
+  .memo-form-container .mb-2 {
+    margin-bottom: 3px !important;
+  }
+
+  .memo-form-container .mb-1 {
+    margin-bottom: 2px !important;
   }
 
   @page {
-    margin: 10mm;
+    margin: 5mm;
     size: landscape;
   }
 }

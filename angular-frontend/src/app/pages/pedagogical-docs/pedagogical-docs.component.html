@@ -498,7 +498,7 @@
   <div *ngIf="activeTab === 'create-memo'" class="space-y-6">
     <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 memo-form-container">
       <!-- Title -->
-      <h1 class="text-2xl font-bold text-center mb-6" style="color: #2563eb;">نموذج خطة الدرس</h1>
+      <h1 class="text-xl font-bold text-center mb-4" style="color: #2563eb;">نموذج خطة الدرس</h1>
 
       <!-- Header Section -->
       <div class="memo-header mb-6">
@@ -521,13 +521,13 @@
             />
           </div>
         </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
+        <div class="grid grid-cols-3 gap-4 mb-4">
           <div class="flex items-center gap-2">
-            <label class="font-semibold" style="color: #2563eb;">القسم:</label>
+            <label class="font-semibold whitespace-nowrap" style="color: #2563eb;">القسم:</label>
             <select
               [(ngModel)]="memoForm.selectedClassId"
               (change)="onMemoClassSelected(memoForm.selectedClassId!)"
-              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent text-sm"
             >
               <option [ngValue]="undefined">-- اختر القسم --</option>
               <option *ngFor="let cls of classes" [ngValue]="cls.id">
@@ -536,10 +536,10 @@
             </select>
           </div>
           <div class="flex items-center gap-2">
-            <label class="font-semibold" style="color: #2563eb;">المستوى:</label>
+            <label class="font-semibold whitespace-nowrap" style="color: #2563eb;">المستوى:</label>
             <select
               [(ngModel)]="memoForm.level"
-              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent text-sm"
             >
               <option value="">-- اختر المستوى --</option>
               <option *ngFor="let level of memoLevels" [value]="level">
@@ -547,13 +547,11 @@
               </option>
             </select>
           </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4 mb-4">
           <div class="flex items-center gap-2">
-            <label class="font-semibold" style="color: #2563eb;">الشعبة:</label>
+            <label class="font-semibold whitespace-nowrap" style="color: #2563eb;">الشعبة:</label>
             <select
               [(ngModel)]="memoForm.section"
-              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent"
+              class="flex-1 border-b border-gray-300 px-2 py-1 focus:outline-none focus:border-blue-500 bg-transparent text-sm"
             >
               <option value="">-- اختر الشعبة --</option>
               <option *ngFor="let sec of sections" [value]="sec">
@@ -596,40 +594,40 @@
       </div>
 
       <!-- Objectives Section -->
-      <div class="mb-6">
-        <div class="mb-2">
-          <label class="font-semibold" style="color: #2563eb;">الهدف تحديد.</label>
+      <div class="mb-4">
+        <div class="mb-1">
+          <label class="font-semibold text-sm" style="color: #2563eb;">الهدف تحديد.</label>
           <input
             type="text"
             [(ngModel)]="memoForm.objective"
-            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500"
+            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500 text-sm"
             placeholder=""
           />
         </div>
         <div>
-          <label class="font-semibold" style="color: #2563eb;">يتعرف على.</label>
+          <label class="font-semibold text-sm" style="color: #2563eb;">يتعرف على.</label>
           <input
             type="text"
             [(ngModel)]="memoForm.recognizes"
-            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500"
+            class="w-full border-b border-gray-300 px-2 py-1 mt-1 focus:outline-none focus:border-blue-500 text-sm"
             placeholder=""
           />
         </div>
       </div>
 
       <!-- Current Activity Section -->
-      <div class="mb-6">
-        <label class="font-semibold block mb-2" style="color: #2563eb;">القيام الآن: نشاط مستقل يثير الاهتمام في الدرس:</label>
+      <div class="mb-4">
+        <label class="font-semibold block mb-1 text-sm" style="color: #2563eb;">القيام الآن: نشاط مستقل يثير الاهتمام في الدرس:</label>
         <textarea
           [(ngModel)]="memoForm.currentActivity"
-          rows="3"
-          class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500 resize-none"
+          rows="2"
+          class="w-full border border-gray-300 rounded px-3 py-1 focus:outline-none focus:border-blue-500 resize-none text-sm"
           placeholder=""
         ></textarea>
       </div>
 
       <!-- Table Section -->
-      <div class="overflow-x-auto">
+      <div>
         <table class="w-full border-collapse memo-table">
           <thead>
             <tr>
@@ -658,7 +656,7 @@
               <td class="memo-table-cell-stage">
                 <textarea
                   [(ngModel)]="stage.stage"
-                  rows="4"
+                  rows="3"
                   class="memo-textarea font-bold text-center"
                   style="text-align: center;"
                   placeholder=""
@@ -667,7 +665,7 @@
               <td class="memo-table-cell">
                 <textarea
                   [(ngModel)]="stage.methodologicalApproach"
-                  rows="4"
+                  rows="3"
                   class="memo-textarea text-right"
                   style="text-align: right;"
                   placeholder=""
@@ -685,7 +683,7 @@
                 <textarea
                   *ngIf="i === 0"
                   [(ngModel)]="stage.requiredResources"
-                  rows="4"
+                  rows="3"
                   class="memo-textarea text-center font-bold"
                   style="text-align: center;"
                   placeholder="ما الذي احتاجه لإكمال هذه الخطوة؟"
@@ -693,7 +691,7 @@
                 <textarea
                   *ngIf="i !== 0"
                   [(ngModel)]="stage.requiredResources"
-                  rows="4"
+                  rows="3"
                   class="memo-textarea"
                   placeholder=""
                 ></textarea>
@@ -701,7 +699,7 @@
               <td class="memo-table-cell">
                 <textarea
                   [(ngModel)]="stage.notes"
-                  rows="4"
+                  rows="3"
                   class="memo-textarea"
                   placeholder=""
                 ></textarea>
@@ -713,12 +711,6 @@
 
       <!-- Action Buttons -->
       <div class="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-200">
-        <button
-          (click)="printMemo()"
-          class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-        >
-          🖨️ طباعة
-        </button>
         <button
           (click)="exportMemoToPDF()"
           class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
