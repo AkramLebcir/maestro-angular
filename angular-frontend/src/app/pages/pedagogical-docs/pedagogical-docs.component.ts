@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { AuthService } from '../../services/auth.service';
@@ -192,7 +193,9 @@ export class PedagogicalDocsComponent implements OnInit {
   constructor(
     private api: ApiService,
     public languageService: LanguageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute,
+    private router: Router
   ) {}
 
   translate(key: string): string {
@@ -209,6 +212,33 @@ export class PedagogicalDocsComponent implements OnInit {
     setTimeout(() => {
       this.setupAutoResizeTextareas();
     }, 500);
+
+    // التحقق من query parameters للتصدير التلقائي
+    this.route.queryParams.subscribe(params => {
+      if (params['tab'] === 'create-memo') {
+        this.switchTab('create-memo');
+      }
+      if (params['autoExport'] === '1') {
+        // الانتظار قليلاً للتأكد من تحميل الصفحة ثم التصدير
+        setTimeout(() => {
+          // التحقق من وجود نموذج المذكرة قبل التصدير
+          const memoContainer = document.querySelector('.memo-form-container') as HTMLElement;
+          if (memoContainer) {
+            this.exportMemoToPDF();
+          } else {
+            // إذا لم يكن النموذج جاهزاً، انتظر قليلاً ثم حاول مرة أخرى
+            setTimeout(() => {
+              this.exportMemoToPDF();
+            }, 500);
+          }
+          // إزالة query parameter بعد التصدير
+          this.router.navigate(['/pedagogical-docs'], {
+            queryParams: { tab: 'create-memo' },
+            replaceUrl: true
+          });
+        }, 1500);
+      }
+    });
   }
 
   setupAutoResizeTextareas(): void {

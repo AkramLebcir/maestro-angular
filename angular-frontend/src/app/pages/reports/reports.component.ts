@@ -351,6 +351,12 @@ export class ReportsComponent {
     });
   }
 
+  navigateToMemoExport(): void {
+    this.router.navigate(['/pedagogical-docs'], {
+      queryParams: { tab: 'create-memo', autoExport: '1' },
+    });
+  }
+
   navigateToCertificatesPenalties(): void {
     this.router.navigate(['/achievements-penalties']);
   }
