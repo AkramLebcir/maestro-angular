@@ -11,6 +11,8 @@ import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassResponseDto } from './dto/class-response.dto';
 
+import * as XLSX from 'xlsx';
+
 @Injectable()
 export class ClassesService {
   constructor(
@@ -27,6 +29,175 @@ export class ClassesService {
     @InjectRepository(BehaviorEvent)
     private behaviorEventRepository: Repository<BehaviorEvent>,
   ) {}
+
+  async importDigitalization(ownerId: number, file: Express.Multer.File): Promise<{ importedCount: number; createdClasses: number }> {
+    try {
+      // Use cellDates: true to let xlsx handle date parsing
+      const workbook = XLSX.read(file.buffer, { type: 'buffer', cellDates: true });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      // Use raw: false to get formatted values
+      const data = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: null });
+
+      // Debug: Log sheet info
+      console.log('Total rows in sheet:', data.length);
+      if (data.length > 0) {
+        console.log('First row keys:', Object.keys(data[0]));
+        console.log('First row sample:', JSON.stringify(data[0], null, 2));
+        console.log('All column names in first row:', Object.keys(data[0]));
+      } else {
+        console.log('WARNING: No data rows found in Excel file!');
+      }
+
+      let createdClasses = 0;
+      let importedCount = 0;
+
+      const classMap = new Map<string, Class>();
+
+      // Helper to normalize strings
+      const normalize = (str: any) => (str ? String(str).trim() : '');
+
+      for (const row of data) {
+        // Skip empty rows
+        if (!row) continue;
+
+        // Try different possible column name variations
+        const className = normalize(row['الفوج التربوي']) || normalize(row['الفوج']) || normalize((row as any)['الفوج التربوي']);
+        if (!className) {
+          console.log('Skipping row - no class name found:', Object.keys(row));
+          continue;
+        }
+
+        let classEntity = classMap.get(className);
+        if (!classEntity) {
+          // Check database
+          classEntity = await this.classRepository.findOne({
+            where: { name: className, ownerId },
+          });
+
+          if (!classEntity) {
+            // Determine level
+            let level = '1st_year_high'; // Default
+            if (className.includes('أولى')) level = '1st_year_high';
+            else if (className.includes('ثانية')) level = '2nd_year_high';
+            else if (className.includes('ثالثة')) level = '3rd_year_high';
+
+            // Create class
+            classEntity = this.classRepository.create({
+              name: className,
+              level: level as any, // Cast to match enum
+              subject: 'عام', // Default subject
+              weeklySessions: 0,
+              ownerId,
+            });
+            classEntity = await this.classRepository.save(classEntity);
+            createdClasses++;
+          }
+          classMap.set(className, classEntity);
+        }
+
+        // Process Student - try different column name variations
+        let idNumber = row['رقم التعريف'] || (row as any)['رقم التعريف'] || row['ID'] || (row as any)['id'];
+        // Handle scientific notation or numeric ID
+        if (typeof idNumber === 'number') {
+            idNumber = String(idNumber);
+        } else {
+            idNumber = normalize(idNumber);
+        }
+        
+        if (!idNumber || idNumber === '') {
+          console.log('Skipping row - no ID number found');
+          continue; // Skip if no ID
+        }
+
+        // Registration Number (if exists, otherwise empty or use ID)
+        let studentRegNumber = row['رقم التسجيل'] || (row as any)['رقم التسجيل'] || row['Registration'] || (row as any)['registration'];
+        if (typeof studentRegNumber === 'number') {
+             studentRegNumber = String(studentRegNumber);
+        } else {
+             studentRegNumber = normalize(studentRegNumber);
+        }
+
+        const genderStr = normalize(row['الجنس'] || (row as any)['الجنس'] || row['Gender'] || (row as any)['gender']);
+        const gender: 'male' | 'female' = (genderStr === 'ذكر' || genderStr === 'male') ? 'male' : 'female';
+        
+        // Date parsing
+        const dobRaw = row['تاريخ الميلاد'] || (row as any)['تاريخ الميلاد'] || row['Date of Birth'] || (row as any)['dateOfBirth'];
+        let dateOfBirth: Date | null = null;
+        
+        if (dobRaw instanceof Date) {
+          dateOfBirth = dobRaw;
+        } else if (dobRaw) {
+          // Try manual parsing for DD/MM/YY or DD/MM/YYYY
+          const dobStr = String(dobRaw).trim();
+          // Regex for DD/MM/YYYY or DD/MM/YY or D/M/YY etc.
+          const dateMatch = dobStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+          
+          if (dateMatch) {
+            const day = parseInt(dateMatch[1], 10);
+            const month = parseInt(dateMatch[2], 10) - 1; // Months are 0-indexed in JS
+            let year = parseInt(dateMatch[3], 10);
+            
+            // Handle 2 digit year
+            if (year < 100) {
+              // Pivot year 50: 50-99 -> 1950-1999, 00-49 -> 2000-2049
+              // But for students, likely 2000+
+              year += 2000; 
+            }
+            
+            dateOfBirth = new Date(year, month, day);
+          } else {
+            // Try standard parser
+            const d = new Date(dobStr);
+            if (!isNaN(d.getTime())) {
+              dateOfBirth = d;
+            }
+          }
+        }
+
+        // Check if student exists by Identity Number (idNumber)
+        let student = await this.studentRepository.findOne({
+          where: { idNumber, ownerId },
+        });
+
+        const firstName = normalize(row['الاسم'] || (row as any)['الاسم'] || row['First Name'] || (row as any)['firstName']);
+        const lastName = normalize(row['اللقب'] || (row as any)['اللقب'] || row['Last Name'] || (row as any)['lastName']);
+
+        if (!firstName || !lastName) {
+          console.log('Skipping row - missing name:', { firstName, lastName, idNumber });
+          continue;
+        }
+
+        const studentData = {
+          firstName: firstName,
+          lastName: lastName,
+          idNumber: idNumber,
+          studentNumber: studentRegNumber || idNumber, // Fallback to ID number if reg number missing
+          gender: gender,
+          dateOfBirth: dateOfBirth,
+          classId: classEntity.id,
+          ownerId,
+          studentId: studentRegNumber || idNumber, 
+        };
+
+        if (student) {
+          // Update
+          Object.assign(student, studentData);
+        } else {
+          // Create
+          student = this.studentRepository.create(studentData);
+        }
+
+        await this.studentRepository.save(student);
+        importedCount++;
+      }
+
+      return { importedCount, createdClasses };
+    } catch (error) {
+      console.error('Import Digitalization Error:', error);
+      throw new BadRequestException('Failed to process Excel file. Please check the file format and try again. Error: ' + (error.message || error));
+    }
+  }
 
   async create(ownerId: number, createClassDto: CreateClassDto): Promise<ClassResponseDto> {
     // Validate lab exists if labId is provided

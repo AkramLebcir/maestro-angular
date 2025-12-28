@@ -9,7 +9,10 @@ import {
   ParseIntPipe,
   HttpCode,
   HttpStatus,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ClassesService } from './classes.service';
 import { StudentsService } from '../students/students.service';
 import { CreateClassDto } from './dto/create-class.dto';
@@ -27,6 +30,15 @@ export class ClassesController {
     private readonly classesService: ClassesService,
     private readonly studentsService: StudentsService,
   ) {}
+
+  @Post('import-digitalization')
+  @UseInterceptors(FileInterceptor('file'))
+  async importDigitalization(
+    @CurrentUser() user: AuthUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.classesService.importDigitalization(user.id, file);
+  }
 
   @Post()
   @HttpCode(HttpStatus.CREATED)

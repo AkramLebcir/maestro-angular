@@ -66,6 +66,23 @@ export class ApiService {
   }
 
   /**
+   * Import digitalization data (classes and students from Excel)
+   */
+  importDigitalization(file: File): Observable<{ importedCount: number; createdClasses: number }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    // For file uploads, we need Authorization but let browser set Content-Type
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return this.http.post<{ importedCount: number; createdClasses: number }>(`${this.apiUrl}/classes/import-digitalization`, formData, {
+      headers
+    });
+  }
+
+  /**
    * Generic PUT request
    */
   put<T>(endpoint: string, body: any): Observable<T> {

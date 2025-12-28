@@ -111,6 +111,8 @@ export class ClassesComponent implements OnInit {
   classStudents: Student[] = [];
   selectedStudents: Set<number> = new Set();
   isExportingPDF = false;
+  isImporting = false;
+  importProgress: { total: number; createdClasses: number } | null = null;
   
   // Detailed report data
   classReportStudents: any[] = [];
@@ -208,6 +210,36 @@ export class ClassesComponent implements OnInit {
 
   translate(key: string, params?: { [key: string]: string }): string {
     return this.languageService.translate(key, params);
+  }
+
+  onFileSelected(event: any): void {
+    const file = event.target.files[0];
+    if (file) {
+      this.importDigitalization(file);
+    }
+    // Reset input
+    event.target.value = '';
+  }
+
+  importDigitalization(file: File): void {
+    this.isImporting = true;
+    this.apiService.importDigitalization(file).subscribe({
+      next: (response) => {
+        this.isImporting = false;
+        this.importProgress = {
+          total: response.importedCount,
+          createdClasses: response.createdClasses
+        };
+        alert(`تم الاستيراد بنجاح! \nتم استيراد ${response.importedCount} تلميذ \nوإنشاء ${response.createdClasses} قسم.`);
+        this.loadClasses(); // Refresh list
+      },
+      error: (error) => {
+        this.isImporting = false;
+        console.error('Import error:', error);
+        const errorMsg = error.error?.message || error.message || 'Unknown error';
+        alert(`حدث خطأ أثناء الاستيراد. يرجى المحاولة مرة أخرى.\nالتفاصيل: ${errorMsg}`);
+      }
+    });
   }
 
   ngOnInit(): void {
