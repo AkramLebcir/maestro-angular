@@ -21,13 +21,13 @@ export class GeminiService {
       throw new Error('Gemini API key is not configured. Please set GEMINI_API_KEY in your .env file.');
     }
 
-    const model = this.genAI.getGenerativeModel({ model: 'gemini-pro' });
+    const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
     // بناء prompt تفصيلي للذكاء الاصطناعي
     const prompt = this.buildPrompt(dto);
 
-    // إعداد timeout (120 ثانية)
-    const timeoutMs = 120000;
+    // إعداد timeout (180 ثانية)
+    const timeoutMs = 180000;
 
     // دالة لإجراء الطلب مع إعادة المحاولة و timeout
     const makeRequest = async (retries = 2): Promise<string> => {
@@ -124,16 +124,26 @@ export class GeminiService {
 
     const strategyInstructions = classLevelInstructions[dto.classLevel] || classLevelInstructions['متوسط'];
 
-    return `أنت معلم محترف في الجزائر متخصص في إعداد خطط الدروس (المذكرات) وفق المنهاج الجزائري.
+    // حساب التوزيع الزمني المقترح (نسبي لمدة الحصة)
+    const totalMinutes = dto.sessionDuration;
+    const timeDistribution = {
+      engagement: Math.round(totalMinutes * 0.20), // 20% للالتزام
+      representation: Math.round(totalMinutes * 0.40), // 40% للتمثيل
+      participation: Math.round(totalMinutes * 0.25), // 25% للمشاركة
+      evaluation: Math.round(totalMinutes * 0.15), // 15% للتقييم
+    };
 
-المهمة: أنشئ خطة درس مفصلة (مذكرة) باللغة العربية وفق النموذج المطلوب.
+    return `أنت معلم محترف في الجزائر متخصص في إعداد خطط الدروس (المذكرات) وفق المنهاج الجزائري والمنهجية البيداغوجية الحديثة.
 
-المعلومات:
+المهمة: أنشئ خطة درس مفصلة وشاملة (مذكرة) باللغة العربية وفق النموذج المطلوب.
+
+المعلومات الأساسية:
 - المادة الدراسية: ${dto.subject}
-- المستوى والشعبة: ${dto.level} - ${dto.section}
-- المجال المفاهيمي: ${dto.conceptualField}
-- الوحدة المفاهيمية: ${dto.conceptualUnit}
-- عنوان الدرس: ${dto.lessonTitle}
+- المستوى: ${dto.level}
+- الشعبة: ${dto.section}
+- المجال المفاهيمي (الميدان): ${dto.conceptualField}
+- الوحدة المفاهيمية (المقطع): ${dto.conceptualUnit}
+- الأهداف التعلمية: ${dto.learningObjectives}
 - الكفاءة المستهدفة (الهدف): ${dto.targetCompetency}
 - مستوى القسم: ${dto.classLevel}
 - مدة الحصة: ${dto.sessionDuration} دقيقة
@@ -141,73 +151,109 @@ export class GeminiService {
 تعليمات خاصة بمستوى القسم:
 ${strategyInstructions}
 
-البنية المطلوبة:
-الدرس يجب أن يتكون من 4 مراحل رئيسية:
-1. التزام: وضعية مشكلة (بناء المعرفة المسبقة، والإثارة في الدرس)
-2. تمثيل: طريقة إلقاء الدرس بالتفصيل (مقدمة إلى مفهوم الدرس) مع الاستراتيجيات المتبعة في كل عنصر
-3. مشاركة: تفاعل التلاميذ مع الدرس (أنشطة تفاعلية، أسئلة، مناقشات)
-4. التقييم: تقييم ما إذا كان الهدف قد تحقق (أسئلة تقييمية، أنشطة تقييمية)
+البنية المطلوبة للدرس:
+يجب أن يتكون الدرس من 4 مراحل رئيسية مع تفاصيل كاملة لكل مرحلة:
 
-استراتيجيات مقترحة (اختر ما يناسب مستوى القسم):
-- العمل بالأفواج
-- التعلم بالقرين
-- العصف الذهني
-- التعلم بالمشاريع
-- التعلم التعاوني
-- التعلم النشط
-- استخدام الوسائط المتعددة
-- الأنشطة التطبيقية
+1. مرحلة التزام (الوضعية المشكلة):
+   - يجب أن تبدأ بوضعية مشكلة حقيقية وواقعية تتعلق بالموضوع
+   - بناء المعرفة المسبقة للتلاميذ من خلال استثارة معلوماتهم السابقة
+   - إثارة الاهتمام والفضول في الدرس
+   - يجب أن تكون الوضعية المشكلة مناسبة لمستوى القسم (${dto.classLevel})
+   - الوقت المقترح: حوالي ${timeDistribution.engagement} دقيقة
 
-الموارد المطلوبة: اقترح موارد تعليمية مناسبة مثل (سبورة، كتب، أدوات تقنية، مواد بصرية، إلخ)
+2. مرحلة تمثيل (إلقاء الدرس):
+   - طريقة إلقاء الدرس بالتفصيل مع الشرح الوافي
+   - مقدمة شاملة إلى مفهوم الدرس الرئيسي
+   - يجب أن تكون الاستراتيجيات المستخدمة من استراتيجيات التعلم النشط:
+     * التعلم التعاوني
+     * التعلم بالقرين
+     * العمل بالأفواج
+     * العصف الذهني
+     * التعلم بالمشاريع
+     * الاستكشاف الموجه
+     * التعلم باللعب
+     * التعلم القائم على حل المشكلات
+   - يجب تحديد الاستراتيجية المستخدمة بوضوح لكل عنصر
+   - الوقت المقترح: حوالي ${timeDistribution.representation} دقيقة
 
-الزمن: اقترح توزيع زمني منطقي لكل مرحلة (بالدقائق)
+3. مرحلة مشاركة (تفاعل التلاميذ):
+   - تفاعل التلاميذ مع الدرس من خلال أنشطة تفاعلية
+   - أسئلة تشجيعية ومناقشات
+   - أنشطة تطبيقية عملية
+   - يجب أن تكون الأنشطة متنوعة وتناسب مستوى القسم
+   - الوقت المقترح: حوالي ${timeDistribution.participation} دقيقة
+
+4. مرحلة التقييم (الختامي والمرحلي):
+   - تقويم مرحلي: تقييم فوري لفهم التلاميذ أثناء الدرس
+   - تقويم ختامي: تقييم شامل لتحقيق الكفاءة المستهدفة
+   - يجب أن يتضمن أسئلة تقييمية وأنشطة تقييمية واضحة
+   - التأكد من تحقيق الأهداف التعلمية والكفاءة المستهدفة
+   - الوقت المقترح: حوالي ${timeDistribution.evaluation} دقيقة
+
+الموارد المطلوبة:
+يجب اقتراح موارد تعليمية واقعية ومتاحة في البيئة المدرسية الجزائرية، مثل:
+- سبورة (بيضاء أو سوداء)
+- كتب مدرسية ومراجع
+- أدوات تقنية (حاسوب، بروجكتور، شاشة عرض)
+- مواد بصرية (صور، رسوم بيانية، خرائط)
+- أدوات عملية (حسب المادة الدراسية)
+- أوراق عمل
+- أنشطة تفاعلية
+
+ملاحظات مهمة:
+- جميع النصوص يجب أن تكون باللغة العربية الفصحى
+- المحتوى يجب أن يكون مناسباً لمستوى القسم (${dto.classLevel}) والمادة الدراسية (${dto.subject})
+- الاستراتيجيات يجب أن تكون من استراتيجيات التعلم النشط حصراً
+- الأنشطة يجب أن تكون متنوعة وتناسب البيئة المدرسية الجزائرية
+- الزمن المقترح يجب أن يكون منطقياً ومتناسباً مع مدة الحصة (${dto.sessionDuration} دقيقة)
+- يجب أن يكون مجموع الأزمنة للمراحل الأربع قريباً جداً من مدة الحصة الإجمالية
+- الموارد يجب أن تكون واقعية ومتاحة في البيئة المدرسية
 
 قم بإرجاع النتيجة بصيغة JSON فقط (بدون أي نص إضافي) بالتنسيق التالي:
 {
   "stages": [
     {
       "stage": "1) التزام",
-      "time": "X دقيقة",
-      "methodologicalApproach": "وصف تفصيلي للوضعية المشكلة والأنشطة...",
-      "strategy": "اسم الاستراتيجية المستخدمة",
-      "requiredResources": "قائمة الموارد المطلوبة",
-      "notes": "ملاحظات إضافية (اختياري)"
+      "time": "${timeDistribution.engagement} دقيقة",
+      "methodologicalApproach": "وصف تفصيلي ومفصل للوضعية المشكلة، كيفية بناء المعرفة المسبقة، طرق الإثارة في الدرس، الأنشطة التفاعلية المستخدمة...",
+      "strategy": "اسم الاستراتيجية المستخدمة من استراتيجيات التعلم النشط (مثل: التعلم التعاوني، التعلم بالقرين، العصف الذهني، إلخ)",
+      "requiredResources": "قائمة مفصلة بالموارد المطلوبة لهذه المرحلة (سبورة، مواد بصرية، أدوات، إلخ)",
+      "notes": "ملاحظات إضافية مهمة للمعلم (اختياري)"
     },
     {
       "stage": "2) تمثيل",
-      "time": "X دقيقة",
-      "methodologicalApproach": "وصف تفصيلي لطريقة إلقاء الدرس...",
-      "strategy": "اسم الاستراتيجية المستخدمة",
-      "requiredResources": "قائمة الموارد المطلوبة",
-      "notes": "ملاحظات إضافية (اختياري)"
+      "time": "${timeDistribution.representation} دقيقة",
+      "methodologicalApproach": "وصف تفصيلي وشامل لطريقة إلقاء الدرس، الشرح الوافي للمفاهيم، المقدمة الشاملة لمفهوم الدرس، التفاصيل المنهجية، الخطوات التعليمية...",
+      "strategy": "اسم الاستراتيجية المستخدمة من استراتيجيات التعلم النشط (مثل: التعلم القائم على حل المشكلات، الاستكشاف الموجه، التعلم بالمشاريع، إلخ)",
+      "requiredResources": "قائمة مفصلة بالموارد المطلوبة لهذه المرحلة",
+      "notes": "ملاحظات إضافية مهمة للمعلم (اختياري)"
     },
     {
       "stage": "3) مشاركة",
-      "time": "X دقيقة",
-      "methodologicalApproach": "وصف تفصيلي لأنشطة التفاعل...",
-      "strategy": "اسم الاستراتيجية المستخدمة",
-      "requiredResources": "قائمة الموارد المطلوبة",
-      "notes": "ملاحظات إضافية (اختياري)"
+      "time": "${timeDistribution.participation} دقيقة",
+      "methodologicalApproach": "وصف تفصيلي لأنشطة التفاعل، كيفية تفاعل التلاميذ مع الدرس، الأسئلة والمناقشات، الأنشطة التطبيقية العملية...",
+      "strategy": "اسم الاستراتيجية المستخدمة من استراتيجيات التعلم النشط (مثل: العمل بالأفواج، التعلم بالقرين، التعلم التعاوني، إلخ)",
+      "requiredResources": "قائمة مفصلة بالموارد المطلوبة لهذه المرحلة",
+      "notes": "ملاحظات إضافية مهمة للمعلم (اختياري)"
     },
     {
       "stage": "4) التقييم",
-      "time": "X دقيقة",
-      "methodologicalApproach": "وصف تفصيلي لأدوات التقييم...",
-      "strategy": "اسم الاستراتيجية المستخدمة",
-      "requiredResources": "قائمة الموارد المطلوبة",
-      "notes": "ملاحظات إضافية (اختياري)"
+      "time": "${timeDistribution.evaluation} دقيقة",
+      "methodologicalApproach": "وصف تفصيلي للتقويم المرحلي (أثناء الدرس) والتقويم الختامي (في نهاية الدرس)، أسئلة تقييمية واضحة، أنشطة تقييمية عملية، كيفية التأكد من تحقيق الكفاءة المستهدفة...",
+      "strategy": "اسم الاستراتيجية المستخدمة للتقييم من استراتيجيات التعلم النشط",
+      "requiredResources": "قائمة مفصلة بالموارد المطلوبة لهذه المرحلة (أوراق التقييم، أدوات التقييم، إلخ)",
+      "notes": "ملاحظات إضافية مهمة للمعلم (اختياري)"
     }
   ],
-  "currentActivity": "نشاط مستقل يثير الاهتمام في الدرس (اختياري)"
+  "currentActivity": "نشاط مستقل يثير الاهتمام في الدرس يمكن للتلاميذ القيام به عند بداية الحصة (اختياري - يمكن تركه فارغاً إذا لم يكن مناسباً)"
 }
 
 تأكد من:
-- جميع النصوص باللغة العربية
-- المحتوى مناسب لمستوى القسم المحدد (${dto.classLevel}) والمادة الدراسية (${dto.subject})
-- الاستراتيجيات والأنشطة مناسبة للبيئة المدرسية الجزائرية والمادة المحددة
-- الزمن مقترح بشكل منطقي ومتناسب مع مدة الحصة الإجمالية (${dto.sessionDuration} دقيقة)
-- يجب أن يكون مجموع الأزمنة للمراحل الأربع قريباً من مدة الحصة (${dto.sessionDuration} دقيقة)
-- الموارد واقعية ومتاحة في البيئة المدرسية ومتناسبة مع المادة الدراسية`;
+1. أن جميع الأوصاف مفصلة وواضحة وتتضمن معلومات كافية للمعلم
+2. أن الاستراتيجيات المذكورة من استراتيجيات التعلم النشط فقط
+3. أن الأزمنة المذكورة متقاربة من الأزمنة المقترحة أعلاه ومجموعها قريب من ${dto.sessionDuration} دقيقة
+4. أن المحتوى مناسب تماماً لمستوى القسم (${dto.classLevel})
+5. أن الموارد واقعية ومتاحة في المدارس الجزائرية`;
   }
 
   private parseAIResponse(text: string, dto: GenerateLessonPlanDto): GenerateLessonPlanResponseDto {
@@ -229,27 +275,42 @@ ${strategyInstructions}
         throw new Error('Invalid response structure: stages array not found');
       }
 
-      // التأكد من وجود 4 مراحل
+      // معالجة المراحل - يمكن أن تكون أكثر من 4 أو أقل
       const requiredStages = ['1) التزام', '2) تمثيل', '3) مشاركة', '4) التقييم'];
       const stages: LessonPlanStage[] = [];
       
-      // إنشاء 4 مراحل (إما من البيانات المستلمة أو قوالب افتراضية)
-      for (let i = 0; i < 4; i++) {
-        const parsedStage = parsed.stages[i];
-        if (parsedStage) {
+      // استخدام المراحل المستلمة أو إنشاء 4 مراحل افتراضية
+      if (parsed.stages && parsed.stages.length > 0) {
+        parsed.stages.forEach((parsedStage: any, index: number) => {
           stages.push({
-            stage: parsedStage.stage || requiredStages[i],
-            time: parsedStage.time || 'دقيقة',
+            stage: parsedStage.stage || (index < 4 ? requiredStages[index] : ''),
+            time: parsedStage.time || '',
             methodologicalApproach: parsedStage.methodologicalApproach || '',
             strategy: parsedStage.strategy || '',
             requiredResources: parsedStage.requiredResources || '',
             notes: parsedStage.notes || ''
           });
-        } else {
-          // إضافة مرحلة افتراضية إذا كانت مفقودة
+        });
+      } else {
+        // إنشاء 4 مراحل افتراضية إذا لم تكن موجودة
+        for (let i = 0; i < 4; i++) {
           stages.push({
             stage: requiredStages[i],
-            time: 'دقيقة',
+            time: '',
+            methodologicalApproach: '',
+            strategy: '',
+            requiredResources: '',
+            notes: ''
+          });
+        }
+      }
+      
+      // التأكد من وجود مراحل على الأقل (إذا كانت فارغة تماماً، أضف 4 مراحل)
+      if (stages.length === 0) {
+        for (let i = 0; i < 4; i++) {
+          stages.push({
+            stage: requiredStages[i],
+            time: '',
             methodologicalApproach: '',
             strategy: '',
             requiredResources: '',
@@ -268,7 +329,10 @@ ${strategyInstructions}
         conceptualField: dto.conceptualField,
         conceptualUnit: dto.conceptualUnit,
         objective: dto.targetCompetency,
+        learningObjectives: dto.learningObjectives,
         currentActivity: parsed.currentActivity || '',
+        memoNumber: '',
+        teacherName: '',
         stages: stages
       };
     } catch (error) {
@@ -286,7 +350,10 @@ ${strategyInstructions}
         conceptualField: dto.conceptualField,
         conceptualUnit: dto.conceptualUnit,
         objective: dto.targetCompetency,
+        learningObjectives: dto.learningObjectives,
         currentActivity: '',
+        memoNumber: '',
+        teacherName: '',
         stages: [
           {
             stage: '1) التزام',

@@ -321,15 +321,15 @@
               />
             </div>
 
-            <!-- عنوان الدرس -->
+            <!-- الأهداف التعلمية -->
             <div class="flex flex-col md:col-span-2">
-              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عنوان الدرس *</label>
-              <input
-                type="text"
-                [(ngModel)]="lessonPlanForm.lessonTitle"
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الأهداف التعلمية *</label>
+              <textarea
+                [(ngModel)]="lessonPlanForm.learningObjectives"
+                rows="3"
                 class="border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
-                placeholder="أدخل عنوان الدرس"
-              />
+                placeholder="الأهداف التي يجب تحقيقها في هذا الدرس"
+              ></textarea>
             </div>
 
             <!-- الكفاءة المستهدفة -->
@@ -372,100 +372,177 @@
 
       <!-- Generated Lesson Plan -->
       <div *ngIf="generatedLessonPlan" class="bg-white dark:bg-gray-800 rounded-lg shadow p-6 space-y-4">
-          <!-- Header Info -->
-          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-            <div>
-              <span class="font-semibold">التاريخ: </span>
-              <span>{{ generatedLessonPlan.date }}</span>
-            </div>
-            <div>
-              <span class="font-semibold">المستوى: </span>
-              <span>{{ generatedLessonPlan.level }}</span>
-            </div>
-            <div>
-              <span class="font-semibold">الشعبة: </span>
-              <span>{{ generatedLessonPlan.section }}</span>
-            </div>
-            <div class="md:col-span-2">
-              <span class="font-semibold">المجال المفاهيمي: </span>
-              <span>{{ generatedLessonPlan.conceptualField }}</span>
-            </div>
-            <div class="md:col-span-3">
-              <span class="font-semibold">الوحدة المفاهيمية: </span>
-              <span>{{ generatedLessonPlan.conceptualUnit }}</span>
-            </div>
-            <div class="md:col-span-3">
-              <span class="font-semibold">الهدف: </span>
-              <span>{{ generatedLessonPlan.objective }}</span>
+          <!-- Header Info - قابل للتعديل -->
+          <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-4 space-y-3">
+            <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200 mb-3">معلومات المذكرة (قابلة للتعديل)</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div class="flex flex-col">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">التاريخ:</label>
+                <input
+                  type="date"
+                  [(ngModel)]="generatedLessonPlan.date"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div class="flex flex-col">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">المستوى:</label>
+                <input
+                  type="text"
+                  [(ngModel)]="generatedLessonPlan.level"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div class="flex flex-col">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">الشعبة:</label>
+                <input
+                  type="text"
+                  [(ngModel)]="generatedLessonPlan.section"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div class="flex flex-col">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">مذكرة رقم:</label>
+                <input
+                  type="text"
+                  [(ngModel)]="generatedLessonPlan.memoNumber"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                  placeholder="اختياري"
+                />
+              </div>
+              <div class="flex flex-col md:col-span-2">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">المجال المفاهيمي (الميدان):</label>
+                <input
+                  type="text"
+                  [(ngModel)]="generatedLessonPlan.conceptualField"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div class="flex flex-col md:col-span-2">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">الوحدة المفاهيمية (المقطع):</label>
+                <input
+                  type="text"
+                  [(ngModel)]="generatedLessonPlan.conceptualUnit"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500"
+                />
+              </div>
+              <div class="flex flex-col md:col-span-2">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">الكفاءة المستهدفة (الهدف):</label>
+                <textarea
+                  [(ngModel)]="generatedLessonPlan.objective"
+                  rows="2"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500 resize-none"
+                ></textarea>
+              </div>
+              <div class="flex flex-col md:col-span-2">
+                <label class="font-semibold mb-1 text-gray-700 dark:text-gray-300">الأهداف التعلمية:</label>
+                <textarea
+                  [(ngModel)]="generatedLessonPlan.learningObjectives"
+                  rows="3"
+                  class="border rounded px-3 py-2 dark:bg-gray-600 dark:border-gray-500 resize-none"
+                ></textarea>
+              </div>
             </div>
           </div>
 
-          <!-- Current Activity (if exists) -->
-          <div *ngIf="generatedLessonPlan.currentActivity" class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
-            <h3 class="font-semibold text-gray-800 dark:text-gray-200 mb-2">القيام الآن: نشاط مستقل يثير الاهتمام في الدرس</h3>
-            <p class="text-sm text-gray-700 dark:text-gray-300">{{ generatedLessonPlan.currentActivity }}</p>
+          <!-- Current Activity (if exists) - قابل للتعديل -->
+          <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
+            <label class="font-semibold text-gray-800 dark:text-gray-200 mb-2 block">القيام الآن: نشاط مستقل يثير الاهتمام في الدرس</label>
+            <textarea
+              [(ngModel)]="generatedLessonPlan.currentActivity"
+              rows="3"
+              class="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:border-gray-600 resize-none"
+              placeholder="يمكنك إضافة نشاط أو تركه فارغاً"
+            ></textarea>
           </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
-              <thead>
-                <tr class="bg-blue-600 text-white">
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">الوقت</th>
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">مرحلة الدرس</th>
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">السير المنهجي والاستراتيجيات المتبعة</th>
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">الاستراتيجية</th>
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">الموارد المطلوبة</th>
-                  <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">ملاحظات</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr *ngFor="let stage of generatedLessonPlan.stages; let i = index" class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                  <td class="border border-gray-300 dark:border-gray-600 p-2 bg-blue-50 dark:bg-blue-900/20">
-                    <input
-                      type="text"
-                      [(ngModel)]="stage.time"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1"
-                    />
-                  </td>
-                  <td class="border border-gray-300 dark:border-gray-600 p-2">
-                    <input
-                      type="text"
-                      [(ngModel)]="stage.stage"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1"
-                    />
-                  </td>
-                  <td class="border border-gray-300 dark:border-gray-600 p-2">
-                    <textarea
-                      [(ngModel)]="stage.methodologicalApproach"
-                      rows="3"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1 resize-none"
-                    ></textarea>
-                  </td>
-                  <td class="border border-gray-300 dark:border-gray-600 p-2">
-                    <input
-                      type="text"
-                      [(ngModel)]="stage.strategy"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1"
-                    />
-                  </td>
-                  <td class="border border-gray-300 dark:border-gray-600 p-2">
-                    <textarea
-                      [(ngModel)]="stage.requiredResources"
-                      rows="3"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1 resize-none"
-                    ></textarea>
-                  </td>
-                  <td class="border border-gray-300 dark:border-gray-600 p-2">
-                    <textarea
-                      [(ngModel)]="stage.notes"
-                      rows="3"
-                      class="w-full bg-transparent border-none focus:outline-none focus:ring-1 focus:ring-blue-500 px-1 resize-none"
-                    ></textarea>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <!-- Table with Add/Remove buttons -->
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-lg text-gray-800 dark:text-gray-200">جدول السير المنهجي للدرس</h3>
+              <button
+                (click)="addStageToGeneratedPlan()"
+                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 text-sm"
+              >
+                ➕ إضافة صف
+              </button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full border-collapse border border-gray-300 dark:border-gray-600 text-sm">
+                <thead>
+                  <tr class="bg-blue-600 text-white">
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="width: 60px;">الوقت</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="width: 120px;">مرحلة الدرس</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right">السير المنهجي والاستراتيجيات المتبعة</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="width: 120px;">الاستراتيجية</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="width: 150px;">الموارد المطلوبة</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-right" style="width: 120px;">ملاحظات</th>
+                    <th class="border border-gray-300 dark:border-gray-600 p-2 text-center" style="width: 80px;">حذف</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let stage of generatedLessonPlan.stages; let i = index" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 bg-blue-50 dark:bg-blue-900/20">
+                      <input
+                        type="text"
+                        [(ngModel)]="stage.time"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="دقيقة"
+                      />
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                      <input
+                        type="text"
+                        [(ngModel)]="stage.stage"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="مرحلة الدرس"
+                      />
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                      <textarea
+                        [(ngModel)]="stage.methodologicalApproach"
+                        rows="4"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                        placeholder="السير المنهجي والاستراتيجيات المتبعة"
+                      ></textarea>
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                      <input
+                        type="text"
+                        [(ngModel)]="stage.strategy"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                        placeholder="الاستراتيجية"
+                      />
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                      <textarea
+                        [(ngModel)]="stage.requiredResources"
+                        rows="4"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                        placeholder="الموارد المطلوبة"
+                      ></textarea>
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2">
+                      <textarea
+                        [(ngModel)]="stage.notes"
+                        rows="4"
+                        class="w-full bg-transparent border border-gray-300 dark:border-gray-600 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 resize-none"
+                        placeholder="ملاحظات"
+                      ></textarea>
+                    </td>
+                    <td class="border border-gray-300 dark:border-gray-600 p-2 text-center">
+                      <button
+                        (click)="removeStageFromGeneratedPlan(i)"
+                        [disabled]="generatedLessonPlan.stages.length <= 1"
+                        class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                        title="حذف الصف"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
 
         <!-- Action Buttons -->
@@ -484,11 +561,65 @@
             🔄 إعادة توليد
           </button>
           <button
-            (click)="exportLessonPlanToPDF()"
-            class="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            (click)="openPrintModal()"
+            class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
           >
             📄 تصدير PDF
           </button>
+        </div>
+      </div>
+
+      <!-- Print Style Modal -->
+      <div *ngIf="showPrintModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+          <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200 mb-4">اختر نمط الطباعة</h3>
+          
+          <div class="space-y-3 mb-6">
+            <label class="flex items-center p-3 border-2 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700" 
+                   [class.border-blue-500]="printStyle === 'standard'"
+                   [class.border-gray-300]="printStyle !== 'standard'">
+              <input
+                type="radio"
+                [(ngModel)]="printStyle"
+                value="standard"
+                class="mr-3"
+              />
+              <div>
+                <div class="font-semibold text-gray-800 dark:text-gray-200">النمط القياسي</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">حجم خط متوسط مع تباعد قياسي</div>
+              </div>
+            </label>
+
+            <label class="flex items-center p-3 border-2 rounded cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700"
+                   [class.border-blue-500]="printStyle === 'detailed'"
+                   [class.border-gray-300]="printStyle !== 'detailed'">
+              <input
+                type="radio"
+                [(ngModel)]="printStyle"
+                value="detailed"
+                class="mr-3"
+              />
+              <div>
+                <div class="font-semibold text-gray-800 dark:text-gray-200">النمط المفصل</div>
+                <div class="text-sm text-gray-600 dark:text-gray-400">حجم خط أصغر لمحتوى أكثر في الصفحة</div>
+              </div>
+            </label>
+          </div>
+
+          <div class="flex justify-end gap-3">
+            <button
+              (click)="closePrintModal()"
+              class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700"
+            >
+              إلغاء
+            </button>
+            <button
+              (click)="exportLessonPlanToPDF()"
+              class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              طباعة
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -153,7 +153,7 @@ export class ApiService {
     section: string;
     conceptualField: string;
     conceptualUnit: string;
-    lessonTitle: string;
+    learningObjectives: string;
     targetCompetency: string;
     classLevel: string;
     subject: string;

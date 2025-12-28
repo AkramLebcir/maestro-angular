@@ -84,7 +84,7 @@ export class PedagogicalDocsComponent implements OnInit {
     section: string;
     conceptualField: string;
     conceptualUnit: string;
-    lessonTitle: string;
+    learningObjectives: string;
     targetCompetency: string;
     classLevel: 'ضعيف' | 'متوسط' | 'ممتاز';
     sessionDuration: number;
@@ -93,7 +93,7 @@ export class PedagogicalDocsComponent implements OnInit {
     section: '',
     conceptualField: '',
     conceptualUnit: '',
-    lessonTitle: '',
+    learningObjectives: '',
     targetCompetency: '',
     classLevel: 'متوسط',
     sessionDuration: 60,
@@ -101,6 +101,8 @@ export class PedagogicalDocsComponent implements OnInit {
   selectedClassId?: number;
   generatedLessonPlan: any = null;
   classes: any[] = [];
+  printStyle: 'standard' | 'detailed' = 'standard';
+  showPrintModal = false;
 
   // قائمة المستويات الثابتة للمذكرة
   memoLevels: string[] = [
@@ -356,9 +358,47 @@ export class PedagogicalDocsComponent implements OnInit {
         '2nd_year_high': '2AS',
         '3rd_year_high': '3AS',
       };
+      
+      // ملء البيانات تلقائياً من القسم المختار
       this.lessonPlanForm.level = levelMap[selectedClass.level] || selectedClass.level;
       this.lessonPlanForm.section = selectedClass.name || '';
+      
+      // يمكن إضافة المزيد من البيانات التلقائية هنا حسب الحاجة
+      // مثلاً: إذا كان القسم يحتوي على معلومات إضافية
     }
+  }
+
+  addStageToGeneratedPlan(): void {
+    if (!this.generatedLessonPlan || !this.generatedLessonPlan.stages) {
+      return;
+    }
+    this.generatedLessonPlan.stages.push({
+      stage: '',
+      time: '',
+      methodologicalApproach: '',
+      strategy: '',
+      requiredResources: '',
+      notes: ''
+    });
+  }
+
+  removeStageFromGeneratedPlan(index: number): void {
+    if (!this.generatedLessonPlan || !this.generatedLessonPlan.stages) {
+      return;
+    }
+    if (this.generatedLessonPlan.stages.length > 1) {
+      this.generatedLessonPlan.stages.splice(index, 1);
+    } else {
+      alert('يجب أن تحتوي المذكرة على صف واحد على الأقل');
+    }
+  }
+
+  openPrintModal(): void {
+    this.showPrintModal = true;
+  }
+
+  closePrintModal(): void {
+    this.showPrintModal = false;
   }
 
   switchTab(tab: 'documents' | 'generator' | 'create-memo'): void {
@@ -372,7 +412,7 @@ export class PedagogicalDocsComponent implements OnInit {
         section: '',
         conceptualField: '',
         conceptualUnit: '',
-        lessonTitle: '',
+        learningObjectives: '',
         targetCompetency: '',
         classLevel: 'متوسط',
         sessionDuration: 60,
@@ -393,7 +433,7 @@ export class PedagogicalDocsComponent implements OnInit {
       !this.lessonPlanForm.section ||
       !this.lessonPlanForm.conceptualField ||
       !this.lessonPlanForm.conceptualUnit ||
-      !this.lessonPlanForm.lessonTitle ||
+      !this.lessonPlanForm.learningObjectives ||
       !this.lessonPlanForm.targetCompetency
     ) {
       this.errorMessage = 'الرجاء ملء جميع الحقول المطلوبة.';
@@ -417,6 +457,14 @@ export class PedagogicalDocsComponent implements OnInit {
     this.api.generateLessonPlan(payload).subscribe({
       next: (data) => {
         this.generatedLessonPlan = data;
+        // إضافة اسم المعلم من النموذج
+        if (!this.generatedLessonPlan.teacherName) {
+          this.generatedLessonPlan.teacherName = this.memoForm.teacherName || '';
+        }
+        // التأكد من وجود الأهداف التعلمية
+        if (!this.generatedLessonPlan.learningObjectives) {
+          this.generatedLessonPlan.learningObjectives = this.lessonPlanForm.learningObjectives;
+        }
         this.generatingLessonPlan = false;
       },
       error: (error) => {
@@ -457,6 +505,9 @@ export class PedagogicalDocsComponent implements OnInit {
       return;
     }
 
+    // إغلاق نافذة اختيار نمط الطباعة إذا كانت مفتوحة
+    this.closePrintModal();
+
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
@@ -474,7 +525,7 @@ export class PedagogicalDocsComponent implements OnInit {
     pdf.setFontSize(11);
     pdf.setFont('helvetica', 'normal');
     const currentDate = this.generatedLessonPlan.date || new Date().toLocaleDateString('ar-SA');
-    const teacherName = this.generatedLessonPlan.teacherName || '___________';
+    const teacherName = this.generatedLessonPlan.teacherName || this.memoForm.teacherName || '___________';
     
     pdf.text(`اسم الأستاذ: ${teacherName}`, margin, yPos);
     pdf.text(`التاريخ : ${currentDate}`, pageWidth - margin - 50, yPos);
@@ -487,10 +538,10 @@ export class PedagogicalDocsComponent implements OnInit {
     pdf.text(`مذكرة رقم: ${this.generatedLessonPlan.memoNumber || '___________'}`, margin, yPos);
     yPos += 7;
 
-    pdf.text(`المجال المفاهمي (الميدان): ${this.generatedLessonPlan.conceptualField}`, margin, yPos);
+    pdf.text(`المجال المفاهيمي (الميدان): ${this.generatedLessonPlan.conceptualField}`, margin, yPos);
     yPos += 7;
 
-    pdf.text(`الوحدة المفاهمية (المقطع): ${this.generatedLessonPlan.conceptualUnit}`, margin, yPos);
+    pdf.text(`الوحدة المفاهيمية (المقطع): ${this.generatedLessonPlan.conceptualUnit}`, margin, yPos);
     yPos += 10;
 
     // الهدف
@@ -514,14 +565,14 @@ export class PedagogicalDocsComponent implements OnInit {
       yPos += activityLines.length * 7 + 10;
     }
 
-    // الجدول
+    // الجدول - تخصيص الأنماط حسب نمط الطباعة المختار
     const tableHeaders = ['الوقت', 'مرحله الدرس', 'السير المنهجي والاستراتيجيات المتبعة', 'الاستراتيجية', 'الموارد المطلوبة', 'ملاحظات'];
     const tableData: any[] = [];
 
     if (this.generatedLessonPlan.stages && this.generatedLessonPlan.stages.length > 0) {
       this.generatedLessonPlan.stages.forEach((stage: any) => {
         tableData.push([
-          stage.time || 'دقيقة',
+          stage.time || '',
           stage.stage || '',
           stage.methodologicalApproach || '',
           stage.strategy || '',
@@ -531,6 +582,10 @@ export class PedagogicalDocsComponent implements OnInit {
       });
     }
 
+    // تحديد حجم الخط حسب نمط الطباعة
+    const fontSize = this.printStyle === 'detailed' ? 7 : 8;
+    const cellPadding = this.printStyle === 'detailed' ? 1.5 : 2;
+
     // إضافة الجدول باستخدام autoTable
     (pdf as any).autoTable({
       head: [tableHeaders],
@@ -538,9 +593,9 @@ export class PedagogicalDocsComponent implements OnInit {
       startY: yPos,
       styles: {
         font: 'helvetica',
-        fontSize: 8,
+        fontSize: fontSize,
         textColor: [0, 0, 0],
-        cellPadding: 2,
+        cellPadding: cellPadding,
         halign: 'right',
       },
       headStyles: {
@@ -548,6 +603,7 @@ export class PedagogicalDocsComponent implements OnInit {
         textColor: [255, 255, 255],
         fontStyle: 'bold',
         halign: 'right',
+        fontSize: fontSize + 1,
       },
       columnStyles: {
         0: { cellWidth: 18, halign: 'center' }, // الوقت

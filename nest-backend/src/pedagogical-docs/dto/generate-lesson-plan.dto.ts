@@ -20,7 +20,7 @@ export class GenerateLessonPlanDto {
 
   @IsString()
   @IsNotEmpty()
-  lessonTitle: string; // عنوان الدرس
+  learningObjectives: string; // الأهداف التعلمية
 
   @IsString()
   @IsNotEmpty()
@@ -58,6 +58,7 @@ export class GenerateLessonPlanResponseDto {
   conceptualField: string;
   conceptualUnit: string;
   objective: string;
+  learningObjectives?: string;
   currentActivity?: string;
   stages: LessonPlanStage[];
 }
