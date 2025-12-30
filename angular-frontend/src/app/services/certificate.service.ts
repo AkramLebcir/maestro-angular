@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { ApiService } from './api.service';
 
 export interface CertificateTemplate {
@@ -35,6 +35,9 @@ export interface CertificateIssueResponse {
   providedIn: 'root',
 })
 export class CertificateService {
+  private certificateIssuedSubject = new Subject<void>();
+  public certificateIssued$ = this.certificateIssuedSubject.asObservable();
+
   constructor(private api: ApiService) {}
 
   getTemplates(): Observable<CertificateTemplate[]> {
@@ -50,6 +53,10 @@ export class CertificateService {
 
   issueCertificate(payload: IssueCertificatePayload): Observable<CertificateIssueResponse> {
     return this.api.post<CertificateIssueResponse>('/certificates', payload);
+  }
+
+  notifyCertificateIssued(): void {
+    this.certificateIssuedSubject.next();
   }
 }
 

@@ -190,7 +190,7 @@ export class ReportGeneratorComponent implements OnInit {
       return;
     }
 
-    const student = this.students.find(s => s.id == this.selectedStudentId);
+    const student = this.selectedStudent;
     const studentName = student ? `${student.firstName} ${student.lastName}` : this.translate('report.student');
 
     // Translate the reason for use in the template
@@ -234,11 +234,25 @@ export class ReportGeneratorComponent implements OnInit {
   }
 
   get selectedStudent() {
-    return this.students.find(s => s.id == this.selectedStudentId);
+    if (!this.selectedStudentId) {
+      return undefined;
+    }
+    // Ensure comparison works with both number and string types
+    const studentId = typeof this.selectedStudentId === 'string' 
+      ? Number(this.selectedStudentId) 
+      : this.selectedStudentId;
+    return this.students.find(s => s.id === studentId);
   }
 
   get selectedClass() {
-    return this.classes.find(c => c.id == this.selectedClassId);
+    if (!this.selectedClassId) {
+      return undefined;
+    }
+    // Ensure comparison works with both number and string types
+    const classId = typeof this.selectedClassId === 'string' 
+      ? Number(this.selectedClassId) 
+      : this.selectedClassId;
+    return this.classes.find(c => c.id === classId);
   }
 
   async saveAndPrint() {
@@ -254,11 +268,25 @@ export class ReportGeneratorComponent implements OnInit {
     // Convert translated reason back to Arabic for backend storage
     const originalReason = this.reportReason ? this.getOriginalReason(this.reportReason) : undefined;
 
+    // Format date as ISO string
+    const dateString = this.reportDate instanceof Date 
+      ? this.reportDate.toISOString().split('T')[0]
+      : new Date(this.reportDate).toISOString().split('T')[0];
+
     // 1. Save to Backend
+    // Ensure studentId and classId are numbers
+    const studentId = typeof this.selectedStudentId === 'string' 
+      ? Number(this.selectedStudentId) 
+      : this.selectedStudentId;
+    const classId = this.selectedClassId 
+      ? (typeof this.selectedClassId === 'string' ? Number(this.selectedClassId) : this.selectedClassId)
+      : undefined;
+
     const payload = {
-      studentId: this.selectedStudentId,
-      classId: this.selectedClassId,
-      date: this.reportDate,
+      studentId: studentId,
+      classId: classId,
+      behaviorId: 0, // Default behavior ID for reports
+      date: dateString,
       type: this.reportType,
       reason: originalReason,
       description: this.generatedContent + (this.additionalDetails ? `\n\n${this.translate('report.additionalNotes')}: ${this.additionalDetails}` : ''),
@@ -271,8 +299,15 @@ export class ReportGeneratorComponent implements OnInit {
         await this.generatePdf();
         this.isSubmitting = false;
       },
-      error: () => {
-        this.errorMessage = this.translate('report.error');
+      error: (error) => {
+        console.error('Error saving report:', error);
+        const errorMessage = error?.error?.message || 
+                           (error?.error?.error && Array.isArray(error.error.error) 
+                             ? error.error.error.join(', ') 
+                             : error.error?.error) ||
+                           error?.message || 
+                           this.translate('report.error');
+        this.errorMessage = errorMessage;
         this.isSubmitting = false;
       }
     });

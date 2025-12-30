@@ -18,3 +18,7 @@ export interface Student {
   notes?: string;
   photo?: string; // URL to student photo
 }
+
+
+
+

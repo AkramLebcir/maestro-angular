@@ -3,3 +3,7 @@ import { CreateBehaviorDto } from './create-behavior.dto';
 
 export class UpdateBehaviorDto extends PartialType(CreateBehaviorDto) {}
 
+
+
+
+

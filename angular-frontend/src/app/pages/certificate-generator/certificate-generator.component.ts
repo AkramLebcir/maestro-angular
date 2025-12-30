@@ -161,6 +161,10 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
       });
   }
 
+  onStudentChange(): void {
+    this.updateMainTextPlaceholder();
+  }
+
   selectTemplate(templateId: number): void {
     const template = this.availableTemplates.find((tpl) => tpl.id === templateId);
     if (!template) {
@@ -180,7 +184,7 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
   }
 
   private getTranslatedMainText(templateName: string, defaultText: string): string {
-    const student = this.students.find((item) => item.id === this.selectedStudentId);
+    const student = this.selectedStudent;
     const studentName = student ? `${student.firstName} ${student.lastName ?? ''}`.trim() : this.translate('certificate.student');
     
     // Check template type and return translated text
@@ -209,7 +213,7 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
   }
 
   private replaceStudentPlaceholder(text: string): string {
-    const student = this.students.find((item) => item.id === this.selectedStudentId);
+    const student = this.selectedStudent;
     const fullName = student ? `${student.firstName} ${student.lastName ?? ''}`.trim() : this.translate('certificate.student');
     return text.replace(/{{student}}/g, fullName);
   }
@@ -249,6 +253,8 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
       next: () => {
         this.message = this.translate('certificate.success');
         this.isSubmitting = false;
+        // إشعار المكونات الأخرى بإصدار شهادة جديدة
+        this.certificateService.notifyCertificateIssued();
       },
       error: () => {
         this.errorMessage = this.translate('certificate.error');
@@ -346,6 +352,13 @@ export class CertificateGeneratorComponent implements OnInit, OnDestroy {
   }
 
   get selectedStudent() {
-    return this.students.find((item) => item.id === this.selectedStudentId);
+    if (!this.selectedStudentId) {
+      return undefined;
+    }
+    // Ensure comparison works with both number and string types
+    const studentId = typeof this.selectedStudentId === 'string' 
+      ? Number(this.selectedStudentId) 
+      : this.selectedStudentId;
+    return this.students.find((item) => item.id === studentId);
   }
 }

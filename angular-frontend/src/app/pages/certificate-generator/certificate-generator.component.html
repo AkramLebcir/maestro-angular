@@ -18,9 +18,10 @@
 
       <div class="form-group">
         <label class="text-gray-700 dark:text-gray-300">{{ translate('certificate.student') }}</label>
-        <select [(ngModel)]="selectedStudentId"
+        <select [(ngModel)]="selectedStudentId" (ngModelChange)="onStudentChange()"
           class="border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
-          <option *ngFor="let student of students" [value]="student.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
+          <option [ngValue]="undefined" disabled class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">{{ translate('certificate.selectStudent') || 'اختر التلميذ' }}</option>
+          <option *ngFor="let student of students" [ngValue]="student.id" class="bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200">
             {{ student.firstName }} {{ student.lastName ?? '' }}
           </option>
         </select>

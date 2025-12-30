@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ApiService } from '../../services/api.service';
 import { CertificateService } from '../../services/certificate.service';
@@ -51,7 +51,7 @@ interface CertificateHistory {
   templateUrl: './achievements-penalties.component.html',
   styleUrls: ['./achievements-penalties.component.css'],
 })
-export class AchievementsPenaltiesComponent implements OnInit {
+export class AchievementsPenaltiesComponent implements OnInit, OnDestroy {
   @ViewChild('penaltiesList', { static: false }) penaltiesListRef?: ElementRef;
   
   activeTab: 'achievements' | 'penalties' = 'achievements';
@@ -71,6 +71,7 @@ export class AchievementsPenaltiesComponent implements OnInit {
   isExportingCertificatesPdf = false;
 
   errorMessage = '';
+  private certificateIssuedSubscription?: any;
 
   constructor(
     private apiService: ApiService,
@@ -81,6 +82,14 @@ export class AchievementsPenaltiesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadClasses();
+    
+    // الاشتراك في إشعارات إصدار الشهادات الجديدة
+    this.certificateIssuedSubscription = this.certificateService.certificateIssued$.subscribe(() => {
+      // إعادة تحميل قائمة الشهادات عند إصدار شهادة جديدة
+      if (this.activeTab === 'achievements' && this.selectedClassId) {
+        this.loadCertificateHistory();
+      }
+    });
     
     // دعم الفتح من صفحة التقارير مع التصدير التلقائي
     this.route.queryParams.subscribe((params) => {
@@ -101,6 +110,12 @@ export class AchievementsPenaltiesComponent implements OnInit {
         }, 500);
       }
     });
+  }
+
+  ngOnDestroy(): void {
+    if (this.certificateIssuedSubscription) {
+      this.certificateIssuedSubscription.unsubscribe();
+    }
   }
 
   translate(key: string): string {

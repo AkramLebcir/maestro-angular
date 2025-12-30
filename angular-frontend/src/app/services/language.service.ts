@@ -12458,6 +12458,15 @@ export class LanguageService {
         'DE': 'Schüler auswählen',
         'TR': 'Öğrenci seç'
       },
+      'report.student': {
+        'AR': 'التلميذ:',
+        'FR': 'Élève:',
+        'EN': 'Student:',
+        'ES': 'Estudiante:',
+        'IT': 'Studente:',
+        'DE': 'Schüler:',
+        'TR': 'Öğrenci:'
+      },
       'report.type': {
         'AR': 'نوع التقرير',
         'FR': 'Type de rapport',

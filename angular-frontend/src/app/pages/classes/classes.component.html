@@ -35,23 +35,58 @@
       <table class="w-full border-collapse">
         <thead>
           <tr class="bg-gray-100 dark:bg-gray-800 border-b-2 border-gray-300 dark:border-gray-600">
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.name') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.level') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.studentCount') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.lab') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.weeklySessions') }}</th>
-            <th class="text-right py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.actions') }}</th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">
+              <button
+                (click)="sortClasses('name')"
+                class="flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer w-full justify-center">
+                <span>{{ translate('classes.name') }}</span>
+                <span class="text-sm">{{ getSortIcon('name') }}</span>
+              </button>
+            </th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">
+              <button
+                (click)="sortClasses('level')"
+                class="flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer w-full justify-center">
+                <span>{{ translate('classes.level') }}</span>
+                <span class="text-sm">{{ getSortIcon('level') }}</span>
+              </button>
+            </th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">
+              <button
+                (click)="sortClasses('studentCount')"
+                class="flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer w-full justify-center">
+                <span>{{ translate('classes.studentCount') }}</span>
+                <span class="text-sm">{{ getSortIcon('studentCount') }}</span>
+              </button>
+            </th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">
+              <button
+                (click)="sortClasses('lab')"
+                class="flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer w-full justify-center">
+                <span>{{ translate('classes.lab') }}</span>
+                <span class="text-sm">{{ getSortIcon('lab') }}</span>
+              </button>
+            </th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">
+              <button
+                (click)="sortClasses('weeklySessions')"
+                class="flex items-center gap-2 hover:text-blue-600 transition-colors cursor-pointer w-full justify-center">
+                <span>{{ translate('classes.weeklySessions') }}</span>
+                <span class="text-sm">{{ getSortIcon('weeklySessions') }}</span>
+              </button>
+            </th>
+            <th class="text-center py-3 px-4 font-semibold text-gray-700 dark:text-gray-300">{{ translate('classes.actions') }}</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let classItem of classes" class="border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-900">
-            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.name }}</td>
-            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ getLevelLabel(classItem.level) }}</td>
-            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.studentCount }}</td>
-            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ getLabName(classItem.labId) }}</td>
-            <td class="py-3 px-4 text-gray-800 dark:text-gray-200">{{ classItem.weeklySessions }}</td>
-            <td class="py-3 px-4">
-              <div class="flex items-center gap-2">
+            <td class="py-3 px-4 text-center text-gray-800 dark:text-gray-200">{{ classItem.name }}</td>
+            <td class="py-3 px-4 text-center text-gray-800 dark:text-gray-200">{{ getLevelLabel(classItem.level) }}</td>
+            <td class="py-3 px-4 text-center text-gray-800 dark:text-gray-200">{{ classItem.studentCount }}</td>
+            <td class="py-3 px-4 text-center text-gray-800 dark:text-gray-200">{{ getLabName(classItem.labId) }}</td>
+            <td class="py-3 px-4 text-center text-gray-800 dark:text-gray-200">{{ classItem.weeklySessions }}</td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center gap-2">
                 <button 
                   (click)="openClassReportModal(classItem)"
                   class="p-2 text-green-600 hover:bg-green-50 dark:bg-green-900/20 rounded transition"
