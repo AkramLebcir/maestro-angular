@@ -7,3 +7,4 @@ export class UpdateBehaviorDto extends PartialType(CreateBehaviorDto) {}
 
 
 
+

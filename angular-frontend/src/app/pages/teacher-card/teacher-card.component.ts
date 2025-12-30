@@ -3,6 +3,7 @@ import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
 import { AuthService } from '../../services/auth.service';
 import { LanguageService } from '../../services/language.service';
+import { ApiService } from '../../services/api.service';
 
 interface TeacherCardForm {
   // معلومات أعلى الصفحة
@@ -149,7 +150,8 @@ export class TeacherCardComponent implements OnInit {
 
   constructor(
     private authService: AuthService,
-    public languageService: LanguageService
+    public languageService: LanguageService,
+    private apiService: ApiService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -166,21 +168,55 @@ export class TeacherCardComponent implements OnInit {
   }
 
   private loadCard(): void {
+    // محاولة جلب البيانات من الـ API أولاً
+    this.apiService.get<TeacherCardForm | null>('/users/me/teacher-card').subscribe({
+      next: (data) => {
+        if (data) {
+          this.teacherCard = { ...this.teacherCard, ...data };
+          // حفظ في localStorage كنسخة احتياطية
+          localStorage.setItem(this.getStorageKey(), JSON.stringify(data));
+        } else {
+          // إذا لم تكن هناك بيانات في الـ API، جرب localStorage
+          this.loadFromLocalStorage();
+        }
+      },
+      error: (error) => {
+        console.error('Error loading teacher card from API', error);
+        // في حالة الخطأ، جرب localStorage
+        this.loadFromLocalStorage();
+      }
+    });
+  }
+
+  private loadFromLocalStorage(): void {
     const stored = localStorage.getItem(this.getStorageKey());
     if (stored) {
       try {
         this.teacherCard = { ...this.teacherCard, ...JSON.parse(stored) };
       } catch (error) {
-        console.error('Error parsing teacher card data', error);
+        console.error('Error parsing teacher card data from localStorage', error);
       }
     }
   }
 
   saveCard(): void {
-    // حالياً نخزن البيانات محلياً فقط (يمكن ربطها بالـ backend لاحقاً)
-    localStorage.setItem(this.getStorageKey(), JSON.stringify(this.teacherCard));
-    this.isSaved = true;
-    setTimeout(() => (this.isSaved = false), 3000);
+    // حفظ البيانات في الـ API
+    this.apiService.patch('/users/me/teacher-card', this.teacherCard).subscribe({
+      next: () => {
+        // حفظ في localStorage كنسخة احتياطية
+        localStorage.setItem(this.getStorageKey(), JSON.stringify(this.teacherCard));
+        this.isSaved = true;
+        setTimeout(() => (this.isSaved = false), 3000);
+      },
+      error: (error) => {
+        console.error('Error saving teacher card to API', error);
+        // في حالة الخطأ، احفظ محلياً على الأقل
+        localStorage.setItem(this.getStorageKey(), JSON.stringify(this.teacherCard));
+        this.isSaved = true;
+        setTimeout(() => (this.isSaved = false), 3000);
+        alert('تم حفظ البيانات محلياً. يرجى التحقق من الاتصال بالإنترنت.');
+      }
+    });
   }
 
   async downloadPdf(): Promise<void> {

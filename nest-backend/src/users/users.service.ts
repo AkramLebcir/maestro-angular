@@ -165,6 +165,21 @@ export class UsersService {
       throw new BadRequestException('Username already in use');
     }
   }
+
+  async getTeacherCard(userId: number): Promise<Record<string, unknown> | null> {
+    const user = await this.findOne(userId);
+    return (user.profile?.teacherCard as Record<string, unknown>) || null;
+  }
+
+  async saveTeacherCard(userId: number, teacherCardData: Record<string, unknown>): Promise<User> {
+    const user = await this.findOne(userId);
+    if (!user.profile) {
+      user.profile = {};
+    }
+    user.profile.teacherCard = teacherCardData;
+    await this.usersRepository.save(user);
+    return this.findOne(userId);
+  }
 }
 
 
