@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { jsPDF } from 'jspdf';
@@ -95,7 +95,7 @@ export interface Student {
   templateUrl: './classes.component.html',
   styleUrls: ['./classes.component.css']
 })
-export class ClassesComponent implements OnInit {
+export class ClassesComponent implements OnInit, OnDestroy {
   @ViewChild('classReportContent') classReportContent!: ElementRef;
   
   classes: Class[] = [];
@@ -203,6 +203,7 @@ export class ClassesComponent implements OnInit {
 
   // Import functionality
   isImporting = false;
+  private excelWorker: Worker | null = null;
 
   // Sorting functionality
   sortColumn: string = '';
@@ -219,24 +220,90 @@ export class ClassesComponent implements OnInit {
 
   // Import functionality
   onFileSelected(event: any): void {
-    const file = event.target.files[0];
+    const file: File = event.target.files[0];
     if (file) {
-      this.importClassesFromExcel(file);
+      // Validate file type
+      const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+      if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+        alert('يرجى اختيار ملف Excel صالح (.xlsx أو .xls)');
+        event.target.value = '';
+        return;
+      }
+
+      // Validate file size (max 10MB)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      if (file.size > maxSize) {
+        alert('حجم الملف كبير جداً. الحد الأقصى هو 10 ميجابايت');
+        event.target.value = '';
+        return;
+      }
+
+      this.isImporting = true;
+      
+      // إرسال الملف إلى NestJS باستخدام apiService
+      this.apiService.importDigitalization(file).subscribe({
+        next: (response) => {
+          this.isImporting = false;
+          console.log('تمت المعالجة في السرفر بنجاح', response);
+          const message = `تم استيراد ${response.importedCount} تلميذ بنجاح${response.createdClasses > 0 ? ` وتم إنشاء ${response.createdClasses} قسم جديد` : ''}`;
+          alert(message);
+          // تحديث الواجهة بالبيانات المستلمة
+          this.loadClasses();
+          event.target.value = '';
+        },
+        error: (err) => {
+          this.isImporting = false;
+          console.error('خطأ في الرفع', err);
+          const errorMessage = err?.error?.message || err?.message || 'حدث خطأ أثناء استيراد البيانات';
+          alert(errorMessage);
+          event.target.value = '';
+        }
+      });
     }
   }
 
   private importClassesFromExcel(file: File): void {
+    // Validate file type
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+      alert('يرجى اختيار ملف Excel صالح (.xlsx أو .xls)');
+      return;
+    }
+
+    // Validate file size (e.g., max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى هو 10 ميجابايت');
+      return;
+    }
+
     this.isImporting = true;
-    // TODO: Implement Excel import logic
-    // This should parse the Excel file and create classes from the data
+    this.currentFile = file;
     console.log('Importing classes from:', file.name);
 
-    // Simulate import process
-    setTimeout(() => {
-      this.isImporting = false;
-      alert('تم استيراد الأقسام بنجاح');
-      this.loadClasses();
-    }, 2000);
+    // استخدام Worker إذا كان متاحاً
+    if (this.excelWorker) {
+      // قراءة الملف كـ ArrayBuffer وإرساله إلى Worker
+      const reader = new FileReader();
+      reader.onload = (e: any) => {
+        const arrayBuffer = e.target.result;
+        this.excelWorker?.postMessage({
+          type: 'process',
+          fileData: arrayBuffer,
+          fileName: file.name
+        });
+      };
+      reader.onerror = () => {
+        this.isImporting = false;
+        alert('حدث خطأ أثناء قراءة الملف');
+        this.currentFile = null;
+      };
+      reader.readAsArrayBuffer(file);
+    } else {
+      // Fallback: معالجة مباشرة بدون Worker
+      console.warn('Worker not available, using direct processing');
+      this.sendFileToAPI();
+    }
   }
 
   // Sorting functionality
@@ -299,6 +366,88 @@ export class ClassesComponent implements OnInit {
   ngOnInit(): void {
     this.loadClasses();
     this.loadLabs();
+    this.initializeWorker();
+  }
+
+  ngOnDestroy(): void {
+    if (this.excelWorker) {
+      this.excelWorker.terminate();
+      this.excelWorker = null;
+    }
+  }
+
+  private initializeWorker(): void {
+    // Worker initialization disabled - webpack configuration needed for import.meta.url
+    // Using direct processing fallback instead
+    // TODO: Configure webpack to properly handle workers with import.meta.url
+    this.excelWorker = null;
+    
+    // Original worker initialization code (commented out until webpack is configured):
+    /*
+    if (typeof Worker !== 'undefined') {
+      try {
+        // إنشاء Worker - استخدام import.meta.url متوافق مع webpack 5
+        // ملاحظة: بدون .ts extension لأن webpack سيتولى البناء
+        this.excelWorker = new Worker(
+          new URL('../../workers/excel.worker', import.meta.url)
+        );
+        
+        // الاستماع لرسائل Worker
+        this.excelWorker.onmessage = ({ data }) => {
+          if (data.type === 'success') {
+            // تمت المعالجة بنجاح، الآن أرسل الملف إلى API
+            this.sendFileToAPI();
+          } else if (data.type === 'error') {
+            this.isImporting = false;
+            alert(data.error || 'حدث خطأ أثناء معالجة ملف Excel');
+            this.currentFile = null;
+          } else if (data.type === 'progress') {
+            // يمكن إضافة شريط تقدم هنا إذا لزم الأمر
+            console.log(`Progress: ${data.progress}%`);
+          }
+        };
+
+        this.excelWorker.onerror = (error) => {
+          console.error('Worker error:', error);
+          this.isImporting = false;
+          // Fallback to direct processing
+          if (this.currentFile) {
+            console.warn('Falling back to direct processing');
+            this.sendFileToAPI();
+          }
+        };
+      } catch (error) {
+        console.warn('Failed to initialize Worker, using direct processing:', error);
+        // Worker غير متاح، سيتم استخدام المعالجة المباشرة
+        this.excelWorker = null;
+      }
+    } else {
+      console.warn('Web Workers are not supported in this browser');
+    }
+    */
+  }
+
+  private currentFile: File | null = null;
+
+  private sendFileToAPI(): void {
+    if (!this.currentFile) return;
+
+    this.apiService.importDigitalization(this.currentFile).subscribe({
+      next: (result) => {
+        this.isImporting = false;
+        const message = `تم استيراد ${result.importedCount} تلميذ بنجاح${result.createdClasses > 0 ? ` وتم إنشاء ${result.createdClasses} قسم جديد` : ''}`;
+        alert(message);
+        this.loadClasses();
+        this.currentFile = null;
+      },
+      error: (error) => {
+        this.isImporting = false;
+        console.error('Error importing:', error);
+        const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء استيراد البيانات';
+        alert(errorMessage);
+        this.currentFile = null;
+      }
+    });
   }
 
   loadClasses(): void {

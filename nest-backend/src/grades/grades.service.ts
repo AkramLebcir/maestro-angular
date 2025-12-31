@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In, Not, IsNull } from 'typeorm';
+import * as ExcelJS from 'exceljs';
 import { Grade } from './grade.entity';
 import { Student } from '../students/student.entity';
 import { Class } from '../classes/class.entity';
@@ -330,5 +331,98 @@ export class GradesService {
       createdAt: grade.createdAt,
       updatedAt: grade.updatedAt,
     };
+  }
+
+  async importFromExcel(ownerId: number, file: Express.Multer.File): Promise<{
+    sheets: Array<{
+      sheetName: string;
+      rawData: any[][];
+    }>;
+  }> {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(file.buffer as any);
+
+      const sheetsInfo: Array<{
+        sheetName: string;
+        rawData: any[][];
+      }> = [];
+
+      for (const worksheet of workbook.worksheets) {
+        const sheetName = worksheet.name;
+        const rawData: any[][] = [];
+
+        // Convert worksheet to 2D array
+        worksheet.eachRow((row) => {
+          const rowData: any[] = [];
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            let value = cell.value;
+            if (value === null || value === undefined) {
+              value = '';
+            } else if (typeof value === 'object' && 'text' in value) {
+              value = value.text;
+            } else if (value instanceof Date) {
+              value = value.toISOString().split('T')[0];
+            }
+            rowData.push(value);
+          });
+          rawData.push(rowData);
+        });
+
+        if (rawData.length > 0) {
+          sheetsInfo.push({
+            sheetName,
+            rawData,
+          });
+        }
+      }
+
+      return { sheets: sheetsInfo };
+    } catch (error) {
+      console.error('Import Excel Error:', error);
+      throw new BadRequestException(
+        `فشل معالجة ملف Excel. يرجى التحقق من تنسيق الملف والمحاولة مرة أخرى. الخطأ: ${error.message || error}`
+      );
+    }
+  }
+
+  async exportToExcel(
+    ownerId: number,
+    classId: number,
+    excelData: any[][],
+  ): Promise<Buffer> {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('سجل الدرجات');
+
+      // Add rows
+      excelData.forEach(row => {
+        worksheet.addRow(row);
+      });
+
+      // Style header row
+      if (excelData.length > 0) {
+        worksheet.getRow(1).font = { bold: true };
+        worksheet.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE0E0E0' }
+        };
+      }
+
+      // Auto-fit columns
+      worksheet.columns.forEach(column => {
+        column.width = 15;
+      });
+
+      // Generate buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+      return Buffer.from(buffer);
+    } catch (error) {
+      console.error('Export Excel Error:', error);
+      throw new BadRequestException(
+        `فشل تصدير البيانات إلى Excel. الخطأ: ${error.message || error}`
+      );
+    }
   }
 }

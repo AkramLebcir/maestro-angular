@@ -180,4 +180,89 @@ export class ApiService {
       headers: this.getHeaders()
     });
   }
+
+  /**
+   * Import students from Excel file
+   */
+  importStudentsExcel(file: File): Observable<{
+    sheets: Array<{
+      sheetName: string;
+      detectedRow: number;
+      rawData: any[][];
+    }>;
+  }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return this.http.post<{
+      sheets: Array<{
+        sheetName: string;
+        detectedRow: number;
+        rawData: any[][];
+      }>;
+    }>(`${this.apiUrl}/students/import-excel`, formData, {
+      headers
+    });
+  }
+
+  /**
+   * Export students to Excel file
+   */
+  exportStudentsExcel(classId?: number, group?: number): Observable<Blob> {
+    let params = new HttpParams();
+    if (classId) {
+      params = params.set('classId', classId.toString());
+    }
+    if (group) {
+      params = params.set('group', group.toString());
+    }
+    return this.http.get(`${this.apiUrl}/students/export-excel`, {
+      params,
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
+  /**
+   * Import grades from Excel file
+   */
+  importGradesExcel(file: File): Observable<{
+    sheets: Array<{
+      sheetName: string;
+      rawData: any[][];
+    }>;
+  }> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return this.http.post<{
+      sheets: Array<{
+        sheetName: string;
+        rawData: any[][];
+      }>;
+    }>(`${this.apiUrl}/grades/import-excel`, formData, {
+      headers
+    });
+  }
+
+  /**
+   * Export grades to Excel file
+   */
+  exportGradesExcel(classId: number, excelData: any[][]): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/grades/export-excel`, {
+      classId,
+      excelData
+    }, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
 }

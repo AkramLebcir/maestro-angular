@@ -11,7 +11,7 @@ import { CreateClassDto } from './dto/create-class.dto';
 import { UpdateClassDto } from './dto/update-class.dto';
 import { ClassResponseDto } from './dto/class-response.dto';
 
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 
 @Injectable()
 export class ClassesService {
@@ -32,170 +32,382 @@ export class ClassesService {
 
   async importDigitalization(ownerId: number, file: Express.Multer.File): Promise<{ importedCount: number; createdClasses: number }> {
     try {
-      // Use cellDates: true to let xlsx handle date parsing
-      const workbook = XLSX.read(file.buffer, { type: 'buffer', cellDates: true });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      // Use raw: false to get formatted values
-      const data = XLSX.utils.sheet_to_json(sheet, { raw: false, defval: null });
+      // Load Excel file using exceljs
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(file.buffer as any);
+      
+      const worksheet = workbook.worksheets[0];
+      if (!worksheet) {
+        throw new BadRequestException('لا توجد أوراق عمل في ملف Excel');
+      }
+      
+      // Convert worksheet to JSON array
+      const data: any[] = [];
+      const headers: string[] = [];
+      
+      // Get headers from first row
+      worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell, colNumber) => {
+        headers[colNumber - 1] = cell.value ? String(cell.value).trim() : '';
+      });
+      
+      // Convert rows to objects
+      worksheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header row
+        
+        const rowData: any = {};
+        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+          const header = headers[colNumber - 1];
+          if (header) {
+            let value = cell.value;
+            // Handle different cell value types
+            if (value === null || value === undefined) {
+              rowData[header] = null;
+            } else if (typeof value === 'object' && 'text' in value) {
+              // Rich text
+              rowData[header] = value.text;
+            } else if (value instanceof Date) {
+              // Date value
+              rowData[header] = value;
+            } else {
+              // Regular value
+              rowData[header] = value;
+            }
+          }
+        });
+        
+        // Only add row if it has at least one non-empty value
+        if (Object.keys(rowData).length > 0 && Object.values(rowData).some(v => v !== null && v !== undefined && v !== '')) {
+          data.push(rowData);
+        }
+      });
 
       // Debug: Log sheet info
       console.log('Total rows in sheet:', data.length);
       if (data.length > 0) {
         console.log('First row keys:', Object.keys(data[0]));
         console.log('First row sample:', JSON.stringify(data[0], null, 2));
-        console.log('All column names in first row:', Object.keys(data[0]));
       } else {
         console.log('WARNING: No data rows found in Excel file!');
+        throw new BadRequestException('لا توجد بيانات في ملف Excel');
       }
 
       let createdClasses = 0;
       let importedCount = 0;
+      let skippedCount = 0;
+      const errors: string[] = [];
 
       const classMap = new Map<string, Class>();
+      const processedIdNumbers = new Set<string>(); // Track idNumbers in current import to prevent duplicates
 
-      // Helper to normalize strings
-      const normalize = (str: any) => (str ? String(str).trim() : '');
+      // Helper to normalize strings and handle Arabic
+      const normalize = (str: any): string => {
+        if (str === null || str === undefined) return '';
+        return String(str).trim();
+      };
 
-      for (const row of data) {
-        // Skip empty rows
-        if (!row) continue;
+      // Helper function to find column value with multiple possible names
+      const findColumn = (row: any, possibleNames: string[]): any => {
+        for (const name of possibleNames) {
+          if (row[name] !== undefined && row[name] !== null && row[name] !== '') {
+            return row[name];
+          }
+        }
+        return null;
+      };
 
-        // Try different possible column name variations
-        const className = normalize(row['الفوج التربوي']) || normalize(row['الفوج']) || normalize((row as any)['الفوج التربوي']);
-        if (!className) {
-          console.log('Skipping row - no class name found:', Object.keys(row));
-          continue;
+      // Helper function to parse date with multiple formats
+      const parseDate = (dateValue: any): Date | null => {
+        if (!dateValue) return null;
+        
+        // If it's already a Date object
+        if (dateValue instanceof Date) {
+          // Validate the date
+          if (!isNaN(dateValue.getTime())) {
+            return dateValue;
+          }
+          return null;
         }
 
-        let classEntity = classMap.get(className);
-        if (!classEntity) {
-          // Check database
-          classEntity = await this.classRepository.findOne({
-            where: { name: className, ownerId },
+        const dateStr = String(dateValue).trim();
+        if (!dateStr) return null;
+
+        // Try Excel serial date format (number of days since 1900-01-01)
+        if (typeof dateValue === 'number') {
+          try {
+            // Excel date serial number
+            const excelEpoch = new Date(1899, 11, 30);
+            const date = new Date(excelEpoch.getTime() + dateValue * 24 * 60 * 60 * 1000);
+            if (!isNaN(date.getTime())) {
+              return date;
+            }
+          } catch (e) {
+            // Continue to other parsing methods
+          }
+        }
+
+        // Try DD/MM/YYYY or DD/MM/YY formats
+        const dateMatch = dateStr.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+        if (dateMatch) {
+          const day = parseInt(dateMatch[1], 10);
+          const month = parseInt(dateMatch[2], 10) - 1; // Months are 0-indexed
+          let year = parseInt(dateMatch[3], 10);
+          
+          // Handle 2-digit year
+          if (year < 100) {
+            // For students, assume 2000+ for years 00-49, 1900+ for 50-99
+            year += year < 50 ? 2000 : 1900;
+          }
+          
+          const date = new Date(year, month, day);
+          if (!isNaN(date.getTime()) && date.getDate() === day && date.getMonth() === month) {
+            return date;
+          }
+        }
+
+        // Try standard Date parser
+        const standardDate = new Date(dateStr);
+        if (!isNaN(standardDate.getTime())) {
+          return standardDate;
+        }
+
+        return null;
+      };
+
+      for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
+        const row = data[rowIndex];
+        
+        // Skip empty rows
+        if (!row || Object.keys(row).length === 0) continue;
+
+        try {
+          // Extract الفوج التربوي (Classroom/Section)
+          const className = normalize(
+            findColumn(row, [
+              'الفوج التربوي',
+              'الفوج',
+              'القسم',
+              'Classroom',
+              'Section',
+              'Class'
+            ])
+          );
+
+          if (!className) {
+            console.log(`Skipping row ${rowIndex + 1} - no class name found`);
+            skippedCount++;
+            continue;
+          }
+
+          // Find or create class
+          let classEntity = classMap.get(className);
+          if (!classEntity) {
+            // Check database
+            classEntity = await this.classRepository.findOne({
+              where: { name: className, ownerId },
+            });
+
+            if (!classEntity) {
+              // Determine level from class name
+              let level = '1st_year_high'; // Default
+              if (className.includes('أولى') || className.includes('1')) {
+                level = '1st_year_high';
+              } else if (className.includes('ثانية') || className.includes('2')) {
+                level = '2nd_year_high';
+              } else if (className.includes('ثالثة') || className.includes('3')) {
+                level = '3rd_year_high';
+              } else if (className.includes('رابعة') || className.includes('4')) {
+                level = '4th_year_middle';
+              }
+
+              // Create class
+              classEntity = this.classRepository.create({
+                name: className,
+                level: level as any,
+                subject: 'عام',
+                weeklySessions: 0,
+                ownerId,
+              });
+              classEntity = await this.classRepository.save(classEntity);
+              createdClasses++;
+              console.log(`Created new class: ${className}`);
+            }
+            classMap.set(className, classEntity);
+          }
+
+          // Extract رقم التعريف أو الكود (Identity Number)
+          let idNumberRaw = findColumn(row, [
+            'رقم التعريف',
+            'رقم التعريف أو الكود',
+            'الكود',
+            'رقم الهوية',
+            'رقم الهوية / الكود',
+            'ID',
+            'id',
+            'identity_number',
+            'code'
+          ]);
+
+          // Handle numeric ID (convert to string, handle scientific notation)
+          let idNumber: string;
+          if (typeof idNumberRaw === 'number') {
+            // Convert to string without scientific notation
+            // Use toFixed(0) to avoid scientific notation for large numbers
+            if (idNumberRaw > Number.MAX_SAFE_INTEGER) {
+              idNumber = idNumberRaw.toString();
+            } else {
+              idNumber = Math.floor(idNumberRaw).toString();
+            }
+          } else {
+            idNumber = normalize(idNumberRaw);
+          }
+
+          if (!idNumber || idNumber === '') {
+            console.log(`Skipping row ${rowIndex + 1} - no ID number found`);
+            skippedCount++;
+            continue;
+          }
+
+          // Check for duplicate idNumber in current import
+          if (processedIdNumbers.has(idNumber)) {
+            errors.push(`الصف ${rowIndex + 1}: رقم التعريف ${idNumber} مكرر في الملف`);
+            skippedCount++;
+            continue;
+          }
+
+          // Check if student already exists in database with this idNumber
+          const existingStudent = await this.studentRepository.findOne({
+            where: { idNumber, ownerId },
           });
 
-          if (!classEntity) {
-            // Determine level
-            let level = '1st_year_high'; // Default
-            if (className.includes('أولى')) level = '1st_year_high';
-            else if (className.includes('ثانية')) level = '2nd_year_high';
-            else if (className.includes('ثالثة')) level = '3rd_year_high';
-
-            // Create class
-            classEntity = this.classRepository.create({
-              name: className,
-              level: level as any, // Cast to match enum
-              subject: 'عام', // Default subject
-              weeklySessions: 0,
-              ownerId,
-            });
-            classEntity = await this.classRepository.save(classEntity);
-            createdClasses++;
+          if (existingStudent) {
+            // Update existing student
+            console.log(`Updating existing student with idNumber: ${idNumber}`);
           }
-          classMap.set(className, classEntity);
-        }
 
-        // Process Student - try different column name variations
-        let idNumber = row['رقم التعريف'] || (row as any)['رقم التعريف'] || row['ID'] || (row as any)['id'];
-        // Handle scientific notation or numeric ID
-        if (typeof idNumber === 'number') {
-            idNumber = String(idNumber);
-        } else {
-            idNumber = normalize(idNumber);
-        }
-        
-        if (!idNumber || idNumber === '') {
-          console.log('Skipping row - no ID number found');
-          continue; // Skip if no ID
-        }
+          // Extract اللقب (Last Name)
+          const lastName = normalize(
+            findColumn(row, [
+              'اللقب',
+              'Last Name',
+              'lastName',
+              'last_name',
+              'Nom',
+              'nom'
+            ])
+          );
 
-        // Registration Number (if exists, otherwise empty or use ID)
-        let studentRegNumber = row['رقم التسجيل'] || (row as any)['رقم التسجيل'] || row['Registration'] || (row as any)['registration'];
-        if (typeof studentRegNumber === 'number') {
-             studentRegNumber = String(studentRegNumber);
-        } else {
-             studentRegNumber = normalize(studentRegNumber);
-        }
+          // Extract الاسم (First Name)
+          const firstName = normalize(
+            findColumn(row, [
+              'الاسم',
+              'First Name',
+              'firstName',
+              'first_name',
+              'Prénom',
+              'prenom'
+            ])
+          );
 
-        const genderStr = normalize(row['الجنس'] || (row as any)['الجنس'] || row['Gender'] || (row as any)['gender']);
-        const gender: 'male' | 'female' = (genderStr === 'ذكر' || genderStr === 'male') ? 'male' : 'female';
-        
-        // Date parsing
-        const dobRaw = row['تاريخ الميلاد'] || (row as any)['تاريخ الميلاد'] || row['Date of Birth'] || (row as any)['dateOfBirth'];
-        let dateOfBirth: Date | null = null;
-        
-        if (dobRaw instanceof Date) {
-          dateOfBirth = dobRaw;
-        } else if (dobRaw) {
-          // Try manual parsing for DD/MM/YY or DD/MM/YYYY
-          const dobStr = String(dobRaw).trim();
-          // Regex for DD/MM/YYYY or DD/MM/YY or D/M/YY etc.
-          const dateMatch = dobStr.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+          if (!firstName || !lastName) {
+            errors.push(`الصف ${rowIndex + 1}: الاسم أو اللقب مفقود (رقم التعريف: ${idNumber})`);
+            skippedCount++;
+            continue;
+          }
+
+          // Extract الجنس (Gender)
+          const genderStr = normalize(
+            findColumn(row, [
+              'الجنس',
+              'Gender',
+              'gender',
+              'Sexe',
+              'sexe'
+            ])
+          );
           
-          if (dateMatch) {
-            const day = parseInt(dateMatch[1], 10);
-            const month = parseInt(dateMatch[2], 10) - 1; // Months are 0-indexed in JS
-            let year = parseInt(dateMatch[3], 10);
-            
-            // Handle 2 digit year
-            if (year < 100) {
-              // Pivot year 50: 50-99 -> 1950-1999, 00-49 -> 2000-2049
-              // But for students, likely 2000+
-              year += 2000; 
-            }
-            
-            dateOfBirth = new Date(year, month, day);
-          } else {
-            // Try standard parser
-            const d = new Date(dobStr);
-            if (!isNaN(d.getTime())) {
-              dateOfBirth = d;
+          let gender: 'male' | 'female' | null = null;
+          if (genderStr) {
+            const genderLower = genderStr.toLowerCase();
+            if (genderLower === 'ذكر' || genderLower === 'male' || genderLower === 'm' || genderLower === 'ذ') {
+              gender = 'male';
+            } else if (genderLower === 'أنثى' || genderLower === 'أنثى' || genderLower === 'female' || genderLower === 'f' || genderLower === 'أن') {
+              gender = 'female';
             }
           }
+
+          // Extract تاريخ الميلاد (Date of Birth)
+          const dobRaw = findColumn(row, [
+            'تاريخ الميلاد',
+            'Date of Birth',
+            'dateOfBirth',
+            'birth_date',
+            'Date de naissance',
+            'dateNaissance'
+          ]);
+          
+          const dateOfBirth = parseDate(dobRaw);
+
+          // Registration Number (optional)
+          let studentRegNumber = normalize(
+            findColumn(row, [
+              'رقم التسجيل',
+              'Registration',
+              'registration',
+              'studentNumber',
+              'student_number'
+            ])
+          );
+          if (typeof studentRegNumber === 'number') {
+            studentRegNumber = String(studentRegNumber);
+          }
+
+          // Prepare student data
+          const studentData: any = {
+            firstName: firstName,
+            lastName: lastName,
+            idNumber: idNumber,
+            studentNumber: studentRegNumber || idNumber,
+            gender: gender,
+            dateOfBirth: dateOfBirth,
+            classId: classEntity.id,
+            ownerId,
+            studentId: studentRegNumber || idNumber,
+          };
+
+          if (existingStudent) {
+            // Update existing student
+            Object.assign(existingStudent, studentData);
+            await this.studentRepository.save(existingStudent);
+          } else {
+            // Create new student
+            const newStudent = this.studentRepository.create(studentData);
+            await this.studentRepository.save(newStudent);
+          }
+
+          processedIdNumbers.add(idNumber);
+          importedCount++;
+        } catch (error) {
+          console.error(`Error processing row ${rowIndex + 1}:`, error);
+          errors.push(`الصف ${rowIndex + 1}: ${error.message || 'خطأ غير معروف'}`);
+          skippedCount++;
         }
-
-        // Check if student exists by Identity Number (idNumber)
-        let student = await this.studentRepository.findOne({
-          where: { idNumber, ownerId },
-        });
-
-        const firstName = normalize(row['الاسم'] || (row as any)['الاسم'] || row['First Name'] || (row as any)['firstName']);
-        const lastName = normalize(row['اللقب'] || (row as any)['اللقب'] || row['Last Name'] || (row as any)['lastName']);
-
-        if (!firstName || !lastName) {
-          console.log('Skipping row - missing name:', { firstName, lastName, idNumber });
-          continue;
-        }
-
-        const studentData = {
-          firstName: firstName,
-          lastName: lastName,
-          idNumber: idNumber,
-          studentNumber: studentRegNumber || idNumber, // Fallback to ID number if reg number missing
-          gender: gender,
-          dateOfBirth: dateOfBirth,
-          classId: classEntity.id,
-          ownerId,
-          studentId: studentRegNumber || idNumber, 
-        };
-
-        if (student) {
-          // Update
-          Object.assign(student, studentData);
-        } else {
-          // Create
-          student = this.studentRepository.create(studentData);
-        }
-
-        await this.studentRepository.save(student);
-        importedCount++;
       }
 
-      return { importedCount, createdClasses };
+      // Log summary
+      console.log(`Import completed: ${importedCount} imported, ${createdClasses} classes created, ${skippedCount} skipped`);
+      if (errors.length > 0) {
+        console.log('Errors:', errors);
+      }
+
+      return { 
+        importedCount, 
+        createdClasses
+      };
     } catch (error) {
       console.error('Import Digitalization Error:', error);
-      throw new BadRequestException('Failed to process Excel file. Please check the file format and try again. Error: ' + (error.message || error));
+      throw new BadRequestException(
+        `فشل معالجة ملف Excel. يرجى التحقق من تنسيق الملف والمحاولة مرة أخرى. الخطأ: ${error.message || error}`
+      );
     }
   }
 

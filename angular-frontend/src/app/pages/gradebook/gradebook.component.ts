@@ -4,7 +4,7 @@ import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { GradingSettingsService, GradingSettings, CustomAssessmentColumn, BaseColumnConfig, BaseColumnKey, DEFAULT_BASE_COLUMN_SETTINGS, RatingRangeConfig, GuidanceRangeConfig } from '../../services/grading-settings.service';
 import { VoiceGradingService } from '../../services/voice-grading.service';
-import * as XLSX from 'xlsx';
+import * as ExcelJS from 'exceljs';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
@@ -212,7 +212,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   gradeMonitoringErrors: any[] = [];
   isProcessing = false;
   // حفظ ملف Excel الأصلي لإضافته الملاحظات والإرشادات دون تغيير البنية
-  originalWorkbook: XLSX.WorkBook | null = null;
+  originalWorkbook: ExcelJS.Workbook | null = null;
   originalFileName: string = '';
   
   // Import options
@@ -1723,24 +1723,63 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   // Excel Import
-  onExcelFileSelected(event: Event): void {
+  async onExcelFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    const reader = new FileReader();
 
-    reader.onload = (e: any) => {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      
-      const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-      const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+    // Validate file type
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+      alert('يرجى اختيار ملف Excel صالح (.xlsx أو .xls)');
+      input.value = '';
+      return;
+    }
 
-      this.processExcelData(jsonData);
-    };
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى هو 10 ميجابايت');
+      input.value = '';
+      return;
+    }
 
-    reader.readAsArrayBuffer(file);
+    try {
+      // إرسال الملف إلى NestJS للمعالجة
+      this.apiService.importGradesExcel(file).subscribe({
+        next: (response) => {
+          console.log('تمت المعالجة في السرفر بنجاح', response);
+
+          if (!response.sheets || response.sheets.length === 0) {
+            alert('لا توجد أوراق عمل في ملف Excel');
+            input.value = '';
+            return;
+          }
+
+          // استخدام أول ورقة عمل
+          const firstSheet = response.sheets[0];
+          if (!firstSheet.rawData || firstSheet.rawData.length === 0) {
+            alert('لا توجد بيانات في ورقة العمل');
+            input.value = '';
+            return;
+          }
+
+          this.processExcelData(firstSheet.rawData);
+          input.value = '';
+        },
+        error: (err) => {
+          console.error('خطأ في الرفع', err);
+          const errorMessage = err?.error?.message || err?.message || 'حدث خطأ أثناء استيراد البيانات';
+          alert(errorMessage);
+          input.value = '';
+        }
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('حدث خطأ أثناء رفع الملف');
+      input.value = '';
+    }
   }
 
   processExcelData(data: any[]): void {
@@ -2519,7 +2558,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  exportToExcel(): void {
+  async exportToExcel(): Promise<void> {
     if (!this.selectedClass || this.students.length === 0) {
       alert('لا توجد بيانات للتصدير');
       return;
@@ -2572,16 +2611,36 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
        ]);
      });
 
-    // Create workbook and worksheet
-    const ws = XLSX.utils.aoa_to_sheet(excelData);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'سجل الدرجات');
+    // إرسال البيانات إلى NestJS للتصدير
+    if (!this.selectedClass) {
+      alert('يرجى اختيار قسم أولاً');
+      return;
+    }
 
-    // Generate filename
-    const fileName = `سجل_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.xlsx`;
+    try {
+      this.apiService.exportGradesExcel(this.selectedClass.id, excelData).subscribe({
+        next: (blob: Blob) => {
+          // Generate filename
+          const fileName = `سجل_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
-    // Save file
-    XLSX.writeFile(wb, fileName);
+          // Create download link
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting to Excel:', error);
+          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تصدير البيانات إلى Excel';
+          alert(errorMessage);
+        }
+      });
+    } catch (error) {
+      console.error('Error exporting to Excel:', error);
+      alert('حدث خطأ أثناء تصدير البيانات إلى Excel');
+    }
   }
 
   async exportReportToPDF(): Promise<void> {
@@ -3183,66 +3242,93 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isProcessing = false;
   }
 
-  onEnhancedExcelFileSelected(event: Event): void {
+  async onEnhancedExcelFileSelected(event: Event): Promise<void> {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
-    const reader = new FileReader();
+
+    // Validate file type
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+      alert('يرجى اختيار ملف Excel صالح (.xlsx أو .xls)');
+      input.value = '';
+      return;
+    }
+
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى هو 10 ميجابايت');
+      input.value = '';
+      return;
+    }
 
     this.isProcessing = true;
     this.processedSheetsData = [];
 
-    reader.onload = (e: any) => {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        // حفظ ملف Excel الأصلي واسمه لإضافته الملاحظات والإرشادات لاحقاً
-        this.originalWorkbook = workbook;
-        this.originalFileName = file.name;
-        
-        const sheetNames = workbook.SheetNames;
-        
-        // Process all sheets
-        let totalProcessed = 0;
-        const allProcessedData: any[] = [];
-        
-        for (let sheetIndex = 0; sheetIndex < sheetNames.length; sheetIndex++) {
-          const sheetName = sheetNames[sheetIndex];
-          const sheet = workbook.Sheets[sheetName];
-          const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    try {
+      // إرسال الملف إلى NestJS للمعالجة
+      this.apiService.importGradesExcel(file).subscribe({
+        next: (response) => {
+          console.log('تمت المعالجة في السرفر بنجاح', response);
+
+          if (!response.sheets || response.sheets.length === 0) {
+            alert('لا توجد أوراق عمل في ملف Excel');
+            input.value = '';
+            this.isProcessing = false;
+            return;
+          }
+
+          // حفظ اسم الملف الأصلي
+          this.originalFileName = file.name;
           
-          if (jsonData && jsonData.length > 0) {
-            const sheetProcessedData = this.processEnhancedExcelData(jsonData, sheetName);
-            if (sheetProcessedData && sheetProcessedData.length > 0) {
-              this.processedSheetsData.push({
-                sheetName: sheetName,
-                data: sheetProcessedData
-              });
-              allProcessedData.push(...sheetProcessedData);
-              totalProcessed += sheetProcessedData.length;
+          // Process all sheets
+          let totalProcessed = 0;
+          const allProcessedData: any[] = [];
+          
+          for (const sheetInfo of response.sheets) {
+            const sheetName = sheetInfo.sheetName;
+            const jsonData = sheetInfo.rawData;
+            
+            if (jsonData && jsonData.length > 0) {
+              const sheetProcessedData = this.processEnhancedExcelData(jsonData, sheetName);
+              if (sheetProcessedData && sheetProcessedData.length > 0) {
+                this.processedSheetsData.push({
+                  sheetName: sheetName,
+                  data: sheetProcessedData
+                });
+                allProcessedData.push(...sheetProcessedData);
+                totalProcessed += sheetProcessedData.length;
+              }
             }
           }
-        }
 
-        this.processedExcelData = allProcessedData;
-        this.isProcessing = false;
-        this.closeEnhancedImportModal();
-        
-        if (totalProcessed === 0) {
-          alert('لم يتم العثور على بيانات صحيحة في أي صفحة من صفحات الملف');
-        } else {
-          alert(`تم معالجة ${totalProcessed} سجل بنجاح من ${this.processedSheetsData.length} صفحة في ملف Excel`);
+          this.processedExcelData = allProcessedData;
+          this.isProcessing = false;
+          this.closeEnhancedImportModal();
+          
+          if (totalProcessed === 0) {
+            alert('لم يتم العثور على بيانات صحيحة في أي صفحة من صفحات الملف');
+          } else {
+            alert(`تم معالجة ${totalProcessed} سجل بنجاح من ${this.processedSheetsData.length} صفحة في ملف Excel`);
+          }
+          input.value = '';
+        },
+        error: (err) => {
+          console.error('خطأ في الرفع', err);
+          const errorMessage = err?.error?.message || err?.message || 'حدث خطأ أثناء استيراد البيانات';
+          alert(errorMessage);
+          this.isProcessing = false;
+          input.value = '';
         }
-      } catch (error) {
-        console.error('Error reading Excel file:', error);
-        alert('حدث خطأ أثناء قراءة ملف Excel');
-        this.isProcessing = false;
-      }
-    };
-
-    reader.readAsArrayBuffer(file);
+      });
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      alert('حدث خطأ أثناء رفع الملف');
+      this.isProcessing = false;
+      input.value = '';
+    }
   }
 
   processEnhancedExcelData(data: any[], sheetName?: string): any[] {
@@ -3784,7 +3870,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  downloadProcessedExcel(): void {
+  async downloadProcessedExcel(): Promise<void> {
     if (!this.processedExcelData || this.processedExcelData.length === 0) {
       alert('لا توجد بيانات للتحميل');
       return;
@@ -3797,18 +3883,25 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // Create workbook
-    const wb = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
 
     // Sheet 0: تقرير أخطاء النقاط (للاطلاع مباشرة بعد الاستيراد)
     const gradeErrors = this.getStudentsWithGradeErrors();
     if (gradeErrors && gradeErrors.length > 0) {
-      const errorSheetData: any[] = [
-        ['#', 'الاسم', 'الصفحة', 'العمود', 'القيمة', 'الخطأ']
-      ];
+      const errorSheet = workbook.addWorksheet('GradeErrors');
+      errorSheet.addRow(['#', 'الاسم', 'الصفحة', 'العمود', 'القيمة', 'الخطأ']);
+      
+      // Style header row
+      errorSheet.getRow(1).font = { bold: true };
+      errorSheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
 
       gradeErrors.forEach((student: any, studentIndex: number) => {
         student.errors.forEach((error: any) => {
-          errorSheetData.push([
+          errorSheet.addRow([
             studentIndex + 1,
             `${student.firstName || ''} ${student.lastName || ''}`.trim() || '-',
             student.sheetName || '-',
@@ -3818,9 +3911,6 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
           ]);
         });
       });
-
-      const errorsWs = XLSX.utils.aoa_to_sheet(errorSheetData);
-      XLSX.utils.book_append_sheet(wb, errorsWs, 'GradeErrors');
     }
 
     // Process each sheet (الصفحات الأصلية مع الدرجات الملوّنة)
@@ -3940,32 +4030,36 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         });
 
         // Create worksheet
-        const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-        // Apply color coding ONLY to grade columns (not name / id / obs / cons)
-        const firstGradeColIndex = 4; // 0:#,1:id,2:firstName,3:lastName,4:first grade column
-        const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
-
-        // Helper to convert column index (0-based) to Excel column letter (A, B, ..., AA, AB, ...)
-        const getColLetter = (colIndex: number): string => {
-          let dividend = colIndex + 1;
-          let colLetter = '';
-          while (dividend > 0) {
-            const modulo = (dividend - 1) % 26;
-            colLetter = String.fromCharCode(65 + modulo) + colLetter;
-            dividend = Math.floor((dividend - modulo) / 26);
-          }
-          return colLetter;
+        let cleanSheetName = sheetInfo.sheetName || `Sheet${sheetIndex + 1}`;
+        cleanSheetName = cleanSheetName.substring(0, 31); // Excel sheet name max length
+        cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_'); // Remove invalid characters
+        const ws = workbook.addWorksheet(cleanSheetName);
+        
+        // Add rows
+        excelData.forEach(row => {
+          ws.addRow(row);
+        });
+        
+        // Style header row
+        ws.getRow(1).font = { bold: true };
+        ws.getRow(1).fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFE0E0E0' }
         };
 
-        // Rows: 0 = header, so start from 1
-        for (let rowIndex = 1; rowIndex < excelData.length; rowIndex++) {
-          for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
-            const cellAddress = `${getColLetter(colIndex)}${rowIndex + 1}`;
-            const cell = ws[cellAddress];
-            if (!cell) continue;
+        // Apply color coding ONLY to grade columns (not name / id / obs / cons)
+        const firstGradeColIndex = 5; // 1-based: 1:#,2:id,3:firstName,4:lastName,5:first grade column
+        const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
 
-            const rawValue = cell.v;
+        // Rows: 1 = header, so start from 2
+        for (let rowIndex = 2; rowIndex <= excelData.length; rowIndex++) {
+          const row = ws.getRow(rowIndex);
+          for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
+            const cell = row.getCell(colIndex);
+            if (!cell || !cell.value) continue;
+
+            const rawValue = cell.value;
             const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
             const numValue = parseFloat(strValue);
 
@@ -3986,22 +4080,13 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
               fgColor = 'FFEB9C'; // orange
             }
 
-            cell.s = {
-              ...(cell.s || {}),
-              fill: {
-                ...(cell.s?.fill || {}),
-                fgColor: { rgb: fgColor }
-              }
+            cell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: fgColor }
             };
           }
         }
-        
-        // Clean sheet name (Excel sheet names have limitations)
-        let cleanSheetName = sheetInfo.sheetName || `Sheet${sheetIndex + 1}`;
-        cleanSheetName = cleanSheetName.substring(0, 31); // Excel sheet name max length
-        cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_'); // Remove invalid characters
-        
-        XLSX.utils.book_append_sheet(wb, ws, cleanSheetName);
       });
     } else {
       // Fallback: create a single sheet with all data
@@ -4104,30 +4189,32 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         excelData.push(rowData);
       });
 
-      const ws = XLSX.utils.aoa_to_sheet(excelData);
-
-      // Apply color coding ONLY to grade columns (not name / id / obs / cons)
-      const firstGradeColIndex = 4; // 0:#,1:id,2:firstName,3:lastName,4:first grade column
-      const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
-
-      const getColLetter = (colIndex: number): string => {
-        let dividend = colIndex + 1;
-        let colLetter = '';
-        while (dividend > 0) {
-          const modulo = (dividend - 1) % 26;
-          colLetter = String.fromCharCode(65 + modulo) + colLetter;
-          dividend = Math.floor((dividend - modulo) / 26);
-        }
-        return colLetter;
+      const ws = workbook.addWorksheet('النتائج المعالجة');
+      
+      // Add rows
+      excelData.forEach(row => {
+        ws.addRow(row);
+      });
+      
+      // Style header row
+      ws.getRow(1).font = { bold: true };
+      ws.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
       };
 
-      for (let rowIndex = 1; rowIndex < excelData.length; rowIndex++) {
-        for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
-          const cellAddress = `${getColLetter(colIndex)}${rowIndex + 1}`;
-          const cell = ws[cellAddress];
-          if (!cell) continue;
+      // Apply color coding ONLY to grade columns (not name / id / obs / cons)
+      const firstGradeColIndex = 5; // 1-based: 1:#,2:id,3:firstName,4:lastName,5:first grade column
+      const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
 
-          const rawValue = cell.v;
+      for (let rowIndex = 2; rowIndex <= excelData.length; rowIndex++) {
+        const row = ws.getRow(rowIndex);
+        for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
+          const cell = row.getCell(colIndex);
+          if (!cell || !cell.value) continue;
+
+          const rawValue = cell.value;
           const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
           const numValue = parseFloat(strValue);
 
@@ -4143,16 +4230,13 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             fgColor = 'FFEB9C'; // orange
           }
 
-          cell.s = {
-            ...(cell.s || {}),
-            fill: {
-              ...(cell.s?.fill || {}),
-              fgColor: { rgb: fgColor }
-            }
+          cell.fill = {
+            type: 'pattern',
+            pattern: 'solid',
+            fgColor: { argb: fgColor }
           };
         }
       }
-      XLSX.utils.book_append_sheet(wb, ws, 'النتائج المعالجة');
     }
 
     // Generate filename
@@ -4165,36 +4249,50 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
     // Save file
-    XLSX.writeFile(wb, fileName);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 
-  downloadProcessedExcelWithOriginalStructure(): void {
+  async downloadProcessedExcelWithOriginalStructure(): Promise<void> {
     if (!this.originalWorkbook) {
       alert('لا يوجد ملف Excel أصلي');
       return;
     }
 
     // إنشاء نسخة من الملف الأصلي
-    const wb = XLSX.utils.book_new();
+    const workbook = new ExcelJS.Workbook();
 
     // معالجة كل صفحة من الملف الأصلي
-    const sheetNames = this.originalWorkbook.SheetNames;
-    
-    for (let sheetIndex = 0; sheetIndex < sheetNames.length; sheetIndex++) {
-      const sheetName = sheetNames[sheetIndex];
-      const originalSheet = this.originalWorkbook.Sheets[sheetName];
+    for (const originalWorksheet of this.originalWorkbook.worksheets) {
+      const sheetName = originalWorksheet.name;
       
       // تحويل الصفحة إلى مصفوفة ثنائية الأبعاد مع الحفاظ على البنية
-      const sheetData: any[][] = XLSX.utils.sheet_to_json(originalSheet, { 
-        header: 1, 
-        defval: '',
-        raw: false 
+      const sheetData: any[][] = [];
+      originalWorksheet.eachRow((row) => {
+        const rowData: any[] = [];
+        row.eachCell({ includeEmpty: true }, (cell) => {
+          let value = cell.value;
+          if (value === null || value === undefined) {
+            value = '';
+          } else if (typeof value === 'object' && 'text' in value) {
+            value = value.text;
+          } else if (value instanceof Date) {
+            value = value.toISOString().split('T')[0];
+          }
+          rowData.push(value);
+        });
+        sheetData.push(rowData);
       });
 
       if (!sheetData || sheetData.length === 0) {
         // إذا كانت الصفحة فارغة، نضيفها كما هي
-        const ws = XLSX.utils.aoa_to_sheet(sheetData);
-        XLSX.utils.book_append_sheet(wb, ws, sheetName);
+        const ws = workbook.addWorksheet(sheetName);
         continue;
       }
 
@@ -4527,17 +4625,17 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       }
 
       // إنشاء ورقة عمل جديدة مع الحفاظ على البيانات الأصلية
-      const ws = XLSX.utils.aoa_to_sheet(sheetData);
-
-      // نسخ التنسيق من الملف الأصلي (إن أمكن)
-      // ملاحظة: XLSX لا يدعم نسخ التنسيق الكامل، لكننا نحافظ على البيانات
-      
       // تنظيف اسم الصفحة
-      let cleanSheetName = sheetName || `Sheet${sheetIndex + 1}`;
+      let cleanSheetName = sheetName || `Sheet${workbook.worksheets.length + 1}`;
       cleanSheetName = cleanSheetName.substring(0, 31);
       cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_');
       
-      XLSX.utils.book_append_sheet(wb, ws, cleanSheetName);
+      const ws = workbook.addWorksheet(cleanSheetName);
+      
+      // Add rows
+      sheetData.forEach(row => {
+        ws.addRow(row);
+      });
     }
 
     // إنشاء اسم الملف بناءً على الاسم الأصلي مع إضافة "مملوء"
@@ -4550,7 +4648,14 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // حفظ الملف
-    XLSX.writeFile(wb, fileName);
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName;
+    link.click();
+    window.URL.revokeObjectURL(url);
   }
 
   // Excel Analysis Functions

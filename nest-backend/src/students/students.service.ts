@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import * as ExcelJS from 'exceljs';
 import { Student } from './student.entity';
 import { Class } from '../classes/class.entity';
 import { CreateStudentDto } from './dto/create-student.dto';
@@ -302,6 +303,159 @@ export class StudentsService {
       createdAt: student.createdAt,
       updatedAt: student.updatedAt,
     };
+  }
+
+  async importFromExcel(ownerId: number, file: Express.Multer.File): Promise<{
+    sheets: Array<{
+      sheetName: string;
+      detectedRow: number;
+      rawData: any[][];
+    }>;
+  }> {
+    try {
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(file.buffer as any);
+
+      const sheetsInfo: Array<{
+        sheetName: string;
+        detectedRow: number;
+        rawData: any[][];
+      }> = [];
+
+      for (const worksheet of workbook.worksheets) {
+        const sheetName = worksheet.name;
+        const rawData: any[][] = [];
+
+        // Convert worksheet to 2D array
+        worksheet.eachRow((row, rowNumber) => {
+          const rowData: any[] = [];
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            let value = cell.value;
+            if (value === null || value === undefined) {
+              value = '';
+            } else if (typeof value === 'object' && 'text' in value) {
+              value = value.text;
+            } else if (value instanceof Date) {
+              value = value.toISOString().split('T')[0];
+            }
+            rowData.push(value);
+          });
+          rawData.push(rowData);
+        });
+
+        if (rawData.length === 0) continue;
+
+        const detectedRow = this.findHeaderRow(rawData);
+
+        sheetsInfo.push({
+          sheetName,
+          detectedRow,
+          rawData,
+        });
+      }
+
+      return { sheets: sheetsInfo };
+    } catch (error) {
+      console.error('Import Excel Error:', error);
+      throw new BadRequestException(
+        `فشل معالجة ملف Excel. يرجى التحقق من تنسيق الملف والمحاولة مرة أخرى. الخطأ: ${error.message || error}`
+      );
+    }
+  }
+
+  private findHeaderRow(rawData: any[][]): number {
+    const keyColumns = [
+      'رقم التعريف', 'رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف',
+      'الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'name',
+      'اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'last name', 'surname',
+      'تاريخ الميلاد', 'تاريخ الازدياد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'تاريخ_الازدياد', 'birth_date', 'date of birth', 'dob',
+      'مكان الميلاد', 'مكان الازدياد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'مكان_الازدياد', 'birth_place', 'place of birth',
+      'الجنس', 'gender', 'sex', 'sexe', 'النوع', 'الجنس/النوع',
+      'معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater'
+    ];
+
+    const maxRowsToCheck = Math.min(20, rawData.length);
+    for (let i = 0; i < maxRowsToCheck; i++) {
+      const row = rawData[i];
+      if (!row || row.length === 0) continue;
+
+      const rowStrings = row.map(cell => {
+        if (cell === null || cell === undefined) return '';
+        return String(cell).trim().toLowerCase();
+      });
+
+      let matchCount = 0;
+      for (const keyColumn of keyColumns) {
+        if (rowStrings.some(cell => cell === keyColumn.toLowerCase() || cell.includes(keyColumn.toLowerCase()))) {
+          matchCount++;
+        }
+      }
+
+      if (matchCount >= 2) {
+        return i;
+      }
+    }
+
+    return -1;
+  }
+
+  async exportToExcel(ownerId: number, filters?: {
+    classId?: number;
+    group?: number;
+  }): Promise<Buffer> {
+    try {
+      const students = await this.findAll(ownerId, filters);
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('التلاميذ');
+
+      // Prepare data
+      const dataToExport = students.map(student => ({
+        'رقم الهوية / الكود': student.idNumber || '',
+        'اللقب': student.lastName,
+        'الاسم': student.firstName,
+        'تاريخ الميلاد': student.dateOfBirth || '',
+        'مكان الميلاد': student.placeOfBirth || '',
+        'الجنس': student.gender === 'male' ? 'ذكر' : student.gender === 'female' ? 'أنثى' : '',
+        'معيد': student.isRepeater ? 'نعم' : 'لا',
+        'رقم التلميذ': student.studentId || '',
+        'القسم': student.class?.name || '',
+        'البريد الإلكتروني': student.email || '',
+        'رقم الطالب': student.studentNumber || '',
+        'ملاحظات عامة': student.generalNotes || ''
+      }));
+
+      // Add headers
+      const headers = Object.keys(dataToExport[0] || {});
+      worksheet.addRow(headers);
+
+      // Style header row
+      worksheet.getRow(1).font = { bold: true };
+      worksheet.getRow(1).fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FFE0E0E0' }
+      };
+
+      // Add data rows
+      dataToExport.forEach(row => {
+        worksheet.addRow(headers.map(header => (row as any)[header] || ''));
+      });
+
+      // Auto-fit columns
+      worksheet.columns.forEach(column => {
+        column.width = 15;
+      });
+
+      // Generate buffer
+      const buffer = await workbook.xlsx.writeBuffer();
+      return Buffer.from(buffer);
+    } catch (error) {
+      console.error('Export Excel Error:', error);
+      throw new BadRequestException(
+        `فشل تصدير البيانات إلى Excel. الخطأ: ${error.message || error}`
+      );
+    }
   }
 }
 

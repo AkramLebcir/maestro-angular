@@ -1,7 +1,6 @@
 import { Component, OnInit, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
-import * as XLSX from 'xlsx';
 import { ChartConfiguration, ChartOptions, ChartData } from 'chart.js';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
@@ -790,103 +789,117 @@ export class StudentsComponent implements OnInit {
   }
 
   // Excel Import
-  onExcelFileSelected(event: any): void {
-    const file = event.target.files[0];
+  async onExcelFileSelected(event: any): Promise<void> {
+    const file: File = event.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (e: any) => {
-      try {
-        const data = new Uint8Array(e.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        
-        // Process all sheets - each sheet represents a class
-        const allStudentsData: Array<{ students: any[], className: string, startRow: number }> = [];
-        let totalStudents = 0;
+    // Validate file type
+    const validTypes = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+    if (!validTypes.includes(file.type) && !file.name.match(/\.(xlsx|xls)$/i)) {
+      alert('يرجى اختيار ملف Excel صالح (.xlsx أو .xls)');
+      event.target.value = '';
+      return;
+    }
 
-        // First pass: Check all sheets and detect header rows
-        const sheetsInfo: Array<{ sheetName: string; detectedRow: number; rawData: any[][] }> = [];
-        let hasUndetectedSheets = false;
+    // Validate file size (max 10MB)
+    const maxSize = 10 * 1024 * 1024; // 10MB
+    if (file.size > maxSize) {
+      alert('حجم الملف كبير جداً. الحد الأقصى هو 10 ميجابايت');
+      event.target.value = '';
+      return;
+    }
 
-        for (const sheetName of workbook.SheetNames) {
-          const sheet = workbook.Sheets[sheetName];
-          const rawData: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
-          
-          if (rawData.length === 0) continue;
+    this.isImporting = true;
 
-          const detectedRow = this.findHeaderRow(rawData);
-          this.detectedHeaderRow[sheetName] = detectedRow;
-          
-          sheetsInfo.push({
-            sheetName,
-            detectedRow,
-            rawData
+    try {
+      // إرسال الملف إلى NestJS للمعالجة
+      this.apiService.importStudentsExcel(file).subscribe({
+        next: (response) => {
+          this.isImporting = false;
+          console.log('تمت المعالجة في السرفر بنجاح', response);
+
+          const sheetsInfo = response.sheets;
+          let hasUndetectedSheets = false;
+
+          // Store detected rows
+          sheetsInfo.forEach(info => {
+            this.detectedHeaderRow[info.sheetName] = info.detectedRow;
+            if (info.detectedRow === -1) {
+              hasUndetectedSheets = true;
+            }
           });
 
-          if (detectedRow === -1) {
-            hasUndetectedSheets = true;
+          // If some sheets need manual header row selection, show modal
+          if (hasUndetectedSheets) {
+            this.pendingExcelData = sheetsInfo.map(info => ({
+              students: [], // Will be populated after user selects header row
+              className: info.sheetName.trim(),
+              startRow: 0,
+              rawData: info.rawData
+            }));
+            this.showHeaderRowModal = true;
+            event.target.value = '';
+            return;
           }
-        }
 
-        // If some sheets need manual header row selection, show modal
-        if (hasUndetectedSheets) {
-          this.pendingExcelData = sheetsInfo.map(info => ({
-            students: [], // Will be populated after user selects header row
-            className: info.sheetName.trim(),
-            startRow: 0,
-            rawData: info.rawData
-          }));
-          this.showHeaderRowModal = true;
-          return;
-        }
+          // All sheets have detected header rows, process them
+          const allStudentsData: Array<{ students: any[], className: string, startRow: number }> = [];
+          let totalStudents = 0;
 
-        // All sheets have detected header rows, process them
-        for (const info of sheetsInfo) {
-          if (info.detectedRow === -1) continue;
+          for (const info of sheetsInfo) {
+            if (info.detectedRow === -1) continue;
 
-          const headers = info.rawData[info.detectedRow];
-          const dataRows = info.rawData.slice(info.detectedRow + 1).filter(row => 
-            row.some(cell => cell !== '' && cell !== null && cell !== undefined)
-          );
+            const headers = info.rawData[info.detectedRow];
+            const dataRows = info.rawData.slice(info.detectedRow + 1).filter(row => 
+              row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+            );
 
-          if (dataRows.length === 0) continue;
+            if (dataRows.length === 0) continue;
 
-          // Convert to object array with proper column mapping
-          const jsonData = dataRows.map(row => {
-            const obj: any = {};
-            headers.forEach((header, index) => {
-              if (header && header !== '') {
-                obj[header] = row[index] !== undefined && row[index] !== null ? row[index] : '';
-              }
+            // Convert to object array with proper column mapping
+            const jsonData = dataRows.map(row => {
+              const obj: any = {};
+              headers.forEach((header, index) => {
+                if (header && header !== '') {
+                  obj[header] = row[index] !== undefined && row[index] !== null ? row[index] : '';
+                }
+              });
+              return obj;
             });
-            return obj;
-          });
 
-          allStudentsData.push({
-            students: jsonData,
-            className: info.sheetName.trim(),
-            startRow: info.detectedRow + 2
-          });
-          
-          totalStudents += jsonData.length;
+            allStudentsData.push({
+              students: jsonData,
+              className: info.sheetName.trim(),
+              startRow: info.detectedRow + 2
+            });
+            
+            totalStudents += jsonData.length;
+          }
+
+          if (allStudentsData.length === 0) {
+            alert('لم يتم العثور على بيانات صحيحة في أي ورقة عمل');
+            event.target.value = '';
+            return;
+          }
+
+          // Process all sheets with their class names
+          this.processExcelDataWithClasses(allStudentsData, totalStudents);
+          event.target.value = '';
+        },
+        error: (err) => {
+          this.isImporting = false;
+          console.error('خطأ في الرفع', err);
+          const errorMessage = err?.error?.message || err?.message || 'حدث خطأ أثناء استيراد البيانات';
+          alert(errorMessage);
+          event.target.value = '';
         }
-
-        if (allStudentsData.length === 0) {
-          alert('لم يتم العثور على بيانات صحيحة في أي ورقة عمل');
-          return;
-        }
-
-        // Process all sheets with their class names
-        this.processExcelDataWithClasses(allStudentsData, totalStudents);
-      } catch (error) {
-        console.error('Error reading Excel file:', error);
-        alert('حدث خطأ أثناء قراءة ملف Excel. يرجى التحقق من صحة الملف.');
-      }
-    };
-    reader.readAsArrayBuffer(file);
-    
-    // Reset file input
-    event.target.value = '';
+      });
+    } catch (error) {
+      this.isImporting = false;
+      console.error('Error uploading file:', error);
+      alert('حدث خطأ أثناء رفع الملف');
+      event.target.value = '';
+    }
   }
 
   findHeaderRow(rawData: any[][]): number {
@@ -1400,30 +1413,33 @@ export class StudentsComponent implements OnInit {
       .filter(row => row && row.length > 0);
   }
 
-  exportToExcel(): void {
+  async exportToExcel(): Promise<void> {
     try {
-      const dataToExport = this.filteredStudents.map(student => ({
-        'رقم الهوية / الكود': student.idNumber || '',
-        'اللقب': student.lastName,
-        'الاسم': student.firstName,
-        'تاريخ الميلاد': student.dateOfBirth ? this.formatDate(student.dateOfBirth) : '',
-        'مكان الميلاد': student.placeOfBirth || '',
-        'الجنس': this.getGenderLabel(student.gender),
-        'معيد': student.isRepeater ? 'نعم' : 'لا',
-        'رقم التلميذ': student.studentId || '',
-        'القسم': this.getClassName(student.classId),
-        'البريد الإلكتروني': student.email || '',
-        'رقم الطالب': student.studentNumber || '',
-        'ملاحظات عامة': student.generalNotes || ''
-      }));
+      // إرسال طلب التصدير إلى NestJS
+      const filters = {
+        classId: this.selectedClassFilter || undefined,
+        group: this.selectedGroupFilter || undefined,
+      };
 
-      const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-      const workbook = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(workbook, worksheet, 'التلاميذ');
-      
-      // Generate file name with current date
-      const fileName = `التلاميذ_${new Date().toISOString().split('T')[0]}.xlsx`;
-      XLSX.writeFile(workbook, fileName);
+      this.apiService.exportStudentsExcel(filters.classId, filters.group).subscribe({
+        next: (blob: Blob) => {
+          // Generate file name with current date
+          const fileName = `التلاميذ_${new Date().toISOString().split('T')[0]}.xlsx`;
+          
+          // Create download link
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting to Excel:', error);
+          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تصدير البيانات إلى Excel';
+          alert(errorMessage);
+        }
+      });
     } catch (error) {
       console.error('Error exporting to Excel:', error);
       alert('حدث خطأ أثناء تصدير البيانات إلى Excel');

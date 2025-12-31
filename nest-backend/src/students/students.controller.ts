@@ -13,11 +13,13 @@ import {
   UploadedFile,
   UseInterceptors,
   BadRequestException,
+  Res,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
+import { diskStorage, memoryStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { Response } from 'express';
 import { StudentsService } from './students.service';
 import { CreateStudentDto } from './dto/create-student.dto';
 import { UpdateStudentDto } from './dto/update-student.dto';
@@ -137,6 +139,60 @@ export class StudentsController {
     }
     const fileUrl = `/uploads/medical-certificates/${file.filename}`;
     return { fileUrl };
+  }
+
+  @Post('import-excel')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        const allowedTypes = [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+        ];
+        if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(xlsx|xls)$/i)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('نوع الملف غير مسموح. يُسمح فقط بملفات Excel (.xlsx أو .xls)'), false);
+        }
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+    }),
+  )
+  async importExcel(
+    @CurrentUser() user: AuthUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('لم يتم استقبال أي ملف. يرجى اختيار ملف Excel.');
+    }
+    return this.studentsService.importFromExcel(user.id, file);
+  }
+
+  @Get('export-excel')
+  async exportExcel(
+    @CurrentUser() user: AuthUser,
+    @Query('classId') classId?: string,
+    @Query('group') group?: string,
+    @Res() res?: Response,
+  ) {
+    const filters = {
+      classId: classId ? Number(classId) : undefined,
+      group: group ? Number(group) : undefined,
+    };
+
+    const buffer = await this.studentsService.exportToExcel(user.id, filters);
+    const fileName = `التلاميذ_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    if (res) {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      res.send(buffer);
+    } else {
+      return buffer;
+    }
   }
 }
 

@@ -10,7 +10,14 @@ import {
   HttpCode,
   HttpStatus,
   Query,
+  UploadedFile,
+  UseInterceptors,
+  BadRequestException,
+  Res,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { memoryStorage } from 'multer';
+import { Response } from 'express';
 import { GradesService } from './grades.service';
 import { CreateGradeDto } from './dto/create-grade.dto';
 import { UpdateGradeDto } from './dto/update-grade.dto';
@@ -66,6 +73,54 @@ export class GradesController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<void> {
     return this.gradesService.remove(user.id, id);
+  }
+
+  @Post('import-excel')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        const allowedTypes = [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+        ];
+        if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(xlsx|xls)$/i)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('نوع الملف غير مسموح. يُسمح فقط بملفات Excel (.xlsx أو .xls)'), false);
+        }
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+    }),
+  )
+  async importExcel(
+    @CurrentUser() user: AuthUser,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    if (!file) {
+      throw new BadRequestException('لم يتم استقبال أي ملف. يرجى اختيار ملف Excel.');
+    }
+    return this.gradesService.importFromExcel(user.id, file);
+  }
+
+  @Post('export-excel')
+  async exportExcel(
+    @CurrentUser() user: AuthUser,
+    @Body() body: { classId: number; excelData: any[][] },
+    @Res() res?: Response,
+  ) {
+    const buffer = await this.gradesService.exportToExcel(user.id, body.classId, body.excelData);
+    const fileName = `سجل_الدرجات_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    if (res) {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+      res.send(buffer);
+    } else {
+      return buffer;
+    }
   }
 }
 
