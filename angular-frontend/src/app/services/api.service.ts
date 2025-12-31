@@ -265,4 +265,51 @@ export class ApiService {
       responseType: 'blob'
     });
   }
+
+  /**
+   * Export processed Excel with errors and colored grades
+   */
+  exportProcessedExcel(payload: {
+    processedExcelData: any[];
+    processedSheetsData: Array<{ sheetName: string; data: any[] }>;
+    gradeErrors: any[];
+    selectedLanguage?: string;
+    selectedLevel?: string;
+  }): Observable<Blob> {
+    return this.http.post(`${this.apiUrl}/grades/export-processed-excel`, payload, {
+      headers: this.getHeaders(),
+      responseType: 'blob'
+    });
+  }
+
+  /**
+   * Export processed Excel with original structure preserved
+   */
+  exportProcessedExcelWithOriginalStructure(
+    originalFile: File,
+    payload: {
+      processedSheetsData: Array<{ sheetName: string; data: any[] }>;
+      selectedLanguage?: string;
+      originalFileName?: string;
+    }
+  ): Observable<Blob> {
+    const formData = new FormData();
+    formData.append('originalFile', originalFile);
+    formData.append('processedSheetsData', JSON.stringify(payload.processedSheetsData));
+    formData.append('selectedLanguage', payload.selectedLanguage || 'AR');
+    if (payload.originalFileName) {
+      formData.append('originalFileName', payload.originalFileName);
+    }
+
+    const token = this.authService.getToken();
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+
+    return this.http.post(`${this.apiUrl}/grades/export-processed-excel-with-original`, formData, {
+      headers,
+      responseType: 'blob'
+    });
+  }
 }

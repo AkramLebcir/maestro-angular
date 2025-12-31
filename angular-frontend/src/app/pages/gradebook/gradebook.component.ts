@@ -4,7 +4,6 @@ import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
 import { GradingSettingsService, GradingSettings, CustomAssessmentColumn, BaseColumnConfig, BaseColumnKey, DEFAULT_BASE_COLUMN_SETTINGS, RatingRangeConfig, GuidanceRangeConfig } from '../../services/grading-settings.service';
 import { VoiceGradingService } from '../../services/voice-grading.service';
-import * as ExcelJS from 'exceljs';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import html2canvas from 'html2canvas';
@@ -211,8 +210,7 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
   // نتائج أخطاء النقاط المستخدمة في تقرير مراقبة النقاط
   gradeMonitoringErrors: any[] = [];
   isProcessing = false;
-  // حفظ ملف Excel الأصلي لإضافته الملاحظات والإرشادات دون تغيير البنية
-  originalWorkbook: ExcelJS.Workbook | null = null;
+  // حفظ اسم ملف Excel الأصلي لإضافته الملاحظات والإرشادات دون تغيير البنية
   originalFileName: string = '';
   
   // Import options
@@ -2621,7 +2619,8 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       this.apiService.exportGradesExcel(this.selectedClass.id, excelData).subscribe({
         next: (blob: Blob) => {
           // Generate filename
-          const fileName = `سجل_الدرجات_${this.selectedClass.name}_${new Date().toISOString().split('T')[0]}.xlsx`;
+          const className = this.selectedClass?.name || 'غير_محدد';
+          const fileName = `سجل_الدرجات_${className}_${new Date().toISOString().split('T')[0]}.xlsx`;
 
           // Create download link
           const url = window.URL.createObjectURL(blob);
@@ -3876,787 +3875,100 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    // إذا كان لدينا ملف Excel الأصلي، نستخدمه ونضيف الملاحظات والإرشادات فقط
-    if (this.originalWorkbook) {
-      this.downloadProcessedExcelWithOriginalStructure();
+    // إذا كان لدينا اسم ملف Excel الأصلي، يمكن استخدام الطريقة مع الحفاظ على البنية
+    // لكن نحتاج إلى الملف الأصلي نفسه، لذا سنستخدم الطريقة العادية
+
+    try {
+      const gradeErrors = this.getStudentsWithGradeErrors();
+
+      // إرسال البيانات إلى NestJS للتصدير
+      this.apiService.exportProcessedExcel({
+        processedExcelData: this.processedExcelData,
+        processedSheetsData: this.processedSheetsData,
+        gradeErrors: gradeErrors,
+        selectedLanguage: this.selectedLanguage,
+        selectedLevel: this.selectedLevel
+      }).subscribe({
+        next: (blob: Blob) => {
+          const levelNames: { [key: string]: string } = {
+            'primary': 'ابتدائي',
+            'middle': 'متوسط',
+            'secondary': 'ثانوي'
+          };
+          const levelName = levelNames[this.selectedLevel] || 'غير محدد';
+          const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting processed Excel:', error);
+          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تصدير البيانات';
+          alert(errorMessage);
+        }
+      });
+    } catch (error) {
+      console.error('Error exporting processed Excel:', error);
+      alert('حدث خطأ أثناء تصدير البيانات');
+    }
+  }
+
+  // Old implementation removed - now handled by Backend
+
+  async downloadProcessedExcelWithOriginalStructure(originalFile?: File): Promise<void> {
+    if (!originalFile && !this.originalFileName) {
+      alert('لا يوجد ملف Excel أصلي. يرجى رفع الملف الأصلي مرة أخرى');
       return;
     }
 
-    // Create workbook
-    const workbook = new ExcelJS.Workbook();
-
-    // Sheet 0: تقرير أخطاء النقاط (للاطلاع مباشرة بعد الاستيراد)
-    const gradeErrors = this.getStudentsWithGradeErrors();
-    if (gradeErrors && gradeErrors.length > 0) {
-      const errorSheet = workbook.addWorksheet('GradeErrors');
-      errorSheet.addRow(['#', 'الاسم', 'الصفحة', 'العمود', 'القيمة', 'الخطأ']);
-      
-      // Style header row
-      errorSheet.getRow(1).font = { bold: true };
-      errorSheet.getRow(1).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' }
-      };
-
-      gradeErrors.forEach((student: any, studentIndex: number) => {
-        student.errors.forEach((error: any) => {
-          errorSheet.addRow([
-            studentIndex + 1,
-            `${student.firstName || ''} ${student.lastName || ''}`.trim() || '-',
-            student.sheetName || '-',
-            error.columnHeader || '-',
-            error.value !== null && error.value !== undefined && error.value !== '' ? error.value : '-',
-            error.error || '-'
-          ]);
-        });
-      });
-    }
-
-    // Process each sheet (الصفحات الأصلية مع الدرجات الملوّنة)
-    if (this.processedSheetsData && this.processedSheetsData.length > 0) {
-      // If we have multiple sheets, create a sheet for each
-      this.processedSheetsData.forEach((sheetInfo, sheetIndex) => {
-        const sheetData = sheetInfo.data;
-        if (!sheetData || sheetData.length === 0) return;
-
-        // Get all unique column headers from this sheet's data
-        const allColumnHeaders = new Set<string>();
-        
-        // Collect all grade column headers
-        sheetData.forEach((row: any) => {
-          if (row.gradeColumns) {
-            row.gradeColumns.forEach((col: any) => {
-              if (col.header && !allColumnHeaders.has(String(col.header))) {
-                allColumnHeaders.add(String(col.header));
-              }
-            });
-          }
-        });
-
-        // Build headers array
-        const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
-        
-        // Add grade column headers (these are the ONLY columns where we apply coloring)
-        // Map numeric headers to translated names based on selected language
-        const mapHeaderToTranslated = (header: string): string => {
-          const headerStr = String(header).trim();
-          const lang = this.selectedLanguage || 'AR';
-          
-          if (headerStr === '01' || headerStr === '1') {
-            if (lang === 'FR') return 'Évaluation continue';
-            if (lang === 'EN') return 'Continuous Assessment';
-            return 'التقييم المستمر';
-          } else if (headerStr === '02' || headerStr === '2') {
-            if (lang === 'FR') return 'Travaux pratiques ou Expression orale';
-            if (lang === 'EN') return 'Practical Work or Oral Expression';
-            return 'أعمال تطبيقية أو تعبير شفوي';
-          } else if (headerStr === '03' || headerStr === '3') {
-            if (lang === 'FR') return 'Moyenne des devoirs';
-            if (lang === 'EN') return 'Assignment Average';
-            return 'معدل الفروض';
-          } else if (headerStr === '09' || headerStr === '9') {
-            if (lang === 'FR') return 'Examen';
-            if (lang === 'EN') return 'Test';
-            return 'الاختبار';
-          }
-          return headerStr; // Return original if no mapping found
-        };
-        
-        const gradeHeaders = Array.from(allColumnHeaders).map(mapHeaderToTranslated);
-        headers.push(...gradeHeaders);
-        
-        // Add calculated columns
-        headers.push(
-          this.translate('gradebook.termAverage'),
-          this.translate('gradebook.notes'),
-          this.translate('gradebook.guidanceCons')
-        );
-        
-        const excelData: any[] = [headers];
-
-        // Data rows
-        sheetData.forEach((row: any, index: number) => {
-          const rowData: any[] = [
-            index + 1,
-            row.id || '-',
-            row.firstName || '-',
-            row.lastName || '-'
-          ];
-
-          // Add grade values in the same order as headers
-          // Need to map back from translated headers to original headers for lookup
-          const mapTranslatedToOriginal = (translatedHeader: string): string => {
-            const lang = this.selectedLanguage || 'AR';
-            // Check all language variations
-            if (translatedHeader === 'التقييم المستمر' || translatedHeader === 'Évaluation continue' || translatedHeader === 'Continuous Assessment') {
-              return '01';
-            }
-            if (translatedHeader === 'أعمال تطبيقية أو تعبير شفوي' || translatedHeader === 'Travaux pratiques ou Expression orale' || translatedHeader === 'Practical Work or Oral Expression') {
-              return '02';
-            }
-            if (translatedHeader === 'معدل الفروض' || translatedHeader === 'Moyenne des devoirs' || translatedHeader === 'Assignment Average') {
-              return '03';
-            }
-            if (translatedHeader === 'الاختبار' || translatedHeader === 'Examen' || translatedHeader === 'Test') {
-              return '09';
-            }
-            return translatedHeader; // Return original if no mapping found
-          };
-          
-          gradeHeaders.forEach(translatedHeader => {
-            const originalHeader = mapTranslatedToOriginal(translatedHeader);
-            const gradeCol = row.gradeColumns?.find((col: any) => {
-              const colHeader = String(col.header).trim();
-              return colHeader === originalHeader || colHeader === translatedHeader;
-            });
-            const value = gradeCol?.value;
-            if (value !== undefined && value !== null && value !== '') {
-              const numValue = parseFloat(String(value));
-              rowData.push(isNaN(numValue) ? value : numValue);
-            } else {
-              rowData.push('-');
-            }
-          });
-
-          // Add calculated values
-          rowData.push(
-            row.average?.toFixed(2) || '-',
-            row.observation || '-',
-            row.guidance || '-'
-          );
-
-          excelData.push(rowData);
-        });
-
-        // Create worksheet
-        let cleanSheetName = sheetInfo.sheetName || `Sheet${sheetIndex + 1}`;
-        cleanSheetName = cleanSheetName.substring(0, 31); // Excel sheet name max length
-        cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_'); // Remove invalid characters
-        const ws = workbook.addWorksheet(cleanSheetName);
-        
-        // Add rows
-        excelData.forEach(row => {
-          ws.addRow(row);
-        });
-        
-        // Style header row
-        ws.getRow(1).font = { bold: true };
-        ws.getRow(1).fill = {
-          type: 'pattern',
-          pattern: 'solid',
-          fgColor: { argb: 'FFE0E0E0' }
-        };
-
-        // Apply color coding ONLY to grade columns (not name / id / obs / cons)
-        const firstGradeColIndex = 5; // 1-based: 1:#,2:id,3:firstName,4:lastName,5:first grade column
-        const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
-
-        // Rows: 1 = header, so start from 2
-        for (let rowIndex = 2; rowIndex <= excelData.length; rowIndex++) {
-          const row = ws.getRow(rowIndex);
-          for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
-            const cell = row.getCell(colIndex);
-            if (!cell || !cell.value) continue;
-
-            const rawValue = cell.value;
-            const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
-            const numValue = parseFloat(strValue);
-
-            // Skip empty cells
-            if (strValue === '' || strValue === '-') {
-              continue;
-            }
-
-            // Determine color:
-            // - Green: numeric between 0.25 and 20
-            // - Orange: contains "غ م" OR exactly 0
-            // - Red: everything else
-            let fgColor = 'FFC7CE'; // default red
-
-            if (!isNaN(numValue) && numValue >= 0.25 && numValue <= 20) {
-              fgColor = 'C6EFCE'; // green
-            } else if (strValue.includes('غ م') || (!isNaN(numValue) && numValue === 0)) {
-              fgColor = 'FFEB9C'; // orange
-            }
-
-            cell.fill = {
-              type: 'pattern',
-              pattern: 'solid',
-              fgColor: { argb: fgColor }
-            };
-          }
-        }
-      });
-    } else {
-      // Fallback: create a single sheet with all data
-      const allColumnHeaders = new Set<string>();
-      
-      this.processedExcelData.forEach(row => {
-        if (row.gradeColumns) {
-          row.gradeColumns.forEach((col: any) => {
-            if (col.header && !allColumnHeaders.has(String(col.header))) {
-              allColumnHeaders.add(String(col.header));
-            }
-          });
-        }
-      });
-
-      const headers: any[] = ['#', 'رقم الهوية', 'الاسم', 'اللقب'];
-      
-      // Map numeric headers to translated names based on selected language
-      const mapHeaderToTranslated = (header: string): string => {
-        const headerStr = String(header).trim();
-        const lang = this.selectedLanguage || 'AR';
-        
-        if (headerStr === '01' || headerStr === '1') {
-          if (lang === 'FR') return 'Évaluation continue';
-          if (lang === 'EN') return 'Continuous Assessment';
-          return 'التقييم المستمر';
-        } else if (headerStr === '02' || headerStr === '2') {
-          if (lang === 'FR') return 'Travaux pratiques ou Expression orale';
-          if (lang === 'EN') return 'Practical Work or Oral Expression';
-          return 'أعمال تطبيقية أو تعبير شفوي';
-        } else if (headerStr === '03' || headerStr === '3') {
-          if (lang === 'FR') return 'Moyenne des devoirs';
-          if (lang === 'EN') return 'Assignment Average';
-          return 'معدل الفروض';
-        } else if (headerStr === '09' || headerStr === '9') {
-          if (lang === 'FR') return 'Examen';
-          if (lang === 'EN') return 'Test';
-          return 'الاختبار';
-        }
-        return headerStr; // Return original if no mapping found
-      };
-      
-      const gradeHeaders = Array.from(allColumnHeaders).map(mapHeaderToTranslated);
-      headers.push(...gradeHeaders);
-      headers.push(
-        this.translate('gradebook.termAverage'),
-        this.translate('gradebook.notes'),
-        this.translate('gradebook.guidanceCons')
-      );
-      
-      const excelData: any[] = [headers];
-
-      this.processedExcelData.forEach((row, index) => {
-        const rowData: any[] = [
-          index + 1,
-          row.id || '-',
-          row.firstName || '-',
-          row.lastName || '-'
-        ];
-
-        // Need to map back from translated headers to original headers for lookup
-        const mapTranslatedToOriginal = (translatedHeader: string): string => {
-          // Check all language variations
-          if (translatedHeader === 'التقييم المستمر' || translatedHeader === 'Évaluation continue' || translatedHeader === 'Continuous Assessment') {
-            return '01';
-          }
-          if (translatedHeader === 'أعمال تطبيقية أو تعبير شفوي' || translatedHeader === 'Travaux pratiques ou Expression orale' || translatedHeader === 'Practical Work or Oral Expression') {
-            return '02';
-          }
-          if (translatedHeader === 'معدل الفروض' || translatedHeader === 'Moyenne des devoirs' || translatedHeader === 'Assignment Average') {
-            return '03';
-          }
-          if (translatedHeader === 'الاختبار' || translatedHeader === 'Examen' || translatedHeader === 'Test') {
-            return '09';
-          }
-          return translatedHeader; // Return original if no mapping found
-        };
-        
-        gradeHeaders.forEach(translatedHeader => {
-          const originalHeader = mapTranslatedToOriginal(translatedHeader);
-          const gradeCol = row.gradeColumns?.find((col: any) => {
-            const colHeader = String(col.header).trim();
-            return colHeader === originalHeader || colHeader === translatedHeader;
-          });
-          const value = gradeCol?.value;
-          if (value !== undefined && value !== null && value !== '') {
-            const numValue = parseFloat(String(value));
-            rowData.push(isNaN(numValue) ? value : numValue);
-          } else {
-            rowData.push('-');
-          }
-        });
-
-        rowData.push(
-          row.average?.toFixed(2) || '-',
-          row.observation || '-',
-          row.guidance || '-'
-        );
-
-        excelData.push(rowData);
-      });
-
-      const ws = workbook.addWorksheet('النتائج المعالجة');
-      
-      // Add rows
-      excelData.forEach(row => {
-        ws.addRow(row);
-      });
-      
-      // Style header row
-      ws.getRow(1).font = { bold: true };
-      ws.getRow(1).fill = {
-        type: 'pattern',
-        pattern: 'solid',
-        fgColor: { argb: 'FFE0E0E0' }
-      };
-
-      // Apply color coding ONLY to grade columns (not name / id / obs / cons)
-      const firstGradeColIndex = 5; // 1-based: 1:#,2:id,3:firstName,4:lastName,5:first grade column
-      const lastGradeColIndex = firstGradeColIndex + gradeHeaders.length - 1;
-
-      for (let rowIndex = 2; rowIndex <= excelData.length; rowIndex++) {
-        const row = ws.getRow(rowIndex);
-        for (let colIndex = firstGradeColIndex; colIndex <= lastGradeColIndex; colIndex++) {
-          const cell = row.getCell(colIndex);
-          if (!cell || !cell.value) continue;
-
-          const rawValue = cell.value;
-          const strValue = rawValue !== undefined && rawValue !== null ? String(rawValue).trim() : '';
-          const numValue = parseFloat(strValue);
-
-          if (strValue === '' || strValue === '-') {
-            continue;
-          }
-
-          let fgColor = 'FFC7CE'; // red by default
-
-          if (!isNaN(numValue) && numValue >= 0.25 && numValue <= 20) {
-            fgColor = 'C6EFCE'; // green
-          } else if (strValue.includes('غ م') || (!isNaN(numValue) && numValue === 0)) {
-            fgColor = 'FFEB9C'; // orange
-          }
-
-          cell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: fgColor }
-          };
-        }
-      }
-    }
-
-    // Generate filename
-    const levelNames: { [key: string]: string } = {
-      'primary': 'ابتدائي',
-      'middle': 'متوسط',
-      'secondary': 'ثانوي'
-    };
-    const levelName = levelNames[this.selectedLevel] || 'غير محدد';
-    const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
-
-    // Save file
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    window.URL.revokeObjectURL(url);
-  }
-
-  async downloadProcessedExcelWithOriginalStructure(): Promise<void> {
-    if (!this.originalWorkbook) {
-      alert('لا يوجد ملف Excel أصلي');
+    // إذا لم يكن الملف متوفراً، نطلب من المستخدم رفعه
+    if (!originalFile) {
+      // يمكن إضافة UI لرفع الملف هنا
+      alert('يرجى رفع الملف الأصلي مرة أخرى');
       return;
     }
 
-    // إنشاء نسخة من الملف الأصلي
-    const workbook = new ExcelJS.Workbook();
-
-    // معالجة كل صفحة من الملف الأصلي
-    for (const originalWorksheet of this.originalWorkbook.worksheets) {
-      const sheetName = originalWorksheet.name;
-      
-      // تحويل الصفحة إلى مصفوفة ثنائية الأبعاد مع الحفاظ على البنية
-      const sheetData: any[][] = [];
-      originalWorksheet.eachRow((row) => {
-        const rowData: any[] = [];
-        row.eachCell({ includeEmpty: true }, (cell) => {
-          let value = cell.value;
-          if (value === null || value === undefined) {
-            value = '';
-          } else if (typeof value === 'object' && 'text' in value) {
-            value = value.text;
-          } else if (value instanceof Date) {
-            value = value.toISOString().split('T')[0];
+    try {
+      // إرسال الملف الأصلي والبيانات المعالجة إلى NestJS
+      this.apiService.exportProcessedExcelWithOriginalStructure(originalFile, {
+        processedSheetsData: this.processedSheetsData,
+        selectedLanguage: this.selectedLanguage,
+        originalFileName: this.originalFileName || originalFile.name
+      }).subscribe({
+        next: (blob: Blob) => {
+          let fileName = 'ملف_مملوء.xlsx';
+          if (this.originalFileName) {
+            const nameWithoutExt = this.originalFileName.replace(/\.(xlsx|xls)$/i, '');
+            fileName = `${nameWithoutExt}_مملوء.xlsx`;
+          } else if (originalFile.name) {
+            const nameWithoutExt = originalFile.name.replace(/\.(xlsx|xls)$/i, '');
+            fileName = `${nameWithoutExt}_مملوء.xlsx`;
           }
-          rowData.push(value);
-        });
-        sheetData.push(rowData);
+
+          const url = window.URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = fileName;
+          link.click();
+          window.URL.revokeObjectURL(url);
+        },
+        error: (error) => {
+          console.error('Error exporting processed Excel with original structure:', error);
+          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء تصدير البيانات';
+          alert(errorMessage);
+        }
       });
-
-      if (!sheetData || sheetData.length === 0) {
-        // إذا كانت الصفحة فارغة، نضيفها كما هي
-        const ws = workbook.addWorksheet(sheetName);
-        continue;
-      }
-
-      // البحث عن صف الرؤوس - يمكن أن يكون في السطر 7 أو 8 أو 9 أو قبل ذلك
-      let headerRow = -1;
-      // البحث أولاً في السطور 7-9 (index 6-8) كما طلب المستخدم
-      const priorityRows = [6, 7, 8]; // السطور 7, 8, 9 (index 6, 7, 8)
-      for (const rowIndex of priorityRows) {
-        if (rowIndex < sheetData.length) {
-          const row = sheetData[rowIndex];
-          if (Array.isArray(row) && row.some((cell: any) => {
-            const cellStr = String(cell || '').toLowerCase();
-            return cellStr.includes('name') || 
-                   cellStr.includes('اسم') || 
-                   cellStr.includes('nom') ||
-                   cellStr.includes('score') ||
-                   cellStr.includes('درجة') ||
-                   cellStr.includes('obs') ||
-                   cellStr.includes('ملاحظات') ||
-                   cellStr.includes('cons') ||
-                   cellStr.includes('إرشادات') ||
-                   cellStr.includes('observation') ||
-                   cellStr.includes('guidance') ||
-                   cellStr.includes('ratings') ||
-                   cellStr.includes('تقديرات') ||
-                   cellStr.includes('appréciation') ||
-                   cellStr.includes('appreciation');
-          })) {
-            headerRow = rowIndex;
-            break;
-          }
-        }
-      }
-      
-      // إذا لم نجد في السطور 7-9، نبحث في السطور الأخرى (0-6 و 9-15)
-      if (headerRow === -1) {
-        for (let i = 0; i < Math.min(15, sheetData.length); i++) {
-          // تخطي السطور 7-9 لأننا بحثنا فيها بالفعل
-          if (priorityRows.includes(i)) continue;
-          
-          const row = sheetData[i];
-          if (Array.isArray(row) && row.some((cell: any) => {
-            const cellStr = String(cell || '').toLowerCase();
-            return cellStr.includes('name') || 
-                   cellStr.includes('اسم') || 
-                   cellStr.includes('nom') ||
-                   cellStr.includes('score') ||
-                   cellStr.includes('درجة') ||
-                   cellStr.includes('obs') ||
-                   cellStr.includes('ملاحظات') ||
-                   cellStr.includes('cons') ||
-                   cellStr.includes('إرشادات') ||
-                   cellStr.includes('observation') ||
-                   cellStr.includes('guidance') ||
-                   cellStr.includes('ratings') ||
-                   cellStr.includes('تقديرات') ||
-                   cellStr.includes('appréciation') ||
-                   cellStr.includes('appreciation');
-          })) {
-            headerRow = i;
-            break;
-          }
-        }
-      }
-      
-      // إذا لم نجد صف رؤوس، نستخدم السطر الأول كافتراضي
-      if (headerRow === -1) {
-        headerRow = 0;
-      }
-
-      const headers = sheetData[headerRow] || [];
-      console.log(`[Download] Header row found at index ${headerRow}, headers:`, headers);
-      
-      // البحث عن أعمدة الملاحظات/التقديرات والإرشادات الموجودة في الملف الأصلي
-      // نبحث عن "obs" لعمود التقديرات و "cons" لعمود الإرشادات
-      let notesColIndex = -1;
-      let guidanceColIndex = -1;
-      
-      for (let colIndex = 0; colIndex < headers.length; colIndex++) {
-        const header = String(headers[colIndex] || '').toLowerCase().trim();
-        
-        // البحث عن عمود التقديرات (ratings/obs) - الأولوية لـ "obs" و "ratings" و "تقديرات"
-        if (notesColIndex === -1) {
-          // البحث الدقيق أولاً عن "obs" أو "ratings" أو "تقديرات"
-          if (header === 'obs' || 
-              header === 'ratings' || 
-              header === 'تقديرات' ||
-              header === 'appréciation' ||
-              header === 'appreciation' ||
-              header.includes('obs') || 
-              header.includes('ratings') || 
-              header.includes('تقديرات') ||
-              header.includes('rating') ||
-              header.includes('تقييم') ||
-              header.includes('appréciation') ||
-              header.includes('appreciation') ||
-              header.includes('observation') ||
-              header.includes('ملاحظات') ||
-              header.includes('ملاحظة')) {
-            notesColIndex = colIndex;
-            console.log(`[Download] Found notes/ratings column at index ${colIndex}: "${headers[colIndex]}"`);
-          }
-        }
-        
-        // البحث عن عمود الإرشادات (guidance/cons) - الأولوية لـ "cons" و "guidance" و "إرشادات"
-        if (guidanceColIndex === -1) {
-          // البحث الدقيق أولاً عن "cons" أو "guidance" أو "إرشادات"
-          if (header === 'cons' || 
-              header === 'guidance' || 
-              header === 'إرشادات' ||
-              header === 'conseils' ||
-              header === 'conseil' ||
-              header.includes('cons') || 
-              header.includes('guidance') || 
-              header.includes('إرشادات') ||
-              header.includes('إرشاد') ||
-              header.includes('conseils') ||
-              header.includes('conseil')) {
-            guidanceColIndex = colIndex;
-            console.log(`[Download] Found guidance column at index ${colIndex}: "${headers[colIndex]}"`);
-          }
-        }
-      }
-      
-      if (notesColIndex === -1) {
-        console.warn(`[Download] Notes/ratings column not found in headers`);
-      }
-      if (guidanceColIndex === -1) {
-        console.warn(`[Download] Guidance column not found in headers`);
-      }
-
-      // إذا لم تكن الأعمدة موجودة، نضيفها
-      const lang = this.selectedLanguage || 'AR';
-      if (notesColIndex === -1) {
-        // إضافة عمود الملاحظات/التقديرات
-        notesColIndex = headers.length;
-        if (lang === 'FR') {
-          headers.push('Appréciation');
-        } else if (lang === 'EN') {
-          headers.push('Ratings');
-        } else {
-          headers.push('التقديرات');
-        }
-        // التأكد من أن جميع الصفوف تحتوي على عدد كافٍ من الأعمدة
-        for (let i = 0; i < sheetData.length; i++) {
-          while (sheetData[i].length <= notesColIndex) {
-            sheetData[i].push('');
-          }
-        }
-      }
-      
-      if (guidanceColIndex === -1) {
-        // إضافة عمود الإرشادات
-        guidanceColIndex = headers.length;
-        if (lang === 'FR') {
-          headers.push('Conseils');
-        } else if (lang === 'EN') {
-          headers.push('Guidance');
-        } else {
-          headers.push('الإرشادات');
-        }
-        // التأكد من أن جميع الصفوف تحتوي على عدد كافٍ من الأعمدة
-        for (let i = 0; i < sheetData.length; i++) {
-          while (sheetData[i].length <= guidanceColIndex) {
-            sheetData[i].push('');
-          }
-        }
-      }
-      
-      // تحديث صف الرؤوس في sheetData
-      sheetData[headerRow] = headers;
-
-      // البحث عن البيانات المعالجة لهذه الصفحة
-      const sheetProcessedData = this.processedSheetsData.find(s => s.sheetName === sheetName);
-      
-      // إنشاء خريطة للبيانات المعالجة باستخدام الاسم أو رقم الهوية
-      // نستخدم عدة مفاتيح للمطابقة الأفضل
-      const processedDataMap = new Map<string, { observation: string; guidance: string; rowIndex?: number }>();
-      
-      if (sheetProcessedData && sheetProcessedData.data) {
-        console.log(`[Download] Found ${sheetProcessedData.data.length} processed rows for sheet: ${sheetName}`);
-        sheetProcessedData.data.forEach((row: any, index: number) => {
-          // مفاتيح متعددة للمطابقة
-          const key1 = `${row.firstName || ''}_${row.lastName || ''}_${row.id || ''}`.trim().toLowerCase();
-          const key2 = `${row.firstName || ''}_${row.lastName || ''}`.trim().toLowerCase();
-          const key3 = `${row.lastName || ''}_${row.firstName || ''}`.trim().toLowerCase();
-          const key4 = `${row.id || ''}`.trim().toLowerCase();
-          
-          const data = {
-            observation: row.observation || '',
-            guidance: row.guidance || '',
-            rowIndex: headerRow + 1 + index // تقدير موضع الصف في الملف الأصلي
-          };
-          
-          // Debug: Log first few rows
-          if (index < 3) {
-            console.log(`[Download] Processed row ${index}: firstName="${row.firstName}", lastName="${row.lastName}", id="${row.id}", observation="${data.observation}", guidance="${data.guidance}"`);
-          }
-          
-          processedDataMap.set(key1, data);
-          if (key2 !== key1) processedDataMap.set(key2, data);
-          if (key3 !== key2 && key3 !== key1) processedDataMap.set(key3, data);
-          if (key4 && key4 !== key1 && key4 !== key2 && key4 !== key3) processedDataMap.set(key4, data);
-        });
-        console.log(`[Download] Created map with ${processedDataMap.size} keys`);
-      } else {
-        console.warn(`[Download] No processed data found for sheet: ${sheetName}`);
-      }
-
-      // إضافة البيانات إلى الصفوف
-      for (let rowIndex = headerRow + 1; rowIndex < sheetData.length; rowIndex++) {
-        const row = sheetData[rowIndex];
-        if (!row || row.length === 0) continue;
-
-        // البحث عن الاسم في الصف
-        let firstName = '';
-        let lastName = '';
-        let id = '';
-        
-        // البحث عن عمود الاسم - دعم prenom, nom, matricule
-        for (let colIndex = 0; colIndex < headers.length; colIndex++) {
-          const header = String(headers[colIndex] || '').toLowerCase().trim();
-          
-          // البحث عن الاسم الأول (prenom / firstname / الاسم)
-          if (!firstName && (
-            header === 'prenom' || 
-            header.includes('prenom') ||
-            header.includes('firstname') || 
-            header.includes('first name') ||
-            (header.includes('الاسم') && !header.includes('اللقب'))
-          )) {
-            firstName = String(row[colIndex] || '').trim();
-          }
-          
-          // البحث عن اللقب (nom / lastname / اللقب)
-          if (!lastName && (
-            header === 'nom' || 
-            header.includes('nom') && !header.includes('prenom') ||
-            header.includes('lastname') || 
-            header.includes('last name') ||
-            header.includes('اللقب')
-          )) {
-            lastName = String(row[colIndex] || '').trim();
-          }
-          
-          // البحث عن رقم الهوية (matricule / id / رقم)
-          if (!id && (
-            header === 'matricule' ||
-            header.includes('matricule') ||
-            header.includes('id') || 
-            header.includes('رقم') || 
-            header.includes('code') ||
-            header.includes('رقم التعريف')
-          )) {
-            id = String(row[colIndex] || '').trim();
-          }
-          
-          // إذا لم نجد بعد، نبحث عن عمود name عام
-          if (!firstName && !lastName && header.includes('name') && !header.includes('first') && !header.includes('last')) {
-            const fullName = String(row[colIndex] || '').trim();
-            const nameParts = fullName.split(/\s+/);
-            if (nameParts.length >= 2) {
-              firstName = nameParts[0];
-              lastName = nameParts.slice(1).join(' ');
-            } else {
-              firstName = fullName;
-            }
-          }
-        }
-
-        // البحث عن البيانات المعالجة المطابقة (نحاول عدة مفاتيح)
-        let matchedData = processedDataMap.get(`${firstName}_${lastName}_${id}`.trim().toLowerCase());
-        if (!matchedData) {
-          matchedData = processedDataMap.get(`${firstName}_${lastName}`.trim().toLowerCase());
-        }
-        if (!matchedData) {
-          matchedData = processedDataMap.get(`${lastName}_${firstName}`.trim().toLowerCase());
-        }
-        if (!matchedData && id) {
-          matchedData = processedDataMap.get(id.trim().toLowerCase());
-        }
-        
-        // إذا لم نجد مطابقة دقيقة، نبحث عن مطابقة جزئية بالاسم
-        if (!matchedData && (firstName || lastName)) {
-          for (const [mapKey, mapValue] of processedDataMap.entries()) {
-            if ((firstName && mapKey.includes(firstName.toLowerCase())) || 
-                (lastName && mapKey.includes(lastName.toLowerCase()))) {
-              matchedData = mapValue;
-              break;
-            }
-          }
-        }
-
-        // ملء أعمدة الملاحظات والإرشادات (تم إضافتها إذا لم تكن موجودة)
-        // كتابة الملاحظات (obs) في عمود التقديرات
-        if (notesColIndex !== -1) {
-          // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
-          while (row.length <= notesColIndex) {
-            row.push('');
-          }
-          
-          if (matchedData) {
-            // كتابة الملاحظات (observation) في عمود التقديرات
-            row[notesColIndex] = matchedData.observation || '';
-            // Debug: Log first few matches
-            if (rowIndex <= headerRow + 3) {
-              console.log(`[Download] Row ${rowIndex}: Writing observation="${matchedData.observation}" to column ${notesColIndex}`);
-            }
-          } else if (rowIndex <= headerRow + 3) {
-            console.warn(`[Download] Row ${rowIndex}: No matched data found for firstName="${firstName}", lastName="${lastName}", id="${id}"`);
-          }
-        }
-
-        // كتابة الإرشادات (cons) في عمود الإرشادات
-        if (guidanceColIndex !== -1) {
-          // التأكد من أن الصف يحتوي على عدد كافٍ من الأعمدة
-          while (row.length <= guidanceColIndex) {
-            row.push('');
-          }
-          
-          if (matchedData) {
-            // كتابة الإرشادات (guidance) في عمود الإرشادات
-            row[guidanceColIndex] = matchedData.guidance || '';
-            // Debug: Log first few matches
-            if (rowIndex <= headerRow + 3) {
-              console.log(`[Download] Row ${rowIndex}: Writing guidance="${matchedData.guidance}" to column ${guidanceColIndex}`);
-            }
-          }
-        }
-      }
-
-      // إنشاء ورقة عمل جديدة مع الحفاظ على البيانات الأصلية
-      // تنظيف اسم الصفحة
-      let cleanSheetName = sheetName || `Sheet${workbook.worksheets.length + 1}`;
-      cleanSheetName = cleanSheetName.substring(0, 31);
-      cleanSheetName = cleanSheetName.replace(/[\\\/\?\*\[\]]/g, '_');
-      
-      const ws = workbook.addWorksheet(cleanSheetName);
-      
-      // Add rows
-      sheetData.forEach(row => {
-        ws.addRow(row);
-      });
+    } catch (error) {
+      console.error('Error exporting processed Excel with original structure:', error);
+      alert('حدث خطأ أثناء تصدير البيانات');
     }
-
-    // إنشاء اسم الملف بناءً على الاسم الأصلي مع إضافة "مملوء"
-    let fileName = 'ملف_مملوء.xlsx';
-    if (this.originalFileName) {
-      // استخراج الاسم بدون الامتداد
-      const nameWithoutExt = this.originalFileName.replace(/\.(xlsx|xls)$/i, '');
-      // إضافة "مملوء" قبل الامتداد
-      fileName = `${nameWithoutExt}_مملوء.xlsx`;
-    }
-
-    // حفظ الملف
-    const buffer = await workbook.xlsx.writeBuffer();
-    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = fileName;
-    link.click();
-    window.URL.revokeObjectURL(url);
   }
+
+  // Old implementation removed - now handled by Backend
 
   // Excel Analysis Functions
   onExcelAnalysisTabClick(): void {

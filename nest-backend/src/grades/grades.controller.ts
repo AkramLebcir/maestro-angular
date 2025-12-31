@@ -14,8 +14,9 @@ import {
   UseInterceptors,
   BadRequestException,
   Res,
+  UseGuards,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { Response } from 'express';
 import { GradesService } from './grades.service';
@@ -121,6 +122,83 @@ export class GradesController {
     } else {
       return buffer;
     }
+  }
+
+  @Post('export-processed-excel')
+  async exportProcessedExcel(
+    @CurrentUser() user: AuthUser,
+    @Body() body: {
+      processedExcelData: any[];
+      processedSheetsData: Array<{ sheetName: string; data: any[] }>;
+      gradeErrors: any[];
+      selectedLanguage?: string;
+      selectedLevel?: string;
+    },
+    @Res() res: Response,
+  ) {
+    const buffer = await this.gradesService.exportProcessedExcel(user.id, body);
+    const levelNames: { [key: string]: string } = {
+      'primary': 'ابتدائي',
+      'middle': 'متوسط',
+      'secondary': 'ثانوي'
+    };
+    const levelName = levelNames[body.selectedLevel || ''] || 'غير محدد';
+    const fileName = `النتائج_المعالجة_${levelName}_${new Date().toISOString().split('T')[0]}.xlsx`;
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+    res.send(buffer);
+  }
+
+  @Post('export-processed-excel-with-original')
+  @UseInterceptors(
+    FileInterceptor('originalFile', {
+      storage: memoryStorage(),
+      fileFilter: (_req, file, cb) => {
+        const allowedTypes = [
+          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+          'application/vnd.ms-excel',
+        ];
+        if (allowedTypes.includes(file.mimetype) || file.originalname.match(/\.(xlsx|xls)$/i)) {
+          cb(null, true);
+        } else {
+          cb(new BadRequestException('نوع الملف غير مسموح. يُسمح فقط بملفات Excel (.xlsx أو .xls)'), false);
+        }
+      },
+      limits: {
+        fileSize: 10 * 1024 * 1024, // 10MB
+      },
+    }),
+  )
+  async exportProcessedExcelWithOriginalStructure(
+    @CurrentUser() user: AuthUser,
+    @UploadedFile() originalFile: Express.Multer.File,
+    @Body() body: {
+      processedSheetsData: Array<{ sheetName: string; data: any[] }>;
+      selectedLanguage?: string;
+      originalFileName?: string;
+    },
+    @Res() res: Response,
+  ) {
+    if (!originalFile) {
+      throw new BadRequestException('لم يتم استقبال الملف الأصلي');
+    }
+
+    const buffer = await this.gradesService.exportProcessedExcelWithOriginalStructure(
+      user.id,
+      originalFile,
+      body,
+    );
+
+    let fileName = 'ملف_مملوء.xlsx';
+    if (body.originalFileName) {
+      const nameWithoutExt = body.originalFileName.replace(/\.(xlsx|xls)$/i, '');
+      fileName = `${nameWithoutExt}_مملوء.xlsx`;
+    }
+
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
+    res.send(buffer);
   }
 }
 
