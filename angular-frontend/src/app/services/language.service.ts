@@ -2309,7 +2309,7 @@ export class LanguageService {
         'TR': 'Kimlik numarası veya kod'
       },
       'gradebook.firstName': {
-        'AR': 'الاسم',
+        'AR': 'اللقب',
         'FR': 'Prénom',
         'EN': 'First name',
         'ES': 'Nombre',
@@ -2318,7 +2318,7 @@ export class LanguageService {
         'TR': 'Ad'
       },
       'gradebook.lastName': {
-        'AR': 'اللقب',
+        'AR': 'الاسم',
         'FR': 'Nom',
         'EN': 'Last name',
         'ES': 'Apellido',

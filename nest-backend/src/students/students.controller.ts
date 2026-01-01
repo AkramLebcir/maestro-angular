@@ -96,6 +96,14 @@ export class StudentsController {
     return this.studentsService.update(user.id, id, updateStudentDto);
   }
 
+  @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async removeAll(
+    @CurrentUser() user: AuthUser,
+  ): Promise<void> {
+    return this.studentsService.removeAll(user.id);
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(

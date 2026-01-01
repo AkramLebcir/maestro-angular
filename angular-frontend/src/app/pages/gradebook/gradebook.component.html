@@ -1717,21 +1717,22 @@
       <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">
         <p class="font-semibold mb-2">تعليمات الاستيراد:</p>
         <ul class="list-disc list-inside space-y-1 mb-2">
-          <li *ngIf="importIdentifier === 'name'">يجب أن يحتوي ملف Excel على عمود "الاسم" أو "Name"</li>
-          <li *ngIf="importIdentifier === 'idNumber'">يجب أن يحتوي ملف Excel على عمود "رقم الهوية" أو "رقم التعريف" أو "Code" أو "رقم"</li>
-          <li *ngIf="importMode === 'single'">يجب أن يحتوي ملف Excel على عمود "الدرجة" أو "Score"</li>
+          <li><strong>صف الرأس:</strong> يجب أن تكون أسماء الأعمدة موجودة في السطر رقم 8</li>
+          <li *ngIf="importIdentifier === 'name'">يجب أن يحتوي ملف Excel على عمود "اللقب" (Last Name) في السطر رقم 8. يمكن أيضاً إضافة عمود "الاسم" (First Name) للتعريف الأفضل</li>
+          <li *ngIf="importIdentifier === 'idNumber'">يجب أن يحتوي ملف Excel على عمود "رقم الهوية" أو "رقم التعريف" أو "رقم الهوية/الكود" في السطر رقم 8</li>
+          <li *ngIf="importMode === 'single'">يجب أن يحتوي ملف Excel على عمود "الدرجة" أو اسم نوع التقييم المحدد في السطر رقم 8</li>
           <li *ngIf="importMode === 'multiple'">
-            <strong>للاستيراد المتعدد:</strong> يجب أن يحتوي ملف Excel على أعمدة للدرجات بأسماء:
+            <strong>للاستيراد المتعدد:</strong> يجب أن يحتوي ملف Excel على أعمدة للدرجات بأسماء في السطر رقم 8:
             <ul class="list-disc list-inside mt-1 mr-4">
               <li>التقييم المستمر (أو Continuous Assessment)</li>
-              <li>التعبير الشفهي أو التعبير الشفهي/العمل العملي (أو Oral Expression)</li>
-              <li>الفرض أو معدل الفروض (أو Assignment)</li>
+              <li>التعبير الشفهي/العمل العملي (أو Oral Expression) - <strong>اختياري</strong></li>
+              <li>الفرض (أو Assignment)</li>
               <li>الاختبار (أو Test)</li>
             </ul>
           </li>
         </ul>
         <p *ngIf="importMode === 'multiple'" class="mt-2 pt-2 border-t border-blue-300">
-          <strong>ملاحظة:</strong> يمكن استيراد جميع النقاط دفعة واحدة من ملف Excel واحد يحتوي على جميع الأعمدة المذكورة أعلاه.
+          <strong>ملاحظة:</strong> يمكن استيراد جميع النقاط دفعة واحدة من ملف Excel واحد يحتوي على جميع الأعمدة المذكورة أعلاه. عمود التعبير الشفهي/العمل العملي اختياري ويمكن استيراد باقي الأنواع بدونه.
         </p>
       </div>
       

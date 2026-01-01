@@ -350,24 +350,63 @@ export class GradesService {
 
       for (const worksheet of workbook.worksheets) {
         const sheetName = worksheet.name;
+        
+        // Determine the maximum column count by scanning actual rows
+        let actualMaxColumn = 0;
+        const rowCount = worksheet.actualRowCount || worksheet.rowCount || 100;
+        
+        // First pass: find maximum column count
+        for (let rowNum = 1; rowNum <= Math.min(rowCount, 100); rowNum++) {
+          const row = worksheet.getRow(rowNum);
+          if (!row) continue;
+          
+          if (row.cellCount > actualMaxColumn) {
+            actualMaxColumn = row.cellCount;
+          }
+          // Also check actual column numbers in use
+          row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+            if (colNumber > actualMaxColumn) {
+              actualMaxColumn = colNumber;
+            }
+          });
+        }
+        
+        // Ensure minimum of 10 columns to handle most cases
+        actualMaxColumn = Math.max(actualMaxColumn, 10);
+        
+        // Convert worksheet to 2D array with proper column alignment
         const rawData: any[][] = [];
-
-        // Convert worksheet to 2D array
-        worksheet.eachRow((row) => {
+        
+        for (let rowNum = 1; rowNum <= Math.min(rowCount, 1000); rowNum++) {
+          const row = worksheet.getRow(rowNum);
+          if (!row) continue;
+          
           const rowData: any[] = [];
-          row.eachCell({ includeEmpty: true }, (cell) => {
+          for (let colNum = 1; colNum <= actualMaxColumn; colNum++) {
+            const cell = row.getCell(colNum);
             let value = cell.value;
+            
             if (value === null || value === undefined) {
               value = '';
-            } else if (typeof value === 'object' && 'text' in value) {
-              value = value.text;
-            } else if (value instanceof Date) {
-              value = value.toISOString().split('T')[0];
+            } else if (typeof value === 'object' && value !== null) {
+              if ('text' in value) {
+                value = value.text;
+              } else if ('result' in value && typeof value.result !== 'undefined') {
+                value = value.result;
+              } else if (value instanceof Date) {
+                value = value.toISOString().split('T')[0];
+              } else {
+                value = String(value);
+              }
             }
             rowData.push(value);
-          });
-          rawData.push(rowData);
-        });
+          }
+          
+          // Only add non-empty rows
+          if (rowData.some(cell => cell !== '' && cell !== null && cell !== undefined)) {
+            rawData.push(rowData);
+          }
+        }
 
         if (rawData.length > 0) {
           sheetsInfo.push({

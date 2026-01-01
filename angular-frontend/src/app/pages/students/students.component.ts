@@ -117,9 +117,13 @@ export class StudentsComponent implements OnInit {
   };
   showImportModal: boolean = false;
   showHeaderRowModal: boolean = false;
+  showSheetSelectorModal: boolean = false;
   pendingExcelData: Array<{ students: any[], className: string, startRow: number, rawData: any[][] }> = [];
   selectedHeaderRow: { [sheetName: string]: number } = {};
   detectedHeaderRow: { [sheetName: string]: number } = {};
+  availableSheets: Array<{ sheetName: string; detectedRow: number; rawData: any[][] }> = [];
+  selectedSheetsForImport: string[] = []; // Array of sheet names to import
+  importAllSheets: boolean = true; // Default to import all sheets
 
   // Student Report Modal
   showReportModal: boolean = false;
@@ -618,6 +622,28 @@ export class StudentsComponent implements OnInit {
     }
   }
 
+  deleteAllStudents(): void {
+    const count = this.students.length;
+    if (count === 0) {
+      alert('لا يوجد تلاميذ للحذف');
+      return;
+    }
+    
+    if (confirm(`هل أنت متأكد من حذف جميع التلاميذ (${count} تلميذ)؟\nهذه العملية لا يمكن التراجع عنها!`)) {
+      this.apiService.delete('/students').subscribe({
+        next: () => {
+          alert(`تم حذف جميع التلاميذ بنجاح (${count} تلميذ)`);
+          this.loadStudents();
+        },
+        error: (error) => {
+          console.error('Error deleting all students:', error);
+          const errorMessage = error?.error?.message || error?.message || 'حدث خطأ أثناء حذف التلاميذ';
+          alert(errorMessage);
+        }
+      });
+    }
+  }
+
   // Search and Filter
   applyFilters(): void {
     let filtered = [...this.students];
@@ -829,6 +855,11 @@ export class StudentsComponent implements OnInit {
             }
           });
 
+          // Store available sheets for selection
+          this.availableSheets = sheetsInfo;
+          this.selectedSheetsForImport = sheetsInfo.map(s => s.sheetName);
+          this.importAllSheets = true;
+
           // If some sheets need manual header row selection, show modal
           if (hasUndetectedSheets) {
             this.pendingExcelData = sheetsInfo.map(info => ({
@@ -842,48 +873,15 @@ export class StudentsComponent implements OnInit {
             return;
           }
 
-          // All sheets have detected header rows, process them
-          const allStudentsData: Array<{ students: any[], className: string, startRow: number }> = [];
-          let totalStudents = 0;
-
-          for (const info of sheetsInfo) {
-            if (info.detectedRow === -1) continue;
-
-            const headers = info.rawData[info.detectedRow];
-            const dataRows = info.rawData.slice(info.detectedRow + 1).filter(row => 
-              row.some(cell => cell !== '' && cell !== null && cell !== undefined)
-            );
-
-            if (dataRows.length === 0) continue;
-
-            // Convert to object array with proper column mapping
-            const jsonData = dataRows.map(row => {
-              const obj: any = {};
-              headers.forEach((header, index) => {
-                if (header && header !== '') {
-                  obj[header] = row[index] !== undefined && row[index] !== null ? row[index] : '';
-                }
-              });
-              return obj;
-            });
-
-            allStudentsData.push({
-              students: jsonData,
-              className: info.sheetName.trim(),
-              startRow: info.detectedRow + 2
-            });
-            
-            totalStudents += jsonData.length;
-          }
-
-          if (allStudentsData.length === 0) {
-            alert('لم يتم العثور على بيانات صحيحة في أي ورقة عمل');
+          // If multiple sheets, show sheet selector modal
+          if (sheetsInfo.length > 1) {
+            this.showSheetSelectorModal = true;
             event.target.value = '';
             return;
           }
 
-          // Process all sheets with their class names
-          this.processExcelDataWithClasses(allStudentsData, totalStudents);
+          // Single sheet or proceed with all sheets
+          this.processSelectedSheets(sheetsInfo);
           event.target.value = '';
         },
         error: (err) => {
@@ -902,15 +900,37 @@ export class StudentsComponent implements OnInit {
     }
   }
 
+  /**
+   * Normalize Arabic text for better matching (handles hamza, taa marbuta, etc.)
+   */
+  normalizeArabicText(text: string): string {
+    if (!text) return '';
+    
+    let normalized = String(text).trim();
+    
+    // Normalize hamza variations
+    normalized = normalized.replace(/[أإآ]/g, 'ا');
+    normalized = normalized.replace(/[ىي]/g, 'ي');
+    normalized = normalized.replace(/[ةه]/g, 'ه');
+    
+    // Remove diacritics (tashkeel)
+    normalized = normalized.replace(/[\u064B-\u065F\u0670]/g, '');
+    
+    // Normalize spaces
+    normalized = normalized.replace(/\s+/g, ' ').trim();
+    
+    return normalized.toLowerCase();
+  }
+
   findHeaderRow(rawData: any[][]): number {
     // Column names to search for (in Arabic and English)
     // Prioritize exact matches from grade sheet format
     const keyColumns = [
       // ID number - most important for grade sheet format
       'رقم التعريف', 'رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف',
-      // First name variations
+      // First name variations - الاسم comes first
       'الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'name',
-      // Last name variations
+      // Last name variations - اللقب comes first
       'اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'last name', 'surname',
       // Date of birth variations (including تاريخ الازدياد)
       'تاريخ الميلاد', 'تاريخ الازدياد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'تاريخ_الازدياد', 'birth_date', 'date of birth', 'dob',
@@ -922,51 +942,262 @@ export class StudentsComponent implements OnInit {
       'معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater'
     ];
 
-    // Search through all rows (check first 20 rows to avoid checking too many)
-    const maxRowsToCheck = Math.min(20, rawData.length);
+    // Preferred header row positions (0-indexed, so row 8 = index 7, row 9 = index 8)
+    const preferredRows = [7, 8]; // Rows 8 and 9 (0-indexed: 7, 8)
+    
+    // Search through ALL rows (increased from 20 to 100 to find headers in any row)
+    const maxRowsToCheck = Math.min(100, rawData.length);
+    
+    let bestMatch = { row: -1, score: 0, exactMatches: 0, foundCount: 0, criticalMatches: 0 };
+    
+    // First, check preferred rows (8 and 9) with higher priority
+    for (const preferredRow of preferredRows) {
+      if (preferredRow >= rawData.length) continue;
+      
+      const row = rawData[preferredRow];
+      if (!row || row.length === 0) continue;
+
+      // CRITICAL: Must have both lastName (اللقب) and firstName (الاسم) columns
+      const hasLastName = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      if (!hasLastName || !hasFirstName) {
+        continue; // Skip this row if it doesn't have both required columns
+      }
+
+      const matchResult = this.evaluateRowForHeaders(row, keyColumns);
+      if (matchResult.foundCount >= 2) {
+        // Give bonus points for being in preferred row
+        const preferredBonus = 100;
+        const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                     matchResult.criticalMatches * 30 + preferredBonus;
+        
+        if (score > bestMatch.score) {
+          bestMatch = { 
+            row: preferredRow, 
+            score, 
+            exactMatches: matchResult.exactMatches, 
+            foundCount: matchResult.foundCount,
+            criticalMatches: matchResult.criticalMatches
+          };
+        }
+      }
+    }
+    
+    // Then search through all other rows
     for (let i = 0; i < maxRowsToCheck; i++) {
+      // Skip preferred rows as we already checked them
+      if (preferredRows.includes(i)) continue;
+      
       const row = rawData[i];
       if (!row || row.length === 0) continue;
 
-      // Convert row to strings for comparison
-      const rowStrings = row.map(cell => {
-        if (cell === null || cell === undefined) return '';
-        return String(cell).trim();
-      });
-
-      // Check if this row contains key column names (exact match preferred)
-      let foundCount = 0;
-      let exactMatches = 0;
+      const matchResult = this.evaluateRowForHeaders(row, keyColumns);
       
-      for (const keyColumn of keyColumns) {
-        const keyLower = keyColumn.toLowerCase().trim();
-        const found = rowStrings.some(cell => {
-          const cellLower = cell.toLowerCase().trim();
-          // Exact match gets higher priority
-          if (cellLower === keyLower) {
-            exactMatches++;
-            return true;
-          }
-          // Partial match
-          return cellLower.includes(keyLower) || keyLower.includes(cellLower);
-        });
-        
-        if (found) {
-          foundCount++;
+      // CRITICAL: Must have both lastName (اللقب) and firstName (الاسم) columns
+      const hasLastName = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      // Calculate score: prioritize rows with more exact matches and critical columns
+      const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                   matchResult.criticalMatches * 30;
+      
+      // REQUIRE both lastName and firstName to be present
+      // If we found at least 2 key columns (with at least 1 exact match preferred), this is likely the header row
+      if (hasLastName && hasFirstName && matchResult.foundCount >= 2 && (matchResult.exactMatches >= 1 || matchResult.foundCount >= 3)) {
+        if (score > bestMatch.score) {
+          bestMatch = { 
+            row: i, 
+            score, 
+            exactMatches: matchResult.exactMatches, 
+            foundCount: matchResult.foundCount,
+            criticalMatches: matchResult.criticalMatches
+          };
         }
       }
-
-      // If we found at least 2 key columns (with at least 1 exact match preferred), this is likely the header row
-      // For grade sheet format, we should find at least: رقم التعريف, اللقب, الاسم, تاريخ الميلاد
-      if (foundCount >= 2) {
-        // Prefer rows with more exact matches
-        if (exactMatches >= 1 || foundCount >= 3) {
-          return i;
+    }
+    
+    // Final verification: ensure the best match has both required columns
+    if (bestMatch.row >= 0) {
+      const finalRow = rawData[bestMatch.row];
+      const hasLastName = this.hasColumnInRow(finalRow, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(finalRow, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      if (!hasLastName || !hasFirstName) {
+        // If best match doesn't have both, try to find any row that has both
+        for (let i = 0; i < maxRowsToCheck; i++) {
+          const row = rawData[i];
+          if (!row || row.length === 0) continue;
+          
+          const hasLastNameCheck = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+          const hasFirstNameCheck = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+          
+          if (hasLastNameCheck && hasFirstNameCheck) {
+            const matchResult = this.evaluateRowForHeaders(row, keyColumns);
+            const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                         matchResult.criticalMatches * 30;
+            if (score > bestMatch.score || bestMatch.row === -1) {
+              bestMatch = { 
+                row: i, 
+                score, 
+                exactMatches: matchResult.exactMatches, 
+                foundCount: matchResult.foundCount,
+                criticalMatches: matchResult.criticalMatches
+              };
+            }
+          }
         }
       }
     }
 
-    return -1; // Header row not found
+    return bestMatch.row; // Return the best matching row, or -1 if none found
+  }
+  
+  private hasColumnInRow(row: any[], columnNames: string[]): boolean {
+    const rowStrings = row.map(cell => {
+      if (cell === null || cell === undefined) return '';
+      return String(cell).trim();
+    });
+    
+    // Check if row contains mostly numbers (likely data row, not header)
+    const numericCells = rowStrings.filter(cell => {
+      if (!cell) return false;
+      // Check if cell is a number or contains mostly digits
+      const numValue = Number(cell);
+      return !isNaN(numValue) && isFinite(numValue) && cell.trim() === String(numValue);
+    }).length;
+    
+    // If more than 50% of cells are pure numbers, this is likely a data row, not a header
+    if (numericCells > rowStrings.length * 0.5 && rowStrings.length > 3) {
+      return false;
+    }
+    
+    for (const columnName of columnNames) {
+      const found = rowStrings.some(cell => {
+        if (!cell) return false;
+        
+        const cellLower = cell.toLowerCase().trim();
+        const normalizedCell = this.normalizeArabicText(cell);
+        const normalizedKey = this.normalizeArabicText(columnName);
+        
+        // Exact match (highest priority)
+        if (cellLower === columnName.toLowerCase().trim() || normalizedCell === normalizedKey) {
+          return true;
+        }
+        
+        // For Arabic columns, be more strict - require the exact word
+        if (columnName.includes('الاسم') || columnName.includes('اللقب')) {
+          // Must contain the exact Arabic word, not just part of it
+          if (normalizedCell === normalizedKey) {
+            return true;
+          }
+          // Allow if it's the exact word with optional spaces
+          const exactMatch = new RegExp(`^\\s*${normalizedKey}\\s*$`, 'i').test(normalizedCell);
+          if (exactMatch) {
+            return true;
+          }
+          return false; // Don't use partial match for critical Arabic columns
+        }
+        
+        // For English columns, allow partial match but be more careful
+        // Only match if the cell starts with or equals the column name
+        if (cellLower.startsWith(columnName.toLowerCase().trim()) || 
+            columnName.toLowerCase().trim().startsWith(cellLower)) {
+          return true;
+        }
+        
+        return false;
+      });
+      
+      if (found) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  private evaluateRowForHeaders(row: any[], keyColumns: string[]): {
+    foundCount: number;
+    exactMatches: number;
+    criticalMatches: number;
+  } {
+    // Convert row to strings for comparison
+    const rowStrings = row.map(cell => {
+      if (cell === null || cell === undefined) return '';
+      return String(cell).trim();
+    });
+
+    // Check if row contains mostly numbers (likely data row, not header)
+    const numericCells = rowStrings.filter(cell => {
+      if (!cell) return false;
+      const numValue = Number(cell);
+      return !isNaN(numValue) && isFinite(numValue) && cell.trim() === String(numValue);
+    }).length;
+    
+    // If more than 50% of cells are pure numbers, this is likely a data row, not a header
+    if (numericCells > rowStrings.length * 0.5 && rowStrings.length > 3) {
+      return { foundCount: 0, exactMatches: 0, criticalMatches: 0 };
+    }
+
+    // Check if this row contains key column names (exact match preferred)
+    let foundCount = 0;
+    let exactMatches = 0;
+    let criticalMatches = 0; // رقم التعريف, اللقب, الاسم
+    
+    for (const keyColumn of keyColumns) {
+      const keyLower = keyColumn.toLowerCase().trim();
+      let isExactMatch = false;
+      let isCritical = false;
+      
+      const found = rowStrings.some(cell => {
+        if (!cell) return false;
+        
+        const cellLower = cell.toLowerCase().trim();
+        const normalizedCell = this.normalizeArabicText(cell);
+        const normalizedKey = this.normalizeArabicText(keyColumn);
+        
+        // Exact match gets higher priority
+        if (cellLower === keyLower || normalizedCell === normalizedKey) {
+          isExactMatch = true;
+          // Check if it's a critical column (ID, lastName, firstName)
+          if (keyColumn.includes('رقم التعريف') || keyColumn.includes('رقم الهوية') || 
+              keyColumn.includes('idNumber') || keyColumn.includes('id_number')) {
+            isCritical = true;
+          } else if (keyColumn.includes('اللقب') || keyColumn.includes('lastName') || 
+                     keyColumn.includes('last_name') || keyColumn.includes('surname')) {
+            isCritical = true;
+          } else if (keyColumn.includes('الاسم') || keyColumn.includes('firstName') || 
+                     keyColumn.includes('first_name')) {
+            isCritical = true;
+          }
+          return true;
+        }
+        
+        // For Arabic columns (الاسم, اللقب), be strict - require exact word match
+        if (keyColumn.includes('الاسم') || keyColumn.includes('اللقب')) {
+          // Only accept exact normalized match for Arabic columns
+          return normalizedCell === normalizedKey;
+        }
+        
+        // For other columns, allow partial match but be more careful
+        // Only match if the cell starts with or equals the column name
+        return cellLower.startsWith(keyLower) || keyLower.startsWith(cellLower) ||
+               normalizedCell.startsWith(normalizedKey) || normalizedKey.startsWith(normalizedCell);
+      });
+      
+      if (found) {
+        foundCount++;
+        if (isExactMatch) {
+          exactMatches++;
+        }
+        if (isCritical) {
+          criticalMatches++;
+        }
+      }
+    }
+
+    return { foundCount, exactMatches, criticalMatches };
   }
 
   processExcelDataWithClasses(sheetsData: Array<{ students: any[], className: string, startRow: number }>, totalStudents: number): void {
@@ -981,13 +1212,16 @@ export class StudentsComponent implements OnInit {
 
     // Column mapping - supports multiple possible column names
     // Updated to prioritize exact matches from the grade sheet format
+    // IMPORTANT: lastName must come from "اللقب" and firstName from "الاسم"
     // رقم التعريف = رقم الهوية / الكود
     // مكان الميلاد = مكان الازدياد
     // تاريخ الميلاد = تاريخ الازدياد
     const columnMap: { [key: string]: string[] } = {
       idNumber: ['رقم التعريف', 'رقم الهوية / الكود', 'رقم الهوية', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف', 'identification number'],
-      lastName: ['اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'surname'],
-      firstName: ['الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name'],
+      // CRITICAL: lastName comes from "اللقب" (Last Name / Family Name)
+      lastName: ['اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'surname', 'nom', 'Nom'],
+      // CRITICAL: firstName comes from "الاسم" (First Name / Given Name)
+      firstName: ['الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'prenom', 'Prénom'],
       dateOfBirth: ['تاريخ الميلاد', 'تاريخ الازدياد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'تاريخ_الازدياد', 'birth_date', 'date of birth', 'dob'],
       placeOfBirth: ['مكان الميلاد', 'مكان الازدياد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'مكان_الازدياد', 'birth_place', 'lieu de naissance', 'place'],
       gender: ['الجنس', 'gender', 'sex', 'sexe', 'النوع', 'الجنس/النوع', 'sex/gender'],
@@ -1075,7 +1309,12 @@ export class StudentsComponent implements OnInit {
           const currentRowNumber = sheet.startRow + i;
           
           if (!studentData.lastName || !studentData.firstName) {
-            errors.push(`ورقة "${sheet.className}" - الصف ${currentRowNumber}: الاسم واللقب مطلوبان`);
+            // Get available column names for debugging
+            const availableColumns = Object.keys(row).filter(k => row[k] !== '' && row[k] !== null && row[k] !== undefined);
+            const columnHint = availableColumns.length > 0 
+              ? ` (الأعمدة المتاحة: ${availableColumns.slice(0, 5).join(', ')}${availableColumns.length > 5 ? '...' : ''})`
+              : '';
+            errors.push(`ورقة "${sheet.className}" - الصف ${currentRowNumber}: الاسم واللقب مطلوبان${columnHint}`);
             continue;
           }
 
@@ -1129,6 +1368,147 @@ export class StudentsComponent implements OnInit {
     });
   }
 
+  processSelectedSheets(sheetsInfo: Array<{ sheetName: string; detectedRow: number; rawData: any[][] }>): void {
+    // Filter sheets based on selection
+    const sheetsToProcess = this.importAllSheets 
+      ? sheetsInfo 
+      : sheetsInfo.filter(info => this.selectedSheetsForImport.includes(info.sheetName));
+
+    if (sheetsToProcess.length === 0) {
+      alert('يرجى اختيار ورقة واحدة على الأقل للاستيراد');
+      return;
+    }
+
+    // Process all selected sheets
+    const allStudentsData: Array<{ students: any[], className: string, startRow: number }> = [];
+    let totalStudents = 0;
+
+    for (const info of sheetsToProcess) {
+      // Re-detect header row if not found or if detected row doesn't contain required columns
+      let headerRowIndex = info.detectedRow;
+      
+      if (headerRowIndex === -1 || headerRowIndex >= info.rawData.length) {
+        // Try to find header row again
+        headerRowIndex = this.findHeaderRow(info.rawData);
+      }
+      
+      // Verify that the detected header row actually contains "الاسم" and "اللقب"
+      if (headerRowIndex >= 0 && headerRowIndex < info.rawData.length) {
+        const potentialHeaders = info.rawData[headerRowIndex];
+        const headerStrings = potentialHeaders.map(cell => {
+          if (cell === null || cell === undefined) return '';
+          return String(cell).trim();
+        });
+        
+        const hasLastName = headerStrings.some(h => {
+          const normalized = this.normalizeArabicText(h);
+          return normalized.includes(this.normalizeArabicText('اللقب')) || 
+                 h.toLowerCase().includes('lastname') || 
+                 h.toLowerCase().includes('last_name') ||
+                 h.toLowerCase().includes('surname');
+        });
+        
+        const hasFirstName = headerStrings.some(h => {
+          const normalized = this.normalizeArabicText(h);
+          return normalized.includes(this.normalizeArabicText('الاسم')) || 
+                 h.toLowerCase().includes('firstname') || 
+                 h.toLowerCase().includes('first_name') ||
+                 (h.toLowerCase().includes('name') && !h.toLowerCase().includes('last'));
+        });
+        
+        // If header row doesn't have required columns, try to find it again
+        if (!hasLastName || !hasFirstName) {
+          headerRowIndex = this.findHeaderRow(info.rawData);
+        }
+      }
+      
+      if (headerRowIndex === -1 || headerRowIndex >= info.rawData.length) {
+        console.warn(`Could not find header row for sheet: ${info.sheetName}`);
+        continue;
+      }
+
+      const headers = info.rawData[headerRowIndex];
+      const dataRows = info.rawData.slice(headerRowIndex + 1).filter(row => 
+        row.some(cell => cell !== '' && cell !== null && cell !== undefined)
+      );
+
+      if (dataRows.length === 0) continue;
+
+      // Convert to object array with proper column mapping
+      const jsonData = dataRows.map(row => {
+        const obj: any = {};
+        headers.forEach((header, index) => {
+          if (header) {
+            // Trim header to remove leading/trailing spaces
+            const trimmedHeader = String(header).trim();
+            if (trimmedHeader !== '') {
+              // Store both trimmed and original header for maximum compatibility
+              const cellValue = row[index];
+              // Only set if value exists (don't set empty strings for missing values)
+              if (cellValue !== undefined && cellValue !== null) {
+                // Convert to string and trim if it's a string, but preserve numbers
+                if (typeof cellValue === 'string') {
+                  const trimmed = cellValue.trim();
+                  obj[trimmedHeader] = trimmed || '';
+                } else {
+                  obj[trimmedHeader] = cellValue;
+                }
+                // Also store with original header (if different) for backward compatibility
+                if (trimmedHeader !== String(header)) {
+                  obj[header] = obj[trimmedHeader];
+                }
+              } else {
+                obj[trimmedHeader] = '';
+              }
+            }
+          }
+        });
+        return obj;
+      });
+
+      allStudentsData.push({
+        students: jsonData,
+        className: info.sheetName.trim(),
+        startRow: headerRowIndex + 2
+      });
+      
+      totalStudents += jsonData.length;
+    }
+
+    if (allStudentsData.length === 0) {
+      alert('لم يتم العثور على بيانات صحيحة في الأوراق المحددة');
+      return;
+    }
+
+    // Process all sheets with their class names
+    this.processExcelDataWithClasses(allStudentsData, totalStudents);
+  }
+
+  confirmSheetSelection(): void {
+    if (!this.importAllSheets && this.selectedSheetsForImport.length === 0) {
+      alert('يرجى اختيار ورقة واحدة على الأقل للاستيراد');
+      return;
+    }
+
+    this.showSheetSelectorModal = false;
+    this.processSelectedSheets(this.availableSheets);
+  }
+
+  toggleSheetSelection(sheetName: string): void {
+    const index = this.selectedSheetsForImport.indexOf(sheetName);
+    if (index > -1) {
+      this.selectedSheetsForImport.splice(index, 1);
+    } else {
+      this.selectedSheetsForImport.push(sheetName);
+    }
+  }
+
+  onImportAllSheetsChange(): void {
+    if (this.importAllSheets) {
+      this.selectedSheetsForImport = this.availableSheets.map(s => s.sheetName);
+    }
+  }
+
   processExcelData(jsonData: any[], startRowNumber: number = 2): void {
     // Legacy method - kept for backward compatibility
     // This method is now replaced by processExcelDataWithClasses
@@ -1136,41 +1516,76 @@ export class StudentsComponent implements OnInit {
   }
 
   mapRowToStudent(row: any, columnMap: { [key: string]: string[] }): CreateStudentDto {
-    const findColumnValue = (keys: string[], convertToString: boolean = false): any => {
+    const findColumnValue = (keys: string[], convertToString: boolean = false, normalize: boolean = false): any => {
       for (const key of keys) {
         // Check exact match first (case-sensitive for Arabic)
-        if (row[key] !== undefined && row[key] !== null && row[key] !== '') {
+        if (row[key] !== undefined && row[key] !== null) {
           const value = row[key];
+          // Skip empty strings, but allow numbers including 0
+          if (typeof value === 'string' && value.trim() === '') {
+            continue;
+          }
           if (convertToString && typeof value === 'number') {
             return String(value);
           }
+          if (normalize && typeof value === 'string') {
+            const normalized = this.normalizeArabicText(value.trim());
+            return normalized || undefined;
+          }
+          if (typeof value === 'string') {
+            const trimmed = value.trim();
+            return trimmed || undefined;
+          }
           return value;
         }
-        // Check exact match with trim
+        // Check exact match with trim and normalization
         const rowKeys = Object.keys(row);
         const matchedKey = rowKeys.find(rk => {
           const rkTrimmed = String(rk).trim();
           const keyTrimmed = String(key).trim();
+          const rkNormalized = this.normalizeArabicText(rkTrimmed);
+          const keyNormalized = this.normalizeArabicText(keyTrimmed);
+          
           // Exact match (case-sensitive for Arabic text)
           if (rkTrimmed === keyTrimmed) {
+            return true;
+          }
+          // Normalized match (handles hamza, taa marbuta, etc.)
+          if (rkNormalized === keyNormalized) {
             return true;
           }
           // Case-insensitive match for English
           if (rkTrimmed.toLowerCase() === keyTrimmed.toLowerCase()) {
             return true;
           }
-          // Partial match for flexibility
-          return rkTrimmed.includes(keyTrimmed) || keyTrimmed.includes(rkTrimmed);
+          // Partial match for flexibility (but prioritize longer matches)
+          const rkIncludesKey = rkTrimmed.includes(keyTrimmed);
+          const keyIncludesRk = keyTrimmed.includes(rkTrimmed);
+          const rkNormIncludesKey = rkNormalized.includes(keyNormalized);
+          const keyNormIncludesRk = keyNormalized.includes(rkNormalized);
+          return rkIncludesKey || keyIncludesRk || rkNormIncludesKey || keyNormIncludesRk;
         });
-        if (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null && row[matchedKey] !== '') {
+        if (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null) {
           const value = row[matchedKey];
+          // Skip empty strings
+          if (typeof value === 'string' && value.trim() === '') {
+            continue;
+          }
           // Convert to string if needed
           if (convertToString && typeof value === 'number') {
             return String(value);
           }
           // Convert to string and trim if it's a string
           if (typeof value === 'string') {
-            return value.trim();
+            const trimmed = value.trim();
+            if (!trimmed) {
+              continue;
+            }
+            if (normalize) {
+              const normalized = this.normalizeArabicText(trimmed);
+              return normalized || undefined;
+            }
+            return trimmed;
           }
           return value;
         }
@@ -1194,11 +1609,33 @@ export class StudentsComponent implements OnInit {
       return String(value);
     };
 
+    // CRITICAL: Ensure lastName comes from "اللقب" and firstName from "الاسم"
+    // Use normalization for better matching
+    let lastNameRaw = findColumnValue(columnMap['lastName'], false, true);
+    let firstNameRaw = findColumnValue(columnMap['firstName'], false, true);
+    
+    // If not found with normalization, try without normalization
+    if (!lastNameRaw) {
+      lastNameRaw = findColumnValue(columnMap['lastName'], false, false);
+    }
+    if (!firstNameRaw) {
+      firstNameRaw = findColumnValue(columnMap['firstName'], false, false);
+    }
+    
+    // Note: We require separate "الاسم" and "اللقب" columns - no combined column support
+    // This ensures accurate data mapping and prevents confusion
+    
+    // Convert to strings and trim properly
+    const lastName = toString(lastNameRaw);
+    const firstName = toString(firstNameRaw);
+    
     const studentData: CreateStudentDto = {
       // idNumber must be string - convert from number if needed
       idNumber: toString(findColumnValue(columnMap['idNumber'], true)),
-      lastName: findColumnValue(columnMap['lastName']) || '',
-      firstName: findColumnValue(columnMap['firstName']) || '',
+      // IMPORTANT: lastName from "اللقب" column
+      lastName: lastName || '',
+      // IMPORTANT: firstName from "الاسم" column
+      firstName: firstName || '',
       dateOfBirth: this.parseDate(findColumnValue(columnMap['dateOfBirth'])),
       placeOfBirth: toString(findColumnValue(columnMap['placeOfBirth'])),
       gender: this.parseGender(findColumnValue(columnMap['gender'])),

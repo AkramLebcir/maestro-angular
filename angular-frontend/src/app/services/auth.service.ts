@@ -54,11 +54,20 @@ export class AuthService {
 
   logout(): void {
     // Try to notify backend to clear refresh token cookie/session
+    // Ignore errors as user is already logging out
     this.http.post(`${this.apiUrl}/auth/logout`, {}, {
       withCredentials: true
     }).subscribe({
-      next: () => {},
-      error: () => {}
+      next: () => {
+        // Logout successful on backend
+      },
+      error: (err) => {
+        // Ignore 401/403 errors as token might already be invalid
+        // This is expected behavior when logging out
+        if (err.status !== 401 && err.status !== 403) {
+          console.warn('Logout request failed:', err);
+        }
+      }
     });
 
     this.removeToken();

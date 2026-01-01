@@ -41,45 +41,101 @@ export class ClassesService {
         throw new BadRequestException('لا توجد أوراق عمل في ملف Excel');
       }
       
-      // Convert worksheet to JSON array
-      const data: any[] = [];
-      const headers: string[] = [];
+      // Determine the maximum column count by scanning actual rows
+      let actualMaxColumn = 0;
+      const rowCount = worksheet.actualRowCount || worksheet.rowCount || 100;
       
-      // Get headers from first row
-      worksheet.getRow(1).eachCell({ includeEmpty: true }, (cell, colNumber) => {
-        headers[colNumber - 1] = cell.value ? String(cell.value).trim() : '';
+      // First pass: find maximum column count
+      for (let rowNum = 1; rowNum <= Math.min(rowCount, 100); rowNum++) {
+        const row = worksheet.getRow(rowNum);
+        if (!row) continue;
+        
+        if (row.cellCount > actualMaxColumn) {
+          actualMaxColumn = row.cellCount;
+        }
+        // Also check actual column numbers in use
+        row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+          if (colNumber > actualMaxColumn) {
+            actualMaxColumn = colNumber;
+          }
+        });
+      }
+      
+      // Ensure minimum of 10 columns to handle most cases
+      actualMaxColumn = Math.max(actualMaxColumn, 10);
+      
+      // Convert worksheet to 2D array first to ensure proper column alignment
+      const rawData: any[][] = [];
+      
+      for (let rowNum = 1; rowNum <= Math.min(rowCount, 1000); rowNum++) {
+        const row = worksheet.getRow(rowNum);
+        if (!row) continue;
+        
+        const rowData: any[] = [];
+        for (let colNum = 1; colNum <= actualMaxColumn; colNum++) {
+          const cell = row.getCell(colNum);
+          let value = cell.value;
+          
+          if (value === null || value === undefined) {
+            value = '';
+          } else if (typeof value === 'object' && value !== null) {
+            if ('text' in value) {
+              value = value.text;
+            } else if ('result' in value && typeof value.result !== 'undefined') {
+              value = value.result;
+            } else if (value instanceof Date) {
+              value = value;
+            } else {
+              value = String(value);
+            }
+          }
+          rowData.push(value);
+        }
+        
+        // Only add non-empty rows
+        if (rowData.some(cell => cell !== '' && cell !== null && cell !== undefined)) {
+          rawData.push(rowData);
+        }
+      }
+      
+      // Find header row using the same logic as students service
+      const headerRowIndex = this.findHeaderRow(rawData);
+      if (headerRowIndex === -1) {
+        throw new BadRequestException('لم يتم العثور على صف الرأس في ملف Excel. تأكد من وجود أعمدة مثل "رقم التعريف" و "الاسم" و "اللقب"');
+      }
+      
+      // Extract headers from detected header row
+      const headers: string[] = rawData[headerRowIndex].map(cell => {
+        if (cell === null || cell === undefined) return '';
+        return String(cell).trim();
       });
       
       // Convert rows to objects
-      worksheet.eachRow((row, rowNumber) => {
-        if (rowNumber === 1) return; // Skip header row
-        
+      const data: any[] = [];
+      for (let i = headerRowIndex + 1; i < rawData.length; i++) {
+        const row = rawData[i];
         const rowData: any = {};
-        row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-          const header = headers[colNumber - 1];
-          if (header) {
-            let value = cell.value;
-            // Handle different cell value types
-            if (value === null || value === undefined) {
-              rowData[header] = null;
-            } else if (typeof value === 'object' && 'text' in value) {
-              // Rich text
-              rowData[header] = value.text;
-            } else if (value instanceof Date) {
-              // Date value
-              rowData[header] = value;
-            } else {
-              // Regular value
-              rowData[header] = value;
-            }
+        
+        for (let j = 0; j < Math.min(headers.length, row.length); j++) {
+          const header = headers[j];
+          if (!header || header === '') continue;
+          
+          let value = row[j];
+          // Handle different cell value types
+          if (value === null || value === undefined || value === '') {
+            rowData[header] = null;
+          } else if (value instanceof Date) {
+            rowData[header] = value;
+          } else {
+            rowData[header] = value;
           }
-        });
+        }
         
         // Only add row if it has at least one non-empty value
         if (Object.keys(rowData).length > 0 && Object.values(rowData).some(v => v !== null && v !== undefined && v !== '')) {
           data.push(rowData);
         }
-      });
+      }
 
       // Debug: Log sheet info
       console.log('Total rows in sheet:', data.length);
@@ -409,6 +465,43 @@ export class ClassesService {
         `فشل معالجة ملف Excel. يرجى التحقق من تنسيق الملف والمحاولة مرة أخرى. الخطأ: ${error.message || error}`
       );
     }
+  }
+
+  private findHeaderRow(rawData: any[][]): number {
+    const keyColumns = [
+      'رقم التعريف', 'رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف',
+      'الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'name',
+      'اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'last name', 'surname',
+      'الفوج التربوي', 'الفوج', 'القسم', 'Classroom', 'Section', 'Class',
+      'تاريخ الميلاد', 'تاريخ الازدياد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'تاريخ_الازدياد', 'birth_date', 'date of birth', 'dob',
+      'مكان الميلاد', 'مكان الازدياد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'مكان_الازدياد', 'birth_place', 'place of birth',
+      'الجنس', 'gender', 'sex', 'sexe', 'النوع', 'الجنس/النوع',
+      'معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater'
+    ];
+
+    const maxRowsToCheck = Math.min(20, rawData.length);
+    for (let i = 0; i < maxRowsToCheck; i++) {
+      const row = rawData[i];
+      if (!row || row.length === 0) continue;
+
+      const rowStrings = row.map(cell => {
+        if (cell === null || cell === undefined) return '';
+        return String(cell).trim().toLowerCase();
+      });
+
+      let matchCount = 0;
+      for (const keyColumn of keyColumns) {
+        if (rowStrings.some(cell => cell === keyColumn.toLowerCase() || cell.includes(keyColumn.toLowerCase()))) {
+          matchCount++;
+        }
+      }
+
+      if (matchCount >= 2) {
+        return i;
+      }
+    }
+
+    return -1;
   }
 
   async create(ownerId: number, createClassDto: CreateClassDto): Promise<ClassResponseDto> {

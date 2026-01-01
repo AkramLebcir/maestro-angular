@@ -44,6 +44,14 @@
           </svg>
           <span>{{ translate('students.addStudent') }}</span>
         </button>
+        <button 
+          (click)="deleteAllStudents()"
+          class="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-red-700 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          <span>حذف جميع التلاميذ</span>
+        </button>
       </div>
     </div>
 
@@ -657,6 +665,81 @@
           (click)="closeImportModal()"
           class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
           {{ translate('classes.close') }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Sheet Selector Modal -->
+<div 
+  *ngIf="showSheetSelectorModal"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto"
+  (click)="showSheetSelectorModal = false">
+  <div 
+    class="bg-white dark:bg-gray-800 dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 p-6 w-full max-w-2xl my-8"
+    (click)="$event.stopPropagation()">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-gray-800 dark:text-gray-200">اختيار الأوراق للاستيراد</h3>
+      <button 
+        (click)="showSheetSelectorModal = false"
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4">
+      <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-4">
+        <p class="text-sm text-gray-700 dark:text-gray-300">
+          تم العثور على {{ availableSheets.length }} ورقة في الملف. اختر الأوراق التي تريد استيرادها:
+        </p>
+      </div>
+
+      <!-- Import All Option -->
+      <div class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg">
+        <input 
+          type="checkbox"
+          [(ngModel)]="importAllSheets"
+          (change)="onImportAllSheetsChange()"
+          id="importAll"
+          class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+        <label for="importAll" class="text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+          استيراد جميع الأوراق ({{ availableSheets.length }} ورقة)
+        </label>
+      </div>
+
+      <!-- Individual Sheet Selection -->
+      <div *ngIf="!importAllSheets" class="space-y-2 max-h-96 overflow-y-auto">
+        <div *ngFor="let sheet of availableSheets" 
+             class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700">
+          <input 
+            type="checkbox"
+            [checked]="selectedSheetsForImport.includes(sheet.sheetName)"
+            (change)="toggleSheetSelection(sheet.sheetName)"
+            [id]="'sheet-' + sheet.sheetName"
+            class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+          <label [for]="'sheet-' + sheet.sheetName" class="flex-1 text-sm font-medium text-gray-700 dark:text-gray-300 cursor-pointer">
+            {{ sheet.sheetName }}
+            <span class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+              (سطر الرأس: {{ sheet.detectedRow !== -1 ? sheet.detectedRow + 1 : 'غير محدد' }})
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+        <button 
+          (click)="showSheetSelectorModal = false"
+          class="px-4 py-2 bg-gray-200 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-300 transition">
+          إلغاء
+        </button>
+        <button 
+          (click)="confirmSheetSelection()"
+          class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+          تأكيد والاستيراد
         </button>
       </div>
     </div>

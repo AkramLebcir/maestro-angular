@@ -172,6 +172,13 @@ export class StudentsService {
     await this.studentRepository.remove(student);
   }
 
+  async removeAll(ownerId: number): Promise<void> {
+    const students = await this.studentRepository.find({ where: { ownerId } });
+    if (students.length > 0) {
+      await this.studentRepository.remove(students);
+    }
+  }
+
   async bulkCreate(
     ownerId: number,
     bulkCreateDto: BulkCreateStudentsDto,
@@ -324,24 +331,63 @@ export class StudentsService {
 
       for (const worksheet of workbook.worksheets) {
         const sheetName = worksheet.name;
+        
+        // Determine the maximum column count by scanning actual rows
+        let actualMaxColumn = 0;
+        const rowCount = worksheet.actualRowCount || worksheet.rowCount || 100;
+        
+        // First pass: find maximum column count
+        for (let rowNum = 1; rowNum <= Math.min(rowCount, 100); rowNum++) {
+          const row = worksheet.getRow(rowNum);
+          if (!row) continue;
+          
+          if (row.cellCount > actualMaxColumn) {
+            actualMaxColumn = row.cellCount;
+          }
+          // Also check actual column numbers in use
+          row.eachCell({ includeEmpty: false }, (cell, colNumber) => {
+            if (colNumber > actualMaxColumn) {
+              actualMaxColumn = colNumber;
+            }
+          });
+        }
+        
+        // Ensure minimum of 10 columns to handle most cases
+        actualMaxColumn = Math.max(actualMaxColumn, 10);
+        
+        // Convert worksheet to 2D array with proper column alignment
         const rawData: any[][] = [];
-
-        // Convert worksheet to 2D array
-        worksheet.eachRow((row, rowNumber) => {
+        
+        for (let rowNum = 1; rowNum <= Math.min(rowCount, 1000); rowNum++) {
+          const row = worksheet.getRow(rowNum);
+          if (!row) continue;
+          
           const rowData: any[] = [];
-          row.eachCell({ includeEmpty: true }, (cell) => {
+          for (let colNum = 1; colNum <= actualMaxColumn; colNum++) {
+            const cell = row.getCell(colNum);
             let value = cell.value;
+            
             if (value === null || value === undefined) {
               value = '';
-            } else if (typeof value === 'object' && 'text' in value) {
-              value = value.text;
-            } else if (value instanceof Date) {
-              value = value.toISOString().split('T')[0];
+            } else if (typeof value === 'object' && value !== null) {
+              if ('text' in value) {
+                value = value.text;
+              } else if ('result' in value && typeof value.result !== 'undefined') {
+                value = value.result;
+              } else if (value instanceof Date) {
+                value = value.toISOString().split('T')[0];
+              } else {
+                value = String(value);
+              }
             }
             rowData.push(value);
-          });
-          rawData.push(rowData);
-        });
+          }
+          
+          // Only add non-empty rows
+          if (rowData.some(cell => cell !== '' && cell !== null && cell !== undefined)) {
+            rawData.push(rowData);
+          }
+        }
 
         if (rawData.length === 0) continue;
 
@@ -363,10 +409,32 @@ export class StudentsService {
     }
   }
 
+  private normalizeArabicText(text: string): string {
+    if (!text) return '';
+    
+    let normalized = String(text).trim();
+    
+    // Normalize hamza variations
+    normalized = normalized.replace(/[أإآ]/g, 'ا');
+    normalized = normalized.replace(/[ىي]/g, 'ي');
+    normalized = normalized.replace(/[ةه]/g, 'ه');
+    
+    // Remove diacritics (tashkeel)
+    normalized = normalized.replace(/[\u064B-\u065F\u0670]/g, '');
+    
+    // Normalize spaces
+    normalized = normalized.replace(/\s+/g, ' ').trim();
+    
+    return normalized.toLowerCase();
+  }
+
   private findHeaderRow(rawData: any[][]): number {
     const keyColumns = [
+      // ID number - most important
       'رقم التعريف', 'رقم الهوية', 'رقم الهوية / الكود', 'idNumber', 'id_number', 'رقم_الهوية', 'رقم_التعريف',
+      // First name - الاسم comes first
       'الاسم', 'firstName', 'first_name', 'الاسم الأول', 'first name', 'name',
+      // Last name - اللقب comes first
       'اللقب', 'lastName', 'last_name', 'اسم العائلة', 'family_name', 'last name', 'surname',
       'تاريخ الميلاد', 'تاريخ الازدياد', 'dateOfBirth', 'date_of_birth', 'تاريخ_الميلاد', 'تاريخ_الازدياد', 'birth_date', 'date of birth', 'dob',
       'مكان الميلاد', 'مكان الازدياد', 'placeOfBirth', 'place_of_birth', 'مكان_الميلاد', 'مكان_الازدياد', 'birth_place', 'place of birth',
@@ -374,29 +442,263 @@ export class StudentsService {
       'معيد', 'مكرر', 'isRepeater', 'is_repeater', 'repeater'
     ];
 
-    const maxRowsToCheck = Math.min(20, rawData.length);
+    // Preferred header row positions (0-indexed, so row 8 = index 7, row 9 = index 8)
+    const preferredRows = [7, 8]; // Rows 8 and 9 (0-indexed: 7, 8)
+    
+    // Search through ALL rows (increased from 20 to 100 to find headers in any row like row 8)
+    const maxRowsToCheck = Math.min(100, rawData.length);
+    
+    let bestMatch = { row: -1, score: 0, exactMatches: 0, foundCount: 0, criticalMatches: 0 };
+    
+    // First, check preferred rows (8 and 9) with higher priority
+    for (const preferredRow of preferredRows) {
+      if (preferredRow >= rawData.length) continue;
+      
+      const row = rawData[preferredRow];
+      if (!row || row.length === 0) continue;
+
+      // CRITICAL: Must have both lastName (اللقب) and firstName (الاسم) columns
+      const hasLastName = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      if (!hasLastName || !hasFirstName) {
+        continue; // Skip this row if it doesn't have both required columns
+      }
+
+      const matchResult = this.evaluateRowForHeaders(row, keyColumns);
+      if (matchResult.foundCount >= 2) {
+        // Give bonus points for being in preferred row
+        const preferredBonus = 100;
+        const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                     matchResult.criticalMatches * 30 + preferredBonus;
+        
+        if (score > bestMatch.score) {
+          bestMatch = { 
+            row: preferredRow, 
+            score, 
+            exactMatches: matchResult.exactMatches, 
+            foundCount: matchResult.foundCount,
+            criticalMatches: matchResult.criticalMatches
+          };
+        }
+      }
+    }
+    
+    // Then search through all other rows
     for (let i = 0; i < maxRowsToCheck; i++) {
+      // Skip preferred rows as we already checked them
+      if (preferredRows.includes(i)) continue;
+      
       const row = rawData[i];
       if (!row || row.length === 0) continue;
 
-      const rowStrings = row.map(cell => {
-        if (cell === null || cell === undefined) return '';
-        return String(cell).trim().toLowerCase();
-      });
-
-      let matchCount = 0;
-      for (const keyColumn of keyColumns) {
-        if (rowStrings.some(cell => cell === keyColumn.toLowerCase() || cell.includes(keyColumn.toLowerCase()))) {
-          matchCount++;
+      const matchResult = this.evaluateRowForHeaders(row, keyColumns);
+      
+      // CRITICAL: Must have both lastName (اللقب) and firstName (الاسم) columns
+      const hasLastName = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      // Calculate score: prioritize rows with more exact matches and critical columns
+      const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                   matchResult.criticalMatches * 30;
+      
+      // REQUIRE both lastName and firstName to be present
+      if (hasLastName && hasFirstName && matchResult.foundCount >= 2 && (matchResult.exactMatches >= 1 || matchResult.foundCount >= 3)) {
+        if (score > bestMatch.score) {
+          bestMatch = { 
+            row: i, 
+            score, 
+            exactMatches: matchResult.exactMatches, 
+            foundCount: matchResult.foundCount,
+            criticalMatches: matchResult.criticalMatches
+          };
         }
       }
-
-      if (matchCount >= 2) {
-        return i;
+    }
+    
+    // Final verification: ensure the best match has both required columns
+    if (bestMatch.row >= 0) {
+      const finalRow = rawData[bestMatch.row];
+      const hasLastName = this.hasColumnInRow(finalRow, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+      const hasFirstName = this.hasColumnInRow(finalRow, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+      
+      if (!hasLastName || !hasFirstName) {
+        // If best match doesn't have both, try to find any row that has both
+        for (let i = 0; i < maxRowsToCheck; i++) {
+          const row = rawData[i];
+          if (!row || row.length === 0) continue;
+          
+          const hasLastNameCheck = this.hasColumnInRow(row, ['اللقب', 'lastName', 'last_name', 'surname', 'اسم العائلة']);
+          const hasFirstNameCheck = this.hasColumnInRow(row, ['الاسم', 'firstName', 'first_name', 'الاسم الأول']);
+          
+          if (hasLastNameCheck && hasFirstNameCheck) {
+            const matchResult = this.evaluateRowForHeaders(row, keyColumns);
+            const score = matchResult.foundCount * 10 + matchResult.exactMatches * 20 + 
+                         matchResult.criticalMatches * 30;
+            if (score > bestMatch.score || bestMatch.row === -1) {
+              bestMatch = { 
+                row: i, 
+                score, 
+                exactMatches: matchResult.exactMatches, 
+                foundCount: matchResult.foundCount,
+                criticalMatches: matchResult.criticalMatches
+              };
+            }
+          }
+        }
       }
     }
 
-    return -1;
+    return bestMatch.row; // Return the best matching row, or -1 if none found
+  }
+  
+  private evaluateRowForHeaders(row: any[], keyColumns: string[]): {
+    foundCount: number;
+    exactMatches: number;
+    criticalMatches: number;
+  } {
+    const rowStrings = row.map(cell => {
+      if (cell === null || cell === undefined) return '';
+      return String(cell).trim();
+    });
+
+    // Check if row contains mostly numbers (likely data row, not header)
+    const numericCells = rowStrings.filter(cell => {
+      if (!cell) return false;
+      const numValue = Number(cell);
+      return !isNaN(numValue) && isFinite(numValue) && cell.trim() === String(numValue);
+    }).length;
+    
+    // If more than 50% of cells are pure numbers, this is likely a data row, not a header
+    if (numericCells > rowStrings.length * 0.5 && rowStrings.length > 3) {
+      return { foundCount: 0, exactMatches: 0, criticalMatches: 0 };
+    }
+
+    let matchCount = 0;
+    let exactMatches = 0;
+    let criticalMatches = 0; // رقم التعريف, اللقب, الاسم
+    
+    for (const keyColumn of keyColumns) {
+      const keyLower = keyColumn.toLowerCase().trim();
+      let isExactMatch = false;
+      let isCritical = false;
+      
+      const found = rowStrings.some(cell => {
+        if (!cell) return false;
+        
+        const cellLower = cell.toLowerCase().trim();
+        const normalizedCell = this.normalizeArabicText(cell);
+        const normalizedKey = this.normalizeArabicText(keyColumn);
+        
+        // Exact match gets higher priority
+        if (cellLower === keyLower || normalizedCell === normalizedKey) {
+          isExactMatch = true;
+          // Check if it's a critical column
+          if (keyColumn.includes('رقم التعريف') || keyColumn.includes('رقم الهوية') || 
+              keyColumn.includes('idNumber') || keyColumn.includes('id_number')) {
+            isCritical = true;
+          } else if (keyColumn.includes('اللقب') || keyColumn.includes('lastName') || 
+                     keyColumn.includes('last_name') || keyColumn.includes('surname')) {
+            isCritical = true;
+          } else if (keyColumn.includes('الاسم') || keyColumn.includes('firstName') || 
+                     keyColumn.includes('first_name')) {
+            isCritical = true;
+          }
+          return true;
+        }
+        
+        // For Arabic columns (الاسم, اللقب), be strict - require exact word match
+        if (keyColumn.includes('الاسم') || keyColumn.includes('اللقب')) {
+          // Only accept exact normalized match for Arabic columns
+          return normalizedCell === normalizedKey;
+        }
+        
+        // For other columns, allow partial match but be more careful
+        // Only match if the cell starts with or equals the column name
+        return cellLower.startsWith(keyLower) || keyLower.startsWith(cellLower) ||
+               normalizedCell.startsWith(normalizedKey) || normalizedKey.startsWith(normalizedCell);
+      });
+      
+      if (found) {
+        matchCount++;
+        if (isExactMatch) {
+          exactMatches++;
+        }
+        if (isCritical) {
+          criticalMatches++;
+        }
+      }
+    }
+
+    return { foundCount: matchCount, exactMatches, criticalMatches };
+  }
+  
+  private hasColumnInRow(row: any[], columnNames: string[]): boolean {
+    const rowStrings = row.map(cell => {
+      if (cell === null || cell === undefined) return '';
+      return String(cell).trim();
+    });
+    
+    // Check if row contains mostly numbers (likely data row, not header)
+    const numericCells = rowStrings.filter(cell => {
+      if (!cell) return false;
+      const numValue = Number(cell);
+      return !isNaN(numValue) && isFinite(numValue) && cell.trim() === String(numValue);
+    }).length;
+    
+    // If more than 50% of cells are pure numbers, this is likely a data row, not a header
+    if (numericCells > rowStrings.length * 0.5 && rowStrings.length > 3) {
+      return false;
+    }
+    
+    for (const columnName of columnNames) {
+      const found = rowStrings.some(cell => {
+        if (!cell) return false;
+        
+        const cellLower = cell.toLowerCase().trim();
+        const normalizedCell = this.normalizeArabicText(cell);
+        const normalizedKey = this.normalizeArabicText(columnName);
+        
+        // Exact match (highest priority)
+        if (cellLower === columnName.toLowerCase().trim() || normalizedCell === normalizedKey) {
+          return true;
+        }
+        
+        // For Arabic columns, be more strict - require the exact word
+        if (columnName.includes('الاسم') || columnName.includes('اللقب')) {
+          // Must contain the exact Arabic word, not just part of it
+          if (normalizedCell === normalizedKey) {
+            return true;
+          }
+          // Allow if it's the exact word with optional spaces
+          const exactMatch = new RegExp(`^\\s*${normalizedKey}\\s*$`, 'i').test(normalizedCell);
+          if (exactMatch) {
+            return true;
+          }
+          return false; // Don't use partial match for critical Arabic columns
+        }
+        
+        // For English columns, allow partial match but be more careful
+        // Only match if the cell starts with or equals the column name
+        if (cellLower.startsWith(columnName.toLowerCase().trim()) || 
+            columnName.toLowerCase().trim().startsWith(cellLower)) {
+          return true;
+        }
+        
+        return false;
+        // Partial match
+        return cellLower.includes(columnName.toLowerCase().trim()) || 
+               columnName.toLowerCase().trim().includes(cellLower) ||
+               normalizedCell.includes(normalizedKey) || 
+               normalizedKey.includes(normalizedCell);
+      });
+      
+      if (found) {
+        return true;
+      }
+    }
+    
+    return false;
   }
 
   async exportToExcel(ownerId: number, filters?: {

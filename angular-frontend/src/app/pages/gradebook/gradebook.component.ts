@@ -549,6 +549,30 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
     return null;
   }
 
+  /**
+   * Normalize Arabic text for better matching (handles hamza, taa marbuta, etc.)
+   */
+  normalizeArabicText(text: string): string {
+    if (!text) return '';
+    
+    let normalized = String(text).trim();
+    
+    // Normalize hamza variations (أ, إ, آ -> ا)
+    normalized = normalized.replace(/[أإآ]/g, 'ا');
+    // Normalize ي and ى
+    normalized = normalized.replace(/[ىي]/g, 'ي');
+    // Normalize ة and ه
+    normalized = normalized.replace(/[ةه]/g, 'ه');
+    
+    // Remove diacritics (tashkeel)
+    normalized = normalized.replace(/[\u064B-\u065F\u0670]/g, '');
+    
+    // Normalize spaces (multiple spaces to single space)
+    normalized = normalized.replace(/\s+/g, ' ').trim();
+    
+    return normalized.toLowerCase();
+  }
+
   ngOnDestroy() {
     this.voiceGradingService.stop();
   }
@@ -1785,51 +1809,203 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       alert('يرجى اختيار القسم أولاً');
       return;
     }
+    
+    console.log('Processing Excel data. Selected class:', this.selectedClass.id, this.selectedClass.name);
+    console.log('Current students count:', this.students?.length || 0);
+    
+    // Ensure students are loaded for the selected class
+    if (!this.students || this.students.length === 0) {
+      console.warn('No students loaded. Loading students for class:', this.selectedClass.id);
+      
+      // Load students and wait for the response
+      this.apiService.get<Student[]>(`/classes/${this.selectedClass.id}/students`).subscribe({
+        next: (students) => {
+          this.students = students;
+          console.log(`Students loaded: ${students.length}, Class: ${this.selectedClass?.name}`);
+          console.log('Sample students:', students.slice(0, 3).map(s => ({ id: s.id, name: `${s.firstName} ${s.lastName}`, idNumber: s.idNumber })));
+          
+          if (students.length === 0) {
+            alert(`لا يوجد تلاميذ في القسم "${this.selectedClass?.name ?? 'غير محدد'}".\n\nيرجى التأكد من:\n1. وجود تلاميذ في القسم المحدد\n2. أن التلاميذ في ملف Excel موجودون في نفس القسم\n3. أن البيانات في ملف Excel تبدأ من السطر رقم 9`);
+            return;
+          }
+          // Now process the Excel data with loaded students
+          this.processExcelDataInternal(data);
+        },
+        error: (error) => {
+          console.error('Error loading students:', error);
+          // Try fallback
+          this.apiService.get<Student[]>('/students').subscribe({
+            next: (allStudents) => {
+              this.students = allStudents.filter(s => s.classId === this.selectedClass!.id);
+              console.log(`Students loaded (fallback): ${this.students.length}, Class: ${this.selectedClass?.name}`);
+              console.log('Sample students (fallback):', this.students.slice(0, 3).map(s => ({ id: s.id, name: `${s.firstName} ${s.lastName}`, idNumber: s.idNumber })));
+              
+              if (this.students.length === 0) {
+                alert(`لا يوجد تلاميذ في القسم "${this.selectedClass?.name ?? 'غير محدد'}".\n\nيرجى التأكد من:\n1. وجود تلاميذ في القسم المحدد\n2. أن التلاميذ في ملف Excel موجودون في نفس القسم\n3. أن البيانات في ملف Excel تبدأ من السطر رقم 9`);
+                return;
+              }
+              this.processExcelDataInternal(data);
+            },
+            error: (error2) => {
+              console.error('Error loading students (fallback):', error2);
+              alert('حدث خطأ أثناء تحميل التلاميذ. يرجى المحاولة مرة أخرى');
+            }
+          });
+        }
+      });
+      return;
+    }
+    
+    // Students already loaded, process directly
+    console.log('Students already loaded, processing Excel data directly');
+    this.processExcelDataInternal(data);
+  }
 
-    // Find header row
-    let headerRow = 0;
-    for (let i = 0; i < Math.min(10, data.length); i++) {
-      const row = data[i];
-      if (Array.isArray(row) && row.some((cell: any) => 
-        String(cell).toLowerCase().includes('name') || 
-        String(cell).toLowerCase().includes('اسم') ||
-        String(cell).toLowerCase().includes('id') ||
-        String(cell).toLowerCase().includes('رقم') ||
-        String(cell).toLowerCase().includes('code') ||
-        String(cell).toLowerCase().includes('كود') ||
-        String(cell).toLowerCase().includes('score') ||
-        String(cell).toLowerCase().includes('درجة')
-      )) {
-        headerRow = i;
-        break;
+  private processExcelDataInternal(data: any[]): void {
+    if (!this.selectedClass) {
+      alert('يرجى اختيار القسم أولاً');
+      return;
+    }
+    
+    console.log('=== Starting Excel Data Processing ===');
+    console.log('Selected class:', this.selectedClass.id, this.selectedClass.name);
+    console.log('Students available:', this.students?.length || 0);
+    console.log('Excel data rows:', data.length);
+    console.log('Sample students:', this.students?.slice(0, 3).map(s => ({ 
+      id: s.id, 
+      name: `${s.firstName} ${s.lastName}`, 
+      idNumber: s.idNumber,
+      classId: s.classId 
+    })));
+    
+    // استخدام السطر رقم 8 كصف رأس (index 7 لأن المصفوفات تبدأ من 0)
+    const headerRowIndex = 7;
+    
+    // التحقق من وجود بيانات كافية
+    if (data.length <= headerRowIndex) {
+      alert(`ملف Excel لا يحتوي على بيانات كافية.\n\nيجب أن يحتوي على:\n- صف رأس في السطر رقم 8\n- بيانات التلاميذ من السطر رقم 9 فما فوق\n\nعدد الأسطر الحالي: ${data.length}`);
+      return;
+    }
+
+    const headerRow = headerRowIndex;
+    const headers = data[headerRow] || [];
+    
+    // Debug: Log header row and headers
+    console.log('Header row index:', headerRow, '(السطر رقم', headerRow + 1, 'في Excel)');
+    console.log('Headers found:', headers);
+    console.log('Data rows after header:', data.length - headerRow - 1);
+    
+    // Find identifier columns (name or idNumber)
+    let identifierColIndex = -1;
+    let lastNameColIndex = -1;
+    let firstNameColIndex = -1;
+    
+    if (this.importIdentifier === 'idNumber') {
+      // First, try exact matches (highest priority) - case sensitive for Arabic
+      const exactMatches = [
+        'رقم التعريف',
+        'رقم الهوية',
+        'رقم الهوية / الكود',
+        'رقم الهوية/الكود',
+        'idnumber',
+        'id_number',
+        'student_id',
+        'رقم_التعريف',
+        'رقم_الهوية'
+      ];
+      
+      identifierColIndex = headers.findIndex((h: any) => {
+        const headerStr = String(h || '').trim();
+        const headerStrLower = headerStr.toLowerCase();
+        
+        // Try exact match (case sensitive for Arabic, case insensitive for English)
+        for (const exactMatch of exactMatches) {
+          if (exactMatch === headerStr || exactMatch.toLowerCase() === headerStrLower) {
+            return true;
+          }
+        }
+        return false;
+      });
+      
+      // If no exact match, try partial matches
+      if (identifierColIndex === -1) {
+        identifierColIndex = headers.findIndex((h: any) => {
+          const headerStr = String(h || '').trim();
+          const headerStrLower = headerStr.toLowerCase();
+          
+          // Skip if header looks like a number (data row, not header)
+          if (!isNaN(Number(headerStr)) && headerStr.length > 0) {
+            return false;
+          }
+          
+          // Priority 1: Contains "رقم التعريف" or "رقم الهوية" (exact phrase)
+          if (headerStr.includes('رقم التعريف') || headerStr.includes('رقم الهوية')) {
+            return true;
+          }
+          
+          // Priority 2: Contains both "رقم" and ("هوية" or "تعريف")
+          if (headerStr.includes('رقم') && (headerStr.includes('هوية') || headerStr.includes('تعريف'))) {
+            return true;
+          }
+          
+          // Priority 3: Contains "id" or "code" (excluding name/id fields)
+          if ((headerStrLower.includes('id') || headerStrLower.includes('code') || headerStr.includes('كود')) &&
+              !headerStrLower.includes('name') && !headerStr.includes('اسم')) {
+            return true;
+          }
+          
+          // Priority 4: Contains "رقم" and "كود"
+          if (headerStr.includes('رقم') && headerStr.includes('كود')) {
+            return true;
+          }
+          
+          return false;
+        });
+      }
+    } else {
+      // البحث عن عمود اللقب (lastName)
+      const lastNameKeywords = ['اللقب', 'lastname', 'last_name', 'last name', 'surname', 'اسم العائلة', 'family_name', 'family name'];
+      lastNameColIndex = headers.findIndex((h: any) => {
+        const headerStr = String(h || '').trim().toLowerCase();
+        if (!isNaN(Number(headerStr)) && headerStr.length > 0) {
+          return false;
+        }
+        return lastNameKeywords.some(keyword => headerStr === keyword.toLowerCase() || headerStr.includes(keyword.toLowerCase()));
+      });
+      
+      // البحث عن عمود الاسم (firstName) - اختياري
+      const firstNameKeywords = ['الاسم', 'firstname', 'first_name', 'first name', 'name', 'الاسم الأول'];
+      firstNameColIndex = headers.findIndex((h: any) => {
+        const headerStr = String(h || '').trim().toLowerCase();
+        if (!isNaN(Number(headerStr)) && headerStr.length > 0) {
+          return false;
+        }
+        // تجنب عمود اللقب
+        if (h === headers[lastNameColIndex]) return false;
+        return firstNameKeywords.some(keyword => headerStr === keyword.toLowerCase() || headerStr.includes(keyword.toLowerCase()));
+      });
+      
+      // إذا لم نجد عمود الاسم، نستخدم عمود اللقب فقط
+      if (lastNameColIndex !== -1) {
+        identifierColIndex = lastNameColIndex;
+      } else if (firstNameColIndex !== -1) {
+        identifierColIndex = firstNameColIndex;
       }
     }
 
-    const headers = data[headerRow] || [];
-    
-    // Find identifier column (name or idNumber)
-    let identifierColIndex = -1;
-    if (this.importIdentifier === 'idNumber') {
-      identifierColIndex = headers.findIndex((h: any) => 
-        String(h).toLowerCase().includes('id') || 
-        String(h).toLowerCase().includes('رقم') ||
-        String(h).toLowerCase().includes('code') ||
-        String(h).toLowerCase().includes('كود') ||
-        String(h).toLowerCase().includes('رقم التعريف') ||
-        String(h).toLowerCase().includes('رقم الهوية')
-      );
-    } else {
-      identifierColIndex = headers.findIndex((h: any) => 
-        String(h).toLowerCase().includes('name') || 
-        String(h).toLowerCase().includes('اسم')
-      );
-    }
-
     if (identifierColIndex === -1) {
+      const availableHeaders = headers.filter((h: any) => h).slice(0, 10).map((h: any) => String(h)).join(', ');
+      console.error('Could not find identifier column. Headers:', headers);
       alert(this.importIdentifier === 'idNumber' 
-        ? 'لم يتم العثور على عمود رقم الهوية/الكود في ملف Excel'
-        : 'لم يتم العثور على عمود الاسم في ملف Excel');
+        ? `لم يتم العثور على عمود رقم الهوية/الكود في ملف Excel.\n\nصف الرأس: السطر رقم 8\n\nالأعمدة الموجودة: ${availableHeaders}${headers.length > 10 ? '...' : ''}\n\nتأكد من وجود عمود باسم "رقم التعريف" أو "رقم الهوية" أو "رقم الهوية/الكود" في السطر رقم 8`
+        : `لم يتم العثور على عمود اللقب في ملف Excel.\n\nصف الرأس: السطر رقم 8\n\nالأعمدة الموجودة: ${availableHeaders}${headers.length > 10 ? '...' : ''}\n\nتأكد من وجود عمود باسم "اللقب" في السطر رقم 8`);
       return;
+    }
+    
+    console.log('Identifier column found at index:', identifierColIndex, 'Header:', headers[identifierColIndex]);
+    if (this.importIdentifier === 'name') {
+      console.log('Last name column:', lastNameColIndex !== -1 ? headers[lastNameColIndex] : 'not found');
+      console.log('First name column:', firstNameColIndex !== -1 ? headers[firstNameColIndex] : 'not found');
     }
 
     // Determine which assessments to import
@@ -1858,48 +2034,84 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       // البحث عن أعمدة الدرجات لكل نوع تقييم
       for (const assessment of assessmentsToImport) {
         const colIndex = headers.findIndex((h: any) => {
+          if (!h || h === '') return false;
+          
           const headerStr = String(h).toLowerCase().trim();
           const assessmentNameAr = assessment.nameAr.toLowerCase().trim();
           
-          // البحث المطابق الدقيق للاسم العربي
+          // تطبيع النص العربي للمقارنة
+          const normalizedHeader = this.normalizeArabicText(String(h));
+          const normalizedAssessment = this.normalizeArabicText(assessment.nameAr);
+          
+          // البحث المطابق الدقيق للاسم العربي (مع تطبيع)
+          if (normalizedHeader === normalizedAssessment) {
+            return true;
+          }
+          
+          // البحث المطابق الدقيق للاسم العربي (بدون تطبيع)
           if (headerStr === assessmentNameAr || 
               headerStr.includes(assessmentNameAr) || 
               assessmentNameAr.includes(headerStr)) {
             return true;
           }
           
+          // مطابقة جزئية مع تطبيع
+          if (normalizedHeader.includes(normalizedAssessment) || 
+              normalizedAssessment.includes(normalizedHeader)) {
+            return true;
+          }
+          
           // البحث حسب نوع التقييم - كلمات مفتاحية متعددة
           switch (assessment.type) {
             case 'continuous_assessment':
+              // تطبيع النص العربي للمقارنة
+              const normalizedHeader = this.normalizeArabicText(String(h));
+              const normalizedAssessment = this.normalizeArabicText(assessment.nameAr);
+              
+              // مطابقة دقيقة للاسم العربي
+              if (normalizedHeader === normalizedAssessment) {
+                return true;
+              }
+              
+              // مطابقة جزئية
               return headerStr.includes('continuous') || 
                      headerStr.includes('مستمر') || 
                      headerStr.includes('تقييم مستمر') ||
+                     headerStr.includes('التقييم المستمر') ||
+                     normalizedHeader.includes('تقييم') && normalizedHeader.includes('مستمر') ||
                      headerStr.includes('évaluation continue') ||
-                     headerStr.includes('تقييم') && headerStr.includes('مستمر');
+                     headerStr.includes('évaluation') && headerStr.includes('continue') ||
+                     (headerStr.includes('تقييم') && headerStr.includes('مستمر'));
             case 'oral_expression':
               return (headerStr.includes('oral') && headerStr.includes('expression')) ||
                      (headerStr.includes('شفهي') && headerStr.includes('تعبير')) ||
                      headerStr.includes('تعبير شفهي') ||
+                     headerStr.includes('التعبير الشفهي') ||
                      headerStr.includes('expression orale') ||
                      headerStr.includes('شفهي') ||
                      headerStr.includes('تعبير') ||
                      headerStr.includes('oral') ||
                      headerStr.includes('expression') ||
-                     (headerStr.includes('عمل') && headerStr.includes('عملي'));
+                     (headerStr.includes('عمل') && headerStr.includes('عملي')) ||
+                     headerStr.includes('العمل العملي');
             case 'assignment':
               return headerStr.includes('assignment') || 
                      headerStr.includes('فرض') ||
+                     headerStr.includes('الفرض') ||
                      headerStr.includes('معدل الفروض') ||
                      headerStr.includes('معدل فرض') ||
                      headerStr.includes('devoir') ||
                      headerStr === 'فرض' ||
+                     headerStr === 'الفرض' ||
                      headerStr === 'معدل الفروض';
             case 'test':
               return headerStr.includes('test') || 
                      headerStr.includes('exam') ||
                      headerStr.includes('اختبار') ||
+                     headerStr.includes('الاختبار') ||
                      headerStr.includes('examen') ||
-                     headerStr === 'اختبار';
+                     headerStr === 'اختبار' ||
+                     headerStr === 'الاختبار';
             default:
               return false;
           }
@@ -1916,20 +2128,43 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       // إذا لم نجد أعمدة محددة، نبحث عن أعمدة "درجة" أو "score" عامة
       // ونحاول مطابقتها مع أنواع التقييم حسب الترتيب
       if (assessmentColumns.length === 0) {
-        const scoreColumns = headers
-          .map((h: any, index: number) => {
-            const headerStr = String(h).toLowerCase().trim();
+        const headerStrings = headers.map((h: any) => String(h || '').toLowerCase().trim());
+        const scoreColumns = headerStrings
+          .map((headerStr: string, index: number) => {
+            // Skip empty headers
+            if (!headerStr || headerStr === '') return -1;
+            
             // تجنب الأعمدة التي هي معرفات (اسم، رقم، إلخ)
-            if ((headerStr.includes('score') || 
-                 headerStr.includes('درجة') ||
-                 headerStr.includes('mark') ||
-                 headerStr.includes('note')) &&
-                !headerStr.includes('name') &&
-                !headerStr.includes('اسم') &&
-                !headerStr.includes('id') &&
-                !headerStr.includes('رقم') &&
-                !headerStr.includes('code') &&
-                !headerStr.includes('كود')) {
+            const isIdentifier = headerStr.includes('name') || 
+                                 headerStr.includes('اسم') ||
+                                 headerStr.includes('id') ||
+                                 headerStr.includes('رقم') ||
+                                 headerStr.includes('code') ||
+                                 headerStr.includes('كود') ||
+                                 headerStr.includes('last') ||
+                                 headerStr.includes('first') ||
+                                 headerStr.includes('لقب') ||
+                                 headerStr.includes('تاريخ') ||
+                                 headerStr.includes('date') ||
+                                 headerStr.includes('birth') ||
+                                 headerStr.includes('الميلاد') ||
+                                 headerStr.includes('gender') ||
+                                 headerStr.includes('جنس');
+            
+            if (isIdentifier) return -1;
+            
+            // Look for score-related keywords
+            const isScoreColumn = headerStr.includes('score') || 
+                                  headerStr.includes('درجة') ||
+                                  headerStr.includes('mark') ||
+                                  headerStr.includes('note') ||
+                                  headerStr.includes('نقطة') ||
+                                  headerStr.includes('point');
+            
+            // Also accept any numeric column that's not an identifier
+            const hasNumbers = /\d/.test(headerStr);
+            
+            if (isScoreColumn || (!isIdentifier && hasNumbers)) {
               return index;
             }
             return -1;
@@ -1937,16 +2172,9 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
           .filter((idx: number) => idx !== -1);
         
         // مطابقة الأعمدة مع أنواع التقييم حسب الترتيب
-        if (scoreColumns.length >= assessmentsToImport.length) {
-          for (let i = 0; i < assessmentsToImport.length; i++) {
-            assessmentColumns.push({ 
-              assessment: assessmentsToImport[i], 
-              colIndex: scoreColumns[i] 
-            });
-          }
-        } else {
-          // إذا كان عدد الأعمدة أقل، نستخدم ما هو متاح
-          for (let i = 0; i < scoreColumns.length; i++) {
+        if (scoreColumns.length > 0) {
+          const maxColumns = Math.min(scoreColumns.length, assessmentsToImport.length);
+          for (let i = 0; i < maxColumns; i++) {
             assessmentColumns.push({ 
               assessment: assessmentsToImport[i], 
               colIndex: scoreColumns[i] 
@@ -1963,14 +2191,55 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
         })));
       }
     } else {
-      // استيراد نوع واحد - البحث عن عمود الدرجة
-      const scoreColIndex = headers.findIndex((h: any) => 
-        String(h).toLowerCase().includes('score') || 
-        String(h).toLowerCase().includes('درجة') ||
-        String(h).toLowerCase().includes('mark')
-      );
+      // استيراد نوع واحد - البحث عن عمود الدرجة مع تحسينات
+      const headerStrings = headers.map((h: any) => String(h || '').toLowerCase().trim());
+      
+      // Try multiple search strategies
+      let scoreColIndex = -1;
+      
+      // Strategy 1: Exact match with assessment name
+      if (this.selectedAssessment?.nameAr) {
+        const assessmentName = this.selectedAssessment.nameAr.toLowerCase().trim();
+        scoreColIndex = headerStrings.findIndex((h: string) => 
+          h === assessmentName || 
+          h.includes(assessmentName) || 
+          assessmentName.includes(h)
+        );
+      }
+      
+      // Strategy 2: Generic score keywords
       if (scoreColIndex === -1) {
-        alert('لم يتم العثور على عمود الدرجة في ملف Excel');
+        const scoreKeywords = ['score', 'درجة', 'mark', 'note', 'note/20', 'درجة/20', 'score/20'];
+        for (const keyword of scoreKeywords) {
+          scoreColIndex = headerStrings.findIndex((h: string) => h.includes(keyword));
+          if (scoreColIndex !== -1) break;
+        }
+      }
+      
+      // Strategy 3: Look for any column that doesn't match identifier patterns but contains numbers
+      if (scoreColIndex === -1) {
+        // Find columns that are not identifiers
+        for (let i = 0; i < headers.length; i++) {
+          const headerStr = headerStrings[i];
+          if (!headerStr) continue;
+          
+          // Skip identifier columns
+          if (headerStr.includes('name') || headerStr.includes('اسم') ||
+              headerStr.includes('id') || headerStr.includes('رقم') ||
+              headerStr.includes('code') || headerStr.includes('كود') ||
+              headerStr.includes('last') || headerStr.includes('first') ||
+              headerStr.includes('لقب') || headerStr.includes('تاريخ')) {
+            continue;
+          }
+          
+          // If it's not an identifier, it might be a score column
+          scoreColIndex = i;
+          break;
+        }
+      }
+      
+      if (scoreColIndex === -1) {
+        alert(`لم يتم العثور على عمود الدرجة في ملف Excel.\n\nالأعمدة الموجودة: ${headers.filter((h: any) => h).slice(0, 10).join(', ')}${headers.length > 10 ? '...' : ''}\n\nتأكد من وجود عمود باسم "الدرجة" أو "Score" أو اسم التقييم: ${this.selectedAssessment?.nameAr || ''}`);
         return;
       }
       assessmentColumns.push({ assessment: this.selectedAssessment!, colIndex: scoreColIndex });
@@ -1980,9 +2249,17 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       const expectedColumns = this.importMode === 'multiple' 
         ? assessmentsToImport.map(a => a.nameAr).join('، ')
         : this.selectedAssessment?.nameAr || 'الدرجة';
+      
+      // عرض الأعمدة الموجودة في الملف للمساعدة في التشخيص
+      const availableHeaders = headers
+        .map((h: any, idx: number) => `${idx + 1}. ${String(h || '').trim()}`)
+        .filter((h: string) => h && !h.includes('undefined') && !h.includes('null'))
+        .slice(0, 10)
+        .join('\n');
+      
       alert(`لم يتم العثور على أعمدة الدرجات في ملف Excel.\n\nالمتوقع: ${expectedColumns}\n\nتأكد من أن أسماء الأعمدة في ملف Excel تحتوي على:\n${this.importMode === 'multiple' 
-        ? '- التقييم المستمر\n- التعبير الشفهي أو التعبير الشفهي/العمل العملي\n- الفرض أو معدل الفروض\n- الاختبار'
-        : '- الدرجة أو Score'}`);
+        ? '- التقييم المستمر (مطلوب)\n- التعبير الشفهي أو التعبير الشفهي/العمل العملي (اختياري)\n- الفرض أو معدل الفروض\n- الاختبار'
+        : '- الدرجة أو Score'}\n\nالأعمدة الموجودة في الملف:\n${availableHeaders || 'لا توجد أعمدة'}`);
       return;
     }
     
@@ -2017,38 +2294,227 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       const row = data[i];
       if (!row || row.length === 0) continue;
 
-      const identifier = String(row[identifierColIndex] || '').trim();
-      if (!identifier) continue;
-
-      // Find student by identifier
-      let student: Student | undefined;
+      // Extract identifier from row - handle different data types
+      let identifier: string = '';
+      let lastName: string = '';
+      let firstName: string = '';
+      
       if (this.importIdentifier === 'idNumber') {
-        // البحث الدقيق أولاً
-        student = this.students.find(s => 
-          s.idNumber && String(s.idNumber).trim() === String(identifier).trim()
-        );
-        // إذا لم نجد، نبحث بدون مسافات
-        if (!student) {
-          student = this.students.find(s => 
-            s.idNumber && String(s.idNumber).replace(/\s/g, '') === String(identifier).replace(/\s/g, '')
-          );
+        const identifierValue = row[identifierColIndex];
+        if (identifierValue !== null && identifierValue !== undefined && identifierValue !== '') {
+          if (typeof identifierValue === 'number') {
+            // Handle large numbers that might lose precision - use toFixed(0) to avoid scientific notation
+            if (identifierValue > 1e15) {
+              // Very large number - might have precision issues
+              identifier = identifierValue.toFixed(0);
+            } else {
+              identifier = String(identifierValue).trim();
+            }
+          } else {
+            identifier = String(identifierValue).trim();
+          }
         }
       } else {
+        // استخراج اللقب والاسم
+        if (lastNameColIndex !== -1) {
+          const lastNameValue = row[lastNameColIndex];
+          if (lastNameValue !== null && lastNameValue !== undefined && lastNameValue !== '') {
+            lastName = String(lastNameValue).trim();
+          }
+        }
+        
+        if (firstNameColIndex !== -1) {
+          const firstNameValue = row[firstNameColIndex];
+          if (firstNameValue !== null && firstNameValue !== undefined && firstNameValue !== '') {
+            firstName = String(firstNameValue).trim();
+          }
+        }
+        
+        // إذا لم نجد عمود الاسم، نستخدم اللقب فقط
+        if (!lastName && !firstName) {
+          console.warn(`Empty name at row ${i + 1}`);
+          continue;
+        }
+      }
+      
+      if (this.importIdentifier === 'idNumber' && !identifier) {
+        console.warn(`Empty identifier at row ${i + 1}`);
+        continue;
+      }
+
+      // Find student by identifier with multiple matching strategies
+      let student: Student | undefined;
+      if (this.importIdentifier === 'idNumber') {
+        // Normalize identifier: handle Excel number formats (scientific notation, etc.)
+        // First, ensure we have a string representation
+        let cleanIdentifier = String(identifier).trim();
+        
+        // Handle scientific notation (e.g., 1.1009161702046e+15)
+        if (cleanIdentifier.includes('e+') || cleanIdentifier.includes('E+')) {
+          const num = parseFloat(cleanIdentifier);
+          if (!isNaN(num)) {
+            // Convert to string without scientific notation
+            cleanIdentifier = num.toFixed(0);
+          }
+        }
+        
+        // Remove spaces and normalize
+        const normalizedIdentifier = cleanIdentifier.replace(/\s/g, '');
+        const normalizedNoLeadingZeros = normalizedIdentifier.replace(/^0+/, '');
+        
+        // Strategy 1: Exact match (with original formatting)
         student = this.students.find(s => {
-          const fullName = `${s.firstName} ${s.lastName}`.toLowerCase();
-          const reverseName = `${s.lastName} ${s.firstName}`.toLowerCase();
-          const searchName = identifier.toLowerCase();
-          return fullName === searchName ||
-                 reverseName === searchName ||
-                 fullName.includes(searchName) ||
-                 reverseName.includes(searchName) ||
-                 s.firstName.toLowerCase().includes(searchName) ||
-                 s.lastName.toLowerCase().includes(searchName);
+          if (!s.idNumber) return false;
+          const studentId = String(s.idNumber).trim();
+          return studentId === cleanIdentifier;
         });
+        
+        // Strategy 2: Match without spaces
+        if (!student) {
+          student = this.students.find(s => {
+            if (!s.idNumber) return false;
+            const studentId = String(s.idNumber).replace(/\s/g, '');
+            return studentId === normalizedIdentifier;
+          });
+        }
+        
+        // Strategy 3: Match with normalized numbers (remove leading zeros) - but only if both have leading zeros
+        if (!student) {
+          student = this.students.find(s => {
+            if (!s.idNumber) return false;
+            const studentId = String(s.idNumber).replace(/\s/g, '').replace(/^0+/, '');
+            return studentId === normalizedNoLeadingZeros && normalizedNoLeadingZeros.length > 0;
+          });
+        }
+        
+        // Strategy 4: Reverse match - check if Excel ID is contained in DB ID or vice versa
+        if (!student) {
+          student = this.students.find(s => {
+            if (!s.idNumber) return false;
+            const studentId = String(s.idNumber).replace(/\s/g, '');
+            const searchId = normalizedIdentifier;
+            // Only match if one is clearly a substring of the other (not just any overlap)
+            if (studentId.length >= searchId.length) {
+              return studentId.endsWith(searchId) || studentId.startsWith(searchId);
+            } else {
+              return searchId.endsWith(studentId) || searchId.startsWith(studentId);
+            }
+          });
+        }
+        
+        // Strategy 5: Partial match (contains) - last resort
+        if (!student) {
+          student = this.students.find(s => {
+            if (!s.idNumber) return false;
+            const studentId = String(s.idNumber).replace(/\s/g, '');
+            const searchId = normalizedIdentifier;
+            // Only use contains if there's significant overlap (at least 10 characters)
+            if (studentId.length >= 10 && searchId.length >= 10) {
+              return studentId.includes(searchId) || searchId.includes(studentId);
+            }
+            return false;
+          });
+        }
+        
+        // Debug logging with more details
+        if (!student) {
+          console.warn(`❌ Student not found for identifier: "${identifier}" (cleaned: "${cleanIdentifier}", normalized: "${normalizedIdentifier}") at row ${i + 1}`);
+          console.warn(`Available student IDs (first 10):`, this.students.slice(0, 10).map(s => {
+            const dbId = s.idNumber ? String(s.idNumber) : 'null';
+            const dbIdNoSpaces = dbId.replace(/\s/g, '');
+            return { 
+              id: s.id, 
+              idNumber: dbId,
+              idNumberNoSpaces: dbIdNoSpaces,
+              idNumberNoLeadingZeros: dbIdNoSpaces.replace(/^0+/, ''),
+              name: `${s.firstName} ${s.lastName}`,
+              classId: s.classId 
+            };
+          }));
+          console.warn(`Searching for: "${normalizedIdentifier}" (no leading zeros: "${normalizedNoLeadingZeros}")`);
+          console.warn(`Total students in class: ${this.students.length}`);
+        } else {
+          console.log(`✓ Found student: ${student.firstName} ${student.lastName} (ID: ${student.id}, IDNumber: ${student.idNumber}) for identifier: "${identifier}"`);
+        }
+      } else {
+        // البحث بالاسم: مطابقة اللقب والاسم مع تطبيع النص العربي
+        const searchLastName = this.normalizeArabicText(lastName);
+        const searchFirstName = this.normalizeArabicText(firstName);
+        
+        // Strategy 1: مطابقة كاملة للقب والاسم (مع تطبيع)
+        if (searchLastName && searchFirstName) {
+          student = this.students.find(s => {
+            const sLastName = this.normalizeArabicText(s.lastName || '');
+            const sFirstName = this.normalizeArabicText(s.firstName || '');
+            return sLastName === searchLastName && sFirstName === searchFirstName;
+          });
+        }
+        
+        // Strategy 2: مطابقة اللقب فقط (إذا لم يكن هناك عمود اسم)
+        if (!student && searchLastName) {
+          student = this.students.find(s => {
+            const sLastName = this.normalizeArabicText(s.lastName || '');
+            return sLastName === searchLastName;
+          });
+        }
+        
+        // Strategy 3: مطابقة جزئية للقب والاسم (مع تطبيع)
+        if (!student && searchLastName && searchFirstName) {
+          student = this.students.find(s => {
+            const sLastName = this.normalizeArabicText(s.lastName || '');
+            const sFirstName = this.normalizeArabicText(s.firstName || '');
+            // For partial match, check if normalized strings contain each other
+            return (sLastName.includes(searchLastName) || searchLastName.includes(sLastName)) &&
+                   (sFirstName.includes(searchFirstName) || searchFirstName.includes(sFirstName));
+          });
+        }
+        
+        // Strategy 4: مطابقة جزئية للقب فقط (مع تطبيع)
+        if (!student && searchLastName) {
+          student = this.students.find(s => {
+            const sLastName = this.normalizeArabicText(s.lastName || '');
+            return sLastName.includes(searchLastName) || searchLastName.includes(sLastName);
+          });
+        }
+        
+        // Strategy 5: مطابقة جزئية للاسم فقط (للأسماء المركبة مثل "أكرم عبد المنعم")
+        if (!student && searchFirstName) {
+          student = this.students.find(s => {
+            const sFirstName = this.normalizeArabicText(s.firstName || '');
+            // Check if the search name is contained in the student's name or vice versa
+            // This handles cases like "أكرم" matching "أكرم عبد المنعم"
+            if (sFirstName.includes(searchFirstName) || searchFirstName.includes(sFirstName)) {
+              // Also check last name if available
+              if (searchLastName) {
+                const sLastName = this.normalizeArabicText(s.lastName || '');
+                return sLastName.includes(searchLastName) || searchLastName.includes(sLastName);
+              }
+              return true;
+            }
+            return false;
+          });
+        }
+        
+        // Debug logging
+        if (!student) {
+          console.warn(`❌ Student not found for name: lastName="${lastName}", firstName="${firstName}" at row ${i + 1}`);
+          console.warn(`Available students (first 10):`, this.students.slice(0, 10).map(s => ({ 
+            id: s.id, 
+            lastName: s.lastName, 
+            firstName: s.firstName,
+            classId: s.classId 
+          })));
+          console.warn(`Total students in class: ${this.students.length}`);
+        } else {
+          console.log(`✓ Found student: ${student.firstName} ${student.lastName} (ID: ${student.id}) for lastName="${lastName}", firstName="${firstName}"`);
+        }
       }
 
       if (!student) {
-        console.warn(`Student not found: ${identifier}`);
+        const identifierDisplay = this.importIdentifier === 'idNumber' 
+          ? identifier 
+          : `اللقب: ${lastName}${firstName ? `, الاسم: ${firstName}` : ''}`;
+        console.warn(`Student not found: ${identifierDisplay} (row ${i + 1})`);
         failedCount++;
         continue;
       }
@@ -2081,7 +2547,10 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
             }
           },
           error: (error) => {
-            console.error(`Error importing grade for ${identifier} (${assessment.nameAr}):`, error);
+            const identifierDisplay = this.importIdentifier === 'idNumber' 
+              ? identifier 
+              : `اللقب: ${lastName}${firstName ? `, الاسم: ${firstName}` : ''}`;
+            console.error(`Error importing grade for ${identifierDisplay} (${assessment.nameAr}):`, error);
             failedCount++;
             processedCount++;
           }
@@ -2103,8 +2572,19 @@ export class GradebookComponent implements OnInit, AfterViewInit, OnDestroy {
       }
       
       if (failedCount > 0) {
-        message += `\n\nملاحظة: فشل استيراد ${failedCount} صف`;
+        message += `\n\n⚠️ ملاحظة: فشل استيراد ${failedCount} صف`;
+        message += `\n\nالأسباب المحتملة:`;
+        message += `\n- التلميذ غير موجود في القسم المحدد`;
+        message += `\n- رقم الهوية أو الاسم غير متطابق`;
+        message += `\n- البيانات في ملف Excel تبدأ من السطر رقم 9`;
+        message += `\n\nيرجى التحقق من console للمزيد من التفاصيل`;
       }
+      
+      console.log('=== Import Summary ===');
+      console.log(`Total imported: ${totalImported}`);
+      console.log(`Failed rows: ${failedCount}`);
+      console.log(`Total rows processed: ${totalRows}`);
+      console.log(`Assessment columns found: ${assessmentColumns.length}`);
       
       alert(message);
       this.closeImportModal();
