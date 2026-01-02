@@ -1712,6 +1712,21 @@
           [disabled]="importMode === 'single' && !selectedAssessment"
           class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg disabled:bg-gray-100 dark:bg-gray-800 disabled:cursor-not-allowed">
       </div>
+
+      <!-- Sheet Selection (shown when multiple sheets are available) -->
+      <div *ngIf="showSheetSelector" class="mt-4 p-4 border rounded bg-blue-50 dark:bg-gray-800">
+        <label class="block mb-2 font-bold text-gray-700 dark:text-gray-200">
+          يحتوي الملف على عدة أوراق، يرجى اختيار الورقة الصحيحة:
+        </label>
+        <select 
+          (change)="onSheetChange($any($event.target).value)" 
+          class="w-full p-2 border rounded shadow-sm focus:ring-2 focus:ring-blue-500">
+          <option value="" disabled selected>-- اختر ورقة العمل --</option>
+          <option *ngFor="let sheet of allSheets; let i = index" [value]="i">
+            {{ sheet.sheetName || sheet.name || 'ورقة ' + (i + 1) }}
+          </option>
+        </select>
+      </div>
       
       <!-- Help Text -->
       <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 rounded-lg p-3 text-xs text-blue-800">

@@ -1,5 +1,24 @@
 /* Gradebook component styles */
 
+/* Snackbar styles for import success/error messages */
+::ng-deep .success-snackbar {
+  background-color: #10b981 !important; /* green-500 */
+  color: white !important;
+}
+
+::ng-deep .success-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
+
+::ng-deep .error-snackbar {
+  background-color: #ef4444 !important; /* red-500 */
+  color: white !important;
+}
+
+::ng-deep .error-snackbar .mat-simple-snackbar-action {
+  color: white !important;
+}
+
 
 
 

@@ -388,6 +388,15 @@ export class GradesService {
             
             if (value === null || value === undefined) {
               value = '';
+            } else if (typeof value === 'number') {
+              // For large numbers (like ID numbers), try to get text representation to avoid precision loss
+              // If the number is very large, use text property if available, otherwise convert to string
+              if (value > Number.MAX_SAFE_INTEGER || (value.toString().length > 15 && cell.text)) {
+                // Use text property for large numbers to preserve precision
+                value = cell.text || value.toString();
+              } else {
+                value = value.toString();
+              }
             } else if (typeof value === 'object' && value !== null) {
               if ('text' in value) {
                 value = value.text;
@@ -398,6 +407,9 @@ export class GradesService {
               } else {
                 value = String(value);
               }
+            } else {
+              // For strings and other types, convert to string
+              value = String(value);
             }
             rowData.push(value);
           }
