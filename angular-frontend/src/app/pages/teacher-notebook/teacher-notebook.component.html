@@ -44,6 +44,104 @@
       <p>{{ translate('teacherNotebook.emptyState') }}</p>
     </div>
   </div>
+
+  <!-- To-Do List Section -->
+  <div class="todo-section">
+    <div class="todo-header">
+      <h2>{{ translate('teacherNotebook.todoListTitle') }}</h2>
+      <button class="btn add-task-btn" (click)="showTaskForm = !showTaskForm">
+        {{ showTaskForm ? translate('common.cancel') : translate('teacherNotebook.addTask') }}
+      </button>
+    </div>
+
+    <!-- Add Task Form -->
+    <div class="task-form" *ngIf="showTaskForm">
+      <div class="form-group">
+        <input
+          type="text"
+          [(ngModel)]="newTaskTitle"
+          [placeholder]="translate('teacherNotebook.taskTitlePlaceholder')"
+          class="task-input"
+          (keyup.enter)="addTask()"
+        />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <select [(ngModel)]="newTaskCategory" class="task-select">
+            <option value="">{{ translate('teacherNotebook.selectCategory') }}</option>
+            <option *ngFor="let cat of taskCategories" [value]="cat">{{ cat }}</option>
+            <option value="custom">{{ translate('teacherNotebook.customCategory') }}</option>
+          </select>
+          <input
+            *ngIf="newTaskCategory === 'custom'"
+            type="text"
+            [(ngModel)]="customCategory"
+            [placeholder]="translate('teacherNotebook.customCategoryPlaceholder')"
+            class="task-input custom-category-input"
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="date"
+            [(ngModel)]="newTaskDueDate"
+            class="task-input date-input"
+            [placeholder]="translate('teacherNotebook.dueDatePlaceholder')"
+          />
+        </div>
+      </div>
+      <div class="form-group">
+        <input
+          type="text"
+          [(ngModel)]="newTaskReminderText"
+          [placeholder]="translate('teacherNotebook.reminderTextPlaceholder')"
+          class="task-input"
+        />
+      </div>
+      <button class="btn submit-task-btn" (click)="addTask()">
+        {{ translate('teacherNotebook.addTask') }}
+      </button>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-list">
+      <div
+        *ngFor="let task of tasks"
+        class="task-item"
+        [class.completed]="task.completed"
+        [class.overdue]="isTaskOverdue(task)"
+      >
+        <div class="task-content">
+          <input
+            type="checkbox"
+            [checked]="task.completed"
+            (change)="toggleTask(task)"
+            class="task-checkbox"
+          />
+          <div class="task-details">
+            <div class="task-title-row">
+              <span class="task-title" [class.strikethrough]="task.completed">
+                {{ task.title }}
+              </span>
+              <button class="delete-task-btn" (click)="deleteTask(task.id)" title="{{ translate('common.delete') }}">
+                ×
+              </button>
+            </div>
+            <div class="task-meta" *ngIf="task.category || task.dueDate || task.reminderText">
+              <span class="task-category" *ngIf="task.category">{{ task.category }}</span>
+              <span class="task-date" *ngIf="task.dueDate" [class.overdue-date]="isTaskOverdue(task)">
+                📅 {{ formatDate(task.dueDate) }}
+              </span>
+              <span class="task-reminder" *ngIf="task.reminderText">🔔 {{ task.reminderText }}</span>
+            </div>
+            <div class="task-description" *ngIf="task.description">{{ task.description }}</div>
+          </div>
+        </div>
+      </div>
+      <div class="empty-tasks" *ngIf="!tasks.length">
+        <p>{{ translate('teacherNotebook.emptyTasks') }}</p>
+      </div>
+    </div>
+  </div>
 </div>
 
 

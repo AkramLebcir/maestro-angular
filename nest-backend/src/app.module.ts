@@ -31,6 +31,7 @@ import { ClassroomLayoutModule } from './classroom-layout/classroom-layout.modul
 import { ClubsModule } from './clubs/clubs.module';
 import { GradingSettingsModule } from './grading-settings/grading-settings.module';
 import { CouncilModule } from './council/council.module';
+import { TasksModule } from './tasks/tasks.module';
 import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ModuleAccessGuard } from './auth/guards/module-access.guard';
@@ -66,6 +67,7 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     ClubsModule,
     GradingSettingsModule,
     CouncilModule,
+    TasksModule,
     AuthModule,
     UsersModule,
   ],

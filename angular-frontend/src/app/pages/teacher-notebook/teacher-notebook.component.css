@@ -162,6 +162,232 @@
   font-size: 0.95rem;
 }
 
+/* To-Do List Styles */
+.todo-section {
+  margin-top: 2rem;
+  background: #ffffff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+  padding: 1.5rem;
+  border: 2px solid #e5e7eb;
+}
+
+.todo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.todo-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+}
+
+.add-task-btn {
+  background: #3b82f6;
+  color: #ffffff;
+  border: none;
+}
+
+.add-task-btn:hover {
+  background: #2563eb;
+}
+
+.task-form {
+  background: #f9fafb;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.task-input,
+.task-select {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 0.9rem;
+  color: #111827;
+  background: #ffffff;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.task-input:focus,
+.task-select:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.custom-category-input {
+  margin-top: 0.5rem;
+}
+
+.date-input {
+  cursor: pointer;
+}
+
+.submit-task-btn {
+  background: #10b981;
+  color: #ffffff;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.submit-task-btn:hover {
+  background: #059669;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.task-item {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  transition: all 0.15s ease;
+}
+
+.task-item:hover {
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  border-color: #d1d5db;
+}
+
+.task-item.completed {
+  background: #f9fafb;
+  opacity: 0.8;
+}
+
+.task-item.overdue {
+  border-left: 4px solid #ef4444;
+}
+
+.task-content {
+  display: flex;
+  gap: 0.875rem;
+  align-items: flex-start;
+}
+
+.task-checkbox {
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: pointer;
+  margin-top: 0.125rem;
+  accent-color: #3b82f6;
+}
+
+.task-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.task-title {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #111827;
+  flex: 1;
+  word-break: break-word;
+}
+
+.task-title.strikethrough {
+  text-decoration: line-through;
+  color: #6b7280;
+}
+
+.delete-task-btn {
+  border: none;
+  background: transparent;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  color: rgba(15, 23, 42, 0.5);
+  padding: 0.25rem;
+  transition: color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.delete-task-btn:hover {
+  color: #ef4444;
+}
+
+.task-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.task-category {
+  background: #e0e7ff;
+  color: #4338ca;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.375rem;
+  font-weight: 500;
+}
+
+.task-date {
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.task-date.overdue-date {
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.task-reminder {
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.task-description {
+  margin-top: 0.5rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.empty-tasks {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+  font-size: 0.95rem;
+}
+
 @media (max-width: 768px) {
   .page-wrapper {
     padding: 1rem;
@@ -173,6 +399,21 @@
 
   .sticky {
     width: 160px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .todo-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .task-meta {
+    flex-direction: column;
+    gap: 0.5rem;
   }
 }
 

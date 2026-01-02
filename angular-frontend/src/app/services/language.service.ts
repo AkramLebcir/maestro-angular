@@ -1186,6 +1186,123 @@ export class LanguageService {
         'DE': 'Möchten Sie alle Notizen vom Board löschen?',
         'TR': 'Tahtadaki tüm notları temizlemek istiyor musunuz?'
       },
+      'teacherNotebook.todoListTitle': {
+        'AR': 'قائمة المهام',
+        'FR': 'Liste des tâches',
+        'EN': 'To-Do List',
+        'ES': 'Lista de tareas',
+        'IT': 'Lista delle attività',
+        'DE': 'Aufgabenliste',
+        'TR': 'Yapılacaklar Listesi'
+      },
+      'teacherNotebook.addTask': {
+        'AR': 'إضافة مهمة',
+        'FR': 'Ajouter une tâche',
+        'EN': 'Add Task',
+        'ES': 'Agregar tarea',
+        'IT': 'Aggiungi attività',
+        'DE': 'Aufgabe hinzufügen',
+        'TR': 'Görev ekle'
+      },
+      'teacherNotebook.taskTitlePlaceholder': {
+        'AR': 'عنوان المهمة...',
+        'FR': 'Titre de la tâche...',
+        'EN': 'Task title...',
+        'ES': 'Título de la tarea...',
+        'IT': 'Titolo dell\'attività...',
+        'DE': 'Aufgabentitel...',
+        'TR': 'Görev başlığı...'
+      },
+      'teacherNotebook.selectCategory': {
+        'AR': 'اختر التصنيف',
+        'FR': 'Sélectionner une catégorie',
+        'EN': 'Select category',
+        'ES': 'Seleccionar categoría',
+        'IT': 'Seleziona categoria',
+        'DE': 'Kategorie auswählen',
+        'TR': 'Kategori seç'
+      },
+      'teacherNotebook.customCategory': {
+        'AR': 'تصنيف مخصص',
+        'FR': 'Catégorie personnalisée',
+        'EN': 'Custom category',
+        'ES': 'Categoría personalizada',
+        'IT': 'Categoria personalizzata',
+        'DE': 'Benutzerdefinierte Kategorie',
+        'TR': 'Özel kategori'
+      },
+      'teacherNotebook.customCategoryPlaceholder': {
+        'AR': 'أدخل التصنيف المخصص...',
+        'FR': 'Entrez la catégorie personnalisée...',
+        'EN': 'Enter custom category...',
+        'ES': 'Ingrese categoría personalizada...',
+        'IT': 'Inserisci categoria personalizzata...',
+        'DE': 'Benutzerdefinierte Kategorie eingeben...',
+        'TR': 'Özel kategori girin...'
+      },
+      'teacherNotebook.dueDatePlaceholder': {
+        'AR': 'تاريخ الاستحقاق',
+        'FR': 'Date d\'échéance',
+        'EN': 'Due date',
+        'ES': 'Fecha de vencimiento',
+        'IT': 'Data di scadenza',
+        'DE': 'Fälligkeitsdatum',
+        'TR': 'Bitiş tarihi'
+      },
+      'teacherNotebook.reminderTextPlaceholder': {
+        'AR': 'نص التنبيه (مثل: تنبيه قبل موعد "اجتماع مجلس الأقسام")',
+        'FR': 'Texte de rappel (ex: rappel avant "réunion du conseil des départements")',
+        'EN': 'Reminder text (e.g., reminder before "department council meeting")',
+        'ES': 'Texto de recordatorio (ej: recordatorio antes de "reunión del consejo de departamentos")',
+        'IT': 'Testo promemoria (es: promemoria prima di "riunione del consiglio dei dipartimenti")',
+        'DE': 'Erinnerungstext (z.B. Erinnerung vor "Abteilungsratssitzung")',
+        'TR': 'Hatırlatma metni (örn: "bölüm konseyi toplantısı" öncesi hatırlatma)'
+      },
+      'teacherNotebook.emptyTasks': {
+        'AR': 'لا توجد مهام. ابدأ بإضافة مهمة جديدة.',
+        'FR': 'Aucune tâche. Commencez par ajouter une nouvelle tâche.',
+        'EN': 'No tasks. Start by adding a new task.',
+        'ES': 'No hay tareas. Comience agregando una nueva tarea.',
+        'IT': 'Nessuna attività. Inizia aggiungendo una nuova attività.',
+        'DE': 'Keine Aufgaben. Beginnen Sie mit dem Hinzufügen einer neuen Aufgabe.',
+        'TR': 'Görev yok. Yeni bir görev ekleyerek başlayın.'
+      },
+      'teacherNotebook.taskDeleteConfirm': {
+        'AR': 'هل تريد حذف هذه المهمة؟',
+        'FR': 'Voulez-vous supprimer cette tâche?',
+        'EN': 'Do you want to delete this task?',
+        'ES': '¿Desea eliminar esta tarea?',
+        'IT': 'Vuoi eliminare questa attività?',
+        'DE': 'Möchten Sie diese Aufgabe löschen?',
+        'TR': 'Bu görevi silmek istiyor musunuz?'
+      },
+      'teacherNotebook.taskCreateError': {
+        'AR': 'حدث خطأ أثناء إنشاء المهمة',
+        'FR': 'Erreur lors de la création de la tâche',
+        'EN': 'Error creating task',
+        'ES': 'Error al crear la tarea',
+        'IT': 'Errore durante la creazione dell\'attività',
+        'DE': 'Fehler beim Erstellen der Aufgabe',
+        'TR': 'Görev oluşturulurken hata'
+      },
+      'teacherNotebook.taskUpdateError': {
+        'AR': 'حدث خطأ أثناء تحديث المهمة',
+        'FR': 'Erreur lors de la mise à jour de la tâche',
+        'EN': 'Error updating task',
+        'ES': 'Error al actualizar la tarea',
+        'IT': 'Errore durante l\'aggiornamento dell\'attività',
+        'DE': 'Fehler beim Aktualisieren der Aufgabe',
+        'TR': 'Görev güncellenirken hata'
+      },
+      'teacherNotebook.taskDeleteError': {
+        'AR': 'حدث خطأ أثناء حذف المهمة',
+        'FR': 'Erreur lors de la suppression de la tâche',
+        'EN': 'Error deleting task',
+        'ES': 'Error al eliminar la tarea',
+        'IT': 'Errore durante l\'eliminazione dell\'attività',
+        'DE': 'Fehler beim Löschen der Aufgabe',
+        'TR': 'Görev silinirken hata'
+      },
 
       // Training & Inspection
       'trainingInspection.title': {
@@ -13418,6 +13535,24 @@ export class LanguageService {
         'IT': 'Generare memo utilizzando l\'intelligenza artificiale',
         'DE': 'Memos mit künstlicher Intelligenz generieren',
         'TR': 'Yapay zeka kullanarak notlar oluştur'
+      },
+      'moduleAccess.module.teacher-notebook.name': {
+        'AR': 'مفكرة الأستاذ',
+        'FR': 'Carnet du professeur',
+        'EN': 'Teacher Notebook',
+        'ES': 'Cuaderno del profesor',
+        'IT': 'Quaderno insegnante',
+        'DE': 'Lehrernotizbuch',
+        'TR': 'Öğretmen Defteri'
+      },
+      'moduleAccess.module.teacher-notebook.description': {
+        'AR': 'مفكرة الأستاذ مع الملاحظات اللاصقة وقائمة المهام',
+        'FR': 'Carnet du professeur avec notes autocollantes et liste de tâches',
+        'EN': 'Teacher notebook with sticky notes and task list',
+        'ES': 'Cuaderno del profesor con notas adhesivas y lista de tareas',
+        'IT': 'Quaderno insegnante con note adesive e lista di attività',
+        'DE': 'Lehrernotizbuch mit Haftnotizen und Aufgabenliste',
+        'TR': 'Yapışkan notlar ve görev listesi ile öğretmen defteri'
       },
       'header.priorityUrgent': {
         'AR': 'عاجل',

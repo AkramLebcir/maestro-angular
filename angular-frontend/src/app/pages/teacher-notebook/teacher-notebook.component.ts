@@ -1,6 +1,7 @@
 import { Component, HostListener, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { LanguageService } from '../../services/language.service';
 import { AuthService } from '../../services/auth.service';
+import { ApiService } from '../../services/api.service';
 
 export type StickyColor = 'yellow' | 'pink' | 'blue' | 'green';
 
@@ -13,6 +14,18 @@ export interface StickyNote {
   z: number;
 }
 
+export interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  completed: boolean;
+  category?: string;
+  dueDate?: Date | string;
+  reminderText?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 @Component({
   standalone: false,
   selector: 'app-teacher-notebook',
@@ -22,7 +35,8 @@ export interface StickyNote {
 export class TeacherNotebookComponent implements OnInit, AfterViewInit {
   constructor(
     public languageService: LanguageService,
-    private authService: AuthService
+    private authService: AuthService,
+    private apiService: ApiService
   ) {}
   @ViewChild('board', { static: false }) boardElement!: ElementRef<HTMLDivElement>;
   notes: StickyNote[] = [];
@@ -36,8 +50,24 @@ export class TeacherNotebookComponent implements OnInit, AfterViewInit {
   private readonly STICKY_MIN_HEIGHT = 130;
   private readonly BOARD_PADDING = 20; // 1.25rem ≈ 20px
 
+  // To-Do List properties
+  tasks: Task[] = [];
+  newTaskTitle = '';
+  newTaskCategory = '';
+  customCategory = '';
+  newTaskDueDate = '';
+  newTaskReminderText = '';
+  showTaskForm = false;
+  taskCategories = [
+    'تحضير مذكرة',
+    'تصحيح أوراق',
+    'صب النقاط في الرقمية',
+    'ندوة تربوية'
+  ];
+
   ngOnInit(): void {
     this.loadFromStorage();
+    this.loadTasks();
   }
 
   ngAfterViewInit(): void {
@@ -232,6 +262,149 @@ export class TeacherNotebookComponent implements OnInit, AfterViewInit {
     if (changed) {
       this.saveToStorage();
     }
+  }
+
+  // To-Do List Methods
+  loadTasks(): void {
+    this.apiService.get<Task[]>('/tasks').subscribe({
+      next: (tasks) => {
+        this.tasks = tasks;
+      },
+      error: (error) => {
+        console.error('Error loading tasks:', error);
+        this.tasks = [];
+      }
+    });
+  }
+
+  addTask(): void {
+    if (!this.newTaskTitle.trim()) {
+      return;
+    }
+
+    const taskData: any = {
+      title: this.newTaskTitle.trim()
+    };
+
+    // completed هو optional في DTO، لذا لا نرسله إذا كان false
+    // لكن يمكن إرساله إذا أردنا
+    // taskData.completed = false;
+
+    if (this.newTaskCategory === 'custom' && this.customCategory) {
+      taskData.category = this.customCategory.trim();
+    } else if (this.newTaskCategory && this.newTaskCategory !== 'custom') {
+      taskData.category = this.newTaskCategory;
+    }
+
+    if (this.newTaskDueDate) {
+      // input type="date" يعطي تنسيق YYYY-MM-DD مباشرة
+      // لكن نتحقق من أنه صحيح
+      const dateStr = this.newTaskDueDate.trim();
+      if (dateStr) {
+        // التحقق من أن التاريخ صحيح
+        const date = new Date(dateStr);
+        if (!isNaN(date.getTime())) {
+          // استخدام تنسيق ISO date (YYYY-MM-DD) بدون الوقت
+          taskData.dueDate = date.toISOString().split('T')[0];
+        } else {
+          // إذا كان التنسيق غير صحيح، نستخدم القيمة كما هي
+          taskData.dueDate = dateStr;
+        }
+      }
+    }
+
+    if (this.newTaskReminderText && this.newTaskReminderText.trim()) {
+      taskData.reminderText = this.newTaskReminderText.trim();
+    }
+
+    console.log('Sending task data:', taskData);
+
+    this.apiService.post<Task>('/tasks', taskData).subscribe({
+      next: (task) => {
+        this.tasks.unshift(task);
+        this.resetTaskForm();
+      },
+      error: (error) => {
+        console.error('Error creating task:', error);
+        console.error('Error details:', JSON.stringify(error, null, 2));
+        
+        let errorMessage = this.translate('teacherNotebook.taskCreateError');
+        
+        // عرض رسالة الخطأ التفصيلية إن وجدت
+        if (error?.error?.message) {
+          errorMessage += '\n' + error.error.message;
+        } else if (error?.error?.error) {
+          if (Array.isArray(error.error.error)) {
+            errorMessage += '\n' + error.error.error.join('\n');
+          } else if (typeof error.error.error === 'string') {
+            errorMessage += '\n' + error.error.error;
+          }
+        } else if (error?.message) {
+          errorMessage += '\n' + error.message;
+        }
+        
+        // إضافة معلومات إضافية للتصحيح
+        if (error?.status) {
+          errorMessage += `\n(Status: ${error.status})`;
+        }
+        
+        alert(errorMessage);
+      }
+    });
+  }
+
+  toggleTask(task: Task): void {
+    const updatedTask = { ...task, completed: !task.completed };
+    this.apiService.patch<Task>(`/tasks/${task.id}`, { completed: updatedTask.completed }).subscribe({
+      next: (updated) => {
+        const index = this.tasks.findIndex(t => t.id === task.id);
+        if (index !== -1) {
+          this.tasks[index] = updated;
+        }
+      },
+      error: (error) => {
+        console.error('Error updating task:', error);
+        alert(this.translate('teacherNotebook.taskUpdateError'));
+      }
+    });
+  }
+
+  deleteTask(taskId: number): void {
+    if (confirm(this.translate('teacherNotebook.taskDeleteConfirm'))) {
+      this.apiService.delete(`/tasks/${taskId}`).subscribe({
+        next: () => {
+          this.tasks = this.tasks.filter(t => t.id !== taskId);
+        },
+        error: (error) => {
+          console.error('Error deleting task:', error);
+          alert(this.translate('teacherNotebook.taskDeleteError'));
+        }
+      });
+    }
+  }
+
+  resetTaskForm(): void {
+    this.newTaskTitle = '';
+    this.newTaskCategory = '';
+    this.customCategory = '';
+    this.newTaskDueDate = '';
+    this.newTaskReminderText = '';
+    this.showTaskForm = false;
+  }
+
+  formatDate(date: Date | string | undefined): string {
+    if (!date) return '';
+    const d = typeof date === 'string' ? new Date(date) : date;
+    return d.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  isTaskOverdue(task: Task): boolean {
+    if (!task.dueDate || task.completed) return false;
+    const dueDate = typeof task.dueDate === 'string' ? new Date(task.dueDate) : task.dueDate;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate < today;
   }
 }
 
