@@ -11,6 +11,7 @@ import { LabsModule } from './labs/labs.module';
 import { StudentsModule } from './students/students.module';
 import { TimetableModule } from './timetable/timetable.module';
 import { NotebooksModule } from './notebooks/notebooks.module';
+import { DailyJournalModule } from './daily-journal/daily-journal.module';
 import { TopicsModule } from './topics/topics.module';
 import { BehaviorEventsModule } from './behavior-events/behavior-events.module';
 import { BehaviorsModule } from './behaviors/behaviors.module';
@@ -49,6 +50,7 @@ import { ModuleAccessGuard } from './auth/guards/module-access.guard';
     StudentsModule,
     TimetableModule,
     NotebooksModule,
+    DailyJournalModule,
     TopicsModule,
     BehaviorEventsModule,
     BehaviorsModule,

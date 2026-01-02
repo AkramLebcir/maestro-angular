@@ -15,6 +15,7 @@ import { StudentsComponent } from './pages/students/students.component';
 import { TimetableComponent } from './pages/timetable/timetable.component';
 import { TopicsComponent } from './pages/topics/topics.component';
 import { NotebooksComponent } from './pages/notebooks/notebooks.component';
+import { DailyJournalComponent } from './pages/daily-journal/daily-journal.component';
 import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
@@ -60,6 +61,7 @@ import { BehaviorDictionaryComponent } from './components/behavior-dictionary/be
     TimetableComponent,
     TopicsComponent,
     NotebooksComponent,
+    DailyJournalComponent,
     AttendanceComponent,
     BehaviorComponent,
     GradebookComponent,

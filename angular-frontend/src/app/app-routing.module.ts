@@ -6,6 +6,7 @@ import { StudentsComponent } from './pages/students/students.component';
 import { TimetableComponent } from './pages/timetable/timetable.component';
 import { TopicsComponent } from './pages/topics/topics.component';
 import { NotebooksComponent } from './pages/notebooks/notebooks.component';
+import { DailyJournalComponent } from './pages/daily-journal/daily-journal.component';
 import { BehaviorComponent } from './pages/behavior/behavior.component';
 import { AttendanceComponent } from './pages/attendance/attendance.component';
 import { GradebookComponent } from './pages/gradebook/gradebook.component';
@@ -39,6 +40,7 @@ const routes: Routes = [
   { path: 'timetable', component: TimetableComponent, canActivate: [AuthGuard] },
   { path: 'topics', component: TopicsComponent, canActivate: [AuthGuard] },
   { path: 'notebooks', component: NotebooksComponent, canActivate: [AuthGuard] },
+  { path: 'daily-journal', component: DailyJournalComponent, canActivate: [AuthGuard] },
   { path: 'attendance', component: AttendanceComponent, canActivate: [AuthGuard] },
   { path: 'behavior', component: BehaviorComponent, canActivate: [AuthGuard] },
   { path: 'gradebook', component: GradebookComponent, canActivate: [AuthGuard] },

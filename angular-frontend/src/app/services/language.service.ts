@@ -243,6 +243,15 @@ export class LanguageService {
         'DE': 'Hefteverwaltung',
         'TR': 'Defter Yönetimi'
       },
+      'menu.dailyJournal': {
+        'AR': 'الكراس اليومي',
+        'FR': 'Cahier quotidien',
+        'EN': 'Daily Journal',
+        'ES': 'Diario diario',
+        'IT': 'Diario giornaliero',
+        'DE': 'Tagesjournal',
+        'TR': 'Günlük Defter'
+      },
       'menu.attendance': {
         'AR': 'الحضور',
         'FR': 'Présence',
