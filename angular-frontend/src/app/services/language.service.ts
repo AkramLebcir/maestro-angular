@@ -13257,6 +13257,24 @@ export class LanguageService {
         'DE': 'Lehrerhefte',
         'TR': 'Öğretmen defterleri'
       },
+      'moduleAccess.module.daily-journal.name': {
+        'AR': 'الكراس اليومي',
+        'FR': 'Cahier quotidien',
+        'EN': 'Daily Journal',
+        'ES': 'Diario diario',
+        'IT': 'Diario giornaliero',
+        'DE': 'Tagesjournal',
+        'TR': 'Günlük defter'
+      },
+      'moduleAccess.module.daily-journal.description': {
+        'AR': 'توثيق الدروس والواجبات اليومية',
+        'FR': 'Documenter les leçons et les devoirs quotidiens',
+        'EN': 'Document daily lessons and homework',
+        'ES': 'Documentar lecciones y tareas diarias',
+        'IT': 'Documentare lezioni e compiti quotidiani',
+        'DE': 'Tägliche Lektionen und Hausaufgaben dokumentieren',
+        'TR': 'Günlük dersleri ve ödevleri belgeleyin'
+      },
       'moduleAccess.module.topics.name': {
         'AR': 'المواضيع',
         'FR': 'Sujets',
