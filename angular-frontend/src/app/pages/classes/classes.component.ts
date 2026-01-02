@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef, Inject } from '@angular/core';
 import { ApiService } from '../../services/api.service';
 import { LanguageService } from '../../services/language.service';
+import { AuthService } from '../../services/auth.service';
 import { jsPDF } from 'jspdf';
 import html2canvas from 'html2canvas';
 import { createPage1, createPage2, createPage3, createPage4 } from './classes-pdf-export';
@@ -104,13 +105,16 @@ export class ClassesComponent implements OnInit, OnDestroy {
   showLabModal = false;
   showGroupModal = false;
   showClassReportModal = false;
+  showExamPackagingModal = false;
   editingClass: Class | null = null;
   currentClassForGroups: Class | null = null;
   currentClassForReport: Class | null = null;
+  currentClassForExamPackaging: Class | null = null;
   classReportData: any = null;
   classStudents: Student[] = [];
   selectedStudents: Set<number> = new Set();
   isExportingPDF = false;
+  isExportingExamPackagingPDF = false;
   
   // Detailed report data
   classReportStudents: any[] = [];
@@ -209,9 +213,31 @@ export class ClassesComponent implements OnInit, OnDestroy {
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
+  // Exam Packaging Report Form Data
+  examPackagingForm = {
+    academicYearStart: '',
+    academicYearEnd: '',
+    subject: '',
+    level: '',
+    branch: '',
+    className: '',
+    studentCount: 0,
+    paperCount: '',
+    procedureDate: '',
+    preparedBy: '',
+    preparedDate: '',
+    notes: ''
+  };
+
+  // School and teacher info
+  schoolName = '';
+  wilaya = '';
+  teacherName = '';
+
   constructor(
     private apiService: ApiService,
-    @Inject(LanguageService) public languageService: LanguageService
+    @Inject(LanguageService) public languageService: LanguageService,
+    private authService: AuthService
   ) {}
 
   translate(key: string, params?: { [key: string]: string }): string {
@@ -1439,6 +1465,344 @@ export class ClassesComponent implements OnInit, OnDestroy {
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
     return `${day}-${month}`;
+  }
+
+  // Exam Packaging Report Methods
+  openExamPackagingModal(classItem: Class): void {
+    this.currentClassForExamPackaging = classItem;
+    
+    // Load teacher and school info
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      const firstName = user.firstName || '';
+      const lastName = user.lastName || '';
+      this.teacherName = `${firstName} ${lastName}`.trim() || user.email || '';
+    }
+
+    // Try to get school info from localStorage (teacher card)
+    if (user) {
+      // Try with user-specific key first
+      const userSpecificKey = `teacherCard_${user.id}`;
+      let storedCard = localStorage.getItem(userSpecificKey);
+      
+      // Fallback to general key
+      if (!storedCard) {
+        storedCard = localStorage.getItem('teacherCard');
+      }
+      
+      if (storedCard) {
+        try {
+          const cardData = JSON.parse(storedCard);
+          if (cardData.schoolName) {
+            this.schoolName = cardData.schoolName;
+          }
+          if (cardData.wilayaDirectorate) {
+            this.wilaya = cardData.wilayaDirectorate;
+          } else if (cardData.wilaya) {
+            this.wilaya = cardData.wilaya;
+          }
+        } catch (e) {
+          console.error('Error parsing teacher card', e);
+        }
+      }
+    }
+
+    // Get current academic year (assuming it starts in September)
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const month = now.getMonth(); // 0-11
+    const academicYearStart = month >= 8 ? currentYear : currentYear - 1; // September = 8
+    const academicYearEnd = academicYearStart + 1;
+
+    // Initialize form with class data
+    this.examPackagingForm = {
+      academicYearStart: academicYearStart.toString(),
+      academicYearEnd: academicYearEnd.toString(),
+      subject: classItem.subject || '',
+      level: this.getLevelLabel(classItem.level),
+      branch: '', // Optional field
+      className: classItem.name || '',
+      studentCount: classItem.studentCount || 0,
+      paperCount: '',
+      procedureDate: this.formatDateForInput(now),
+      preparedBy: this.teacherName,
+      preparedDate: this.formatDateForInput(now),
+      notes: ''
+    };
+
+    this.showExamPackagingModal = true;
+  }
+
+  closeExamPackagingModal(): void {
+    this.showExamPackagingModal = false;
+    this.currentClassForExamPackaging = null;
+    this.examPackagingForm = {
+      academicYearStart: '',
+      academicYearEnd: '',
+      subject: '',
+      level: '',
+      branch: '',
+      className: '',
+      studentCount: 0,
+      paperCount: '',
+      procedureDate: '',
+      preparedBy: '',
+      preparedDate: '',
+      notes: ''
+    };
+  }
+
+  formatDateForInput(date: Date): string {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  formatDateForDisplay(dateString: string): string {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return '';
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      return `${day}/${month}/${year}`;
+    } catch (e) {
+      return '';
+    }
+  }
+
+  parseNumber(value: string | number): number {
+    if (typeof value === 'number') return value;
+    if (!value) return 0;
+    const parsed = parseInt(value.toString(), 10);
+    return isNaN(parsed) ? 0 : parsed;
+  }
+
+  isPaperCountValid(): boolean {
+    if (!this.examPackagingForm.paperCount) return true;
+    const paperCount = this.parseNumber(this.examPackagingForm.paperCount);
+    return paperCount <= this.examPackagingForm.studentCount;
+  }
+
+  async exportExamPackagingToPDF(): Promise<void> {
+    if (!this.currentClassForExamPackaging) return;
+
+    this.isExportingExamPackagingPDF = true;
+
+    try {
+      // Reload teacher card data before export
+      const user = this.authService.getCurrentUser();
+      if (user) {
+        // Try to get school info from localStorage (teacher card)
+        const userSpecificKey = `teacherCard_${user.id}`;
+        let storedCard = localStorage.getItem(userSpecificKey);
+        
+        // Fallback to general key
+        if (!storedCard) {
+          storedCard = localStorage.getItem('teacherCard');
+        }
+        
+        if (storedCard) {
+          try {
+            const cardData = JSON.parse(storedCard);
+            if (cardData.schoolName) {
+              this.schoolName = cardData.schoolName;
+            }
+            if (cardData.wilayaDirectorate) {
+              this.wilaya = cardData.wilayaDirectorate;
+            } else if (cardData.wilaya) {
+              this.wilaya = cardData.wilaya;
+            }
+          } catch (e) {
+            console.error('Error parsing teacher card', e);
+          }
+        }
+      }
+
+      // Create a temporary container for the PDF content - optimized for single page
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '0';
+      container.style.width = '210mm';
+      container.style.height = '297mm'; // Fixed height for single page
+      container.style.padding = '15mm'; // Reduced padding
+      container.style.backgroundColor = '#ffffff';
+      container.style.fontFamily = 'Arial, "Helvetica Neue", Helvetica, sans-serif';
+      container.style.direction = 'rtl';
+      container.style.textAlign = 'right';
+      container.style.boxSizing = 'border-box';
+      container.style.overflow = 'hidden'; // Prevent overflow
+      document.body.appendChild(container);
+
+      // Header - reduced margins
+      const header = document.createElement('div');
+      header.style.marginBottom = '15px';
+      header.style.textAlign = 'center';
+      header.innerHTML = `
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">الجمهورية الجزائرية الديمقراطية الشعبية</div>
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 5px;">وزارة التربية الوطنية</div>
+        <div style="font-size: 12px; margin-bottom: 3px;">مديرية التربية لولاية : ${this.wilaya || '…………………'}</div>
+        <div style="font-size: 12px; margin-bottom: 10px;">المؤسسة التعليمية : ${this.schoolName || '……………………………………'}</div>
+      `;
+      container.appendChild(header);
+
+      // Title - reduced margins
+      const title = document.createElement('div');
+      title.style.fontSize = '16px';
+      title.style.fontWeight = 'bold';
+      title.style.textAlign = 'center';
+      title.style.marginBottom = '15px';
+      title.style.textDecoration = 'underline';
+      title.textContent = 'محضر تغليف أوراق امتحان';
+      container.appendChild(title);
+
+      // Form fields - reduced line height and margins
+      const fieldsContainer = document.createElement('div');
+      fieldsContainer.style.fontSize = '12px';
+      fieldsContainer.style.lineHeight = '1.6';
+      
+      const fields = [
+        { label: 'السنة الدراسية:', value: `${this.examPackagingForm.academicYearStart} / ${this.examPackagingForm.academicYearEnd}` },
+        { label: 'المادة :', value: this.examPackagingForm.subject || '……………………………………………' },
+        { label: 'المستوى :', value: this.examPackagingForm.level || '………………………………………' },
+        { label: 'الشعبة (إن وجدت):', value: this.examPackagingForm.branch || '………………………………' },
+        { label: 'القسم :', value: this.examPackagingForm.className || '……………………………………………' },
+        { label: 'عدد تلاميذ القسم :', value: this.examPackagingForm.studentCount.toString() || '.................................' },
+        { label: 'عدد الأوراق :', value: this.examPackagingForm.paperCount || '……………………………………' },
+        { label: 'تاريخ الإجراء :', value: this.formatDateForDisplay(this.examPackagingForm.procedureDate) || '……. / ……. / ……..' }
+      ];
+
+      fields.forEach(field => {
+        const fieldDiv = document.createElement('div');
+        fieldDiv.style.marginBottom = '8px';
+        fieldDiv.style.display = 'flex';
+        fieldDiv.style.justifyContent = 'space-between';
+        fieldDiv.innerHTML = `
+          <span style="font-weight: bold;">${field.label}</span>
+          <span>${field.value}</span>
+        `;
+        fieldsContainer.appendChild(fieldDiv);
+      });
+
+      container.appendChild(fieldsContainer);
+
+      // Separator - reduced margins
+      const separator = document.createElement('div');
+      separator.style.borderTop = '1px solid #000';
+      separator.style.marginTop = '15px';
+      separator.style.marginBottom = '15px';
+      container.appendChild(separator);
+
+      // Footer text - reduced margins
+      const footerText = document.createElement('div');
+      footerText.style.fontSize = '12px';
+      footerText.style.marginBottom = '10px';
+      footerText.textContent = 'تم تصحيح أوراق هذا الامتحان وإرجاعها إلى الإدارة بعد الاطلاع عليها من طرف التلاميذ.';
+      container.appendChild(footerText);
+
+      // Prepared by and date - reduced margins
+      const preparedDiv = document.createElement('div');
+      preparedDiv.style.fontSize = '12px';
+      preparedDiv.style.marginBottom = '10px';
+      preparedDiv.innerHTML = `
+        <div style="margin-bottom: 5px;">حرر بـ : ${this.examPackagingForm.preparedBy || '………………………'}</div>
+        <div>في : ${this.formatDateForDisplay(this.examPackagingForm.preparedDate) || '……. / ……. / ……..'}</div>
+      `;
+      container.appendChild(preparedDiv);
+
+      // Notes section - reduced margins
+      if (this.examPackagingForm.notes) {
+        const notesDiv = document.createElement('div');
+        notesDiv.style.fontSize = '11px';
+        notesDiv.style.marginBottom = '10px';
+        notesDiv.style.padding = '5px';
+        notesDiv.style.border = '1px solid #ccc';
+        notesDiv.style.borderRadius = '4px';
+        notesDiv.innerHTML = `
+          <div style="font-weight: bold; margin-bottom: 3px;">ملاحظات:</div>
+          <div>${this.examPackagingForm.notes}</div>
+        `;
+        container.appendChild(notesDiv);
+      }
+
+      // Signatures - reduced margins
+      const signaturesDiv = document.createElement('div');
+      signaturesDiv.style.marginTop = '20px';
+      signaturesDiv.style.display = 'flex';
+      signaturesDiv.style.justifyContent = 'space-between';
+      signaturesDiv.innerHTML = `
+        <div style="text-align: center;">
+          <div style="font-size: 12px; font-weight: bold; margin-bottom: 30px;">إمضاء الإدارة:</div>
+          <div style="border-top: 1px solid #000; width: 120px; margin: 0 auto;"></div>
+        </div>
+        <div style="text-align: center;">
+          <div style="font-size: 12px; font-weight: bold; margin-bottom: 30px;">إمضاء الأستاذ(ة):</div>
+          <div style="border-top: 1px solid #000; width: 120px; margin: 0 auto;"></div>
+        </div>
+      `;
+      container.appendChild(signaturesDiv);
+
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Force layout recalculation
+      container.style.display = 'block';
+      container.style.visibility = 'visible';
+      container.offsetHeight; // Force reflow
+
+      // Convert to canvas
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: container.scrollWidth,
+        height: container.scrollHeight,
+        windowWidth: container.scrollWidth,
+        windowHeight: container.scrollHeight
+      });
+
+      // Remove container
+      document.body.removeChild(container);
+
+      // Create PDF - single page only
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const imgWidth = 210;
+      const pageHeight = 297;
+      const pageWidth = 210;
+      
+      // Calculate scale to fit in one page
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let finalWidth = imgWidth;
+      let finalHeight = imgHeight;
+      
+      // Scale down if content is taller than page
+      if (imgHeight > pageHeight) {
+        const scale = pageHeight / imgHeight;
+        finalHeight = pageHeight;
+        finalWidth = imgWidth * scale;
+      }
+      
+      // Center horizontally if scaled down
+      const xOffset = (pageWidth - finalWidth) / 2;
+      const yOffset = 0;
+      
+      // Add image to single page only
+      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+
+      // Save PDF
+      const fileName = `محضر_تغليف_أوراق_امتحان_${this.examPackagingForm.className}_${new Date().toISOString().split('T')[0]}.pdf`;
+      pdf.save(fileName);
+
+      this.isExportingExamPackagingPDF = false;
+    } catch (error) {
+      console.error('Error exporting exam packaging PDF:', error);
+      alert('حدث خطأ أثناء تصدير PDF');
+      this.isExportingExamPackagingPDF = false;
+    }
   }
 }
 

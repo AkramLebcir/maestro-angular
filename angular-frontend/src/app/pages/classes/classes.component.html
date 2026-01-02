@@ -88,6 +88,14 @@
             <td class="py-3 px-4 text-center">
               <div class="flex items-center justify-center gap-2">
                 <button 
+                  (click)="openExamPackagingModal(classItem)"
+                  class="p-2 text-orange-600 hover:bg-orange-50 dark:bg-orange-900/20 rounded transition"
+                  title="طباعة محضر تغليف أوراق امتحان">
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                  </svg>
+                </button>
+                <button 
                   (click)="openClassReportModal(classItem)"
                   class="p-2 text-green-600 hover:bg-green-50 dark:bg-green-900/20 rounded transition"
                   [title]="translate('classes.exportReport')">
@@ -764,6 +772,209 @@
     <!-- Loading Message -->
     <div class="p-6 text-center text-gray-500 dark:text-gray-400" *ngIf="!classReportData">
       <p>{{ translate('classes.loadingReport') }}</p>
+    </div>
+  </div>
+</div>
+
+<!-- Exam Packaging Report Modal -->
+<div 
+  *ngIf="showExamPackagingModal && currentClassForExamPackaging"
+  class="fixed inset-0 bg-black bg-opacity-50 dark:bg-black dark:bg-opacity-75 flex items-center justify-center z-50 overflow-y-auto p-4"
+  (click)="closeExamPackagingModal()">
+  <div 
+    class="bg-white dark:bg-gray-800 rounded-lg shadow-xl dark:shadow-gray-900/50 w-full max-w-3xl my-8"
+    (click)="$event.stopPropagation()">
+    <!-- Header -->
+    <div class="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-6 flex justify-between items-start z-10">
+      <div class="flex-1">
+        <h2 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">محضر تغليف أوراق امتحان</h2>
+        <p class="text-gray-600 dark:text-gray-400" *ngIf="currentClassForExamPackaging">
+          <strong>القسم:</strong> {{ currentClassForExamPackaging.name }} - {{ currentClassForExamPackaging.subject }}
+        </p>
+      </div>
+      <button 
+        (click)="closeExamPackagingModal()"
+        class="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:text-gray-300">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <!-- Form Content -->
+    <div class="p-6">
+      <form #examPackagingFormRef="ngForm" class="space-y-4">
+        <!-- Academic Year -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">السنة الدراسية (بداية)</label>
+            <input 
+              type="text"
+              [(ngModel)]="examPackagingForm.academicYearStart"
+              name="academicYearStart"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="مثال: 2024">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">السنة الدراسية (نهاية)</label>
+            <input 
+              type="text"
+              [(ngModel)]="examPackagingForm.academicYearEnd"
+              name="academicYearEnd"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="مثال: 2025">
+          </div>
+        </div>
+
+        <!-- Subject -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">المادة</label>
+          <input 
+            type="text"
+            [(ngModel)]="examPackagingForm.subject"
+            name="subject"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="المادة">
+        </div>
+
+        <!-- Level and Branch -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">المستوى</label>
+            <input 
+              type="text"
+              [(ngModel)]="examPackagingForm.level"
+              name="level"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="المستوى">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">الشعبة (إن وجدت)</label>
+            <input 
+              type="text"
+              [(ngModel)]="examPackagingForm.branch"
+              name="branch"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="الشعبة">
+          </div>
+        </div>
+
+        <!-- Class Name -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">القسم</label>
+          <input 
+            type="text"
+            [(ngModel)]="examPackagingForm.className"
+            name="className"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="اسم القسم">
+        </div>
+
+        <!-- Student Count and Paper Count -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عدد تلاميذ القسم</label>
+            <input 
+              type="number"
+              [(ngModel)]="examPackagingForm.studentCount"
+              name="studentCount"
+              required
+              min="0"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="عدد التلاميذ">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">عدد الأوراق</label>
+            <input 
+              type="number"
+              [(ngModel)]="examPackagingForm.paperCount"
+              name="paperCount"
+              required
+              [max]="examPackagingForm.studentCount"
+              min="0"
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              [class.border-red-500]="!isPaperCountValid()"
+              placeholder="عدد الأوراق">
+            <p *ngIf="!isPaperCountValid()" class="text-red-500 text-xs mt-1">
+              عدد الأوراق يجب أن يكون أقل من أو يساوي عدد التلاميذ ({{ examPackagingForm.studentCount }})
+            </p>
+          </div>
+        </div>
+
+        <!-- Procedure Date -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تاريخ الإجراء</label>
+          <input 
+            type="date"
+            [(ngModel)]="examPackagingForm.procedureDate"
+            name="procedureDate"
+            required
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+        </div>
+
+        <!-- Prepared By and Date -->
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">حرر بـ</label>
+            <input 
+              type="text"
+              [(ngModel)]="examPackagingForm.preparedBy"
+              name="preparedBy"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="اسم الأستاذ">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">تاريخ الإعداد</label>
+            <input 
+              type="date"
+              [(ngModel)]="examPackagingForm.preparedDate"
+              name="preparedDate"
+              required
+              class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+          </div>
+        </div>
+
+        <!-- Notes -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">ملاحظات</label>
+          <textarea 
+            [(ngModel)]="examPackagingForm.notes"
+            name="notes"
+            rows="4"
+            class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="أي ملاحظات إضافية..."></textarea>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex gap-3 pt-4">
+          <button 
+            type="button"
+            (click)="exportExamPackagingToPDF()"
+            [disabled]="!examPackagingFormRef.valid || isExportingExamPackagingPDF || !isPaperCountValid()"
+            class="flex-1 bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+            <svg *ngIf="!isExportingExamPackagingPDF" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <svg *ngIf="isExportingExamPackagingPDF" class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>{{ isExportingExamPackagingPDF ? 'جاري التصدير...' : 'تصدير PDF' }}</span>
+          </button>
+          <button 
+            type="button"
+            (click)="closeExamPackagingModal()"
+            class="flex-1 bg-gray-200 text-gray-700 dark:text-gray-300 py-2 rounded-lg hover:bg-gray-300 transition">
+            {{ translate('common.cancel') }}
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </div>
