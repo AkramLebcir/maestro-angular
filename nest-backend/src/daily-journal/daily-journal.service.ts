@@ -7,6 +7,7 @@ import { Topic } from '../topics/topic.entity';
 import { CreateDailyJournalEntryDto } from './dto/create-daily-journal-entry.dto';
 import { UpdateDailyJournalEntryDto } from './dto/update-daily-journal-entry.dto';
 import { DailyJournalEntryResponseDto } from './dto/daily-journal-entry-response.dto';
+import { UserRole } from '../users/entities/user.entity';
 
 @Injectable()
 export class DailyJournalService {
@@ -53,9 +54,12 @@ export class DailyJournalService {
     return this.findOne(ownerId, savedEntry.id);
   }
 
-  async findAll(ownerId: number): Promise<DailyJournalEntryResponseDto[]> {
+  async findAll(ownerId: number, userRole?: UserRole): Promise<DailyJournalEntryResponseDto[]> {
+    // Admins can see all entries, teachers only see their own
+    const whereCondition = userRole === UserRole.ADMIN ? {} : { ownerId };
+    
     const entries = await this.journalEntryRepository.find({
-      where: { ownerId },
+      where: whereCondition,
       relations: ['class', 'topic'],
       order: { date: 'DESC', startTime: 'ASC' },
     });

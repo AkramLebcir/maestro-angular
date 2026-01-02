@@ -46,6 +46,7 @@ export class ModuleAccessGuard implements CanActivate {
         'grades': 'الدرجات',
         'topics': 'المواضيع',
         'notebooks': 'الدفاتر',
+        'daily-journal': 'الكراس اليومي',
         'teacher-notebook': 'مفكرة الأستاذ',
         'behavior-events': 'أحداث السلوك',
         'certificate-generator': 'الشهادات',

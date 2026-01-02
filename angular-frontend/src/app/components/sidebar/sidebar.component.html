@@ -2,7 +2,7 @@
   <nav class="space-y-2 overflow-y-auto flex-1">
     <ng-container *ngFor="let item of menuItems; let i = index">
       <a
-        *ngIf="!item.adminOnly || isAdmin"
+        *ngIf="(!item.adminOnly || isAdmin) && (!item.moduleAccess || hasModuleAccess(item.moduleAccess))"
         (click)="navigate(item.route); setActive(i)"
         [class]="item.active
           ? 'flex items-center gap-3 p-3 rounded-lg bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 cursor-pointer'

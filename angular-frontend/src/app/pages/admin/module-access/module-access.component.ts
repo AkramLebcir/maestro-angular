@@ -33,6 +33,7 @@ export class ModuleAccessComponent implements OnInit {
     { key: 'attendance', name: 'الحضور والغياب', description: 'تسجيل حضور الطلاب' },
     { key: 'grades', name: 'الدرجات', description: 'تسجيل وتتبع درجات الطلاب' },
     { key: 'notebooks', name: 'المذكرات', description: 'مذكرات الأستاذ' },
+    { key: 'daily-journal', name: 'الكراس اليومي', description: 'توثيق الدروس والواجبات اليومية' },
     { key: 'teacher-notebook', name: 'مفكرة الأستاذ', description: 'مفكرة الأستاذ مع الملاحظات اللاصقة وقائمة المهام' },
     { key: 'topics', name: 'المواضيع', description: 'إدارة مواضيع الدروس' },
     { key: 'timetable', name: 'جدول الأوقات', description: 'تنظيم الجدول الدراسي' },

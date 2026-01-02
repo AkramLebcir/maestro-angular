@@ -19,6 +19,7 @@ export class ReportsComponent {
   isExportingCertificates = false;
   isExportingPenalties = false;
   isExportingExamPackagingPDF = false;
+  isExportingDailyJournal = false;
   showExamPackagingModal = false;
   classesForExamPackaging: any[] = [];
   selectedClassForExamPackaging: number | null = null;
@@ -1614,6 +1615,179 @@ export class ReportsComponent {
       alert('حدث خطأ أثناء تصدير PDF');
       this.isExportingExamPackagingPDF = false;
     }
+  }
+
+  async exportDailyJournalToPDF(): Promise<void> {
+    if (this.isExportingDailyJournal) {
+      return;
+    }
+
+    this.isExportingDailyJournal = true;
+
+    try {
+      // Load all daily journal entries
+      const entries = await firstValueFrom(this.apiService.get<any[]>('/daily-journal'));
+      
+      if (!entries || entries.length === 0) {
+        alert('لا توجد مدخلات في الكراس اليومي للتصدير');
+        this.isExportingDailyJournal = false;
+        return;
+      }
+
+      // Sort entries by date and time
+      const sortedEntries = entries.sort((a, b) => {
+        const dateCompare = a.date.localeCompare(b.date);
+        if (dateCompare !== 0) return dateCompare;
+        const timeA = this.timeToMinutes(a.startTime);
+        const timeB = this.timeToMinutes(b.startTime);
+        return timeA - timeB;
+      });
+
+      // Create export container
+      const exportContainer = document.createElement('div');
+      exportContainer.style.position = 'absolute';
+      exportContainer.style.left = '-9999px';
+      exportContainer.style.top = '0';
+      exportContainer.style.width = '210mm';
+      exportContainer.style.backgroundColor = '#ffffff';
+      exportContainer.style.padding = '20px';
+      exportContainer.style.fontFamily = 'Arial, sans-serif';
+      exportContainer.style.direction = 'rtl';
+      exportContainer.style.textAlign = 'right';
+      document.body.appendChild(exportContainer);
+
+      // Add title
+      const title = document.createElement('h1');
+      title.textContent = 'تقرير الكراس اليومي';
+      title.style.textAlign = 'center';
+      title.style.fontSize = '24px';
+      title.style.fontWeight = 'bold';
+      title.style.marginBottom = '10px';
+      title.style.color = '#111827';
+      exportContainer.appendChild(title);
+
+      // Add date
+      const dateInfo = document.createElement('p');
+      dateInfo.textContent = `تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG', { numberingSystem: 'latn' })}`;
+      dateInfo.style.textAlign = 'center';
+      dateInfo.style.fontSize = '12px';
+      dateInfo.style.color = '#6b7280';
+      dateInfo.style.marginBottom = '20px';
+      exportContainer.appendChild(dateInfo);
+
+      // Create table
+      const table = document.createElement('table');
+      table.style.width = '100%';
+      table.style.borderCollapse = 'collapse';
+      table.style.fontSize = '10px';
+      table.style.marginBottom = '20px';
+      table.style.border = '1px solid #d1d5db';
+
+      // Table header
+      const thead = document.createElement('thead');
+      const headerRow = document.createElement('tr');
+      headerRow.style.backgroundColor = '#f3f4f6';
+      
+      const headers = ['الملاحظات', 'الواجبات', 'النشاط', 'العنوان الفرعي', 'موضوع الدرس', 'القسم', 'التوقيت', 'التاريخ'];
+      
+      headers.forEach(headerText => {
+        const th = document.createElement('th');
+        th.textContent = headerText;
+        th.style.padding = '8px';
+        th.style.border = '1px solid #d1d5db';
+        th.style.textAlign = 'right';
+        th.style.fontWeight = 'bold';
+        headerRow.appendChild(th);
+      });
+      thead.appendChild(headerRow);
+      table.appendChild(thead);
+
+      // Table body
+      const tbody = document.createElement('tbody');
+      sortedEntries.forEach(entry => {
+        const row = document.createElement('tr');
+        
+        const date = new Date(entry.date).toLocaleDateString('ar-EG', { numberingSystem: 'latn' });
+        const timeRange = `من ${entry.startTime} إلى ${entry.endTime}`;
+        const className = entry.class?.name || '-';
+        const topicTitle = entry.topic?.title || '-';
+        const subtitle = entry.subtitle || '-';
+        const activity = entry.activity || '-';
+        const homework = entry.homework || '-';
+        const notes = entry.notes || '-';
+        
+        const cells = [notes, homework, activity, subtitle, topicTitle, className, timeRange, date];
+        
+        cells.forEach((cellText) => {
+          const td = document.createElement('td');
+          td.textContent = cellText;
+          td.style.padding = '6px';
+          td.style.border = '1px solid #d1d5db';
+          td.style.textAlign = 'right';
+          td.style.wordWrap = 'break-word';
+          td.style.maxWidth = '150px';
+          row.appendChild(td);
+        });
+        
+        tbody.appendChild(row);
+      });
+      table.appendChild(tbody);
+      exportContainer.appendChild(table);
+
+      // Use html2canvas to capture the content
+      const canvas = await html2canvas(exportContainer, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        width: exportContainer.offsetWidth,
+        height: exportContainer.offsetHeight
+      });
+
+      // Clean up
+      document.body.removeChild(exportContainer);
+
+      // Calculate PDF dimensions
+      const imgWidth = 210; // A4 width in mm
+      const pageHeight = 297; // A4 height in mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      let heightLeft = imgHeight;
+
+      const doc = new jsPDF('p', 'mm', 'a4');
+      let position = 0;
+
+      // Add first page
+      doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+
+      // Add additional pages if needed
+      while (heightLeft > 0) {
+        position = heightLeft - imgHeight;
+        doc.addPage();
+        doc.addImage(canvas.toDataURL('image/png'), 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+
+      // Save PDF
+      const fileName = `تقرير_الكراس_اليومي_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+
+      this.isExportingDailyJournal = false;
+    } catch (error) {
+      console.error('Error exporting daily journal PDF:', error);
+      alert('حدث خطأ أثناء تصدير الكراس اليومي');
+      this.isExportingDailyJournal = false;
+    }
+  }
+
+  private timeToMinutes(time: string): number {
+    if (!time || typeof time !== 'string') {
+      return 0;
+    }
+    const parts = time.split(':');
+    const hours = parseInt(parts[0] || '0', 10);
+    const minutes = parseInt(parts[1] || '0', 10);
+    return hours * 60 + minutes;
   }
 }
 

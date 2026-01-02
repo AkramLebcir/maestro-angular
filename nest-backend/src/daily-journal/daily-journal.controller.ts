@@ -17,9 +17,10 @@ import { DailyJournalEntryResponseDto } from './dto/daily-journal-entry-response
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { AuthUser } from '../auth/interfaces/auth-user.interface';
 import { ModuleAccess } from '../auth/decorators/module-access.decorator';
+import { UserRole } from '../users/entities/user.entity';
 
 @Controller('daily-journal')
-@ModuleAccess('notebooks')
+@ModuleAccess('daily-journal')
 export class DailyJournalController {
   constructor(private readonly dailyJournalService: DailyJournalService) {}
 
@@ -34,7 +35,7 @@ export class DailyJournalController {
 
   @Get()
   async findAll(@CurrentUser() user: AuthUser): Promise<DailyJournalEntryResponseDto[]> {
-    return this.dailyJournalService.findAll(user.id);
+    return this.dailyJournalService.findAll(user.id, user.role);
   }
 
   @Get(':id')

@@ -19,6 +19,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     icon: string; 
     active: boolean;
     adminOnly?: boolean;
+    moduleAccess?: string;
   }> = [
     { 
       labelKey: 'menu.dashboard',
@@ -78,7 +79,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
       labelKey: 'menu.dailyJournal',
       route: '/daily-journal', 
       icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01',
-      active: false
+      active: false,
+      moduleAccess: 'daily-journal'
     },
     { 
       labelKey: 'menu.attendance',
@@ -201,6 +203,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   translate(key: string): string {
     return this.languageService.translate(key);
+  }
+
+  hasModuleAccess(module: string): boolean {
+    return this.authService.hasModuleAccess(module);
   }
 
   navigate(route: string): void {
